@@ -34,3 +34,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+/dist/
+.vinext/
+.cloudflare/
+
+# Preview/check helpers (not part of the application)
+.codex-vinext-preview-check.cjs

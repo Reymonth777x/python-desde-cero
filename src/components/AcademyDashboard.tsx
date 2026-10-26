@@ -1,0 +1,247 @@
+import Link from 'next/link';
+import { ArrowRight, BookOpenCheck, Circle, Lock, LogOut } from 'lucide-react';
+import { logout } from '@/app/login/actions';
+import { courseModules } from '@/lib/course';
+
+export type ProgressRow = {
+  module_id: string;
+  lesson_id: string;
+  is_completed: boolean;
+  best_score: number | null;
+};
+
+type Props = {
+  displayName: string;
+  progressRows: ProgressRow[];
+  progressUnavailable: boolean;
+};
+
+/** Returns true if the module at moduleIndex is accessible given the progress rows. */
+function isModuleUnlocked(moduleIndex: number, progressRows: ProgressRow[]): boolean {
+  if (moduleIndex === 0) return true;
+  const prevModule = courseModules[moduleIndex - 1];
+  const assessment = prevModule?.lessons.find((l) => l.assessment);
+  if (!assessment) return true; // no gate lesson — allow access
+  return progressRows.some(
+    (row) =>
+      row.module_id === prevModule.id &&
+      row.lesson_id === assessment.id &&
+      row.is_completed,
+  );
+}
+
+export default function AcademyDashboard({
+  displayName,
+  progressRows,
+  progressUnavailable,
+}: Props) {
+  const completed = (moduleId: string, lessonId: string) =>
+    progressRows.some(
+      (row) =>
+        row.module_id === moduleId &&
+        row.lesson_id === lessonId &&
+        row.is_completed,
+    );
+
+  const completedCount = courseModules.reduce(
+    (total, courseModule) =>
+      total +
+      courseModule.lessons.filter((lesson) => completed(courseModule.id, lesson.id))
+        .length,
+    0,
+  );
+  const lessonCount = courseModules.reduce(
+    (total, courseModule) => total + courseModule.lessons.length,
+    0,
+  );
+
+  // Find the next lesson the user has not yet completed, within an unlocked module
+  const nextLesson = courseModules
+    .flatMap((courseModule, moduleIndex) => {
+      if (!progressUnavailable && !isModuleUnlocked(moduleIndex, progressRows)) return [];
+      return courseModule.lessons.map((lesson) => ({ courseModule, lesson }));
+    })
+    .find(({ courseModule, lesson }) => !completed(courseModule.id, lesson.id));
+
+  const completionPercent = lessonCount > 0
+    ? Math.round((completedCount / lessonCount) * 100)
+    : 0;
+
+  const hasProgress = completedCount > 0;
+  const ctaLabel = progressUnavailable
+    ? 'Abrir primera lección'
+    : hasProgress
+      ? 'Continuar aprendiendo'
+      : 'Comenzar a aprender';
+
+  const ctaHref = nextLesson
+    ? `/academia/${nextLesson.courseModule.id}/${nextLesson.lesson.id}`
+    : '/academia/module-1/lesson-1';
+
+  return (
+    <main className="min-h-screen bg-[#f4f2e9] text-[#252b25]">
+      <header className="border-b border-[#d3d3c7]">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8">
+          <Link href="/" className="inline-flex min-h-11 items-center font-serif text-lg font-semibold text-[#294936]">
+            Python desde cero
+          </Link>
+          <nav aria-label="Navegación de la academia" className="flex flex-wrap items-center gap-4 text-sm">
+            <Link href="/practica" className="inline-flex min-h-11 items-center text-[#294936] underline underline-offset-4">
+              Laboratorio
+            </Link>
+            <form action={logout}>
+              <button type="submit" className="inline-flex min-h-11 items-center gap-2 text-[#596259] underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#294936]">
+                <LogOut aria-hidden="true" size={16} />
+                Cerrar sesión
+              </button>
+            </form>
+          </nav>
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-6xl px-5 py-10 sm:px-8 sm:py-14">
+        {/* Hero / next action */}
+        <div className="flex flex-col gap-6 border-b border-[#d3d3c7] pb-8 sm:flex-row sm:items-end sm:justify-between">
+          <div className="max-w-2xl">
+            <p className="text-xs font-bold tracking-[0.16em] text-[#294936]">
+              TU RUTA DE APRENDIZAJE
+            </p>
+            <h1 className="mt-3 font-serif text-4xl leading-tight sm:text-5xl">
+              {displayName ? `Hola, ${displayName}.` : 'Python desde cero'}
+            </h1>
+            <p className="mt-4 leading-7 text-[#596259]">
+              Estudia conceptos, practica con ejemplos y comprueba lo aprendido módulo a módulo.
+            </p>
+          </div>
+
+          <Link
+            href={ctaHref}
+            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 bg-[#294936] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#203d31] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936]"
+          >
+            {ctaLabel}
+            <ArrowRight aria-hidden="true" size={17} />
+          </Link>
+        </div>
+
+        {/* Progress summary */}
+        {progressUnavailable ? (
+          <p role="alert" className="mt-6 border-l-4 border-[#a04435] bg-white px-4 py-3 text-sm leading-6 text-[#7f3027]">
+            No se pudo consultar el progreso guardado. Puedes estudiar; la aplicación mostrará un error si no logra guardar una evaluación.
+          </p>
+        ) : (
+          <section aria-label="Progreso general" className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+            <BookOpenCheck aria-hidden="true" className="text-[#294936]" size={18} />
+            <span className="font-semibold">{completedCount} de {lessonCount} actividades completadas</span>
+            <span className="text-[#596259]">({completionPercent}%)</span>
+            <div className="h-2 w-full bg-[#ebe9df] sm:max-w-sm" role="progressbar" aria-label="Porcentaje completado" aria-valuemin={0} aria-valuemax={100} aria-valuenow={completionPercent}>
+              <div className="h-full bg-[#294936] transition-[width]" style={{ width: `${completionPercent}%` }} />
+            </div>
+          </section>
+        )}
+
+        {/* Module list */}
+        <div className="mt-10 space-y-10">
+          {courseModules.map((courseModule, moduleIndex) => {
+            const unlocked = progressUnavailable || isModuleUnlocked(moduleIndex, progressRows);
+            const moduleCompleted = courseModule.lessons.filter((lesson) =>
+              completed(courseModule.id, lesson.id),
+            ).length;
+            const percentage = Math.round(
+              (moduleCompleted / courseModule.lessons.length) * 100,
+            );
+            const prevModule = courseModules[moduleIndex - 1];
+            const prevAssessment = prevModule?.lessons.find((l) => l.assessment);
+
+            return (
+              <section key={courseModule.id} aria-labelledby={`${courseModule.id}-title`}>
+                <div className="flex flex-col gap-2 border-b border-[#d3d3c7] pb-4 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <p className={`text-xs font-bold tracking-[0.14em] ${unlocked ? 'text-[#294936]' : 'text-[#8a9087]'}`}>
+                      MÓDULO {courseModule.number}
+                      {!unlocked && (
+                        <span className="ml-2 inline-flex items-center gap-1">
+                          <Lock aria-hidden="true" size={12} />
+                          BLOQUEADO
+                        </span>
+                      )}
+                    </p>
+                    <h2 id={`${courseModule.id}-title`} className={`mt-2 font-serif text-2xl sm:text-3xl ${unlocked ? '' : 'text-[#8a9087]'}`}>
+                      {courseModule.title}
+                    </h2>
+                    <p className="mt-2 max-w-3xl text-sm leading-6 text-[#596259]">
+                      {unlocked
+                        ? courseModule.summary
+                        : prevAssessment
+                          ? `Completa la evaluación del módulo ${prevModule.number} para desbloquear este módulo.`
+                          : `Completa el módulo anterior para desbloquear este módulo.`}
+                    </p>
+                  </div>
+                  {unlocked && !progressUnavailable && (
+                    <p className="shrink-0 text-sm text-[#596259]" aria-live="polite">
+                      {moduleCompleted}/{courseModule.lessons.length} completadas · {percentage}%
+                    </p>
+                  )}
+                </div>
+
+                <ol className="divide-y divide-[#d3d3c7]">
+                  {courseModule.lessons.map((lesson) => {
+                    const isCompleted = completed(courseModule.id, lesson.id);
+
+                    if (!unlocked) {
+                      // Show lessons as locked, no links
+                      return (
+                        <li key={`${courseModule.id}-${lesson.id}`}>
+                          <div className="flex min-h-16 items-center justify-between gap-4 py-4 opacity-50">
+                            <span className="flex min-w-0 items-start gap-3">
+                              <Lock aria-label="Bloqueada" className="mt-0.5 shrink-0 text-[#8a9087]" size={18} />
+                              <span className="min-w-0">
+                                <span className="block text-xs font-semibold text-[#596259]">{lesson.section}{lesson.assessment ? ' · EVALUACIÓN' : ''}</span>
+                                <span className="mt-1 block font-medium text-[#252b25]">{lesson.title}</span>
+                              </span>
+                            </span>
+                          </div>
+                        </li>
+                      );
+                    }
+
+                    return (
+                      <li key={`${courseModule.id}-${lesson.id}`}>
+                        <Link
+                          href={`/academia/${courseModule.id}/${lesson.id}`}
+                          className="group flex min-h-16 items-center justify-between gap-4 py-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936]"
+                        >
+                          <span className="flex min-w-0 items-start gap-3">
+                            {!progressUnavailable && isCompleted ? (
+                              <BookOpenCheck aria-label="Completada" className="mt-0.5 shrink-0 text-[#294936]" size={18} />
+                            ) : (
+                              <Circle aria-label={progressUnavailable ? 'Estado no disponible' : 'Pendiente'} className="mt-0.5 shrink-0 text-[#8a9087]" size={18} />
+                            )}
+                            <span className="min-w-0">
+                              <span className="block text-xs font-semibold text-[#596259]">{lesson.section}{lesson.assessment ? ' · EVALUACIÓN' : ''}</span>
+                              <span className="mt-1 block font-medium text-[#252b25] group-hover:text-[#294936]">{lesson.title}</span>
+                            </span>
+                          </span>
+                          <ArrowRight aria-hidden="true" className="shrink-0 text-[#596259] transition-transform group-hover:translate-x-1" size={17} />
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </section>
+            );
+          })}
+        </div>
+
+        <aside className="mt-12 border-l-2 border-[#b7a77d] bg-[#ebe9df] p-5 sm:p-6">
+          <h2 className="font-serif text-xl">Practica el código en el laboratorio</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[#596259]">
+            El editor ejecuta Python en tu navegador. Las evaluaciones guardan el resultado solo después de comprobar tus respuestas.
+          </p>
+          <Link href="/practica" className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-[#294936] underline underline-offset-4">
+            Abrir el laboratorio
+          </Link>
+        </aside>
+      </div>
+    </main>
+  );
+}
