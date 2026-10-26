@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 
@@ -13,8 +13,21 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 const THEME_KEY = 'python-desde-cero-theme';
 
+function leerTemaGuardado(): ThemeName {
+  if (typeof window === 'undefined') return 'original';
+  try {
+    const guardado = localStorage.getItem(THEME_KEY);
+    if (guardado === 'original' || guardado === 'dark' || guardado === 'hacker' || guardado === 'dracula' || guardado === 'cyberpunk') {
+      return guardado;
+    }
+  } catch {
+    // Ignorar errores de localStorage
+  }
+  return 'original';
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeName>('original');
+  const [theme, setThemeState] = useState<ThemeName>(leerTemaGuardado);
 
   const setTheme = useCallback((next: ThemeName) => {
     setThemeState(next);

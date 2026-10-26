@@ -1,0 +1,9 @@
+{
+  "css.lint.unknownAtRules": {
+    "@tailwind": "ignore",
+    "@apply": "ignore",
+    "@variants": "ignore",
+    "@screen": "ignore"
+  },
+  "css.lint.validProperties": ["content"]
+}
