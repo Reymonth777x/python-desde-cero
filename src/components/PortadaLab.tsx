@@ -62,7 +62,7 @@ export default function PortadaLab({
       }
       setIsRunning(false);
       if (event.data.status === 'success') {
-        setOutput(event.data.output || 'EjecuciÃ³n completada sin salida.');
+        setOutput(event.data.output || 'Ejecución completada sin salida.');
       } else {
         setOutput('Error: ' + (event.data.error ?? 'Error desconocido'));
       }
@@ -99,7 +99,7 @@ export default function PortadaLab({
       if (event.data.id !== requestId) return;
       setIsRunning(false);
       if (event.data.status === 'success') {
-        setOutput(event.data.output || 'EjecuciÃ³n completada sin salida.');
+        setOutput(event.data.output || 'Ejecución completada sin salida.');
       } else {
         setOutput('Error: ' + (event.data.error ?? 'Error desconocido'));
       }
@@ -134,7 +134,7 @@ export default function PortadaLab({
             value={code}
             onChange={(e) => setCode(e.target.value)}
             spellCheck={false}
-            placeholder="Escribe tu cÃ³digo Python aquÃ­..."
+            placeholder="Escribe tu código Python aquí..."
           />
           <div className="absolute bottom-0 left-0 right-0 px-3 py-2 bg-[#f4f2e9] border-t border-[#d3d3c7] flex items-center justify-between">
             <button
@@ -168,11 +168,11 @@ export default function PortadaLab({
               className="h-full w-full overflow-auto p-4 whitespace-pre-wrap break-words border-0 bg-transparent font-mono text-sm leading-6 text-[#252b25]"
               aria-live="polite"
             >
-              {output || (workerState === 'ready' ? '> Escribe cÃ³digo y pulsa Ejecutar.' : '> Preparando entorno Python...')}
+              {output || (workerState === 'ready' ? '> Escribe código y pulsa Ejecutar.' : '> Preparando entorno Python...')}
             </pre>
             {turtleCommands.length > 0 && (
               <div className="absolute bottom-4 right-4 w-[140px] bg-[#ebe9df] border border-[#d3d3c7] rounded p-2 shadow-sm">
-                <p className="text-[10px] font-semibold text-[#294936] mb-1">Salida grÃ¡fica (Turtle)</p>
+                <p className="text-[10px] font-semibold text-[#294936] mb-1">Salida gráfica (Turtle)</p>
                 <div className="w-full h-[120px] border border-[#d3d3c7] bg-[#f4f2e9] relative">
                   <svg
                     className="w-full h-full"
