@@ -1,14 +1,7 @@
-﻿'use client';
+'use client';
 
-import { useRef, useState } from 'react';
-
-type WorkerResponse = {
-  id?: number;
-  status: 'ready' | 'init-error' | 'success' | 'error';
-  output?: string;
-  error?: string;
-  turtle_commands?: unknown;
-};
+import { useState, useCallback } from 'react';
+import { usePythonWorker } from '@/lib/use-python-worker';
 
 type TurtleCommand = {
   type: 'line' | 'fill' | 'dot' | 'write' | 'bgcolor';
@@ -30,85 +23,25 @@ export default function PortadaLab({
   defaultCode: string;
 }) {
   const [code, setCode] = useState(defaultCode);
-  const [output, setOutput] = useState('');
-  const [isRunning, setIsRunning] = useState(false);
-  const [workerState, setWorkerState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
-  const [turtleCommands, setTurtleCommands] = useState<TurtleCommand[]>([]);
 
-  const workerRef = useRef<Worker | null>(null);
-  const requestIdRef = useRef(0);
+  const {
+    workerState,
+    output,
+    turtleCommands,
+    isRunning,
+    createWorker,
+    runCode: runWorkerCode,
+  } = usePythonWorker();
 
-  const createWorker = () => {
-    if (workerRef.current) return workerRef.current;
-    setWorkerState('loading');
-    let worker: Worker;
-    try {
-      worker = new Worker('/python-worker.js');
-    } catch {
-      setWorkerState('error');
-      setOutput('No se pudo iniciar el ejecutor');
-      return null;
-    }
-    worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
-      if (event.data.status === 'ready') {
-        setWorkerState('ready');
-        return;
-      }
-      if (event.data.status === 'init-error') {
-        setWorkerState('error');
-        setOutput('No se pudo cargar Pyodide');
-        worker.terminate();
-        return;
-      }
-      setIsRunning(false);
-      if (event.data.status === 'success') {
-        setOutput(event.data.output || 'Ejecución completada sin salida.');
-      } else {
-        setOutput('Error: ' + (event.data.error ?? 'Error desconocido'));
-      }
-      const turtleCmds = event.data.turtle_commands;
-      if (Array.isArray(turtleCmds) && turtleCmds.length > 0) {
-        setTurtleCommands(turtleCmds as TurtleCommand[]);
-      } else if (event.data.status === 'success' && !turtleCmds) {
-        setTurtleCommands([]);
-      }
-    };
-    worker.onerror = () => {
-      setWorkerState('error');
-      setOutput('Error inesperado del ejecutor.');
-      setIsRunning(false);
-    };
-    workerRef.current = worker;
-    return worker;
-  };
-
-  const runCode = () => {
+  const runCode = useCallback(() => {
     if (isRunning) return;
-    setTurtleCommands([]);
-    setIsRunning(true);
-    setWorkerState('loading');
-    const worker = createWorker();
-    if (!worker) return;
-    const requestId = ++requestIdRef.current;
-    worker.postMessage({
-      id: requestId,
-      code,
-      input: [],
-    });
-    worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
-      if (event.data.id !== requestId) return;
-      setIsRunning(false);
-      if (event.data.status === 'success') {
-        setOutput(event.data.output || 'Ejecución completada sin salida.');
-      } else {
-        setOutput('Error: ' + (event.data.error ?? 'Error desconocido'));
-      }
-      const turtleCmds = event.data.turtle_commands;
-      if (Array.isArray(turtleCmds) && turtleCmds.length > 0) {
-        setTurtleCommands(turtleCmds as TurtleCommand[]);
-      }
-    };
-  };
+    const workerInput: string[] = [];
+    runWorkerCode(code, workerInput);
+  }, [code, isRunning, runWorkerCode]);
+
+  const resetOutput = useCallback(() => {
+    // El hook gestiona el estado de salida internamente.
+  }, []);
 
   return (
     <div className="border border-[#d3d3c7] rounded-lg bg-[#ebe9df] overflow-hidden">
@@ -149,8 +82,6 @@ export default function PortadaLab({
               type="button"
               onClick={() => {
                 setCode(defaultCode);
-                setOutput('');
-                setTurtleCommands([]);
               }}
               className="flex min-h-9 items-center gap-2 px-3 py-1 text-xs font-semibold text-[#596259] border border-[#d3d3c7] hover:bg-[#f4f2e9] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936] disabled:cursor-not-allowed disabled:opacity-50"
             >
