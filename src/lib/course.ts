@@ -172,6 +172,38 @@ export const courseModules: CourseModule[] = [
       lesson('lesson-8', '4.8', 'Evaluación del módulo 4', 'Comprobar funciones, alcance, colecciones y excepciones.', ['La evaluación integra funciones y estructuras que permiten organizar un programa. Se aprueba con al menos tres respuestas correctas de cuatro.', 'El contenido es de elaboración propia y sirve como práctica; no es una reproducción de la prueba oficial.'], 'def dividir_seguro(total, partes):\n    if partes == 0:\n        return None\n    return total / partes', 'Responde las preguntas y explica por qué la función devuelve None cuando no se puede dividir.', [q('¿Qué palabra define una función?', ['def', 'class', 'for'], 0, 'def introduce una definición de función.'), q('¿Qué palabra entrega un valor desde una función?', ['return', 'print', 'input'], 0, 'return devuelve un resultado al llamador.'), q('¿Qué colección asocia claves con valores?', ['dict', 'tuple', 'bool'], 0, 'Los diccionarios relacionan claves y valores.'), q('¿Qué bloque maneja errores previstos?', ['except', 'elif', 'while'], 0, 'except captura las excepciones especificadas.')], true),
     ],
   },
+  {
+    id: 'module-5',
+    number: '05',
+    title: 'Cadenas de texto, archivos y módulos',
+    summary: 'Trabaja con cadenas de caracteres, lectura y escritura de archivos, y la organización de código en módulos reutilizables.',
+    lessons: [
+      lesson(
+        'lesson-1',
+        '5.1',
+        'Cadenas de texto y métodos comunes',
+        'Manipular cadenas: longitud, recorte, búsqueda y cambio de mayúsculas.',
+        ['Una cadena es una secuencia de caracteres. len(cadena) devuelve cuántos caracteres tiene.', 'Métodos como .upper(), .lower(), .strip(), .find() y el acceso por índice [n] permiten leer y transformar texto.'], 'mensaje = "  Hola Python  "\\nprint(len(mensaje))\\nprint(mensaje.strip().upper())\\nprint(mensaje.find("Python"))', 'Crea una cadena con tu nombre, elimina espacios sobrantes y muestra el resultado en mayúsculas.', [q('¿Qué devuelve len("hola")?', ['4', '5', '3'], 0, 'La cadena "hola" tiene cuatro caracteres.')]),
+      lesson(
+        'lesson-2',
+        '5.2',
+        'Lectura y escritura de archivos',
+        'Guardar y recuperar información usando open().',
+        ['open() abre un archivo para leer ("r") o escribir ("w"). Siempre conviene cerrar el archivo o usar with para que se cierre automáticamente.', 'Escribir en modo "w" sobrescribe el contenido existente; modo "a" añade al final sin borrar.'], 'with open("notas.txt", "w", encoding="utf-8") as archivo:\\n    archivo.write("Lección completada\\\\n")\\n\\nwith open("notas.txt", "r", encoding="utf-8") as archivo:\\n    print(archivo.read())', 'Escribe un programa que guarde tu nombre en un archivo y luego lo lea y lo muestre.', [q('¿Qué modo de open() sobrescribe el archivo?', ['"w"', '"r"', '"a"'], 0, 'El modo "w" abre para escritura y sobrescribe el contenido previo.')]),
+      lesson(
+        'lesson-3',
+        '5.3',
+        'Módulos y paquetes con import',
+        'Organizar el código en archivos reutilizables.',
+        ['import matematica carga un módulo llamado matematica para usar sus funciones.', 'from nombre_modulo import funcion permite usar una función directamente sin el prefijo del módulo.', 'La biblioteca estándar de Python incluye módulos como math, random y datetime.'], 'import math\\nprint(math.sqrt(16))\\n\\nfrom random import randint\\nprint(randint(1, 10))', 'Escribe un programa que use math para calcular la raíz cuadrada de un número y muestre el resultado.', [q('¿Qué hace import math?', ['Carga el módulo math para usar sus funciones', 'Crea una carpeta llamada math', 'Ejecuta un programa llamado math'], 0, 'import math carga el módulo estándar math para usar funciones como sqrt.')]),
+      lesson(
+        'lesson-4',
+        '5.4',
+        'Evaluación del módulo 5',
+        'Comprobar cadenas, archivos y módulos.',
+        ['Esta evaluación integra la manipulación de texto, el trabajo con archivos y la organización en módulos. Se aprueba con al menos tres respuestas correctas de cuatro.', 'El contenido es de elaboración propia y sirve como práctica; no es una reproducción de la prueba oficial.'], 'nombre = "  Ana  "\\nprint(nombre.strip().lower())', 'Responde las preguntas y explica por qué es importante cerrar los archivos después de usarlos.', [q('¿Qué método convierte una cadena a mayúsculas?', ['.upper()', '.lower()', '.strip()'], 0, '.upper() devuelve la cadena en mayúsculas.')], true),
+    ],
+  },
 ];
 
 export function findCourseModule(moduleId: string) {

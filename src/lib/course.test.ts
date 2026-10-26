@@ -8,9 +8,10 @@ describe('ruta de aprendizaje PE1', () => {
       'module-2',
       'module-3',
       'module-4',
+      'module-5',
     ]);
     expect(courseModules.map((courseModule) => courseModule.lessons.length)).toEqual([
-      4, 7, 8, 8,
+      4, 7, 8, 8, 4,
     ]);
   });
 
@@ -51,5 +52,29 @@ describe('ruta de aprendizaje PE1', () => {
     });
     expect(gradeQuiz(questions, [0, 0, 1, 0]).passed).toBe(false);
     expect(gradeQuiz([], []).passed).toBe(false);
+  });
+
+  it('trata respuestas faltantes como incorrectas', () => {
+    const questions = [
+      { prompt: '1', options: ['a', 'b'], answer: 0, explanation: '' },
+      { prompt: '2', options: ['a', 'b'], answer: 1, explanation: '' },
+    ];
+
+    const result = gradeQuiz(questions, [0]);
+    expect(result.correct).toBe(1);
+    expect(result.total).toBe(2);
+    expect(result.score).toBe(50);
+    expect(result.passed).toBe(false);
+  });
+
+  it('califica correctamente cuando todas las respuestas son correctas', () => {
+    const questions = [
+      { prompt: '1', options: ['a', 'b'], answer: 0, explanation: '' },
+      { prompt: '2', options: ['a', 'b'], answer: 1, explanation: '' },
+    ];
+
+    const result = gradeQuiz(questions, [0, 1]);
+    expect(result.passed).toBe(true);
+    expect(result.score).toBe(100);
   });
 });
