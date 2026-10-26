@@ -136,6 +136,8 @@ class Turtle:
         return (self.x, self.y)
 
     def pos(self):
+        return self.position()
+
     def begin_fill(self):
         self.is_filling = True
         self.fill_points = [(self.x, self.y)]
@@ -217,20 +219,40 @@ class Turtle:
     def home(self):
         self.goto(0.0, 0.0)
         self.setheading(0.0)
+
+    def bgcolor(self, color=None):
+        global _screen_bgcolor
+        if color is not None:
+            _screen_bgcolor = str(color)
+        _commands.append({"type": "bgcolor", "color": _screen_bgcolor})
+        return _screen_bgcolor
+
+    def clear(self):
+        global _commands
+        _commands = []
+        self.home()
+        self.pen_down = True
+        self.pen_color = "black"
+        self.fill_color = "black"
+        self.pen_size = 1
+
+    def reset(self):
+        self.clear()
+
 class Screen:
     def __init__(self):
         self.bgcolor_value = "white"
-        self.title_value = ""
 
     def bgcolor(self, color=None):
+        global _screen_bgcolor
         if color is not None:
             self.bgcolor_value = str(color)
-        return self.bgcolor_value
+            _screen_bgcolor = self.bgcolor_value
+        _commands.append({"type": "bgcolor", "color": _screen_bgcolor})
+        return _screen_bgcolor
 
     def title(self, title=None):
-        if title is not None:
-            self.title_value = str(title)
-        return self.title_value
+        return self.bgcolor_value
 
     def done(self):
         pass
@@ -245,6 +267,7 @@ class Screen:
 
     def reset(self):
         self.clearscreen()
+        self.title_value = ""
 
 
 def forward(distance):
@@ -375,9 +398,6 @@ def done():
     pass
 
 
-def Screen():
-    return Screen()
-
 def bgcolor(color=None):
     global _screen_bgcolor
     if color is not None:
@@ -393,15 +413,3 @@ def get_commands():
 def clear_commands():
     global _commands
     _commands = []
-
-    def clear(self):
-        global _commands
-        _commands = []
-
-    def reset(self):
-        self.clear()
-        self.home()
-        self.pen_down = True
-        self.pen_color = "black"
-        self.fill_color = "black"
-        self.pen_size = 1
