@@ -1,6 +1,10 @@
 ﻿import Link from "next/link";
+import { useTheme } from "@/app/theme-provider";
+import ThemeSelector from "@/components/ThemeSelector";
 
 export default function Home() {
+  useTheme();
+
   return (
     <main className="min-h-screen bg-[#f4f2e9] text-[#252b25]">
       <header className="border-b border-[#d3d3c7]">
@@ -15,12 +19,14 @@ export default function Home() {
             </span>
           </Link>
 
-          <nav aria-label="Navegaci&oacute;n principal" className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-[#596259]">
+          <nav aria-label="Navegación principal" className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-[#596259]">
             <a href="#ruta" className="inline-flex min-h-11 items-center underline-offset-4 hover:underline">Ruta formativa</a>
             <a href="#ejemplo" className="inline-flex min-h-11 items-center underline-offset-4 hover:underline">Ejemplo de Python</a>
             <Link href="/academia" className="inline-flex min-h-11 items-center font-semibold text-[#294936] underline underline-offset-4">Academia</Link>
-            <Link href="/login" className="inline-flex min-h-11 items-center font-semibold text-[#294936] underline underline-offset-4">Iniciar sesi&oacute;n</Link>
+            <Link href="/login" className="inline-flex min-h-11 items-center font-semibold text-[#294936] underline underline-offset-4">Iniciar sesión</Link>
           </nav>
+
+          <ThemeSelector />
         </div>
       </header>
 

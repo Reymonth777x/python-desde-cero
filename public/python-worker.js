@@ -86,7 +86,7 @@ self.onmessage = async (event) => {
                 if (commands) {
                     turtleCommands = commands();
                 }
-            } catch (e) {
+            } catch {
                 // Ignorar errores al leer comandos de Turtle
             }
         }

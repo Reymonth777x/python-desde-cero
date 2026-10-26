@@ -1,0 +1,122 @@
+/* Sistema de temas de Python desde cero */
+/* Los temas usan variables CSS para ser aplicables en toda la app */
+
+/* ===== TEMA ORIGINAL (preservado) ===== */
+[data-theme="original"] {
+  color-scheme: light;
+  --theme-bg: #f4f2e9;
+  --theme-bg-secondary: #ebe9df;
+  --theme-surface: #ffffff;
+  --theme-ink: #252b25;
+  --theme-forest: #294936;
+  --theme-forest-dark: #203d31;
+  --theme-accent: #294936;
+  --theme-accent-dark: #203d31;
+  --theme-accent-light: #dce5d8;
+  --theme-muted: #596259;
+  --theme-border: #d3d3c7;
+  --theme-border-dark: #b7a77d;
+  --theme-text-secondary: #58645b;
+  --theme-success: #294936;
+  --theme-error: #a04435;
+  --theme-warning: #776945;
+  --theme-paper: #f4f2e9;
+  --theme-font-serif: var(--font-geist-sans), Georgia, 'Times New Roman', serif;
+  --theme-font-mono: var(--font-geist-mono), Consolas, Monaco, monospace;
+}
+
+/* ===== TEMA DARK ===== */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --theme-bg: #0f172a;
+  --theme-bg-secondary: #1e293b;
+  --theme-surface: #1e293b;
+  --theme-ink: #f1f5f9;
+  --theme-forest: #3b82f6;
+  --theme-forest-dark: #2563eb;
+  --theme-accent: #3b82f6;
+  --theme-accent-dark: #2563eb;
+  --theme-accent-light: #dbeafe;
+  --theme-muted: #94a3b8;
+  --theme-border: #334155;
+  --theme-border-dark: #475569;
+  --theme-text-secondary: #94a3b8;
+  --theme-success: #22c55e;
+  --theme-error: #ef4444;
+  --theme-warning: #f59e0b;
+  --theme-paper: #1e293b;
+  --theme-font-serif: var(--font-geist-sans), system-ui, sans-serif;
+  --theme-font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+/* ===== TEMA HACKER ===== */
+[data-theme="hacker"] {
+  color-scheme: dark;
+  --theme-bg: #0a0a0a;
+  --theme-bg-secondary: #141414;
+  --theme-surface: #141414;
+  --theme-ink: #00ff41;
+  --theme-forest: #00ff41;
+  --theme-forest-dark: #00cc33;
+  --theme-accent: #00ff41;
+  --theme-accent-dark: #00cc33;
+  --theme-accent-light: #1a331a;
+  --theme-muted: #666666;
+  --theme-border: #333333;
+  --theme-border-dark: #4d4d4d;
+  --theme-text-secondary: #888888;
+  --theme-success: #00ff41;
+  --theme-error: #ff0044;
+  --theme-warning: #ffaa00;
+  --theme-paper: #141414;
+  --theme-font-serif: 'Courier New', monospace;
+  --theme-font-mono: 'Courier New', monospace;
+}
+
+/* ===== TEMA DRACULA ===== */
+[data-theme="dracula"] {
+  color-scheme: dark;
+  --theme-bg: #282a36;
+  --theme-bg-secondary: #34354a;
+  --theme-surface: #34354a;
+  --theme-ink: #f8f8f2;
+  --theme-forest: #bd93f9;
+  --theme-forest-dark: #7a5af0;
+  --theme-accent: #bd93f9;
+  --theme-accent-dark: #7a5af0;
+  --theme-accent-light: #44475a;
+  --theme-muted: #6272a4;
+  --theme-border: #6272a4;
+  --theme-border-dark: #8be9fd;
+  --theme-text-secondary: #6272a4;
+  --theme-success: #50fa7b;
+  --theme-error: #ff5555;
+  --theme-warning: #f1fa8c;
+  --theme-paper: #34354a;
+  --theme-font-serif: 'Fira Code', Consolas, monospace;
+  --theme-font-mono: 'Fira Code', Consolas, monospace;
+}
+
+/* ===== TEMA CYBERPUNK ===== */
+[data-theme="cyberpunk"] {
+  color-scheme: dark;
+  --theme-bg: #050510;
+  --theme-bg-secondary: #0a0a1a;
+  --theme-surface: #0a0a1a;
+  --theme-ink: #00ffff;
+  --theme-forest: #00ffff;
+  --theme-forest-dark: #00b3b3;
+  --theme-accent: #00ffff;
+  --theme-accent-dark: #00b3b3;
+  --theme-accent-light: #1a1a33;
+  --theme-muted: #66ccff;
+  --theme-border: #00ffff;
+  --theme-border-dark: #008b8b;
+  --theme-text-secondary: #99ffff;
+  --theme-success: #00ffff;
+  --theme-error: #ff00ff;
+  --theme-warning: #ffff00;
+  --theme-paper: #0a0a1a;
+  --theme-font-serif: 'Share Tech Mono', monospace;
+  --theme-font-mono: 'Share Tech Mono', monospace;
+}

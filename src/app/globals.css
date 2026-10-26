@@ -15,14 +15,15 @@
   --foreground: var(--ink);
 }
 
+/* Soporte de temas: los valores de [data-theme] sobrescriben en themes.css */
 body {
-  color: var(--foreground);
-  background: var(--background);
+  color: var(--theme-ink, var(--ink));
+  background: var(--theme-bg, var(--background));
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
 ::selection {
-  color: var(--forest-dark);
+  color: var(--theme-forest-dark, var(--forest-dark));
   background: #dce5d8;
 }
 
