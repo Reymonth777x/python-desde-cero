@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase/server';
 import {
   getCorrectAnswers,
   getExplanations,
-  getQuestionCount,
 } from './quiz-answers.server';
 
 export interface SubmitQuizResult {
@@ -17,7 +16,6 @@ export interface SubmitQuizResult {
   error?: string;
 }
 
-const MAX_ATTEMPTS_PER_MINUTE = 5;
 const PASSING_SCORE = 75;
 
 function parseAnswers(formData: FormData): number[] | null {

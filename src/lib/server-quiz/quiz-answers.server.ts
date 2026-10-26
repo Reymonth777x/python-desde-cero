@@ -53,12 +53,12 @@ export function hasQuiz(moduleId: string, lessonId: string): boolean {
  * Lista de identificadores de lección que tienen quiz, por módulo.
  * Se usa del lado del servidor para conocer qué lecciones son evaluables.
  */
-export function getQuizLessonIds(moduleId: string): string[] {
-  const module = courseModules.find((m) => m.id === moduleId);
-  if (!module) {
+export function getQuizLessonIds(courseModuleId: string): string[] {
+  const mod = courseModules.find((m) => m.id === courseModuleId);
+  if (!mod) {
     return [];
   }
-  return module.lessons
+  return mod.lessons
     .filter((l) => l.questions.length > 0)
     .map((l) => l.id);
 }

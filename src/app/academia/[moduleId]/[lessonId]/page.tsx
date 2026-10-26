@@ -21,7 +21,7 @@ function stripQuizAnswers(lesson: CourseLesson): Omit<CourseLesson, 'questions'>
 } {
   return {
     ...lesson,
-    questions: lesson.questions.map(({ answer, explanation, ...rest }) => rest),
+    questions: lesson.questions.map(({ prompt, options }) => ({ prompt, options })),
   };
 }
 
