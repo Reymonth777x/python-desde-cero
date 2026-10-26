@@ -46,8 +46,9 @@ export async function signup(formData: FormData) {
   const fullName = String(formData.get('full_name') ?? '').trim();
   const email = String(formData.get('email') ?? '').trim();
   const password = String(formData.get('password') ?? '');
+  const invitationCodeValue = formData.get('invitation_code');
   const invitation = parseOptionalInvitationCode(
-    String(formData.get('invitation_code') ?? ''),
+    invitationCodeValue ? String(invitationCodeValue) : '',
   );
 
   if (!fullName || !email || !password) {

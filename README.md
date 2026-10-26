@@ -2,6 +2,8 @@
 
 A self-paced educational platform for learning Python programming from scratch, with an in-browser code editor, guided lessons, quizzes, and student progress tracking.
 
+**Live application:** https://python-desde-cero.pythondesdecero.workers.dev
+
 ## Overview
 
 Python desde cero is an independent educational web application designed to help beginners learn Python programming fundamentals. It combines structured course content with a live, browser-executable Python environment so learners can read, write, and run code without installing anything locally.
@@ -15,6 +17,7 @@ The platform is organized into modules and lessons, each with learning objective
 - Student authentication — Registration, email confirmation, login, logout, and password reset via Supabase Auth
 - Progress tracking — Lesson completion and quiz scores stored per user, with module gating based on assessment results
 - Admin invitation management — Admin-only page for generating one-time invitation codes for student registration
+- Public registration — Users can register without an invitation code; providing a valid, unused, unexpired invitation code is optional
 - Protected routes — Middleware-based route protection for `/practica` and `/academia` paths
 - Responsive design — Tailwind CSS layout that adapts to desktop, tablet, and mobile screens
 - PWA manifest — Web app manifest for installable progressive web app behavior
@@ -30,7 +33,7 @@ The platform is organized into modules and lessons, each with learning objective
 | Python execution | Pyodide in a Web Worker (`public/python-worker.js`) |
 | State management | Zustand |
 | Testing | Vitest |
-| Deployment target | Cloudflare (Vinext) |
+| Deployment target | Cloudflare Workers (Vinext) |
 
 ## Architecture
 
@@ -94,7 +97,7 @@ npm run dev
 
 Course content is defined in `src/lib/course.ts` and organized as:
 
-- **Modules** (`module-1` through `module-4`): thematic groupings of lessons
+- **Modules** (`module-1` through `module-5`): thematic groupings of lessons
 - **Lessons**: each has objectives, explanations, a code example, an exercise, and quiz questions
 - **Assessments**: designated lessons that act as module gates — completing an assessment unlocks the next module
 
@@ -108,38 +111,54 @@ Python code runs in the browser via Pyodide, loaded through a dedicated Web Work
 
 - **Never commit `.env.local` or any file containing secret values.** These are excluded by `.gitignore`.
 - Supabase RLS policies are the final layer of data protection; migration files in `supabase/migrations/` define the schema and policies but must be reviewed and applied deliberately.
-- The `004_explicit_client_table_grants.sql` and `005_public_signup_optional_invitation.sql` migrations are prepared locally but **have not been applied** to any remote database. They require explicit review and authorization before application.
+- Migration files are stored in `supabase/migrations/` with timestamp prefixes (Supabase CLI convention). Duplicate historical copies under `src/app/supabase/migrations/` were removed.
+- The remote Supabase project has migrations applied through `009_public_signup_optional_invitation_reasserted`, which enables public registration without a mandatory invitation code.
+
+## Configuración de correo electrónico (plan gratuito de Supabase)
+
+Supabase Auth envía correos de confirmación de registro y recuperación de contraseña. Para que funcionen en producción:
+
+1. Configura las **URLs de callback** en el panel de Supabase Auth → URL Configuration:
+   - `https://python-desde-cero.pythondesdecero.workers.dev/auth/callback`
+   - `http://localhost:3000/auth/callback` (solo desarrollo)
+2. Configura un **proveedor SMTP** en Supabase Auth → SMTP Settings. Una opción gratuita es Brevo Free (300 envíos diarios):
+   - Crea tu propia cuenta en el proveedor
+   - Verifica la dirección del remitente y el dominio cuando corresponda
+   - Introduce las credenciales SMTP exclusivamente en el panel de Supabase
+   - Comprueba la entrega de correos con una cuenta de prueba real
+3. La protección de contraseñas filtradas (breached password detection) requiere plan Pro o superior de Supabase. En el plan gratuito, configura una longitud mínima adecuada (8 caracteres) desde los ajustes de Auth.
+
+No se incluyen credenciales SMTP, tokens ni claves API en este repositorio.
 
 ## Current Status
 
 ### Implemented
 
-- Course modules 1–4 with lessons, examples, exercises, and quizzes
-- Authentication (register, login, logout, password reset)
+- Course modules 1–5 with lessons, examples, exercises, and quizzes
+- Authentication (register, login, logout, password reset) via Supabase Auth
 - Protected routes and middleware-based session verification
 - In-browser Python editor with Pyodide Web Worker
 - Student progress tracking and quiz score persistence
 - Admin invitation management page
 - PWA manifest
 - Security headers (CSP, X-Frame-Options, etc.)
-- Unit tests (15 tests across 4 files)
+- Unit tests (20 tests across 4 files)
 
 ### Known Limitations
 
 - Email confirmation and password reset delivery depend on Supabase Auth email configuration, which has not been verified against a live provider
-- Row Level Security policies and table grants are defined in local migration files; the effective remote Supabase ACL/RLS state has not been inspected
-- The `004` (table grants) and `005` (optional invitation signup) migrations are pending review and application
+- Row Level Security policies and table grants remote state has not been independently inspected (Supabase CLI not available locally)
 - Real-device mobile testing and physical device accessibility testing have not been performed
-- No production deployment has been executed yet
 
 ## Roadmap
 
 | Status | Items |
 |--------|-------|
 | Completed | Course content, authentication, editor, progress tracking, admin invitations, security headers, unit tests |
-| Pending (pre-release) | Apply migration 004 (table grants), apply migration 005 (optional invitation signup), verify Supabase RLS/ACL remotely, configure email templates and callback URLs |
 | Proposed | Additional course modules, student profile page, admin dashboard analytics, offline PWA support, real-device mobile testing |
 
 ## License
 
 No license has been applied yet. The repository is private until the owner decides on a license and visibility. Do not port or reuse course content without confirming licensing terms.
+
+This project is independent educational material and is not affiliated with or certified by Cisco Networking Academy or Cisco.

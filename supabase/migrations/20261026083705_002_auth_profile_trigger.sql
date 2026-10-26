@@ -1,5 +1,4 @@
--- Crear automáticamente el perfil cuando se registra un usuario.
-CREATE OR REPLACE FUNCTION public.handle_new_user()
+﻿CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -23,7 +22,6 @@ BEGIN
 END;
 $$;
 
--- Evitar duplicar el trigger si se vuelve a ejecutar el script.
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 
 CREATE TRIGGER on_auth_user_created

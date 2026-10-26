@@ -1,7 +1,5 @@
--- 1. Habilitar UUIDs
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+﻿CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- 2. Tabla de perfiles de usuario
 CREATE TABLE public.profiles (
     id UUID REFERENCES auth.users(id) PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
@@ -12,8 +10,6 @@ CREATE TABLE public.profiles (
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
--- Función segura para comprobar si el usuario es administrador.
--- Evita la recursión al consultar profiles desde sus políticas RLS.
 CREATE OR REPLACE FUNCTION public.current_user_is_admin()
 RETURNS BOOLEAN
 LANGUAGE SQL
@@ -44,7 +40,6 @@ FOR SELECT
 TO authenticated
 USING (public.current_user_is_admin());
 
--- 3. Tabla de invitaciones
 CREATE TABLE public.invitations (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     code TEXT UNIQUE NOT NULL,
@@ -57,8 +52,6 @@ CREATE TABLE public.invitations (
 
 ALTER TABLE public.invitations ENABLE ROW LEVEL SECURITY;
 
--- Solo administradores pueden gestionar invitaciones directamente.
--- El acceso mediante Service Role se realizará en el servidor.
 CREATE POLICY "Admins gestionan invitaciones"
 ON public.invitations
 FOR ALL
@@ -66,7 +59,6 @@ TO authenticated
 USING (public.current_user_is_admin())
 WITH CHECK (public.current_user_is_admin());
 
--- 4. Tabla de progreso del estudiante
 CREATE TABLE public.progress (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID REFERENCES auth.users(id) NOT NULL,
