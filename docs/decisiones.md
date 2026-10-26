@@ -27,3 +27,28 @@ Ambos producen una salida funcional, pero el segundo depende de paquetes en beta
 - Eliminado: `vite.config.ts`
 - Modificado: `package.json` (quitar scripts vinext y dependencias beta cloudflare/vinext/cf)
 - Modificado: `playwright.config.ts` (e2e contra `npm run start`, build de producción)
+
+## Decisión 3.2 — CSP completa y aislamiento del código del estudiante
+
+### Contexto
+La CSP original era mínima (solo `base-uri`, `object-src`, `frame-ancestors`). Había que añadir una CSP completa para prevenir inyección de código, exfiltración de datos y carga de recursos externos no autorizados.
+
+### Opciones
+- **Opción A:** CSP en modo Report-Only en desarrollo, enforce en producción.
+- **Opción B:** CSP enforce en todos los entornos.
+- **Opción C:** CSP muy permisiva (solo cabeceras básicas).
+
+### Decisión
+**Opción A:** CSP completa con `Content-Security-Policy-Report-Only` en desarrollo y `Content-Security-Policy` (enforce) en producción.
+
+### Motivo
+- Report-Only permite recoger violaciones sin romper la funcionalidad durante el desarrollo.
+- En producción, enforce bloquea activamente cargas no autorizadas.
+- `'unsafe-eval'` se mantiene justificado: Pyodide compila WebAssembly en tiempo de ejecución y Monaco Editor usa eval para servicios de lenguaje. No hay alternativa sin perder estas funcionalidades.
+- `'unsafe-inline'` para estilos es necesario por Tailwind CSS y estilos en línea de componentes.
+
+### Archivos afectados
+- Modificado: `next.config.mjs` (CSP completa)
+- Nuevo: `src/app/api/csp-report/route.ts` (endpoint de informes CSP)
+- Nuevo: `src/app/python-runner/page.tsx` (runner aislado en iframe)
+- Nuevo: `tests/hostile.test.ts` (pruebas de aislamiento y CSP)
