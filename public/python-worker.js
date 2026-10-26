@@ -6,9 +6,24 @@ const MAX_INPUT_LINES = 20;
 const MAX_INPUT_LINE_LENGTH = 1000;
 
 let pyodideReadyPromise = loadPyodide();
+let turtleLoaded = false;
 
 pyodideReadyPromise
-    .then(() => self.postMessage({ status: "ready" }))
+    .then(async () => {
+        try {
+            const turtleResponse = await fetch("/turtle_compat.py");
+            if (!turtleResponse.ok) {
+                throw new Error(`No se pudo cargar turtle_compat.py: ${turtleResponse.status}`);
+            }
+            const turtleCode = await turtleResponse.text();
+            await pyodideReadyPromise;
+            await pyodideReadyPromise.then((pyodide) => pyodide.runPythonAsync(turtleCode));
+            turtleLoaded = true;
+        } catch (error) {
+            console.warn("No se pudo cargar el modulo Turtle:", error);
+        }
+        self.postMessage({ status: "ready" });
+    })
     .catch((error) => {
         self.postMessage({
             status: "init-error",
@@ -64,16 +79,32 @@ self.onmessage = async (event) => {
             executionError = error?.message || String(error);
         }
 
+        let turtleCommands = null;
+        if (turtleLoaded) {
+            try {
+                const commands = pyodide.globals.get("get_commands");
+                if (commands) {
+                    turtleCommands = commands();
+                }
+            } catch (e) {
+                // Ignorar errores al leer comandos de Turtle
+            }
+        }
+
         if (outputTruncated) {
             output += "\n[Salida limitada para proteger el navegador.]";
         }
 
-        self.postMessage({
+        const response = {
             id,
             status: executionError ? "error" : "success",
             output,
             error: executionError || undefined,
-        });
+        };
+        if (turtleCommands && turtleCommands.length > 0) {
+            response.turtle_commands = turtleCommands;
+        }
+        self.postMessage(response);
     } catch (error) {
         self.postMessage({
             id,

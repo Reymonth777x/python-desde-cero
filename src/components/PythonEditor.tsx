@@ -9,6 +9,21 @@ type WorkerResponse = {
   status: 'ready' | 'init-error' | 'success' | 'error';
   output?: string;
   error?: string;
+  turtle_commands?: unknown;
+};
+
+type TurtleCommand = {
+  type: 'line' | 'fill' | 'dot' | 'write';
+  x?: number;
+  y?: number;
+  x1?: number;
+  y1?: number;
+  x2?: number;
+  y2?: number;
+  color?: string;
+  size?: number;
+  points?: Array<[number, number]>;
+  text?: string;
 };
 
 export default function PythonEditor({
@@ -23,9 +38,11 @@ export default function PythonEditor({
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [workerState, setWorkerState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
-  const [mobilePanel, setMobilePanel] = useState<'instructions' | 'editor' | 'output'>('instructions');
+  const [mobilePanel, setMobilePanel] = useState<'instructions' | 'editor' | 'output' | 'turtle'>('instructions');
   const [editorRequested, setEditorRequested] = useState(false);
   const [desktopLayout, setDesktopLayout] = useState(false);
+  const [turtleCommands, setTurtleCommands] = useState<TurtleCommand[]>([]);
+  const [turtleError, setTurtleError] = useState<string | null>(null);
 
   const workerRef = useRef<Worker | null>(null);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
@@ -95,6 +112,14 @@ export default function PythonEditor({
       } else {
         const partialOutput = event.data.output?.trimEnd();
         setOutput(`${partialOutput ? `${partialOutput}\n` : ''}Error:\n${event.data.error ?? 'Error desconocido'}`);
+      }
+
+      const turtleCmds = event.data.turtle_commands;
+      if (Array.isArray(turtleCmds) && turtleCmds.length > 0) {
+        setTurtleCommands(turtleCmds as TurtleCommand[]);
+        setMobilePanel('turtle');
+      } else if (event.data.status === 'success' && !turtleCmds) {
+        setTurtleCommands([]);
       }
     };
 
@@ -190,6 +215,9 @@ export default function PythonEditor({
   const runCode = () => {
     if (isRunning) return;
 
+    setTurtleCommands([]);
+    setTurtleError(null);
+
     const request = {
       code,
       input: input === '' ? [] : input.split(/\r?\n/).slice(0, 20),
@@ -230,6 +258,7 @@ export default function PythonEditor({
           ['instructions', 'Guía'],
           ['editor', 'Código'],
           ['output', 'Resultado'],
+          ['turtle', 'Gráficos'],
         ] as const).map(([panel, label]) => (
           <button
             key={panel}
@@ -407,6 +436,100 @@ export default function PythonEditor({
             Reintentar carga de Python
           </button>
         )}
+      </div>
+
+      <div
+        id="practice-panel-turtle"
+        role="tabpanel"
+        aria-labelledby="practice-tab-turtle"
+        className={`${mobilePanel === 'turtle' ? 'block' : 'hidden'} mt-4 md:block`}
+      >
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold text-[#252b25]">Gráficos de Turtle</h2>
+          <span className="text-xs text-[#596259]">{turtleCommands.length > 0 ? `${turtleCommands.length} trazo(s) dibujado(s)` : 'Ejecuta código con Turtle para ver el dibujo'}</span>
+        </div>
+        {turtleError && (
+          <p className="mb-2 text-sm text-[#7f3027] bg-[#fdf3f3] border border-[#a04435] px-3 py-2 rounded">
+            {turtleError}
+          </p>
+        )}
+        <div className="flex flex-col items-center justify-center min-h-[200px] max-h-[600px] overflow-auto border border-[#d3d3c7] bg-[#ebe9df] rounded-lg">
+          {turtleCommands.length === 0 ? (
+            <p className="text-sm text-[#596259] py-4">
+              Ejecuta código Python con la librería turtle para ver el dibujo aquí.
+            </p>
+          ) : (
+            <svg
+              className="w-full max-w-[600px] max-h-[500px]"
+              viewBox="-250 -250 500 500"
+              preserveAspectRatio="xMidYMid meet"
+            >
+              {turtleCommands.map((cmd, idx) => {
+                if (cmd.type === 'line') {
+                  return (
+                    <line
+                      key={`turtle-line-${idx}`}
+                      x1={cmd.x1!}
+                      y1={-cmd.y1!}
+                      x2={cmd.x2!}
+                      y2={-cmd.y2!}
+                      stroke={cmd.color ?? 'black'}
+                      strokeWidth={cmd.size ?? 1}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  );
+                }
+                if (cmd.type === 'dot') {
+                  return (
+                    <circle
+                      key={`turtle-dot-${idx}`}
+                      cx={cmd.x!}
+                      cy={-cmd.y!}
+                      r={(cmd.size ?? 2) / 2}
+                      fill={cmd.color ?? 'black'}
+                    />
+                  );
+                }
+                if (cmd.type === 'fill') {
+                  return (
+                    <polygon
+                      key={`turtle-fill-${idx}`}
+                      points={cmd.points?.map(([x, y]) => `${x},${-y}`).join(' ') ?? ''}
+                      fill={cmd.color ?? 'black'}
+                      fillOpacity="0.6"
+                    />
+                  );
+                }
+                if (cmd.type === 'write') {
+                  return (
+                    <text
+                      key={`turtle-write-${idx}`}
+                      x={cmd.x!}
+                      y={-cmd.y!}
+                      fill={cmd.color ?? 'black'}
+                      fontSize={12}
+                      fontFamily="monospace"
+                      textAnchor="start"
+                      dominantBaseline="middle"
+                    >
+                      {cmd.text}
+                    </text>
+                  );
+                }
+                return null;
+              })}
+            </svg>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={() => setTurtleCommands([])}
+          disabled={turtleCommands.length === 0}
+          className="mt-3 flex min-h-11 w-full items-center justify-center border border-[#294936] px-4 py-2 text-sm font-semibold text-[#294936] hover:bg-[#ebe9df] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936] disabled:cursor-not-allowed disabled:opacity-50 md:hidden"
+        >
+          Limpiar gráfico
+        </button>
       </div>
     </section>
   );
