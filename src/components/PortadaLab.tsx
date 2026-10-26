@@ -232,7 +232,6 @@ export default function PortadaLab({
                           </text>
                         );
                       }
-                      return null;
                       if (cmd.type === "bgcolor") {
                         return (
                           <rect
@@ -245,6 +244,7 @@ export default function PortadaLab({
                           />
                         );
                       }
+                      return null;
                     })}
                   </svg>
                 </div>
