@@ -4,10 +4,10 @@ Este documento compara los temas del programa Python PE1 con las lecciones, ejem
 
 ## Ámbito del curso implementado
 
-- **Módulos**: 4 (module-1 a module-4)
-- **Lecciones totales**: 27
-- **Evaluaciones (module assessments)**: 4 (una al final de cada módulo)
-- **Lección de capacitación final**: incluida en el módulo 4 (lesson-8)
+- **Módulos**: 5 (module-1 a module-5)
+- **Lecciones totales**: 31
+- **Evaluaciones (module assessments)**: 5 (una al final de cada módulo)
+- **Lección de capacitación final**: incluida en el módulo 5 (lesson-4)
 
 ## Matriz de cobertura por tema
 
@@ -40,16 +40,14 @@ Este documento compara los temas del programa Python PE1 con las lecciones, ejem
 | Tuplas y diccionarios | Cubierto | module-4 / lesson-6 | Colecciones |
 | Manejo de excepciones | Cubierto | module-4 / lesson-7 | `try` / `except` |
 | Evaluación del módulo 4 | Cubierto | module-4 / lesson-8 | 4 preguntas, umbral 75% |
+| Cadenas de texto: métodos comunes | Cubierto | module-5 / lesson-1 | len(), .upper(), .strip(), .find(), índice |
+| Lectura y escritura de archivos | Cubierto | module-5 / lesson-2 | open(), con "r"/"w"/"a", patrón with |
+| Módulos y paquetes con import | Cubierto | module-5 / lesson-3 | import, from...import, biblioteca estándar |
+| Evaluación del módulo 5 | Cubierto | module-5 / lesson-4 | 4 preguntas, umbral 75% |
 
-## Temas del PE1 no cubiertos en esta versión
+## Temas del PE1 sin cobertura en esta versión
 
-Los siguientes temas del programa Cisco PE1 no tienen una lección dedicada en la implementación actual:
-
-| Tema | Estado | Nota |
-|------|--------|------|
-| Cadenas de texto (manipulación de strings) | No cubierto | No hay lección dedicada a métodos de cadena, formateo o índices de strings |
-| Archivos (lectura y escritura de archivos) | No cubierto | No hay lección sobre `open()`, lectura/escritura de archivos |
-| Módulos y paquetes (import) | No cubierto | No hay lección sobre importar módulos estándar |
+Tras la adición del módulo 5, todos los temas principales del programa PE1 tienen al menos una lección dedicada. Los temas avanzados opcionales (por ejemplo, expresiones regulares, decoradores, programación orientada a objetos avanzada, pruebas unitarias en Python) no forman parte del alcance PE1 básico y se dejan para futuras versiones.
 
 ## Notas sobre el contenido
 
