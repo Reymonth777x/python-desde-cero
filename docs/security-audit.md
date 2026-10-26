@@ -24,13 +24,15 @@ Los estados **APROBADA**, **FALLIDA** y **PENDIENTE** describen evidencia de est
 - El aviso de RCE del optimizador de imágenes depende de la ruta de optimización de imágenes, SVG y Linux basado en glibc; el entorno de despliegue no se conoce. No se afirma que esa condición esté presente. El hallazgo de DoS no depende de esa configuración.
 - **Acción requerida:** aprobar y planificar una actualización deliberada a una línea soportada y parcheada, con adaptación de APIs del App Router/React y pruebas de regresión. No se ejecutó `npm audit fix`, no se usó `--force` y no se modificaron `package.json` ni `package-lock.json`, que ya tenían cambios locales.
 
-### SEC-02 — Privilegios de tabla no declarados explícitamente en las migraciones originales
+### SEC-02 — Privilegios de tabla y USAGE en schema private
 
-**Estado: PENDIENTE — riesgo medio; ACL remoto desconocido.**
+**Estado: PENDIENTE — migración correctiva 012 preparada localmente, no aplicada en remoto.**
 
-- `supabase/migrations/001_schema.sql` habilita RLS en `profiles`, `invitations` y `progress`, pero no incluye `GRANT`/`REVOKE` de tabla para `anon` y `authenticated`. Las políticas RLS visibles limitan filas, pero no permiten inferir los privilegios efectivos del proyecto remoto ni sus cambios manuales posteriores.
-- Se agregó `supabase/migrations/004_explicit_client_table_grants.sql`, que revoca privilegios de tabla de `PUBLIC`, `anon` y `authenticated` y concede a `authenticated` únicamente `SELECT` en perfiles, `SELECT/INSERT` en invitaciones y `SELECT/INSERT/UPDATE` en progreso. RLS continúa siendo necesaria para autorizar filas y operaciones.
-- **No se ejecutó esta migración.** Antes de aplicarla, se debe inspeccionar el ACL remoto y validar en un proyecto local aislado que los flujos requeridos conservan acceso. `supabase`, `psql` y `docker` no están disponibles en este entorno.
+- `supabase/migrations/005_private_admin_helper.sql` crea `private.current_user_is_admin()` y las políticas RLS la invocan, pero ninguna migración previa concede `USAGE ON SCHEMA private TO authenticated`. Sin ese privilegio, `authenticated` no puede ejecutar la función aunque tenga `EXECUTE`.
+- Migración correctiva `supabase/migrations/20261026093001_012_corrective_grants_and_invitation_expiry.sql` añade `GRANT USAGE ON SCHEMA private TO authenticated`.
+- La migración 004 (`004_explicit_client_table_grants.sql`) revoca privilegios de tabla de `PUBLIC`, `anon` y `authenticated`; concede a `authenticated` solo `SELECT` en perfiles, `SELECT/INSERT` en invitaciones y (antes de 011) `SELECT/INSERT/UPDATE` en progreso.
+- Migración 011 (`20261026093000_011_quiz_attempts_and_progress_restrictions.sql`) revoca `INSERT, UPDATE` en `progress` de `authenticated`, dejando solo `SELECT`. La escritura en `progress` ocurre únicamente vía `record_quiz_attempt` (SECURITY DEFINER).
+- Ninguna de estas migraciones se ha ejecutado en Supabase remoto. `supabase`, `psql` y `docker` no están disponibles en este entorno.
 
 ### SEC-03 — URL de confirmación podía apuntar a localhost en producción
 
@@ -43,12 +45,26 @@ Los estados **APROBADA**, **FALLIDA** y **PENDIENTE** describen evidencia de est
 
 ### SEC-04 — Expiración nula y consumo anterior a confirmar correo
 
-**Estado: FALLIDA — riesgo de invitaciones sin vencimiento; PENDIENTE de decisión de esquema/flujo.**
+**Estado: PENDIENTE — migración correctiva 012 preparada localmente, no aplicada en remoto.**
 
 - `001_schema.sql` permite `invitations.expires_at` nulo. `003_require_invitation.sql` acepta explícitamente `expires_at IS NULL`, por lo que esas filas no caducan.
+- Migración correctiva `supabase/migrations/20261026093001_012_corrective_grants_and_invitation_expiry.sql`: hace backfill de filas existentes con `expires_at IS NULL` (a `created_at + INTERVAL '7 days'`) y luego añade `ALTER COLUMN expires_at SET NOT NULL`.
 - La acción de administración genera invitaciones con vencimiento a siete días, pero no es posible determinar si existen invitaciones remotas antiguas con vencimiento nulo. No se cambió el trigger porque rechazar esos códigos podría invalidar invitaciones existentes.
 - El trigger consume el código al insertar el usuario, antes de que la persona confirme el correo. Un correo mal escrito o no confirmado puede dejar el código usado; la recuperación depende de que administración emita otro.
-- **Acción requerida:** revisar el inventario remoto y decidir una política de transición antes de exigir `expires_at NOT NULL` o cambiar el momento de consumo. No se alteró el esquema remoto.
+- **Acción requerida:** revisar el inventario remoto y decidir una política de transición antes de aplicar 012. No se alteró el esquema remoto.
+
+### SEC-04b — Calificación del quiz en cliente y escritura directa en progreso (H1)
+
+**Estado: APROBADA localmente — corregido en código, pendiente de migraciones 011/012 en remoto.**
+
+- `src/components/LessonStudy.tsx` calificaba el quiz en el navegador (`gradeQuiz`) y escribía directamente en `public.progress` desde el cliente de Supabase. Las respuestas correctas (`answer`) y explicaciones (`explanation`) viajaban al navegador dentro del `lesson` prop.
+- Corrección aplicada:
+  - `src/lib/server-quiz/quiz-answers.server.ts` (módulo `server-only`): almacena las respuestas correctas; nunca se importa desde el cliente.
+  - `src/lib/server-quiz/submit-quiz.action.ts` (Server Action): califica en el servidor, devuelve puntuación y explicaciones solo tras el envío, y escribe vía RPC `record_quiz_attempt`.
+  - `src/app/academia/[moduleId]/[lessonId]/page.tsx`: `stripQuizAnswers()` elimina `answer` y `explanation` antes de pasar la lección al cliente.
+  - `src/components/LessonStudy.tsx`: ya no importa `gradeQuiz` ni escribe directamente en `progress`; llama al Server Action y muestra explicaciones solo del resultado del servidor.
+- Migración 011 crea `public.quiz_attempts` (RLS solo lectura propia), revoca `INSERT, UPDATE` en `progress` de `authenticated`, y añade `record_quiz_attempt` (SECURITY DEFINER).
+- Verificación pendiente: buscar una respuesta conocida en `.next/static` tras `npm run build` para confirmar que ninguna respuesta correcta aparece en el bundle del cliente.
 
 ### SEC-05 — Recuperación de cuenta no implementada
 
@@ -79,6 +95,16 @@ Funciones y trigger observados:
 - El `expires_at IS NULL` anterior significa que una invitación sin fecha sigue siendo aceptable. La respuesta al cliente no distingue inválida/vencida/usada; es un error genérico, que evita filtrar estado del código.
 - Hay restricción `UNIQUE` en el código y en la combinación usuario/módulo/lección; IDs UUID y claves foráneas en el esquema. No se observaron restricciones de dominio para puntajes o longitud del código. La app genera códigos criptográficamente aleatorios de 16 hexadecimales, pero una llamada directa a Supabase Auth puede evitar validaciones que solo existen en la Server Action; el trigger sigue exigiendo un código utilizable.
 - No se comprobó la configuración remota, ACL reales, funciones/triggers creados manualmente, backups ni restauración.
+
+### H3 — Duplicado de prefijo 005 y contradicción entre documentos
+
+**Estado: IDENTIFICADO — no se modifica ninguna migración existente.**
+
+- Existen dos migraciones con prefijo `005`: `20261026083730_005_public_signup_optional_invitation.sql` y `20261026083853_005_private_admin_helper.sql`.
+- `docs/database-migrations.md` solo cita a `005_public_signup_optional_invitation` en la secuencia local (001 a 005) y no menciona la 005 privada ni el helper de admin.
+- `README.md` afirmaba (sin evidencia remota) que las migraciones remotas estaban aplicadas hasta `009_public_signup_optional_invitation_reasserted`, y decía que copias históricas bajo `src/app/supabase/migrations/` fueron removidas, lo que contradice `docs/database-migrations.md` (que dice que no se borraron).
+- Ninguna migración existente fue renombrada ni editada. Las nuevas migraciones 011 y 012 se añaden como archivos independientes.
+- El estado real de migraciones en Supabase remoto no se conoce; no se asume ni se afirma.
 
 ## Autenticación, autorización y privacidad
 

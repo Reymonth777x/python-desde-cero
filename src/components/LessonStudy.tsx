@@ -6,11 +6,15 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, CheckCircle2, LogOut } from 'lucide-react';
 import { logout } from '@/app/login/actions';
 import { createClient } from '@/lib/supabase/client';
-import type { CourseLesson } from '@/lib/course';
-import { gradeQuiz } from '@/lib/course-grading';
+import type { CourseLesson, QuizQuestion } from '@/lib/course';
+import { submitQuiz, type SubmitQuizResult } from '@/lib/server-quiz/submit-quiz.action';
+
+type ClientSafeQuizQuestion = Omit<QuizQuestion, 'answer' | 'explanation'>;
 
 type Props = {
-  lesson: CourseLesson;
+  lesson: Omit<CourseLesson, 'questions'> & {
+    questions: ClientSafeQuizQuestion[];
+  };
   moduleId: string;
   moduleNumber: string;
   moduleTitle: string;
@@ -36,7 +40,7 @@ export default function LessonStudy({
 }: Props) {
   const supabase = useMemo(() => createClient(), []);
   const [answers, setAnswers] = useState<Record<number, number>>({});
-  const [result, setResult] = useState<ReturnType<typeof gradeQuiz> | null>(null);
+  const [result, setResult] = useState<SubmitQuizResult | null>(null);
   const [feedback, setFeedback] = useState('');
   const [saving, setSaving] = useState(false);
   const [completed, setCompleted] = useState(initialCompleted);
@@ -84,7 +88,11 @@ export default function LessonStudy({
     };
   }, [expectedUserId, lesson.id, moduleId, supabase]);
 
-  async function submitQuiz(event: FormEvent<HTMLFormElement>) {
+  const answersJson = JSON.stringify(
+    lesson.questions.map((_q, index) => answers[index] ?? -1)
+  );
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (saving || !sessionValid) return;
 
@@ -93,53 +101,33 @@ export default function LessonStudy({
       return;
     }
 
-    const answerList = lesson.questions.map((_question, index) => answers[index]);
-    const grade = gradeQuiz(lesson.questions, answerList);
-    setResult(grade);
-
-    if (!grade.passed) {
-      setFeedback('Aún no alcanzas el puntaje necesario. Revisa la retroalimentación y vuelve a intentarlo.');
-      return;
-    }
-
     setSaving(true);
     setFeedback('');
+    setResult(null);
+
+    const formData = new FormData();
+    formData.set('moduleId', moduleId);
+    formData.set('lessonId', lesson.id);
+    formData.set('answers', answersJson);
 
     try {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+      const serverResult = await submitQuiz(null, formData);
 
-      if (userError || !user || user.id !== expectedUserId) {
-        setSessionValid(false);
-        setCompleted(false);
-        setFeedback('No se pudo confirmar tu sesión. Inicia sesión de nuevo para guardar el resultado.');
+      if (serverResult.error) {
+        setFeedback(serverResult.error);
+        setSaving(false);
         return;
       }
 
-      const { error } = await supabase
-        .from('progress')
-        .upsert(
-          {
-            user_id: user.id,
-            module_id: moduleId,
-            lesson_id: lesson.id,
-            is_completed: true,
-            best_score: Math.max(initialScore, grade.score),
-            last_attempt: new Date().toISOString(),
-          },
-          { onConflict: 'user_id,module_id,lesson_id' },
-        );
+      setResult(serverResult);
 
-      if (error) {
-        setFeedback('Tus respuestas son correctas, pero no se pudo guardar el progreso. Inténtalo de nuevo.');
-        return;
+      if (serverResult.passed) {
+        setCompleted(true);
+        setSavedScore(Math.max(initialScore, serverResult.score));
+        setFeedback('Evaluación aprobada y progreso guardado en tu cuenta.');
+      } else {
+        setFeedback('Aún no alcanzas el puntaje necesario. Revisa la retroalimentación y vuelve a intentarlo.');
       }
-
-      setCompleted(true);
-      setSavedScore(Math.max(initialScore, grade.score));
-      setFeedback('Evaluación aprobada y progreso guardado en tu cuenta.');
     } catch {
       setFeedback('No se pudo guardar el progreso por un error de conexión. Inténtalo de nuevo.');
     } finally {
@@ -225,7 +213,7 @@ export default function LessonStudy({
                 </p>
               </div>
 
-              <form onSubmit={submitQuiz} className="mt-5 space-y-7">
+              <form onSubmit={handleSubmit} className="mt-5 space-y-7">
                 {lesson.questions.map((question, questionIndex) => (
                   <fieldset key={question.prompt} className="space-y-3">
                     <legend className="font-semibold leading-6">
@@ -235,11 +223,9 @@ export default function LessonStudy({
                       {question.options.map((option, optionIndex) => {
                         const id = `${lesson.id}-q${questionIndex}-a${optionIndex}`;
                         const isSelected = answers[questionIndex] === optionIndex;
-                        const showWrong = result && isSelected && optionIndex !== question.answer;
-                        const showCorrect = result && optionIndex === question.answer;
 
                         return (
-                          <label key={option} htmlFor={id} className={`flex cursor-pointer items-start gap-3 border px-3 py-3 text-sm leading-6 ${showWrong ? 'border-[#a04435] bg-[#fff4f1]' : showCorrect ? 'border-[#294936] bg-[#e5ecdf]' : isSelected ? 'border-[#294936] bg-white' : 'border-[#d3d3c7] bg-white hover:bg-[#ebe9df]'}`}>
+                          <label key={option} htmlFor={id} className={`flex cursor-pointer items-start gap-3 border px-3 py-3 text-sm leading-6 ${isSelected ? 'border-[#294936] bg-white' : 'border-[#d3d3c7] bg-white hover:bg-[#ebe9df]'}`}>
                             <input
                               id={id}
                               type="radio"
@@ -260,7 +246,9 @@ export default function LessonStudy({
                       })}
                     </div>
                     {result && (
-                      <p className="text-sm leading-6 text-[#596259]">{question.explanation}</p>
+                      <p className="text-sm leading-6 text-[#596259]">
+                        {result.explanations[questionIndex]}
+                      </p>
                     )}
                   </fieldset>
                 ))}

@@ -4,7 +4,7 @@
 
 - **APROBADA localmente:** framework actualizado a Next.js 16.4.3 y React 19.3.1; el build registra rutas App Router.
 - **APROBADA localmente:** lint, TypeScript y pruebas unitarias; revisar los resultados de esta sesión en `docs/security-audit.md`.
-- **PENDIENTE:** ejecutar en Supabase staging las migraciones que correspondan. La 005 es necesaria para que el registro sin código funcione con un trigger basado en la migración 003.
+- **PENDIENTE:** ejecutar en Supabase staging las migraciones que correspondan. La 005 es necesaria para que el registro sin código funcione con un trigger basado en la migración 003. Las migraciones 011 (quiz_attempts, restricciones de progress y función RPC SECURITY DEFINER) y 012 (GRANT USAGE en schema private e invitations.expires_at NOT NULL) están preparadas localmente y requieren revisión/aprobación antes de aplicarse.
 - **PENDIENTE:** callback, confirmación de correo y recuperación dependen de los URL allowlist, plantillas y entrega de correo configurados en Supabase Auth.
 - **PENDIENTE:** verificar ACL/RLS/triggers efectivos, límites de Auth, MFA/controles de administrador y backups/restauración en el proyecto real.
 - **PENDIENTE:** comprobar dominio, HTTPS/HSTS y CSP final en el alojamiento real. El alojamiento y dominio no están demostrados en este repositorio.
