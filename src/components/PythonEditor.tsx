@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Editor from '@monaco-editor/react';
@@ -13,7 +13,7 @@ type WorkerResponse = {
 };
 
 type TurtleCommand = {
-  type: 'line' | 'fill' | 'dot' | 'write';
+  type: 'line' | 'fill' | 'dot' | 'write' | 'bgcolor';
   x?: number;
   y?: number;
   x1?: number;
@@ -108,7 +108,7 @@ export default function PythonEditor({
       setIsRunning(false);
 
       if (event.data.status === 'success') {
-        setOutput(event.data.output || 'Ejecución completada sin salida.');
+        setOutput(event.data.output || 'EjecuciÃ³n completada sin salida.');
       } else {
         const partialOutput = event.data.output?.trimEnd();
         setOutput(`${partialOutput ? `${partialOutput}\n` : ''}Error:\n${event.data.error ?? 'Error desconocido'}`);
@@ -137,7 +137,7 @@ export default function PythonEditor({
       setWorkerState('error');
       setMobilePanel('output');
       pendingExecutionRef.current = null;
-      setOutput(`Error del ejecutor:\n${event.message || 'El Worker dejó de responder.'}`);
+      setOutput(`Error del ejecutor:\n${event.message || 'El Worker dejÃ³ de responder.'}`);
       worker.terminate();
 
       if (workerRef.current === worker) {
@@ -153,7 +153,7 @@ export default function PythonEditor({
       setWorkerState('error');
       setMobilePanel('output');
       pendingExecutionRef.current = null;
-      setOutput('La carga de Pyodide tardó demasiado. Comprueba la conexión e inténtalo de nuevo.');
+      setOutput('La carga de Pyodide tardÃ³ demasiado. Comprueba la conexiÃ³n e intÃ©ntalo de nuevo.');
       initializationTimeoutRef.current = null;
     }, 60000);
     return worker;
@@ -187,7 +187,7 @@ export default function PythonEditor({
       setWorkerState('loading');
       setMobilePanel('output');
       setOutput(
-        'Error: Tiempo de ejecución excedido. Posible bucle infinito. El entorno se está reiniciando para permitir otra ejecución.'
+        'Error: Tiempo de ejecuciÃ³n excedido. Posible bucle infinito. El entorno se estÃ¡ reiniciando para permitir otra ejecuciÃ³n.'
       );
 
       timeoutRef.current = null;
@@ -252,13 +252,13 @@ export default function PythonEditor({
   };
 
   return (
-    <section className="w-full" aria-label="Espacio de práctica de Python">
+    <section className="w-full" aria-label="Espacio de prÃ¡ctica de Python">
       <div role="tablist" aria-label="Paneles del laboratorio" className="mb-4 grid grid-cols-3 border-b border-[#d3d3c7] md:hidden">
         {([
-          ['instructions', 'Guía'],
-          ['editor', 'Código'],
+          ['instructions', 'GuÃ­a'],
+          ['editor', 'CÃ³digo'],
           ['output', 'Resultado'],
-          ['turtle', 'Gráficos'],
+          ['turtle', 'GrÃ¡ficos'],
         ] as const).map(([panel, label]) => (
           <button
             key={panel}
@@ -284,7 +284,7 @@ export default function PythonEditor({
       {workerState !== 'ready' && (
         <p role="status" aria-live="polite" className="mb-4 flex min-h-11 items-center gap-2 text-sm text-[#596259]">
           {workerState === 'loading' && <span aria-hidden="true" className="h-4 w-4 animate-spin rounded-full border-2 border-[#d3d3c7] border-t-[#294936] motion-reduce:animate-none" />}
-          {workerState === 'idle' ? 'Python se prepara al abrir el editor o iniciar la primera ejecución.' : workerState === 'loading' ? 'Preparando Python en este dispositivo. La primera carga puede tardar.' : 'El ejecutor necesita atención. Consulta el resultado para ver opciones.'}
+          {workerState === 'idle' ? 'Python se prepara al abrir el editor o iniciar la primera ejecuciÃ³n.' : workerState === 'loading' ? 'Preparando Python en este dispositivo. La primera carga puede tardar.' : 'El ejecutor necesita atenciÃ³n. Consulta el resultado para ver opciones.'}
         </p>
       )}
 
@@ -295,7 +295,7 @@ export default function PythonEditor({
         className={`${mobilePanel === 'instructions' ? 'block' : 'hidden'} md:hidden`}
       >
         <section className="border-l-2 border-[#b7a77d] bg-[#ebe9df] p-4 sm:p-5">
-          <h2 className="font-serif text-xl">Guía de práctica</h2>
+          <h2 className="font-serif text-xl">GuÃ­a de prÃ¡ctica</h2>
           <p className="mt-2 text-sm leading-6 text-[#3f4940]">{instructions}</p>
           <button
             type="button"
@@ -340,15 +340,15 @@ export default function PythonEditor({
           />
         </div>
 
-        <div aria-label="Teclas de Python para pantalla táctil" className="flex flex-wrap gap-2 md:hidden">
+        <div aria-label="Teclas de Python para pantalla tÃ¡ctil" className="flex flex-wrap gap-2 md:hidden">
           {[
-            { label: '()', accessible: 'Insertar paréntesis', text: '()', cursor: 1 },
+            { label: '()', accessible: 'Insertar parÃ©ntesis', text: '()', cursor: 1 },
             { label: '""', accessible: 'Insertar comillas', text: '""', cursor: 1 },
             { label: ':', accessible: 'Insertar dos puntos', text: ':' },
             { label: '=', accessible: 'Insertar signo igual', text: '=' },
-            { label: '+', accessible: 'Insertar signo más', text: '+' },
+            { label: '+', accessible: 'Insertar signo mÃ¡s', text: '+' },
             { label: '*', accessible: 'Insertar asterisco', text: '*' },
-            { label: 'Tab', accessible: 'Insertar sangría de cuatro espacios', text: '    ' },
+            { label: 'Tab', accessible: 'Insertar sangrÃ­a de cuatro espacios', text: '    ' },
           ].map((key) => (
             <button
               key={key.accessible}
@@ -363,13 +363,13 @@ export default function PythonEditor({
         </div>
 
         <label className="block text-base font-semibold text-[#252b25] sm:text-sm">
-          Entrada para input() <span className="font-normal text-[#596259]">(una línea por solicitud)</span>
+          Entrada para input() <span className="font-normal text-[#596259]">(una lÃ­nea por solicitud)</span>
           <textarea
             value={input}
             onChange={(event) => setInput(event.target.value)}
             maxLength={10000}
             rows={3}
-            placeholder="Escribe aquí las líneas que leerá tu programa"
+            placeholder="Escribe aquÃ­ las lÃ­neas que leerÃ¡ tu programa"
             className="mt-2 block min-h-20 w-full resize-y border border-[#d3d3c7] bg-white px-3 py-3 font-mono text-base font-normal text-[#252b25] outline-none focus:border-[#294936] focus:ring-1 focus:ring-[#294936] sm:text-sm"
           />
         </label>
@@ -382,7 +382,7 @@ export default function PythonEditor({
           disabled={isRunning || workerState === 'loading'}
           className="flex min-h-12 w-full items-center justify-center bg-[#294936] px-5 py-3 text-base font-semibold text-white transition-colors hover:bg-[#203d31] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:text-sm"
         >
-          {isRunning ? 'Ejecutando...' : workerState === 'loading' ? 'Preparando Python...' : 'Ejecutar código'}
+          {isRunning ? 'Ejecutando...' : workerState === 'loading' ? 'Preparando Python...' : 'Ejecutar cÃ³digo'}
         </button>
 
         {workerState === 'error' && (
@@ -407,14 +407,14 @@ export default function PythonEditor({
       >
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-semibold text-[#252b25]">Salida del programa</h2>
-          <span className="text-xs text-[#596259]">{isRunning ? 'Ejecución en curso' : workerState === 'ready' ? 'Ejecución local en el navegador' : 'Entorno Python'}</span>
+          <span className="text-xs text-[#596259]">{isRunning ? 'EjecuciÃ³n en curso' : workerState === 'ready' ? 'EjecuciÃ³n local en el navegador' : 'Entorno Python'}</span>
         </div>
         <pre
           aria-live="polite"
           aria-atomic="true"
           className="max-h-[42svh] min-h-28 overflow-auto whitespace-pre-wrap break-words border border-[#d3d3c7] bg-[#ebe9df] p-4 font-mono text-sm leading-6 text-[#252b25] sm:max-h-64"
         >
-          {output || (workerState === 'ready' ? '> Entorno listo. Ejecuta código para consultar el resultado.' : '> Preparando el entorno Python en el navegador...')}
+          {output || (workerState === 'ready' ? '> Entorno listo. Ejecuta cÃ³digo para consultar el resultado.' : '> Preparando el entorno Python en el navegador...')}
         </pre>
         <button
           type="button"
@@ -445,8 +445,8 @@ export default function PythonEditor({
         className={`${mobilePanel === 'turtle' ? 'block' : 'hidden'} mt-4 md:block`}
       >
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-sm font-semibold text-[#252b25]">Gráficos de Turtle</h2>
-          <span className="text-xs text-[#596259]">{turtleCommands.length > 0 ? `${turtleCommands.length} trazo(s) dibujado(s)` : 'Ejecuta código con Turtle para ver el dibujo'}</span>
+          <h2 className="text-sm font-semibold text-[#252b25]">GrÃ¡ficos de Turtle</h2>
+          <span className="text-xs text-[#596259]">{turtleCommands.length > 0 ? `${turtleCommands.length} trazo(s) dibujado(s)` : 'Ejecuta cÃ³digo con Turtle para ver el dibujo'}</span>
         </div>
         {turtleError && (
           <p className="mb-2 text-sm text-[#7f3027] bg-[#fdf3f3] border border-[#a04435] px-3 py-2 rounded">
@@ -456,7 +456,7 @@ export default function PythonEditor({
         <div className="flex flex-col items-center justify-center min-h-[200px] max-h-[600px] overflow-auto border border-[#d3d3c7] bg-[#ebe9df] rounded-lg">
           {turtleCommands.length === 0 ? (
             <p className="text-sm text-[#596259] py-4">
-              Ejecuta código Python con la librería turtle para ver el dibujo aquí.
+              Ejecuta cÃ³digo Python con la librerÃ­a turtle para ver el dibujo aquÃ­.
             </p>
           ) : (
             <svg
@@ -516,6 +516,18 @@ export default function PythonEditor({
                       {cmd.text}
                     </text>
                   );
+                if (cmd.type === "bgcolor") {
+                  return (
+                    <rect
+                      key={`turtle-bgcolor-${idx}`}
+                      x="-250"
+                      y="-250"
+                      width="500"
+                      height="500"
+                      fill={cmd.color ?? "white"}
+                    />
+                  );
+                }
                 }
                 return null;
               })}
@@ -528,7 +540,7 @@ export default function PythonEditor({
           disabled={turtleCommands.length === 0}
           className="mt-3 flex min-h-11 w-full items-center justify-center border border-[#294936] px-4 py-2 text-sm font-semibold text-[#294936] hover:bg-[#ebe9df] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936] disabled:cursor-not-allowed disabled:opacity-50 md:hidden"
         >
-          Limpiar gráfico
+          Limpiar grÃ¡fico
         </button>
       </div>
     </section>

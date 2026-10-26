@@ -1,4 +1,4 @@
-"""Modulo de compatibilidad con Turtle para Pyodide en navegador."""
+﻿"""Modulo de compatibilidad con Turtle para Pyodide en navegador."""
 
 import math
 
@@ -7,7 +7,7 @@ _turtles = {}
 _current = None
 _screen = None
 
-
+_screen_bgcolor = "white"
 def _get_turtle():
     global _current
     if _current is None:
@@ -377,6 +377,13 @@ def done():
 
 def Screen():
     return Screen()
+
+def bgcolor(color=None):
+    global _screen_bgcolor
+    if color is not None:
+        _screen_bgcolor = str(color)
+    _commands.append({"type": "bgcolor", "color": _screen_bgcolor})
+    return _screen_bgcolor
 
 
 def get_commands():

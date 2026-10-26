@@ -1,8 +1,138 @@
-﻿import Link from "next/link";
-import { useTheme } from "@/app/theme-provider";
-import ThemeSelector from "@/components/ThemeSelector";
+﻿'use client';
+import Link from 'next/link';
+import { useState } from 'react';
+import { useTheme } from '@/app/theme-provider';
+import ThemeSelector from '@/components/ThemeSelector';
+import PortadaLab from '@/components/PortadaLab';
+
+type Example = {
+  id: string;
+  title: string;
+  subtitle: string;
+  level: string;
+  concepts: string[];
+  code: string;
+  description: string;
+};
+
+const EXAMPLES: Example[] = [
+  {
+    id: 'arbol-fractal',
+    title: 'Árbol fractal',
+    subtitle: 'Recursividad y ramas',
+    level: 'Intermedio',
+    concepts: ['funciones', 'recursividad', 'condicionales'],
+    code: `import turtle as t
+
+t.bgcolor("black")
+t.speed(0)
+t.hideturtle()
+
+def rama(n):
+    if n < 10:
+        return
+    t.pencolor("white" if n > 25 else "lime")
+    t.forward(n)
+    t.left(25); rama(n * 0.78)
+    t.right(50); rama(n * 0.78)
+    t.left(25); t.backward(n)
+
+t.left(90); t.backward(150)
+rama(110)
+
+t.done()`,
+    description: 'Dibuja un árbol fractal recursivo con ramas principales y ramas más pequeñas en blanco y verde lima.',
+  },
+  {
+    id: 'espiral-geometrica',
+    title: 'Espiral geométrica',
+    subtitle: 'Bucles y ángulos',
+    level: 'Principiante',
+    concepts: ['bucles', 'variables', 'operadores'],
+    code: `import turtle as t
+
+t.bgcolor("black")
+t.speed(0)
+t.hideturtle()
+t.pencolor("cyan")
+
+for i in range(200):
+    t.forward(i * 2)
+    t.left(89)`,
+    description: 'Dibuja una espiral que crece progresivamente usando un bucle y un ángulo cercano a 90°.',
+  },
+  {
+    id: 'arte-circulos',
+    title: 'Arte con círculos',
+    subtitle: 'Iteración y parámetros',
+    level: 'Principiante',
+    concepts: ['bucles', 'funciones', 'parámetros'],
+    code: `import turtle as t
+
+t.bgcolor("black")
+t.speed(0)
+t.hideturtle()
+
+for i in range(36):
+    t.pencolor("magenta" if i % 2 == 0 else "cyan")
+    t.circle(100)
+    t.left(10)`,
+    description: 'Dibuja 36 círculos rotados progresivamente para crear un patrón floral.',
+  },
+  {
+    id: 'visualizacion-matematica',
+    title: 'Visualización matemática',
+    subtitle: 'Funciones y patrones',
+    level: 'Intermedio',
+    concepts: ['funciones matemáticas', 'bucles', 'trigonometría'],
+    code: `import turtle as t
+import math
+
+t.bgcolor("black")
+t.speed(0)
+t.hideturtle()
+t.pencolor("lime")
+
+for i in range(360):
+    x = i * math.cos(math.radians(i)) * 0.5
+    y = i * math.sin(math.radians(i)) * 0.5
+    t.penup()
+    t.goto(x, y)
+    t.pendown()
+    t.dot(3)`,
+    description: 'Dibuja una espiral matemática usando funciones seno y coseno.',
+  },
+  {
+    id: 'texto-interactivo',
+    title: 'Saludo interactivo',
+    subtitle: 'Entrada y cadenas',
+    level: 'Principiante',
+    concepts: ['input()', 'cadenas', 'variables'],
+    code: `nombre = input("¿Cómo te llamas? ")
+print("Hola, " + nombre + "!")
+print("Bienvenido a Python desde cero.")`,
+    description: 'Programa que pide tu nombre por entrada y te saluda personalmente.',
+  },
+  {
+    id: 'reto-logica',
+    title: 'Reto de lógica',
+    subtitle: 'Condiciones y comparaciones',
+    level: 'Intermedio',
+    concepts: ['condicionales', 'operadores de comparación'],
+    code: `edad = int(input("¿Cuántos años tienes? "))
+
+if edad >= 18:
+    print("Eres mayor de edad.")
+elif edad >= 13:
+    print("Eres adolescente.")
+else:
+    print("Eres un niño.")`,
+    description: 'Programa que clasifica la edad de una persona usando condiciones.',
+  },
+];
 
 export default function Home() {
+  const [selectedExample, setSelectedExample] = useState(EXAMPLES[0]);
   useTheme();
 
   return (
@@ -103,25 +233,58 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="ejemplo" className="mx-auto grid max-w-7xl gap-8 px-5 py-14 sm:py-16 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-        <div>
-          <p className="text-xs font-bold tracking-[0.18em] text-[#294936]">EJEMPLO ILUSTRATIVO</p>
-          <h2 className="mt-3 font-serif text-3xl sm:text-4xl">Variables y multiplicaci&oacute;n.</h2>
-          <p className="mt-4 leading-7 text-[#596259]">
-            El programa guarda dos valores, los multiplica y muestra el total. Este bloque es solo una muestra; para ejecutar c&oacute;digo, abre el laboratorio.
-          </p>
-          <p className="mt-5 text-sm font-semibold text-[#294936]">Salida esperada: 3600</p>
-          <Link href="/practica" className="mt-6 inline-flex bg-[#294936] px-5 py-3 text-sm font-semibold text-white hover:bg-[#203d31]">
-            Practicar en el laboratorio
-          </Link>
-        </div>
-
-        <div className="overflow-hidden border border-[#d3d3c7] bg-white">
-          <div className="flex items-center justify-between border-b border-[#d3d3c7] px-4 py-3">
-            <p className="text-xs font-bold tracking-[0.12em] text-[#596259]">PYTHON / EJEMPLO 01</p>
-            <span className="text-xs text-[#776945]">Solo ilustrativo</span>
+      <section id="ejemplo" className="mx-auto max-w-7xl px-5 py-14 sm:py-16">
+        <div className="flex flex-col lg:flex-row gap-8">
+          <div className="lg:w-1/3 flex-shrink-0">
+            <p className="text-xs font-bold tracking-[0.18em] text-[#294936]">
+              LABORATORIO INTERACTIVO
+            </p>
+            <h2 className="mt-3 font-serif text-3xl sm:text-4xl">
+              Ejecuta código Python ahora
+            </h2>
+            <p className="mt-4 leading-7 text-[#596259]">
+              Cambia de ejemplo, edita el código y pulsa Ejecutar para ver el
+              resultado en tiempo real.
+            </p>
+            <div className="mt-6 space-y-3">
+              {EXAMPLES.map((example) => (
+                <button
+                  key={example.id}
+                  type="button"
+                  onClick={() => setSelectedExample(example)}
+                  className={`flex w-full items-start gap-3 px-4 py-3 rounded-lg border transition-colors text-left ${
+                    selectedExample.id === example.id
+                      ? 'border-[#294936] bg-[#ebe9df] shadow-sm'
+                      : 'border-transparent hover:border-[#d3d3c7] hover:bg-[#f4f2e9]'
+                  }`}
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-semibold text-[#252b25]">
+                        {example.title}
+                      </span>
+                      <span className="text-[10px] font-bold text-[#294936] uppercase tracking-[0.2em]">
+                        {example.level}
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#596259] mt-1">
+                      {example.description}
+                    </p>
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {example.concepts.map((c) => (
+                        <span key={c} className="text-[10px] px-1.5 py-0.5 bg-[#dce5d8] text-[#294936] rounded">
+                          {c}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
-          <pre className="overflow-x-auto p-5 text-sm leading-7 text-[#203d31] sm:p-7"><code>{"precio_unitario = 1200\ncantidad = 3\ntotal = precio_unitario * cantidad\n\nprint(total)  # 3600"}</code></pre>
+          <div className="lg:w-2/3">
+            <PortadaLab defaultCode={selectedExample.code} />
+          </div>
         </div>
       </section>
 
