@@ -15,7 +15,8 @@ const cspDirectives = [
   "frame-src 'self'",
   "object-src 'none'",
   "base-uri 'self'",
-  "frame-ancestors 'none'",
+  // Permite iframe del runner de Python mismo origen (aislado por sandbox y postMessage).
+  "frame-ancestors 'self'",
   "report-uri /api/csp-report",
 ].join('; ');
 
@@ -25,7 +26,8 @@ const securityHeaders = [
     value: cspDirectives,
   },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
-  { key: 'X-Frame-Options', value: 'DENY' },
+  // Permite iframe same-origin para el runner aislado de Python.
+  { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   {
     key: 'Permissions-Policy',
