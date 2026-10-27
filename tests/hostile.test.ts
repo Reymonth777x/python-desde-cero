@@ -43,18 +43,20 @@ async function setupRunner(page: any) {
     setTimeout(() => { window.removeEventListener('message', h); res(); }, 15000);
   }));
   const run = (code: string, input: string[] = []) => {
-    page.evaluate(({ c, i }) => {
-      const ifrs = document.querySelectorAll('iframe[src="/python-runner"]');
-      const ifr = ifrs[ifrs.length - 1];
-      if (ifr?.contentWindow) ifr.contentWindow.postMessage({ type: 'run', code: c, input: i }, '*');
-    }, { c: code, i: input });
+    page.evaluate(
+      ({ c, i }: { c: string; i: string[] }) => {
+        const ifrs = document.querySelectorAll('iframe[src="/python-runner"]');
+        const ifr = ifrs[ifrs.length - 1] as HTMLIFrameElement | null;
+        if (ifr?.contentWindow)
+          ifr.contentWindow.postMessage({ type: 'run', code: c, input: i }, '*');
+      },
+      { c: code, i: input },
+    );
   };
   return { run, getMsgs: () => page.evaluate(() => (window as any).getMsgs?.()) };
 }
 
 test.describe('pruebas hostiles', () => {
-  test.use({ timeout: 60000 });
-
   test('no lectura de localStorage', async ({ page }) => {
     const { run, getMsgs } = await setupRunner(page);
     run(`from js import window\ntry:\n    print("LEAK:", window.localStorage.getItem("test"))\nexcept Exception as e:\n    print("BLOCKED:", type(e).__name__)`);

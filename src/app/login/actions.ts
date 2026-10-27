@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/server';
 export async function login(formData: FormData) {
   const email = String(formData.get('email') ?? '').trim();
   const password = String(formData.get('password') ?? '');
+  const captchaToken = String(formData.get('captchaToken') ?? '');
 
   if (!email || !password) {
     redirect('/login?error=missing');
@@ -20,6 +21,9 @@ export async function login(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword({
     email,
     password,
+    options: {
+      captchaToken: captchaToken || undefined,
+    },
   });
 
   if (error) {
@@ -50,6 +54,7 @@ export async function signup(formData: FormData) {
   const invitation = parseOptionalInvitationCode(
     invitationCodeValue ? String(invitationCodeValue) : '',
   );
+  const captchaToken = String(formData.get('captchaToken') ?? '');
 
   if (!fullName || !email || !password) {
     redirect('/login?error=missing');
@@ -87,6 +92,7 @@ export async function signup(formData: FormData) {
         invitation_code: invitation.code,
       },
       emailRedirectTo,
+      captchaToken: captchaToken || undefined,
     },
   });
 
@@ -108,6 +114,7 @@ export async function signup(formData: FormData) {
 
 export async function requestPasswordReset(formData: FormData) {
   const email = String(formData.get('email') ?? '').trim();
+  const captchaToken = String(formData.get('captchaToken') ?? '');
 
   if (!email || email.length > 254) {
     redirect('/login/forgot-password?error=missing');

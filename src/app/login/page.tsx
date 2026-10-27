@@ -1,6 +1,7 @@
 
 import { login, signup } from './actions';
 import Link from 'next/link';
+import { TurnstileWidget } from '@/components/TurnstileWidget';
 
 type Props = {
   searchParams?: Promise<{
@@ -150,6 +151,13 @@ export default async function LoginPage({ searchParams }: Props) {
                 />
               </div>
 
+              {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+                <TurnstileWidget
+                  siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+                  onReset={() => {}}
+                />
+              )}
+
               <button
                 type="submit"
                 className="min-h-12 w-full bg-[#294936] px-5 py-3 text-base font-semibold text-white transition-colors hover:bg-[#203d31] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936]"
@@ -251,6 +259,13 @@ export default async function LoginPage({ searchParams }: Props) {
                   Mínimo 8 caracteres.
                 </p>
               </div>
+
+              {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+                <TurnstileWidget
+                  siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+                  onReset={() => {}}
+                />
+              )}
 
               <button
                 type="submit"

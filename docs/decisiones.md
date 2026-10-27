@@ -52,3 +52,30 @@ La CSP original era mínima (solo `base-uri`, `object-src`, `frame-ancestors`). 
 - Nuevo: `src/app/api/csp-report/route.ts` (endpoint de informes CSP)
 - Nuevo: `src/app/python-runner/page.tsx` (runner aislado en iframe)
 - Nuevo: `tests/hostile.test.ts` (pruebas de aislamiento y CSP)
+
+## Decisión 3.3 — Antibots en registro y login (Turnstile + Supabase captchaToken)
+
+### Contexto
+Los formularios de registro, login y recuperación de contraseña están expuestos a ataques de bots (credential stuffing, creación masiva de cuentas, fuerza bruta). Supabase Auth soporta CAPTCHA nativo mediante `captchaToken` en `signUp`, `signInWithPassword` y `resetPasswordForEmail`.
+
+### Opciones
+- **Opción A:** Cloudflare Turnstile (captchaToken nativo de Supabase Auth) + variables de entorno para claves
+- **Opción B:** hCaptcha (también soportado por Supabase Auth)
+- **Opción C:** Implementar rate limiting personalizado en el servidor sin CAPTCHA
+
+### Decisión
+**Opción A:** Cloudflare Turnstile integrado mediante `captchaToken` de Supabase Auth en registro, login y recuperación. Claves por variables de entorno (`.env.example`, sin valores reales). Claves de prueba de Turnstile en local/e2e.
+
+### Motivo
+- Turnstile es gratuito, no requiere resolver desafíos en la mayoría de casos (invisible), y está integrado nativamente en Supabase Auth.
+- `captchaToken` se valida en el servidor de Supabase, no en el cliente.
+- Supabase Auth ya tiene rate limits integrados (30 req/5 min para login, 60s por usuario para recuperación, etc.).
+- Los mensajes de error ya son uniformes (no revelan si el correo existe).
+
+### Archivos afectados
+- Modificado: `.env.example` (añadir NEXT_PUBLIC_TURNSTILE_SITE_KEY y TURNSTILE_SECRET_KEY)
+- Modificado: `src/app/login/actions.ts` (verificar captchaToken en login, signup, requestPasswordReset)
+- Modificado: `src/app/login/page.tsx` (widget Turnstile en formularios)
+- Modificado: `src/app/login/forgot-password/page.tsx` (widget Turnstile)
+- Modificado: `playwright.config.ts` (configurar Turnstile en e2e)
+- Nuevo: `docs/decisiones.md` (esta decisión)

@@ -1,4 +1,5 @@
 import { requestPasswordReset } from '../actions';
+import { TurnstileWidget } from '@/components/TurnstileWidget';
 
 type Props = {
   searchParams?: Promise<{
@@ -42,6 +43,14 @@ export default async function ForgotPasswordPage({ searchParams }: Props) {
             <label htmlFor="reset-email" className="text-sm font-semibold">Correo electrónico</label>
             <input id="reset-email" name="email" type="email" autoComplete="email" required className="mt-2 min-h-12 w-full border border-[#d3d3c7] bg-white px-3 py-3 text-base outline-none focus:border-[#294936] focus:ring-1 focus:ring-[#294936]" />
           </div>
+
+          {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+            <TurnstileWidget
+              siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+              onReset={() => {}}
+            />
+          )}
+
           <button type="submit" className="min-h-12 w-full bg-[#294936] px-5 py-3 text-base font-semibold text-white hover:bg-[#203d31] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936]">
             Enviar instrucciones
           </button>
