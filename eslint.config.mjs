@@ -19,8 +19,9 @@ export default defineConfig([
     'playwright-report/**',
     'test-results/**',
     'coverage/**',
-    // Dependencia estática vendored (Pyodide, ~8 MB): no se lintea.
+    // Dependencias estáticas vendored (Pyodide ~8 MB y Monaco Editor ~1 MB): no se lintean.
     'public/pyodide/**',
+    'public/monaco/**',
   ]),
   // public/ es un worker estático de navegador (python-worker.js) que corre
   // fuera del bundle de Next.js. Se lintea con los globals de Worker que usa.
