@@ -14,11 +14,14 @@ export function TurnstileWidget({
   const widgetRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [isReady, setIsReady] = useState(false);
+  const [isReady, setIsReady] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return !!window.turnstile;
+  });
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (!(window as any).turnstile) {
+    if (!window.turnstile) {
       const script = document.createElement('script');
       script.src =
         'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
@@ -26,8 +29,6 @@ export function TurnstileWidget({
       script.defer = true;
       script.onload = () => setIsReady(true);
       document.head.appendChild(script);
-    } else {
-      setIsReady(true);
     }
   }, []);
 
@@ -36,11 +37,11 @@ export function TurnstileWidget({
       !isReady ||
       !containerRef.current ||
       typeof window === 'undefined' ||
-      !(window as any).turnstile
+      !window.turnstile
     )
       return;
 
-    widgetRef.current = (window as any).turnstile.render(containerRef.current, {
+    widgetRef.current = window.turnstile!.render(containerRef.current, {
       sitekey: siteKey,
       callback: (token: string) => {
         if (inputRef.current) inputRef.current.value = token;
@@ -51,19 +52,19 @@ export function TurnstileWidget({
 
     return () => {
       if (widgetRef.current !== null) {
-        (window as any).turnstile.remove(widgetRef.current);
+        window.turnstile!.remove(widgetRef.current);
         widgetRef.current = null;
       }
     };
   }, [isReady, siteKey, onVerify]);
 
   const reset = useCallback(() => {
-    if (widgetRef.current !== null && typeof window !== 'undefined' && (window as any).turnstile) {
-      (window as any).turnstile.remove(widgetRef.current);
+    if (widgetRef.current !== null && typeof window !== 'undefined' && window.turnstile) {
+      window.turnstile!.remove(widgetRef.current);
       widgetRef.current = null;
       if (inputRef.current) inputRef.current.value = '';
       if (containerRef.current) {
-        widgetRef.current = (window as any).turnstile.render(
+        widgetRef.current = window.turnstile!.render(
           containerRef.current,
           {
             sitekey: siteKey,

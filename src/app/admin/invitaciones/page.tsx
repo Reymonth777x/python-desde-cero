@@ -3,6 +3,14 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createInvitation } from './actions';
 
+type InvitationRow = {
+  id: string;
+  code: string;
+  is_used: boolean;
+  expires_at: string | null;
+  created_at: string;
+};
+
 type Props = {
   searchParams?: Promise<{
     created?: string;
@@ -38,11 +46,13 @@ export default async function InvitationsPage({ searchParams }: Props) {
     redirect('/practica');
   }
 
-  const { data: invitations, error: invitationsError } = await supabase
+  const invitationsResult = await supabase
     .from('invitations')
     .select('id, code, is_used, expires_at, created_at')
     .order('created_at', { ascending: false })
     .limit(50);
+  const invitations = invitationsResult.data as InvitationRow[] | null;
+  const invitationsError = invitationsResult.error;
 
   return (
     <main className="min-h-screen bg-[#f4f2e9] px-5 py-8 text-[#252b25] sm:px-8 sm:py-10">

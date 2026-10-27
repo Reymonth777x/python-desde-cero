@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 type RunnerMessage = {
   type: 'run';
@@ -13,14 +13,14 @@ type RunnerMessage = {
 };
 
 type RunnerResponse = {
-  type: 'ready';
+  status: 'ready';
 } | {
-  type: 'init-error';
+  status: 'init-error';
   error: string;
 } | {
-  type: 'result';
+  status: 'result';
   id: number;
-  status: 'success' | 'error';
+  resultStatus: 'success' | 'error';
   output?: string;
   error?: string;
   turtle_commands?: unknown;
@@ -33,19 +33,36 @@ export default function PythonRunner() {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const postToWorker = useCallback((msg: RunnerMessage) => {
+    const w = workerRef.current;
+    if (!w || !ready) return;
+    if (msg.type === 'run') {
+      requestIdRef.current += 1;
+      w.postMessage({ id: requestIdRef.current, code: msg.code, input: msg.input });
+    } else {
+      w.postMessage(msg);
+    }
+  }, [ready]);
+
   useEffect(() => {
-    let worker: Worker;
+    let worker: Worker | null = null;
+    let initError: string | null = null;
     try {
       worker = new Worker('/python-worker.js');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo iniciar el ejecutor');
+      initError = err instanceof Error ? err.message : 'No se pudo iniciar el ejecutor';
+    }
+    // Aplazar el setState al microtask para no llamarlo directamente dentro del cuerpo del effect
+    // (evita renders en cascada en modo concurrente; respeta react-hooks/set-state-in-effect).
+    if (initError) {
+      queueMicrotask(() => setError(initError));
       return;
     }
-    workerRef.current = worker;
+    workerRef.current = worker!;
 
-    worker.onmessage = (event: MessageEvent<RunnerResponse>) => {
+    worker!.onmessage = (event: MessageEvent<RunnerResponse>) => {
       const data = event.data;
-      if (data.type === 'ready') {
+      if (data.status === 'ready') {
         setReady(true);
         setError(null);
         const pending = pendingRef.current;
@@ -55,37 +72,26 @@ export default function PythonRunner() {
         }
         return;
       }
-      if (data.type === 'init-error') {
+      if (data.status === 'init-error') {
         setError(data.error ?? 'No se pudo cargar Pyodide');
-        worker.terminate();
+        worker!.terminate();
         workerRef.current = null;
         return;
       }
-      if (data.type === 'result') {
+      if (data.status === 'result') {
         window.parent.postMessage(data, '*');
       }
     };
 
-    worker.onerror = () => {
+    worker!.onerror = () => {
       setError('Error inesperado del ejecutor');
       setReady(false);
     };
 
     return () => {
-      worker.terminate();
+      worker!.terminate();
     };
-  }, []);
-
-  const postToWorker = (msg: RunnerMessage) => {
-    const w = workerRef.current;
-    if (!w || !ready) return;
-    if (msg.type === 'run') {
-      requestIdRef.current += 1;
-      w.postMessage({ id: requestIdRef.current, code: msg.code, input: msg.input });
-    } else {
-      w.postMessage(msg);
-    }
-  };
+  }, [postToWorker]);
 
   // Escuchar mensajes del padre (la página que emite el iframe)
   useEffect(() => {
@@ -109,7 +115,7 @@ export default function PythonRunner() {
     };
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [ready]);
+  }, [ready, postToWorker]);
 
   // Notificar al padre que el runner está listo
   useEffect(() => {

@@ -1,4 +1,4 @@
-﻿"""Modulo de compatibilidad con Turtle para Pyodide en navegador."""
+"""Modulo de compatibilidad con Turtle para Pyodide en navegador."""
 
 import math
 

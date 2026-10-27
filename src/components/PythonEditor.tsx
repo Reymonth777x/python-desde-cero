@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Editor from '@monaco-editor/react';
@@ -6,8 +6,8 @@ import type { editor } from 'monaco-editor';
 import { usePythonWorker } from '@/lib/use-python-worker';
 
 // Configura Monaco Editor para usar workers autohospedados desde /monaco/vs/
-if (typeof window !== 'undefined' && !(window as any).MonacoEnvironment) {
-  (window as any).MonacoEnvironment = {
+if (typeof window !== 'undefined' && !window.MonacoEnvironment) {
+  window.MonacoEnvironment = {
     baseUrl: '/monaco/vs/',
   };
 }
