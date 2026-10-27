@@ -136,14 +136,14 @@ export async function submitQuiz(
   // 5. Obtener explicaciones (solo se devuelven tras enviar)
   const explanations = getExplanations(moduleId, lessonId);
 
-  // 6. Registrar intento y progreso vía RPC SECURITY DEFINER
+  // 6. Registrar intento y progreso vía submit_quiz (SECURITY DEFINER).
+  //    El servidor solo envía las respuestas; la base de datos calcula score,
+  //    passed, aplica límites de intentos y hace upsert de progress.
   const { data: rpcResult, error: rpcError } = await supabase.rpc(
-    'record_quiz_attempt',
+    'submit_quiz',
     {
       p_module_id: moduleId,
       p_lesson_id: lessonId,
-      p_score: score,
-      p_passed: passed,
       p_answers: answers,
     }
   );
@@ -161,12 +161,16 @@ export async function submitQuiz(
   }
 
   const completed = Boolean(rpcResult?.completed);
+  const rpcScore = Number(rpcResult?.score ?? score);
+  const rpcPassed = Boolean(rpcResult?.passed ?? passed);
+  const rpcCorrect = Number(rpcResult?.correct ?? correct);
+  const rpcTotal = Number(rpcResult?.total ?? total);
 
   return {
-    score,
-    passed,
-    correct,
-    total,
+    score: rpcScore,
+    passed: rpcPassed,
+    correct: rpcCorrect,
+    total: rpcTotal,
     explanations,
     completed,
   };
