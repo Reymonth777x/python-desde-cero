@@ -4,7 +4,7 @@ import { useTheme } from '@/app/theme-provider';
 import { useState } from 'react';
 
 type ThemeOption = {
-  id: 'original' | 'dark' | 'hacker' | 'dracula' | 'cyberpunk';
+  id: 'original' | 'dark';
   label: string;
   description: string;
   color: string;
@@ -22,24 +22,6 @@ const THEMES: ThemeOption[] = [
     label: 'Oscuro',
     description: 'Espacio de trabajo sobrio',
     color: '#3b82f6',
-  },
-  {
-    id: 'hacker',
-    label: 'Hacker',
-    description: 'Terminal verde carbón',
-    color: '#00ff41',
-  },
-  {
-    id: 'dracula',
-    label: 'Dracula',
-    description: 'Editor morado y violeta',
-    color: '#bd93f9',
-  },
-  {
-    id: 'cyberpunk',
-    label: 'Cyberpunk',
-    description: 'Laboratorio futurista cian',
-    color: '#00ffff',
   },
 ];
 

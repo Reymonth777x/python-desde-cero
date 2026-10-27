@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 
-type ThemeName = 'original' | 'dark' | 'hacker' | 'dracula' | 'cyberpunk';
+type ThemeName = 'original' | 'dark';
 
 type ThemeContextValue = {
   theme: ThemeName;
@@ -17,7 +17,7 @@ function leerTemaGuardado(): ThemeName {
   if (typeof window === 'undefined') return 'original';
   try {
     const guardado = localStorage.getItem(THEME_KEY);
-    if (guardado === 'original' || guardado === 'dark' || guardado === 'hacker' || guardado === 'dracula' || guardado === 'cyberpunk') {
+    if (guardado === 'original' || guardado === 'dark') {
       return guardado;
     }
   } catch {
