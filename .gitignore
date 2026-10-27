@@ -48,3 +48,9 @@ next-env.d.ts
 # Dependencias de navegador vendored (se restauran con npm install + postinstall)
 /public/pyodide/
 /public/monaco/
+
+# Wrangler / Cloudflare local state
+/.wrangler/
+
+# Supabase CLI temp
+/supabase/.temp/

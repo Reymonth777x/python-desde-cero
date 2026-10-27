@@ -12,7 +12,8 @@
     "test:e2e": "playwright test",
     "preview": "wrangler pages dev .next",
     "deploy": "wrangler pages deploy .next",
-    "postinstall": "node scripts/restore-browser-assets.js"
+    "postinstall": "node scripts/restore-browser-assets.js",
+    "doctor": "node scripts/doctor.mjs"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",

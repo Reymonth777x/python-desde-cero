@@ -16,8 +16,10 @@ function copyRecursive(src, dest) {
 
 const root = process.cwd();
 
-// Pyodide desde node_modules/pyodide (versión fija en package.json)
-const pyodideSrc = join(root, 'node_modules', 'pyodide', 'full');
+// Pyodide desde node_modules/pyodide (versión fija en package.json).
+// El paquete npm pyodide publica los archivos en la raíz del paquete,
+// no bajo una subcarpeta "full/".
+const pyodideSrc = join(root, 'node_modules', 'pyodide');
 const pyodideDest = join(root, 'public', 'pyodide', '0.29.5', 'full');
 try {
   copyRecursive(pyodideSrc, pyodideDest);
