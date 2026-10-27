@@ -79,3 +79,27 @@ Los formularios de registro, login y recuperación de contraseña están expuest
 - Modificado: `src/app/login/forgot-password/page.tsx` (widget Turnstile)
 - Modificado: `playwright.config.ts` (configurar Turnstile en e2e)
 - Nuevo: `docs/decisiones.md` (esta decisión)
+
+## Decisión 3.4 — CSP basada en hosts exactos y wasm-unsafe-eval (no nonces)
+
+### Contexto
+La CSP actual permite `'unsafe-eval'` (Pyodide WASM + Monaco Editor) y `'unsafe-inline'` para estilos (Tailwind). Se necesita añadir `challenges.cloudflare.com` (Turnstile) y reemplazar comodines `*.supabase.co` por el host exacto del proyecto en `connect-src`.
+
+### Opciones
+- **Opción A:** CSP basada en nonces (middleware inyecta nonce por request, renderizado dinámico, impacto en caché).
+- **Opción B:** CSP basada en hashes de scripts en línea (pre-computados en build, sin impacto en caché).
+- **Opción C:** CSP con hosts explícitos y `'unsafe-eval'` mantenido (sin nonces ni hashes, más simple).
+
+### Decisión
+**Opción C:** CSP con hosts explícitos, `'unsafe-eval'` mantenido (justificado por Pyodide WASM y Monaco), y `wasm-unsafe-eval` añadido como alternativa más restrictiva.
+
+### Motivo
+- **Nonces (Opción A)** requerirían middleware en todas las rutas y harían el renderizado dinámico (por request), eliminando el caché estático de Next.js. El costo de rendimiento es alto para un beneficio marginal dado que `'unsafe-eval'` ya está presente.
+- **Hashes (Opción B)** requieren computar SHA-256 de todos los scripts en línea en build time. Next.js 16 ya gestiona los scripts de forma segura; los scripts en línea del usuario son mínimos. El beneficio no justifica la complejidad.
+- **Hosts explícitos (Opción C)** es el punto medio pragmático: elimina comodines en `connect-src`, añade Turnstile explícitamente, y mantiene `'unsafe-eval'` solo donde es técnicamente necesario (Pyodide/Monaco).
+- `wasm-unsafe-eval` se añade como directiva más específica para WebAssembly, que algunos navegadores respetan en lugar de `'unsafe-eval'`.
+
+### Archivos afectados
+- Modificado: `next.config.mjs` (CSP con host exacto de Supabase, Turnstile en script-src/frame-src, wasm-unsafe-eval)
+- Modificado: `playwright.config.ts` (quitar excepciones googleapis/gstatic)
+- Modificado: `docs/decisiones.md` (esta decisión)

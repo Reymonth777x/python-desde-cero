@@ -23,7 +23,7 @@ test.describe('CSP y aislamiento', () => {
     });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.goto('/login', { waitUntil: 'domcontentloaded' });
-    expect(ext.filter((u) => !u.includes('googleapis') && !u.includes('gstatic'))).toEqual([]);
+    expect(ext).toEqual([]);
   });
 });
 
