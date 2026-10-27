@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: ['**']
   pull_request:
-    branches: [master]
+    branches: ['**']
 
 jobs:
   test-and-build:
@@ -34,3 +34,9 @@ jobs:
 
       - name: Production build
         run: npm run build
+
+      - name: Run E2E tests contra build de producción
+        run: npm run test:e2e
+
+      - name: Auditoría de dependencias (falla con altas/críticas)
+        run: npm audit --audit-level=high
