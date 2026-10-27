@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { type Page, test, expect } from '@playwright/test';
 
 test.describe('CSP y aislamiento', () => {
   test('CSP cabecera presente', async ({ page }) => {
@@ -27,12 +27,20 @@ test.describe('CSP y aislamiento', () => {
   });
 });
 
-async function setupRunner(page: any) {
-  const msgs: any[] = [];
-  await page.exposeFunction('collect', (m: any) => msgs.push(m));
+interface RunnerHarness {
+  run: (code: string, input?: string[]) => void;
+  getMsgs: () => Promise<unknown[]>;
+  waitForOutput: (timeoutMs?: number) => Promise<void>;
+}
+
+async function setupRunner(page: Page): Promise<RunnerHarness> {
+  const msgs: unknown[] = [];
+  await page.exposeFunction('collect', (m: unknown) => msgs.push(m));
   await page.exposeFunction('getMsgs', () => msgs);
   await page.evaluate(() => {
-    window.addEventListener('message', (e) => (window as any).collect(e.data));
+    window.addEventListener('message', (e) => {
+      (window as unknown as { collect: (m: unknown) => void }).collect(e.data);
+    });
   });
   await page.evaluate(() => new Promise<void>((res) => {
     const ifr = document.createElement('iframe');
@@ -47,59 +55,66 @@ async function setupRunner(page: any) {
       ({ c, i }: { c: string; i: string[] }) => {
         const ifrs = document.querySelectorAll('iframe[src="/python-runner"]');
         const ifr = ifrs[ifrs.length - 1] as HTMLIFrameElement | null;
-        if (ifr?.contentWindow)
-          ifr.contentWindow.postMessage({ type: 'run', code: c, input: i }, '*');
+        if (ifr?.contentWindow) {
+          ifr.contentWindow.postMessage({ type: 'run', code: c, input: i }, window.location.origin);
+        }
       },
       { c: code, i: input },
     );
   };
-  return { run, getMsgs: () => page.evaluate(() => (window as any).getMsgs?.()) };
+  const waitForOutput = (timeoutMs = 15000) =>
+    page.waitForFunction(
+      () => (window as unknown as { getMsgs: () => unknown[] }).getMsgs().length > 0,
+      { timeout: timeoutMs },
+    ).then(() => {});
+  const getMsgs = () => page.evaluate(() => (window as unknown as { getMsgs: () => unknown[] }).getMsgs?.());
+  return { run, getMsgs, waitForOutput };
 }
 
 test.describe('pruebas hostiles', () => {
   test('no lectura de localStorage', async ({ page }) => {
-    const { run, getMsgs } = await setupRunner(page);
+    const { run, getMsgs, waitForOutput } = await setupRunner(page);
     run(`from js import window\ntry:\n    print("LEAK:", window.localStorage.getItem("test"))\nexcept Exception as e:\n    print("BLOCKED:", type(e).__name__)`);
-    await page.waitForTimeout(12000);
-    const out = (await getMsgs()).map((m: any) => JSON.stringify(m)).join('\n');
+    await waitForOutput().catch(() => {});
+    const out = (await getMsgs()).map((m) => JSON.stringify(m)).join('\n');
     expect(out).not.toContain('LEAK:');
     expect(out).toMatch(/BLOCKED:|error|init-error/);
   });
 
   test('no fetch externo', async ({ page }) => {
-    const { run, getMsgs } = await setupRunner(page);
+    const { run, getMsgs, waitForOutput } = await setupRunner(page);
     run(`import urllib.request\ntry:\n    urllib.request.urlopen("https://evil.example.com/")\n    print("FETCH_OK")\nexcept Exception as e:\n    print("BLOCKED:", type(e).__name__)`);
-    await page.waitForTimeout(12000);
-    const out = (await getMsgs()).map((m: any) => JSON.stringify(m)).join('\n');
+    await waitForOutput().catch(() => {});
+    const out = (await getMsgs()).map((m) => JSON.stringify(m)).join('\n');
     expect(out).not.toContain('FETCH_OK');
     expect(out).toContain('BLOCKED:');
   });
 
   test('timeout bucle infinito', async ({ page }) => {
-    const { run, getMsgs } = await setupRunner(page);
+    const { run, getMsgs, waitForOutput } = await setupRunner(page);
     const t0 = Date.now();
     run(`while True:\n    pass`);
-    await page.waitForTimeout(18000);
+    await waitForOutput(20000).catch(() => {});
     const dt = Date.now() - t0;
-    const out = (await getMsgs()).map((m: any) => JSON.stringify(m)).join('\n');
+    const out = (await getMsgs()).map((m) => JSON.stringify(m)).join('\n');
     expect(dt).toBeLessThan(25000);
     expect(out).toMatch(/Tiempo de ejecución agotado|timeout/);
   });
 
   test('no window.open', async ({ page }) => {
-    const { run, getMsgs } = await setupRunner(page);
+    const { run, getMsgs, waitForOutput } = await setupRunner(page);
     run(`from js import window\ntry:\n    window.open("https://evil.example.com")\n    print("OPEN_OK")\nexcept Exception as e:\n    print("BLOCKED:", type(e).__name__)`);
-    await page.waitForTimeout(12000);
-    const out = (await getMsgs()).map((m: any) => JSON.stringify(m)).join('\n');
+    await waitForOutput().catch(() => {});
+    const out = (await getMsgs()).map((m) => JSON.stringify(m)).join('\n');
     expect(out).not.toContain('OPEN_OK');
     expect(out).toContain('BLOCKED:');
   });
 
   test('salida truncada', async ({ page }) => {
-    const { run, getMsgs } = await setupRunner(page);
+    const { run, getMsgs, waitForOutput } = await setupRunner(page);
     run(`print("A" * 50000)`);
-    await page.waitForTimeout(12000);
-    const out = (await getMsgs()).map((m: any) => JSON.stringify(m)).join('\n');
+    await waitForOutput().catch(() => {});
+    const out = (await getMsgs()).map((m) => JSON.stringify(m)).join('\n');
     expect(out).toContain('Salida limitada');
   });
 

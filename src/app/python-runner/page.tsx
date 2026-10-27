@@ -1,16 +1,12 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-
-type RunnerMessage = {
-  type: 'run';
-  code: string;
-  input: string[];
-} | {
-  type: 'init';
-} | {
-  type: 'terminate';
-};
+import {
+  getRunnerWorker,
+  postToRunner,
+  setRunnerMessageHandler,
+  terminateRunnerWorker,
+} from '@/lib/runner-worker';
 
 type RunnerResponse = {
   status: 'ready';
@@ -24,108 +20,133 @@ type RunnerResponse = {
   output?: string;
   error?: string;
   turtle_commands?: unknown;
+} | {
+  status: 'error';
+  id: number;
+  error: string;
 };
+
+type ParentMessage = { type: 'run'; code: string; input: string[] } | { type: 'init' } | { type: 'terminate' };
+
+// Tiempo máximo de ejecución (ms). Coincide con el timeout del worker.
+const MAX_EXECUTION_TIME_MS = 15000;
 
 export default function PythonRunner() {
   const requestIdRef = useRef(0);
-  const pendingRef = useRef<RunnerMessage | null>(null);
-  const workerRef = useRef<Worker | null>(null);
+  const pendingRef = useRef<ParentMessage | null>(null);
+  const parentOriginRef = useRef<string | null>(null);
+  const requestTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastRunIdRef = useRef<number | null>(null);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const postToWorker = useCallback((msg: RunnerMessage) => {
-    const w = workerRef.current;
-    if (!w || !ready) return;
-    if (msg.type === 'run') {
-      requestIdRef.current += 1;
-      w.postMessage({ id: requestIdRef.current, code: msg.code, input: msg.input });
-    } else {
-      w.postMessage(msg);
-    }
-  }, [ready]);
+  const { worker: runnerWorker, error: initError } = getRunnerWorker();
 
-  useEffect(() => {
-    let worker: Worker | null = null;
-    let initError: string | null = null;
-    try {
-      worker = new Worker('/python-worker.js');
-    } catch (err) {
-      initError = err instanceof Error ? err.message : 'No se pudo iniciar el ejecutor';
-    }
-    // Aplazar el setState al microtask para no llamarlo directamente dentro del cuerpo del effect
-    // (evita renders en cascada en modo concurrente; respeta react-hooks/set-state-in-effect).
-    if (initError) {
-      queueMicrotask(() => setError(initError));
-      return;
-    }
-    workerRef.current = worker!;
+  const postToParent = useCallback((data: RunnerResponse) => {
+    const origin = parentOriginRef.current;
+    if (!origin) return;
+    window.parent.postMessage(data, origin);
+  }, []);
 
-    worker!.onmessage = (event: MessageEvent<RunnerResponse>) => {
-      const data = event.data;
+  const clearRequestTimeout = useCallback(() => {
+    if (requestTimeoutRef.current) {
+      clearTimeout(requestTimeoutRef.current);
+      requestTimeoutRef.current = null;
+    }
+  }, []);
+
+  const runnerMessageHandler = useCallback(
+    (data: RunnerResponse) => {
+      clearRequestTimeout();
       if (data.status === 'ready') {
         setReady(true);
         setError(null);
         const pending = pendingRef.current;
         if (pending) {
           pendingRef.current = null;
-          postToWorker(pending);
+          postToRunner({ type: 'init' });
         }
         return;
       }
       if (data.status === 'init-error') {
         setError(data.error ?? 'No se pudo cargar Pyodide');
-        worker!.terminate();
-        workerRef.current = null;
+        terminateRunnerWorker();
+        return;
+      }
+      if (data.status === 'error') {
+        postToParent(data);
         return;
       }
       if (data.status === 'result') {
-        window.parent.postMessage(data, '*');
+        postToParent(data);
       }
-    };
+    },
+    [postToParent, clearRequestTimeout],
+  );
 
-    worker!.onerror = () => {
-      setError('Error inesperado del ejecutor');
-      setReady(false);
-    };
-
+  // Configurar el handler del worker (API imperativa, fuera de React).
+  useEffect(() => {
+    setRunnerMessageHandler(runnerMessageHandler);
     return () => {
-      worker!.terminate();
+      clearRequestTimeout();
+      terminateRunnerWorker();
     };
-  }, [postToWorker]);
+  }, [runnerMessageHandler, postToParent, clearRequestTimeout]);
 
   // Escuchar mensajes del padre (la página que emite el iframe)
   useEffect(() => {
-    const handleMessage = (event: MessageEvent<RunnerMessage>) => {
-      // Validar origen del mensaje (en producción restringir a dominios esperados)
-      if (event.data && event.data.type) {
-        if (event.data.type === 'init') {
-          postToWorker({ type: 'init' });
-        } else if (event.data.type === 'run') {
-          if (!ready) {
-            pendingRef.current = event.data;
-          } else {
-            postToWorker(event.data);
-          }
-        } else if (event.data.type === 'terminate') {
-          workerRef.current?.terminate();
-          workerRef.current = null;
+    const handleMessage = (event: MessageEvent<ParentMessage>) => {
+      // Solo acepta mensajes del mismo origen y del window.parent (iframe same-origin).
+      // Un postMessage de cualquier otro origen/ventana es ignorado.
+      if (event.source !== window.parent) return;
+      if (event.origin !== window.location.origin) return;
+      if (parentOriginRef.current === null) {
+        parentOriginRef.current = event.origin;
+      }
+      if (!event.data || !event.data.type) return;
+
+      if (event.data.type === 'init') {
+        clearRequestTimeout();
+        postToRunner({ type: 'init' });
+      } else if (event.data.type === 'run') {
+        clearRequestTimeout();
+        // Timeout real desde el hilo principal: un setTimeout dentro del worker
+        // no interrumpe la ejecución síncrona de Pyodide; terminate() sí lo hace.
+        lastRunIdRef.current = requestIdRef.current + 1;
+        requestTimeoutRef.current = setTimeout(() => {
+          terminateRunnerWorker();
           setReady(false);
+          postToParent({
+            status: 'error',
+            id: lastRunIdRef.current ?? 0,
+            error: 'Tiempo de ejecución agotado',
+          });
+        }, MAX_EXECUTION_TIME_MS + 1000);
+        if (!ready) {
+          pendingRef.current = event.data;
+        } else {
+          postToRunner({ type: 'run', id: lastRunIdRef.current, code: event.data.code, input: event.data.input });
         }
+      } else if (event.data.type === 'terminate') {
+        clearRequestTimeout();
+        terminateRunnerWorker();
+        setReady(false);
       }
     };
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [ready, postToWorker]);
+  }, [ready, postToParent, clearRequestTimeout]);
 
   // Notificar al padre que el runner está listo
   useEffect(() => {
     if (ready) {
-      window.parent.postMessage({ type: 'ready' }, '*');
+      postToParent({ status: 'ready' });
     }
-  }, [ready]);
+  }, [ready, postToParent]);
 
-  if (error) {
-    return <div className="p-4 text-sm text-red-600">{error}</div>;
+  const displayError = error ?? initError;
+  if (displayError) {
+    return <div className="p-4 text-sm text-red-600">{displayError}</div>;
   }
 
   return null; // Runner se comunica exclusivamente vía postMessage

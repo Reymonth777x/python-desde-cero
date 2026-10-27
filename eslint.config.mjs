@@ -19,14 +19,53 @@ export default defineConfig([
     'playwright-report/**',
     'test-results/**',
     'coverage/**',
-    // tests/ son pruebas e2e de Playwright, ejecutadas con `npm run test:e2e`,
-    // no código fuente de la aplicación. Playwright usa `any` extensivamente en
-    // sus tipos, lo que genera ruido de no-explicit-any con next/typescript.
-    // vitest.config.ts ya las excluye de vitest (include solo de src/**).
-    'tests/**',
-    // public/ es un worker estático de navegador (python-worker.js) que usa
-    // globals de browser (self, importScripts, fetch, setTimeout, console) y
-    // no forma parte del bundle de Next.js; lintarlo genera ruido de no-undef.
-    'public/**',
+    // Dependencia estática vendored (Pyodide, ~8 MB): no se lintea.
+    'public/pyodide/**',
   ]),
+  // public/ es un worker estático de navegador (python-worker.js) que corre
+  // fuera del bundle de Next.js. Se lintea con los globals de Worker que usa.
+  {
+    files: ['public/**'],
+    languageOptions: {
+      globals: {
+        self: 'readonly',
+        importScripts: 'readonly',
+        postMessage: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        fetch: 'readonly',
+        console: 'readonly',
+        pyodide: 'readonly',
+      },
+    },
+  },
+  // tests/ son pruebas e2e de Playwright, ejecutadas con `npm run test:e2e`
+  // (vitest.config.ts ya las excluye de vitest, que incluye solo de src/**).
+  // Playwright expone sus propios globals; se lintean con ellos.
+  {
+    files: ['tests/**'],
+    languageOptions: {
+      globals: {
+        test: 'readonly',
+        expect: 'readonly',
+        describe: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+      },
+    },
+  },
+  // src/lib/runner-worker.ts gestiona el Web Worker (API imperativa del
+  // navegador) fuera de los componentes de React.
+  {
+    files: ['src/lib/runner-worker.ts'],
+    languageOptions: {
+      globals: {
+        Worker: 'readonly',
+        MessageEvent: 'readonly',
+        window: 'readonly',
+      },
+    },
+  },
 ]);
