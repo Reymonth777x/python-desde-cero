@@ -51,6 +51,8 @@ export function usePythonWorker({
   const [turtleCommands, setTurtleCommands] = useState<TurtleCommand[]>([]);
   const [isRunning, setIsRunning] = useState(false);
 
+  const MAX_EXECUTION_TIME_MS = 15000;
+
   const createWorker = useCallback(() => {
     if (workerRef.current) return workerRef.current;
     setWorkerState('loading');
@@ -68,8 +70,31 @@ export function usePythonWorker({
       return null;
     }
 
+    const startWatchdog = () => {
+      if (timeoutRef.current !== null) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => {
+        // Watchdog del hilo principal: setTimeout dentro del worker NO corta
+        // código síncrono de Pyodide; worker.terminate() sí lo hace.
+        worker.terminate();
+        workerRef.current = null;
+        setWorkerState('error');
+        setError(
+          'Tiempo de ejecución agotado. El proceso se ha detenido.'
+        );
+        onStatusChange?.('error');
+        setIsRunning(false);
+        pendingExecutionRef.current = null;
+      }, MAX_EXECUTION_TIME_MS);
+    };
+
     worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
       const data = event.data;
+      if (timeoutRef.current !== null) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
       if (data.status === 'ready') {
         if (initializationTimeoutRef.current !== null) {
           clearTimeout(initializationTimeoutRef.current);
@@ -126,6 +151,10 @@ export function usePythonWorker({
     };
 
     worker.onerror = () => {
+      if (timeoutRef.current !== null) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
       setWorkerState('error');
       setError('Error inesperado del ejecutor de Python.');
       onStatusChange?.('error');
@@ -135,6 +164,7 @@ export function usePythonWorker({
     workerRef.current = worker;
     executeRef.current = (w, request) => {
       const requestId = ++requestIdRef.current;
+      startWatchdog();
       w.postMessage({
         id: requestId,
         code: request.code,

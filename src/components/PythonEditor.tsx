@@ -255,6 +255,15 @@ export default function PythonEditor({
         >
           {isRunning ? 'Ejecutando...' : 'Ejecutar de nuevo'}
         </button>
+        {isRunning && (
+          <button
+            type="button"
+            onClick={stopWorker}
+            className="mt-3 flex min-h-12 w-full items-center justify-center border border-[#b7a77d] px-5 py-3 text-base font-semibold text-[#3f4940] hover:bg-[#ebe9df] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b7a77d] md:hidden"
+          >
+            Detener
+          </button>
+        )}
         {workerState === 'error' && (
           <button
             type="button"
