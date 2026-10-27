@@ -1,0 +1,14 @@
+# wrangler.toml — Despliegue en Cloudflare Pages
+# Despliegue estático de Next.js (output del `next build`).
+# Para full-stack (SSR, Server Actions, middleware) se requiere vinext
+# (beta, recomendado por Cloudflare pero excluido por Decisión 3.1).
+
+name = "python-pe1-academy"
+compatibility_date = "2026-10-26"
+
+[pages]
+build_output = ".next"
+build_command = "npm run build"
+
+[observability]
+enabled = true
