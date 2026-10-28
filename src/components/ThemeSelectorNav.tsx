@@ -1,8 +1,8 @@
 'use client';
 
-import { useTheme } from '@/app/theme-provider';
+import { useTheme, type ThemeName } from '@/app/theme-provider';
 
-const THEMES = [
+const THEMES: Array<{ id: ThemeName; label: string; color: string }> = [
   { id: 'sistema', label: 'Sistema', color: '#6b7280' },
   { id: 'original', label: 'Original', color: '#294936' },
   { id: 'dark', label: 'Oscuro', color: '#1e293b' },
@@ -14,6 +14,7 @@ const THEMES = [
 
 export default function ThemeSelectorNav() {
   const { theme, setTheme } = useTheme();
+
   return (
     <div className="relative inline-block">
       <button
@@ -24,7 +25,7 @@ export default function ThemeSelectorNav() {
       >
         <span
           className="flex h-4 w-4 items-center justify-center rounded-full border border-current"
-          style={{ color: THEMES.find((t) => t.id === theme)?.color }}
+          style={{ color: THEMES.find((item) => item.id === theme)?.color }}
         >
           <span className="h-1.5 w-1.5 rounded-full bg-current" />
         </span>
@@ -42,22 +43,33 @@ export default function ThemeSelectorNav() {
           Tema
         </p>
         <div className="space-y-0.5">
-          {THEMES.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setTheme(t.id as any)}
-              className={`flex w-full items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors ${theme === t.id ? 'bg-[var(--theme-accent)] text-[var(--theme-ink-inverse)]' : 'text-[var(--theme-ink)] hover:bg-[var(--theme-surface)] hover:text-[var(--theme-accent)]'}`}
-            >
-              <span
-                className="flex h-4 w-4 items-center justify-center rounded-full border border-current"
-                style={{ color: t.color }}
+          {THEMES.map((item) => {
+            const isSelected = theme === item.id;
+            const optionClass = isSelected
+              ? 'bg-[var(--theme-accent)] text-[var(--theme-ink-inverse)]'
+              : 'text-[var(--theme-ink)] hover:bg-[var(--theme-surface)] hover:text-[var(--theme-accent)]';
+
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setTheme(item.id)}
+                aria-pressed={isSelected}
+                className={[
+                  'flex w-full items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors',
+                  optionClass,
+                ].join(' ')}
               >
-                <span className="h-1.5 w-1.5 rounded-full bg-current" />
-              </span>
-              <span style={{ color: 'var(--theme-ink)' }}>{t.label}</span>
-            </button>
-          ))}
+                <span
+                  className="flex h-4 w-4 items-center justify-center rounded-full border border-current"
+                  style={{ color: item.color }}
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                </span>
+                <span style={{ color: 'var(--theme-ink)' }}>{item.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>
