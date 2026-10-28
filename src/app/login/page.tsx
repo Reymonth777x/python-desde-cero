@@ -24,7 +24,7 @@ const inputStyle =
   'mt-2 min-h-12 w-full border border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 py-3 text-base text-[var(--theme-ink)] outline-none focus:border-[var(--theme-accent)] focus:ring-1 focus:ring-[var(--theme-focus-ring)]';
 
 export default function LoginPage({ searchParams }: Props) {
-  const params = use(searchParams ?? Promise.resolve({})) as {
+  const params = use(searchParams!) as {
     error?: string;
     message?: string;
   };
