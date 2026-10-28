@@ -17,7 +17,8 @@
     "check:theme-coverage": "node scripts/check-theme-coverage.mjs",
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:originality": "node scripts/check-originality.mjs",
-    "verify": "node scripts/check-encoding.mjs"
+    "verify": "node scripts/check-encoding.mjs",
+    "check:dead-controls": "node scripts/check-dead-controls.mjs"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
