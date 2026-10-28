@@ -96,9 +96,11 @@ jobs:
             exit 1
           fi
 
+          # This credential was created under Account API tokens, so verify it
+          # using the account-scoped endpoint, not the user-token endpoint.
           verify_json="$(curl --silent --show-error \
             -H "Authorization: Bearer $token" \
-            https://api.cloudflare.com/client/v4/user/tokens/verify)"
+            "https://api.cloudflare.com/client/v4/accounts/$account_id/tokens/verify")"
           verify_ok="$(jq -r '.success // false' <<< "$verify_json")"
           if [[ "$verify_ok" != "true" ]]; then
             codes="$(jq -r '[.. | objects | .code? | select(. != null)] | unique | join(",")' <<< "$verify_json")"
