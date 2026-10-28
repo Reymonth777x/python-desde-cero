@@ -147,7 +147,7 @@ jobs:
           echo "Account ID validado; el valor permanece oculto."
 
       - name: Desplegar Worker
-        run: npm run deploy:vinext
+        run: npx cf deploy --prebuilt --mode production --no-strict
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
