@@ -158,6 +158,9 @@ export function usePythonWorker({
       setWorkerState('error');
       setError('Error inesperado del ejecutor de Python.');
       onStatusChange?.('error');
+      worker.terminate();
+      if (workerRef.current === worker) workerRef.current = null;
+      pendingExecutionRef.current = null;
       setIsRunning(false);
     };
 
