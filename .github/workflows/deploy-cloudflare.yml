@@ -146,22 +146,26 @@ jobs:
           printf 'CLOUDFLARE_ACCOUNT_ID=%s\n' "$account_id" >> "$GITHUB_ENV"
           echo "Account ID validado; el valor permanece oculto."
 
-      - name: Alinear variable de URL administrada en Cloudflare
+      - name: Alinear configuración remota de Cloudflare
         shell: bash
         run: |
           set -euo pipefail
-          settings_url="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/python-desde-cero/script-settings"
+          base_url="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/python-desde-cero"
           current="$(curl --fail --silent --show-error \
             -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            "$settings_url")"
+            "$base_url/settings")"
           bindings="$(jq -c '[.result.bindings[]? | select(.name != "NEXT_PUBLIC_SITE_URL")]' <<< "$current")"
-          payload="$(jq -cn --argjson bindings "$bindings" '{bindings: $bindings}')"
+          payload="$(jq -cn --argjson bindings "$bindings" '{settings: {bindings: $bindings}}')"
           updated="$(curl --fail --silent --show-error -X PATCH \
             -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
             -H "Content-Type: application/json" \
-            --data "$payload" "$settings_url")"
+            --data "$payload" "$base_url/settings")"
           jq -e '.success == true' <<< "$updated" >/dev/null
-          echo "Variable de URL anterior alineada; la URL canónica se compila en el build."
+          subdomain="$(curl --silent --show-error -X DELETE \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "$base_url/subdomain")"
+          jq -e '.success == true' <<< "$subdomain" >/dev/null
+          echo "Configuración remota alineada con el dominio personalizado; la URL canónica se compila en el build."
 
       - name: Desplegar Worker
         run: npm run deploy:vinext
