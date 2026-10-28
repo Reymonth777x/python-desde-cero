@@ -146,8 +146,28 @@ jobs:
           printf 'CLOUDFLARE_ACCOUNT_ID=%s\n' "$account_id" >> "$GITHUB_ENV"
           echo "Account ID validado; el valor permanece oculto."
 
+      - name: Alinear variable de URL administrada en Cloudflare
+        shell: bash
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          settings_url="https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/workers/scripts/python-desde-cero/settings"
+          current="$(curl --fail --silent --show-error \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            "$settings_url")"
+          bindings="$(jq -c '[.result.bindings[]? | select(.name != "NEXT_PUBLIC_SITE_URL")]' <<< "$current")"
+          payload="$(jq -cn --argjson bindings "$bindings" '{bindings: $bindings}')"
+          updated="$(curl --fail --silent --show-error -X PATCH \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data "$payload" "$settings_url")"
+          jq -e '.success == true' <<< "$updated" >/dev/null
+          echo "Variable de URL anterior alineada; la URL canónica se compila en el build."
+
       - name: Desplegar Worker
-        run: npx cf deploy --prebuilt --mode production --no-strict
+        run: npm run deploy:vinext
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
