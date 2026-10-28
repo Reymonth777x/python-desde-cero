@@ -1,34 +1,26 @@
 -- 014_extend_profiles_preferences
--- Extiende public.profiles con preferencias de usuario (tema, sonido, movimiento reducido)
--- y agrega avatar elegido por el estudiante.
+-- Adds preferences and an avatar to profiles. The client cannot change role,
+-- is_admin, email, or any other protected profile field directly.
 
 ALTER TABLE public.profiles
   ADD COLUMN IF NOT EXISTS theme TEXT DEFAULT 'sistema',
   ADD COLUMN IF NOT EXISTS avatar TEXT DEFAULT 'chef-1',
   ADD COLUMN IF NOT EXISTS sound_enabled BOOLEAN DEFAULT TRUE,
   ADD COLUMN IF NOT EXISTS reduce_motion BOOLEAN DEFAULT FALSE,
-  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT pg_catalog.now();
 
--- Índice para búsquedas rápidas por tema (útil para admin)
 CREATE INDEX IF NOT EXISTS idx_profiles_theme ON public.profiles(theme);
 
--- Política: usuario actualiza su propio perfil
-CREATE POLICY "Usuario actualiza su propio perfil"
-  ON public.profiles
-  FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = id)
-  WITH CHECK (auth.uid() = id);
+-- The helper lives in the non-exposed private schema.
+GRANT USAGE ON SCHEMA private TO authenticated;
 
--- Política: admins actualizan cualquier perfil
-CREATE POLICY "Admins actualizan cualquier perfil"
-  ON public.profiles
-  FOR UPDATE
-  TO authenticated
-  USING (public.current_user_is_admin())
-  WITH CHECK (public.current_user_is_admin());
+-- Preferences currently live in client state/localStorage. Keep all profile
+-- writes server-owned until a validated Server Action is implemented.
+DROP POLICY IF EXISTS "Usuario actualiza su propio perfil" ON public.profiles;
+DROP POLICY IF EXISTS "Admins actualizan cualquier perfil" ON public.profiles;
+REVOKE INSERT, UPDATE, DELETE ON TABLE public.profiles FROM PUBLIC, anon, authenticated;
+GRANT SELECT ON TABLE public.profiles TO authenticated;
 
--- Comentario
 COMMENT ON COLUMN public.profiles.theme IS 'Tema visual preferido del usuario (sistema, original, dark, dracula, cyberpunk, hacker, rosa)';
 COMMENT ON COLUMN public.profiles.avatar IS 'Avatar elegido del set propio';
 COMMENT ON COLUMN public.profiles.sound_enabled IS 'Si el usuario tiene sonidos de interfaz activados';
