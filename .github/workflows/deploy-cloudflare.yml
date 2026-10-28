@@ -1,0 +1,84 @@
+name: Deploy Cloudflare Worker
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: python-desde-cero-cloudflare-production
+  cancel-in-progress: false
+
+jobs:
+  check-credentials:
+    runs-on: ubuntu-latest
+    outputs:
+      configured: ${{ steps.check.outputs.configured }}
+    steps:
+      - name: Comprobar disponibilidad de credenciales (sin imprimir valores)
+        id: check
+        shell: bash
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [[ "$GITHUB_REF" == "refs/heads/master" && -n "$CF_TOKEN" && -n "$CF_ACCOUNT" ]]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+            echo "Credenciales de despliegue disponibles; se ejecutará el build y deploy."
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Despliegue omitido. Confirma que el workflow corre en master y configura CLOUDFLARE_API_TOKEN y CLOUDFLARE_ACCOUNT_ID en GitHub Actions Secrets."
+          fi
+
+  deploy:
+    needs: check-credentials
+    if: needs.check-credentials.outputs.configured == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependencias fijadas
+        run: npm ci
+
+      - name: Configurar entorno público de producción
+        run: echo "Usando configuración pública de Supabase para el Worker."
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
+          NEXT_PUBLIC_SITE_URL: https://python-desde-cero.pythondesdecero.workers.dev
+
+      - name: Compilar para Cloudflare Workers
+        run: npm run build:vinext
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
+          NEXT_PUBLIC_SITE_URL: https://python-desde-cero.pythondesdecero.workers.dev
+
+      - name: Desplegar Worker
+        run: npm run deploy:vinext
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
+          NEXT_PUBLIC_SITE_URL: https://python-desde-cero.pythondesdecero.workers.dev
+
+      - name: Comprobar la web publicada
+        shell: bash
+        run: |
+          curl --fail --silent --show-error --location --retry 5 --retry-delay 3 --retry-all-errors \
+            https://python-desde-cero.pythondesdecero.workers.dev/ -o /tmp/python-desde-cero-home.html
+          grep -qi "Python desde cero" /tmp/python-desde-cero-home.html
+          echo "La página pública respondió y contiene el título esperado."

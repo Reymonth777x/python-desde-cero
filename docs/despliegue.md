@@ -36,3 +36,15 @@ El secreto de Turnstile se configura en Supabase Auth → Bot and Abuse Protecti
 ## Importante
 
 No usar `wrangler pages deploy .next`: la salida de Next no es una exportación estática completa y eso no preservaría todas las rutas de servidor. Tampoco se debe afirmar que la web quedó desplegada hasta que Cloudflare confirme el deploy y las verificaciones públicas resulten satisfactorias.
+
+
+## Publicación automatizada desde GitHub Actions
+
+El workflow `.github/workflows/deploy-cloudflare.yml` intenta publicar el Worker solo cuando detecta los dos secretos de repositorio siguientes:
+
+- `CLOUDFLARE_API_TOKEN`: token API con permisos de despliegue de Workers.
+- `CLOUDFLARE_ACCOUNT_ID`: identificador de la cuenta Cloudflare dueña del Worker.
+
+Configúralos en GitHub → Settings → Secrets and variables → Actions. El workflow solo comprueba si existen; no imprime sus valores. Si faltan, la publicación se omite y se registra una notificación. Si existen, compila Vinext, despliega `python-desde-cero` y comprueba que la URL pública responde con HTTP exitoso.
+
+No se guarda ningún token en el repositorio. El secreto de Turnstile no se necesita en el Worker: debe configurarse únicamente en Supabase Auth cuando se decida habilitar CAPTCHA.
