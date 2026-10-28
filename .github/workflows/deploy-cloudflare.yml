@@ -69,12 +69,20 @@ jobs:
           token="$RAW_CF_TOKEN"
           token="${token#"${token%%[![:space:]]*}"}"
           token="${token%"${token##*[![:space:]]}"}"
-          if [[ "${token,,}" == "bearer "* ]]; then
-            token="${token#* }"
-          fi
-          if [[ "$token" == \"*\" && "${#token}" -ge 2 ]]; then
-            token="${token:1:${#token}-2}"
-          fi
+          # Accept a token copied with a wrapper/prefix, but never print it.
+          for _ in 1 2; do
+            if [[ "$token" == \"*\" && "${#token}" -ge 2 ]]; then
+              token="${token:1:${#token}-2}"
+            elif [[ "$token" == \'*\' && "${#token}" -ge 2 ]]; then
+              token="${token:1:${#token}-2}"
+            fi
+            case "${token,,}" in
+              "bearer "*) token="${token:7}" ;;
+              "bearer:"*) token="${token#*:}" ;;
+              "cloudflare_api_token="*) token="${token#*=}" ;;
+            esac
+          done
+          token="$(printf '%s' "$token" | tr -d '[:space:]')"
           if [[ -z "$token" ]]; then
             echo "::error::CLOUDFLARE_API_TOKEN está vacío."
             exit 1
@@ -95,11 +103,11 @@ jobs:
           if [[ "$verify_ok" != "true" ]]; then
             codes="$(jq -r '[.. | objects | .code? | select(. != null)] | unique | join(",")' <<< "$verify_json")"
             messages="$(jq -r '[.. | objects | .message? | select(. != null)] | unique | join("; ")' <<< "$verify_json" | tr -d '\r\n')"
-            echo "::error::Cloudflare rechazó el API token (códigos: ${codes:-sin código}). Detalle: ${messages:-sin detalle}. Crea un token nuevo y guarda solo el valor del token, sin el prefijo Bearer."
+            echo "::error::Cloudflare rechazó el API token (códigos: ${codes:-sin código}). Detalle: ${messages:-sin detalle}. Asegúrate de usar un API Token, no la Global API Key, y guarda solo el valor del token."
             exit 1
           fi
           printf 'CLOUDFLARE_API_TOKEN=%s\n' "$token" >> "$GITHUB_ENV"
-          echo "El token de Cloudflare está activo."
+          echo "Token de Cloudflare validado (longitud comprobada; valor oculto)."
 
           account_json="$(curl --silent --show-error \
             -H "Authorization: Bearer $token" \
