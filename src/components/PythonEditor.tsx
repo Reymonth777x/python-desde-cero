@@ -222,6 +222,8 @@ export default function PythonEditor({
           <button
             type="button"
             onClick={() => {
+              stopWorker();
+              createWorker();
             }}
             className="flex min-h-11 w-full items-center justify-center border border-[var(--theme-accent)] px-4 py-2 text-sm font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] sm:w-auto"
           >

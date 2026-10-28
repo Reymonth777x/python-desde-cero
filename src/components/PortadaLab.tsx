@@ -27,6 +27,7 @@ export default function PortadaLab({
   const {
     workerState,
     output,
+    error,
     turtleCommands,
     isRunning,
     createWorker,
@@ -56,7 +57,7 @@ export default function PortadaLab({
         </div>
         <div className="flex items-center gap-1 text-xs text-[var(--theme-accent)]">
           <span className={`px-2 py-0.5 rounded border border-current text-[10px] ${workerState === 'ready' ? 'bg-[var(--theme-accent)]/20 text-[var(--theme-accent)]' : 'bg-[var(--theme-bg)] text-[var(--theme-muted)]'}`}>
-            {workerState === 'ready' ? 'Listo' : workerState === 'loading' ? 'Cargando...' : 'Error'}
+            {workerState === 'ready' ? 'Listo' : workerState === 'loading' ? 'Cargando...' : workerState === 'error' ? 'Error' : 'Inactivo'}
           </span>
         </div>
       </div>
@@ -99,7 +100,7 @@ export default function PortadaLab({
               className="h-full w-full overflow-auto p-4 whitespace-pre-wrap break-words border-0 bg-transparent font-mono text-sm leading-6 text-[var(--theme-ink)]"
               aria-live="polite"
             >
-              {output || (workerState === 'ready' ? '> Escribe código y pulsa Ejecutar.' : '> Preparando entorno Python...')}
+              {output || (workerState === 'ready' ? '> Escribe código y pulsa Ejecutar.' : workerState === 'error' ? `> ${error ?? 'No se pudo iniciar Python. Pulsa Ejecutar para volver a intentarlo.'}` : '> Pulsa Ejecutar para cargar Python en este navegador.')}
             </pre>
             {turtleCommands.length > 0 && (
               <div className="absolute bottom-4 right-4 w-[140px] bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded p-2 shadow-sm">
