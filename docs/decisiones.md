@@ -103,3 +103,27 @@ La CSP actual permite `'unsafe-eval'` (Pyodide WASM + Monaco Editor) y `'unsafe-
 - Modificado: `next.config.mjs` (CSP con host exacto de Supabase, Turnstile en script-src/frame-src, wasm-unsafe-eval)
 - Modificado: `playwright.config.ts` (quitar excepciones googleapis/gstatic)
 - Modificado: `docs/decisiones.md` (esta decisión)
+
+
+## Decisión 3.5 — Despliegue full-stack en Cloudflare Workers con Vinext (actualiza la 3.1)
+
+### Contexto
+La aplicación requiere middleware, Server Actions, route handlers, SSR y autenticación con Supabase. La configuración anterior de Cloudflare Pages apuntaba directamente a `.next`, que es salida de Next.js con servidor y no equivale a una exportación estática completa. Esa configuración no garantiza que login, progreso ni rutas dinámicas funcionen en Pages.
+
+La documentación oficial de Cloudflare, consultada el 28 de octubre de 2026, recomienda Vinext en Workers para aplicaciones Next.js full-stack y advierte que Vinext sigue en beta.
+
+### Opciones
+- **Opción A:** Pages con exportación estática, que no soporta todas las funciones de servidor necesarias.
+- **Opción B:** Seguir sin publicar en Cloudflare y conservar únicamente Next.js estándar.
+- **Opción C:** Mantener Next.js estándar para CI y añadir Vinext como camino de despliegue Worker, con build propio y verificación independiente.
+
+### Decisión
+**Opción C**, a petición del responsable del proyecto. Se conserva `next build` para las comprobaciones estándar y se incorpora `build:vinext` más configuración de Cloudflare Workers para la publicación full-stack. Esta decisión sustituye a la opción A de la Decisión 3.1 exclusivamente en lo relativo al despliegue de producción.
+
+### Riesgos y comprobación
+Vinext y el adaptador de Cloudflare están en beta. No se considera desplegado ni validado por el mero hecho de compilar. El CI debe ejecutar ambos builds; después del acceso autorizado a Cloudflare se debe verificar en la URL pública el inicio de sesión, callback, acceso protegido y ejecución del editor. No se aplican migraciones remotas como parte del despliegue.
+
+### Archivos afectados
+- Restaurados: `vite.config.ts` y `cloudflare.config.ts`.
+- Modificados: `package.json`, `package-lock.json`, workflow de CI, `.env.example` y documentación de despliegue.
+- Eliminado: `wrangler.toml` de Pages, que apuntaba al directorio `.next`.

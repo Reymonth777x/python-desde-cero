@@ -188,8 +188,8 @@ export function findCourseModule(moduleId: string): CourseModule | undefined {
 }
 
 export function findCourseLesson(moduleId: string, lessonId: string): CourseLesson | undefined {
-  const module = findCourseModule(moduleId);
-  return module?.lessons.find((l) => l.id === lessonId);
+  const courseModule = findCourseModule(moduleId);
+  return courseModule?.lessons.find((l) => l.id === lessonId);
 }
 
 export function gradeQuiz(questions: QuizQuestion[], answers: number[]): { score: number; passed: boolean; correct: number; total: number } {

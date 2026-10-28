@@ -1,78 +1,50 @@
-# Despliegue a Cloudflare
+# Despliegue de Python desde cero en Cloudflare Workers
 
-## Hallazgos (documentación oficial de Cloudflare, verificada)
+## Modo de publicación
 
-### Adaptador recomendado
-Cloudflare recomienda **vinext on Workers** para aplicaciones Next.js full-stack
-(SSR, React Server Components, Server Actions, route handlers y middleware).
-Para exportación estática, usar Cloudflare Pages con `next export`.
+La aplicación usa Next.js App Router con middleware, Server Actions, rutas dinámicas y Supabase Auth. Para mantener esas funciones en Cloudflare se usa Vinext sobre Workers, no una publicación estática de `.next` en Pages.
 
-Fuente: https://developers.cloudflare.com/pages/framework-guides/nextjs/
+- Worker objetivo: `python-desde-cero`
+- Configuración: `cloudflare.config.ts`
+- Vite: `vite.config.ts`
+- Build de Cloudflare: `npm run build:vinext`
+- Comando de despliegue: `npm run deploy:vinext`
 
-> "Cloudflare recommends vinext on Workers for full-stack Next.js applications,
-> including server-side rendering, React Server Components, Server Actions,
-> route handlers, and middleware."
+Cloudflare recomienda Vinext para Next.js full-stack en Workers, pero está en beta. El CI verifica por separado el build estándar de Next y el de Vinext; el despliegue solo se considera comprobado cuando pasa también la prueba de autenticación en el Worker real.
 
-### Estado de vinext
-**vinext está en beta** (versiones con `beta` en el rango). Por la **Decisión 3.1**,
-el repositorio mantiene un solo camino de build (`next dev/build/start`) y no
-incluye dependencias beta en producción.
+## Variables públicas de Supabase
 
-### Despliegue estático a Cloudflare Pages (funciona)
-1. `npm run build` → genera `.next/`
-2. `npm run preview` → `wrangler pages dev .next` (servidor local en http://127.0.0.1:8788)
-3. `npm run deploy` → `wrangler pages deploy .next` (despliega a Pages)
+Configurar como variables de entorno disponibles durante el build y en el Worker:
 
-**Limitación:** `.next` es output de `next build` con renderizado del servidor.
-Pages espera archivos estáticos (`next export`). Con `next build` sin `export`,
-algunas rutas pueden devolver 404 bajo Pages estático. Para uso real en Pages,
-ejecutar `next export` (pierde Server Actions y renderizado dinámico).
+- `NEXT_PUBLIC_SUPABASE_URL`: URL del proyecto Supabase.
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: clave publicable del mismo proyecto.
+- `NEXT_PUBLIC_SITE_URL`: origen HTTPS público del Worker, por ejemplo `https://python-desde-cero.pythondesdecero.workers.dev`.
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY`: site key pública de Cloudflare Turnstile.
 
-### Despliegue full-stack a Cloudflare Workers (requiere vinext, beta)
-Requeriría:
-1. Reinstalar `@vinext/cloudflare`, `vinext`, `@cloudflare/vite-plugin`, `cf`
-2. Crear `wrangler.toml` con configuración de Workers
-3. Configurar `vite.config.ts` con plugin de vinext
-4. Desplegar con `wrangler deploy`
+Las variables `NEXT_PUBLIC_SUPABASE_*` son para el cliente web; no configures la service-role key de Supabase en el navegador ni la pongas en Git.
 
-**No implementado** por depender de paquetes beta (Decisión 3.1).
+El secreto de Turnstile se configura en Supabase Auth → Bot and Abuse Protection/CAPTCHA. No se necesita en el Worker. No activar CAPTCHA en producción hasta verificar site key, secreto y formularios.
 
-### Límites de Cloudflare Workers (verificados)
+## Pasos
 
-| Recurso | Plan Free | Plan Paid |
-|---------|-----------|-----------|
-| CPU time por request | 10 ms | 50 ms |
-| Memoria | 128 MB | 256 MB |
-| Requests diarias | 100,000 | Ilimitadas |
-| Subrequests/request | 50 | 50 |
-| Variables de entorno | 4 KB | 16 KB |
-| Wall time (HTTP) | Ilimitada | Ilimitada |
+1. Conectar la rama de publicación del repositorio en Cloudflare Workers Builds.
+2. Definir las variables anteriores para build y runtime.
+3. Ejecutar `npm ci`, comprobar el workflow CI y desplegar el Worker con el camino Vinext.
+4. Abrir la URL pública y validar portada, login, registro, recuperación de contraseña, callback, rutas protegidas y editor Python en escritorio y móvil.
+5. Verificar las URL permitidas de Supabase Auth y la entrega real de correo. No se ejecutan migraciones remotas durante el despliegue.
 
-Fuente: https://developers.cloudflare.com/workers/platform/limits/
+## Importante
 
-### Incompatibilidades conocidas
-- **Middleware/Proxy:** Next.js middleware requiere runtime de servidor (no compatible con Pages estático sin vinext).
-- **Server Actions:** Requieren servidor Node.js (no compatible con Pages estático).
-- **Pyodide WASM:** Requiere `wasm-unsafe-eval` o `unsafe-eval` en CSP; funciona en Workers pero consume CPU limitado.
+No usar `wrangler pages deploy .next`: la salida de Next no es una exportación estática completa y eso no preservaría todas las rutas de servidor. Tampoco se debe afirmar que la web quedó desplegada hasta que Cloudflare confirme el deploy y las verificaciones públicas resulten satisfactorias.
 
-### Archivos de configuración
-- `wrangler.toml` — configuración de Pages (build_output = `.next`)
-- `package.json` — scripts `preview` y `deploy`
 
-### Comandos (ejecutar por el humano)
-```bash
-# Build
-npm run build
+## Publicación automatizada desde GitHub Actions
 
-# Preview local
-npm run preview
+El workflow `.github/workflows/deploy-cloudflare.yml` intenta publicar el Worker solo cuando detecta los dos secretos de repositorio siguientes:
 
-# Desplegar a Cloudflare Pages
-npm run deploy
-```
+- `CLOUDFLARE_API_TOKEN`: token API con permisos de despliegue de Workers.
+- `CLOUDFLARE_ACCOUNT_ID`: identificador de la cuenta Cloudflare dueña del Worker.
 
-### Recomendación
-Para producción con funcionalidad completa (Server Actions, login, quiz),
-evaluar migración a vinext cuando salga de beta, o usar una plataforma que
-soporte Next.js nativamente (Vercel, etc.). Para despliegue estático simple
-en Cloudflare Pages, usar `next export` + `npm run deploy`.
+Configúralos en GitHub → Settings → Secrets and variables → Actions. El workflow solo comprueba si existen; no imprime sus valores. Si faltan, la publicación se omite y se registra una notificación. Si existen, compila Vinext, despliega `python-desde-cero` y comprueba que la URL pública responde con HTTP exitoso.
+
+No se guarda ningún token en el repositorio. El secreto de Turnstile no se necesita en el Worker: debe configurarse únicamente en Supabase Auth cuando se decida habilitar CAPTCHA.

@@ -1,0 +1,164 @@
+name: Deploy Cloudflare Worker
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: python-desde-cero-cloudflare-production
+  cancel-in-progress: false
+
+jobs:
+  check-credentials:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    outputs:
+      configured: ${{ steps.check.outputs.configured }}
+    steps:
+      - name: Comprobar disponibilidad de credenciales (sin imprimir valores)
+        id: check
+        shell: bash
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [[ "$GITHUB_REF" == "refs/heads/master" && -n "$CF_TOKEN" && -n "$CF_ACCOUNT" ]]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+            echo "Credenciales de despliegue disponibles; se ejecutará el build y deploy."
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Despliegue omitido. Confirma que el workflow corre en master y configura CLOUDFLARE_API_TOKEN y CLOUDFLARE_ACCOUNT_ID en GitHub Actions Secrets."
+          fi
+
+  deploy:
+    needs: check-credentials
+    if: needs.check-credentials.outputs.configured == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependencias fijadas
+        run: npm ci
+
+      - name: Configurar entorno público de producción
+        run: echo "Usando configuración pública de Supabase para el Worker."
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
+          NEXT_PUBLIC_SITE_URL: https://python-desde-cero.pythondesdecero.workers.dev
+
+      - name: Diagnosticar y normalizar credenciales de Cloudflare sin revelarlas
+        shell: bash
+        env:
+          RAW_CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          RAW_CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          token="$RAW_CF_TOKEN"
+          token="${token#"${token%%[![:space:]]*}"}"
+          token="${token%"${token##*[![:space:]]}"}"
+          # Accept a token copied with a wrapper/prefix, but never print it.
+          for _ in 1 2; do
+            if [[ "$token" == \"*\" && "${#token}" -ge 2 ]]; then
+              token="${token:1:${#token}-2}"
+            elif [[ "$token" == \'*\' && "${#token}" -ge 2 ]]; then
+              token="${token:1:${#token}-2}"
+            fi
+            case "${token,,}" in
+              "bearer "*) token="${token:7}" ;;
+              "bearer:"*) token="${token#*:}" ;;
+              "cloudflare_api_token="*) token="${token#*=}" ;;
+            esac
+          done
+          token="$(printf '%s' "$token" | tr -d '[:space:]')"
+          if [[ -z "$token" ]]; then
+            echo "::error::CLOUDFLARE_API_TOKEN está vacío."
+            exit 1
+          fi
+
+          account_id="$RAW_CF_ACCOUNT"
+          account_id="${account_id#"${account_id%%[![:space:]]*}"}"
+          account_id="${account_id%"${account_id##*[![:space:]]}"}"
+          if [[ ! "$account_id" =~ ^[A-Fa-f0-9]{32}$ ]]; then
+            echo "::error::CLOUDFLARE_ACCOUNT_ID debe tener exactamente 32 caracteres hexadecimales. Cópialo desde la página principal de Cloudflare."
+            exit 1
+          fi
+
+          # This credential was created under Account API tokens, so verify it
+          # using the account-scoped endpoint, not the user-token endpoint.
+          verify_json="$(curl --silent --show-error \
+            -H "Authorization: Bearer $token" \
+            "https://api.cloudflare.com/client/v4/accounts/$account_id/tokens/verify")"
+          verify_ok="$(jq -r '.success // false' <<< "$verify_json")"
+          if [[ "$verify_ok" != "true" ]]; then
+            codes="$(jq -r '[.. | objects | .code? | select(. != null)] | unique | join(",")' <<< "$verify_json")"
+            messages="$(jq -r '[.. | objects | .message? | select(. != null)] | unique | join("; ")' <<< "$verify_json" | tr -d '\r\n')"
+            echo "::error::Cloudflare rechazó el API token (códigos: ${codes:-sin código}). Detalle: ${messages:-sin detalle}. Asegúrate de usar un API Token, no la Global API Key, y guarda solo el valor del token."
+            exit 1
+          fi
+          printf 'CLOUDFLARE_API_TOKEN=%s\n' "$token" >> "$GITHUB_ENV"
+          echo "Token de Cloudflare validado (longitud comprobada; valor oculto)."
+
+          account_json="$(curl --silent --show-error \
+            -H "Authorization: Bearer $token" \
+            "https://api.cloudflare.com/client/v4/accounts/$account_id")"
+          account_ok="$(jq -r '.success // false' <<< "$account_json")"
+          if [[ "$account_ok" != "true" ]]; then
+            codes="$(jq -r '[.. | objects | .code? | select(. != null)] | unique | join(",")' <<< "$account_json")"
+            messages="$(jq -r '[.. | objects | .message? | select(. != null)] | unique | join("; ")' <<< "$account_json" | tr -d '\r\n')"
+            echo "::error::Cloudflare no acepta el Account ID o el token no tiene lectura de cuenta. Códigos: ${codes:-sin código}. Detalle: ${messages:-sin detalle}. Verifica Account ID y permisos Account Settings:Read."
+            exit 1
+          fi
+          printf 'CLOUDFLARE_ACCOUNT_ID=%s\n' "$account_id" >> "$GITHUB_ENV"
+          echo "Cuenta accesible; credenciales no mostradas."
+
+      - name: Compilar para Cloudflare Workers
+        run: npm run build:vinext
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
+          NEXT_PUBLIC_SITE_URL: https://python-desde-cero.pythondesdecero.workers.dev
+
+      - name: Normalizar y validar Account ID sin exponerlo
+        shell: bash
+        env:
+          RAW_CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          account_id="$RAW_CF_ACCOUNT_ID"
+          account_id="${account_id#"${account_id%%[![:space:]]*}"}"
+          account_id="${account_id%"${account_id##*[![:space:]]}"}"
+          if [[ ! "$account_id" =~ ^[A-Za-z0-9_-]{16,64}$ ]]; then
+            echo "::error::CLOUDFLARE_ACCOUNT_ID no tiene formato válido. Copia únicamente el Account ID de Cloudflare, sin comillas ni espacios."
+            exit 1
+          fi
+          printf 'CLOUDFLARE_ACCOUNT_ID=%s\n' "$account_id" >> "$GITHUB_ENV"
+          echo "Account ID validado; el valor permanece oculto."
+
+      - name: Desplegar Worker
+        run: npm run deploy:vinext
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
+          NEXT_PUBLIC_SITE_URL: https://python-desde-cero.pythondesdecero.workers.dev
+
+      - name: Comprobar la web publicada
+        shell: bash
+        run: |
+          curl --fail --silent --show-error --location --retry 5 --retry-delay 3 --retry-all-errors \
+            https://python-desde-cero.pythondesdecero.workers.dev/ -o /tmp/python-desde-cero-home.html
+          grep -qi "Python desde cero" /tmp/python-desde-cero-home.html
+          echo "La página pública respondió y contiene el título esperado."

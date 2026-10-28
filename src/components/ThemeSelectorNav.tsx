@@ -1,6 +1,6 @@
 'use client';
 
-import { useTheme } from '@/app/theme-provider';
+import { useTheme, type ThemeName } from '@/app/theme-provider';
 
 const THEMES = [
   { id: 'sistema', label: 'Sistema', color: '#6b7280' },
@@ -46,7 +46,7 @@ export default function ThemeSelectorNav() {
             <button
               key={t.id}
               type="button"
-              onClick={() => setTheme(t.id as any)}
+              onClick={() => setTheme(t.id as ThemeName)}
               className={`flex w-full items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors ${theme === t.id ? 'bg-[var(--theme-accent)] text-[var(--theme-ink-inverse)]' : 'text-[var(--theme-ink)] hover:bg-[var(--theme-surface)] hover:text-[var(--theme-accent)]'}`}
             >
               <span

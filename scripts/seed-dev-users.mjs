@@ -1,23 +1,38 @@
 #!/usr/bin/env node
-"""
-Script de semilla de usuarios de desarrollo.
-Solo funciona contra Supabase LOCAL (localhost:54322).
-Rechaza cualquier URL que no sea local para evitar accidentes en producción.
-"""
+
+/**
+ * Semilla de usuarios de desarrollo.
+ * Solo permite Supabase local (localhost/127.0.0.1/::1).
+ * Requiere SUPABASE_SERVICE_ROLE_KEY en el entorno local; nunca la guardes en Git.
+ */
 
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'http://localhost:54322';
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.';
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-// Validar que sea URL local
-if (!SUPABASE_URL.includes('localhost') && !SUPABASE_URL.includes('127.0.0.1')) {
-  console.error('❌ ERROR: seed-dev-users.mjs solo permite URLs locales (localhost/127.0.0.1)');
-  console.error(`   URL detectada: ${SUPABASE_URL}`);
+// Validar el hostname exacto: evitar dominios como localhost.example.com.
+let supabaseHostname;
+try {
+  supabaseHostname = new URL(SUPABASE_URL).hostname;
+} catch {
+  console.error('❌ ERROR: SUPABASE_URL no es una URL válida.');
   process.exit(1);
 }
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const localHostnames = new Set(['localhost', '127.0.0.1', '[::1]', '::1']);
+if (!localHostnames.has(supabaseHostname)) {
+  console.error('❌ ERROR: seed-dev-users.mjs solo permite Supabase local.');
+  console.error('   URL detectada: ' + SUPABASE_URL);
+  process.exit(1);
+}
+if (!SUPABASE_SERVICE_ROLE_KEY) {
+  console.error('❌ ERROR: define SUPABASE_SERVICE_ROLE_KEY solo en tu terminal local.');
+  console.error('   No la pongas en .env.example, código fuente ni en variables NEXT_PUBLIC_.');
+  process.exit(1);
+}
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  auth: { autoRefreshToken: false, persistSession: false },
+});
 
 const DEV_USERS = [
   {
@@ -48,10 +63,8 @@ async function main() {
       const { data, error } = await supabase.auth.admin.createUser({
         email: user.email,
         password: user.password,
-        user_metadata: {
-          full_name: user.full_name,
-          role: user.role,
-        },
+        // role es solo una etiqueta de desarrollo; nunca debe autorizar permisos.
+        user_metadata: { full_name: user.full_name },
         email_confirm: true, // Auto-confirmar en entorno local
       });
 
@@ -62,7 +75,16 @@ async function main() {
           console.error(`❌ Error creando ${user.email}: ${error.message}`);
         }
       } else {
-        console.log(`✅ ${user.email} creado (rol: ${user.role})`);
+        if (user.role === 'admin' && data.user) {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .update({ is_admin: true })
+            .eq('id', data.user.id);
+          if (profileError) {
+            console.error('⚠️ No se pudo habilitar is_admin para el usuario local: ' + profileError.message);
+          }
+        }
+        console.log('✅ ' + user.email + ' creado (rol: ' + user.role + ')');
       }
     } catch (err) {
       console.error(`❌ Excepción creando ${user.email}: ${err.message}`);
