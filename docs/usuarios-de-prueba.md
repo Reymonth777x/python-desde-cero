@@ -1,37 +1,31 @@
-# Usuarios de Prueba — Entorno Local
+# Usuarios de prueba - solo desarrollo local
 
-Este documento lista las credenciales de usuario para pruebas en el entorno de desarrollo local.
-**Nunca usar estas credenciales en producción.**
+Este documento describe cómo generar cuentas descartables para pruebas. No contiene contraseñas fijas.
 
-## Credenciales
+## Requisitos
 
-| Rol | Correo | Contraseña |
-|-----|--------|------------|
-| Estudiante | `estudiante@python-desdecero.local` | `Estudiante123!` |
-| Docente | `docente@python-desdecero.local` | `Docente123!` |
-| Administrador | `admin@python-desdecero.local` | `Admin123!` |
+- Docker y Supabase CLI funcionando localmente.
+- Supabase local iniciado mediante npx supabase start.
+- La URL y la clave de servicio local obtenidas desde npx supabase status -o env.
 
-## Cómo crear estos usuarios
+## Generar usuarios
 
-Ejecutar el script de semilla contra Supabase local:
+En PowerShell, establece la URL de la API local y la clave de servicio que devuelve el comando anterior. Mantén el valor en tu terminal local; no lo compartas ni lo guardes en Git.
 
-```bash
-# Configurar variables de entorno para Supabase local
-export SUPABASE_URL=http://localhost:54322
-export SUPABASE_ANON_KEY=<tu-anon-key-local>
-
-# Ejecutar seed
+~~~powershell
+$env:SUPABASE_URL = "http://127.0.0.1:54321"
+$env:SUPABASE_SERVICE_ROLE_KEY = "<SERVICE_ROLE_KEY LOCAL, NO PRODUCCIÓN>"
 node scripts/seed-dev-users.mjs
-```
+~~~
 
-## Permisos por rol
+El script rechaza hostnames distintos de localhost y 127.0.0.1. Necesita la clave de servicio local porque crear usuarios requiere privilegios administrativos; una clave publishable/anon no sirve para esa operación.
 
-- **Estudiante**: Acceso a `/estudiante`, `/academia`, `/practica`. Puede ver lecciones, ejecutar código en el laboratorio y jugar el juego de cocina.
-- **Docente**: Acceso a `/docente`. Puede ver progreso de estudiantes, gestionar invitaciones.
-- **Administrador**: Acceso a `/admin`. Gestión completa de usuarios, invitaciones y configuración.
+El script genera una contraseña aleatoria distinta para cada cuenta y guarda los datos en .local-dev-users.json en la raíz del proyecto. Ese archivo está excluido de Git. No lo subas, no lo compartas y elimínalo cuando termines las pruebas.
 
-## Notas
+## Cuentas generadas
 
-- Los usuarios se crean con `email_confirm: true` (auto-confirmados) en entorno local.
-- El script `seed-dev-users.mjs` rechaza cualquier URL que no sea `localhost` o `127.0.0.1` para evitar accidentes en producción.
-- Para producción, crear usuarios a través del flujo normal de registro con confirmación por correo.
+- estudiante@python-desdecero.local — estudiante
+- docente@python-desdecero.local — docente
+- admin@python-desdecero.local — administrador
+
+Las contraseñas se vuelven a generar cuando se ejecuta el script y se actualizan las cuentas locales existentes. Nunca ejecutes este script contra producción.
