@@ -1,14 +1,19 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const skipBuild = process.env.PLAYWRIGHT_SKIP_BUILD === '1';
+const serverCommand = skipBuild
+  ? 'npm run start -- --hostname 127.0.0.1'
+  : 'npm run build && npm run start -- --hostname 127.0.0.1';
+
 export default defineConfig({
-  testDir: './tests',
+  testDir: './tests/e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 2 : undefined,
-  reporter: 'html',
+  reporter: process.env.CI ? 'list' : 'html',
   use: {
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:3000',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -24,8 +29,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run build',
-    url: 'http://localhost:3000',
+    command: serverCommand,
+    url: process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 180 * 1000,
     env: {
