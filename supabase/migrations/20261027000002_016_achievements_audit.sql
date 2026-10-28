@@ -1,107 +1,99 @@
 -- 016_achievements_audit
--- Tabla de logros del estudiante, rachas y registro de auditoría de acciones sensibles.
+-- Catalog, student achievements/streaks and audit records.
+-- Client roles are read-only: authoritative awarding and audit writes must come
+-- from a server-owned function or trusted backend, not client-supplied fields.
 
--- Logros disponibles en el sistema
 CREATE TABLE public.achievements (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    code TEXT UNIQUE NOT NULL,
-    name TEXT NOT NULL,
-    description TEXT NOT NULL,
-    icon TEXT NOT NULL,
-    xp_reward INTEGER NOT NULL DEFAULT 0,
-    created_at TIMESTAMPTZ DEFAULT NOW()
+  id UUID PRIMARY KEY DEFAULT extensions.uuid_generate_v4(),
+  code TEXT UNIQUE NOT NULL CHECK (length(code) BETWEEN 1 AND 100),
+  name TEXT NOT NULL CHECK (length(name) BETWEEN 1 AND 160),
+  description TEXT NOT NULL CHECK (length(description) <= 2000),
+  icon TEXT NOT NULL CHECK (length(icon) <= 80),
+  xp_reward INTEGER NOT NULL DEFAULT 0 CHECK (xp_reward >= 0),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT pg_catalog.now()
 );
 
 ALTER TABLE public.achievements ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Logros legibles por todos autenticados"
+CREATE POLICY "Logros legibles por usuarios autenticados"
   ON public.achievements
-  FOR SELECT
-  TO authenticated
+  FOR SELECT TO authenticated
   USING (true);
+REVOKE ALL ON TABLE public.achievements FROM PUBLIC, anon, authenticated;
+GRANT SELECT ON TABLE public.achievements TO authenticated;
+GRANT ALL ON TABLE public.achievements TO service_role;
 
--- Logros desbloqueados por cada estudiante
 CREATE TABLE public.user_achievements (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES auth.users(id) NOT NULL,
-    achievement_id UUID REFERENCES public.achievements(id) NOT NULL,
-    unlocked_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE(user_id, achievement_id)
+  id UUID PRIMARY KEY DEFAULT extensions.uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id),
+  achievement_id UUID NOT NULL REFERENCES public.achievements(id),
+  unlocked_at TIMESTAMPTZ NOT NULL DEFAULT pg_catalog.now(),
+  UNIQUE(user_id, achievement_id)
 );
 
 ALTER TABLE public.user_achievements ENABLE ROW LEVEL SECURITY;
-
 CREATE POLICY "Estudiantes leen sus propios logros"
   ON public.user_achievements
-  FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Sistema inserta logros desbloqueados"
+  FOR SELECT TO authenticated
+  USING ((SELECT auth.uid()) = user_id);
+CREATE POLICY "Admins leen todos los logros de usuarios"
   ON public.user_achievements
-  FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
+  FOR SELECT TO authenticated
+  USING (private.current_user_is_admin());
+REVOKE ALL ON TABLE public.user_achievements FROM PUBLIC, anon, authenticated;
+GRANT SELECT ON TABLE public.user_achievements TO authenticated;
+GRANT ALL ON TABLE public.user_achievements TO service_role;
 CREATE INDEX IF NOT EXISTS idx_user_achievements_user ON public.user_achievements(user_id);
 
--- Rachas de actividad diaria
 CREATE TABLE public.user_streaks (
-    user_id UUID REFERENCES auth.users(id) PRIMARY KEY,
-    current_streak INTEGER NOT NULL DEFAULT 0,
-    longest_streak INTEGER NOT NULL DEFAULT 0,
-    last_activity_date DATE NOT NULL,
-    updated_at TIMESTAMPTZ DEFAULT NOW()
+  user_id UUID PRIMARY KEY REFERENCES auth.users(id),
+  current_streak INTEGER NOT NULL DEFAULT 0 CHECK (current_streak >= 0),
+  longest_streak INTEGER NOT NULL DEFAULT 0 CHECK (longest_streak >= 0),
+  last_activity_date DATE NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT pg_catalog.now(),
+  CHECK (longest_streak >= current_streak)
 );
 
 ALTER TABLE public.user_streaks ENABLE ROW LEVEL SECURITY;
-
 CREATE POLICY "Estudiantes leen su propia racha"
   ON public.user_streaks
-  FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Sistema gestiona rachas"
+  FOR SELECT TO authenticated
+  USING ((SELECT auth.uid()) = user_id);
+CREATE POLICY "Admins leen todas las rachas"
   ON public.user_streaks
-  FOR ALL
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+  FOR SELECT TO authenticated
+  USING (private.current_user_is_admin());
+REVOKE ALL ON TABLE public.user_streaks FROM PUBLIC, anon, authenticated;
+GRANT SELECT ON TABLE public.user_streaks TO authenticated;
+GRANT ALL ON TABLE public.user_streaks TO service_role;
 
--- Registro de auditoría de acciones sensibles
 CREATE TABLE public.audit_log (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES auth.users(id),
-    action TEXT NOT NULL,
-    target_table TEXT,
-    target_id UUID,
-    old_values JSONB,
-    new_values JSONB,
-    ip_address TEXT,
-    user_agent TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW()
+  id UUID PRIMARY KEY DEFAULT extensions.uuid_generate_v4(),
+  user_id UUID REFERENCES auth.users(id),
+  action TEXT NOT NULL CHECK (length(action) BETWEEN 1 AND 120),
+  target_table TEXT CHECK (target_table IS NULL OR length(target_table) <= 120),
+  target_id UUID,
+  old_values JSONB,
+  new_values JSONB,
+  ip_address INET,
+  user_agent TEXT CHECK (user_agent IS NULL OR length(user_agent) <= 2048),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT pg_catalog.now()
 );
 
 ALTER TABLE public.audit_log ENABLE ROW LEVEL SECURITY;
-
 CREATE POLICY "Solo admins leen auditoría"
   ON public.audit_log
-  FOR SELECT
-  TO authenticated
-  USING (public.current_user_is_admin());
+  FOR SELECT TO authenticated
+  USING (private.current_user_is_admin());
 
-CREATE POLICY "Sistema inserta auditoría"
-  ON public.audit_log
-  FOR INSERT
-  TO authenticated
-  WITH CHECK (true);
+REVOKE ALL ON TABLE public.audit_log FROM PUBLIC, anon, authenticated;
+GRANT SELECT ON TABLE public.audit_log TO authenticated;
+GRANT ALL ON TABLE public.audit_log TO service_role;
 
 CREATE INDEX IF NOT EXISTS idx_audit_log_user ON public.audit_log(user_id);
 CREATE INDEX IF NOT EXISTS idx_audit_log_action ON public.audit_log(action);
 CREATE INDEX IF NOT EXISTS idx_audit_log_created ON public.audit_log(created_at);
 
-COMMENT ON TABLE public.achievements IS 'Catálogo de logros del sistema';
-COMMENT ON TABLE public.user_achievements IS 'Logros desbloqueados por cada estudiante';
-COMMENT ON TABLE public.user_streaks IS 'Rachas de actividad diaria por estudiante';
-COMMENT ON TABLE public.audit_log IS 'Registro de auditoría de acciones sensibles';
+COMMENT ON TABLE public.achievements IS 'Catálogo de logros del sistema.';
+COMMENT ON TABLE public.user_achievements IS 'Logros desbloqueados por estudiantes; escritura reservada al backend.';
+COMMENT ON TABLE public.user_streaks IS 'Rachas de actividad por estudiante; actualización reservada al backend.';
+COMMENT ON TABLE public.audit_log IS 'Auditoría de acciones sensibles; escritura reservada al backend.';
