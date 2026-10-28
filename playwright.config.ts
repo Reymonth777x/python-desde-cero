@@ -35,6 +35,9 @@ export default defineConfig({
     timeout: 180 * 1000,
     env: {
       ...process.env,
+      NEXT_PUBLIC_SUPABASE_URL: 'http://127.0.0.1:54321',
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_e2e_placeholder',
+      NEXT_PUBLIC_SITE_URL: 'http://127.0.0.1:3000',
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: '1x00000000000000000000AA',
       TURNSTILE_SECRET_KEY: '1x0000000000000000000000000000000AA',
     },
