@@ -70,20 +70,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // Proteger rutas de admin: requieren autenticación + rol admin
-  if (isAdminRoute) {
-    if (!claims) {
-      const redirectUrl = request.nextUrl.clone();
-      redirectUrl.pathname = '/login';
-      redirectUrl.search = '';
-      return NextResponse.redirect(redirectUrl);
-    }
-
-    // Verificar rol de admin en los claims de JWT
-    const userRole = claims.role || claims['role'];
-    if (userRole !== 'admin' && userRole !== 'administrador') {
-      return NextResponse.redirect(new URL('/estudiante', request.url));
-    }
+  // Proteger rutas de admin: requieren autenticación (verificación de rol completa en cada página)
+  if (isAdminRoute && !claims) {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = '/login';
+    redirectUrl.search = '';
+    return NextResponse.redirect(redirectUrl);
   }
 
   return response;

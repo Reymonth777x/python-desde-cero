@@ -3,15 +3,25 @@ import LessonProgress from '@/components/LessonProgress';
 import { logout } from '@/app/login/actions';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 export default async function PracticaPage() {
+  'use server';
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const { data: profile } = user
-    ? await supabase.from('profiles').select('is_admin').eq('id', user.id).maybeSingle()
-    : { data: null };
+
+  if (!user) {
+    redirect('/login');
+    return null;
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_admin')
+    .eq('id', user.id)
+    .maybeSingle();
 
   return (
     <main className="min-h-screen bg-[var(--theme-bg)] text-[var(--theme-ink)]">

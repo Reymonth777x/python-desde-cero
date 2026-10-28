@@ -31,18 +31,18 @@ class Turtle:
     def __init__(self):
         self.x = 0.0
         self.y = 0.0
-        self.heading = 0.0
+        self._heading = 0.0
         self.pen_down = True
         self.pen_color = "black"
         self.fill_color = "black"
         self.pen_size = 1
-        self.speed = 6
+        self._speed = 6
         self.is_visible = True
         self.is_filling = False
         self.fill_points = []
 
     def forward(self, distance):
-        rad = _radians(self.heading)
+        rad = _radians(self._heading)
         new_x = self.x + distance * math.cos(rad)
         new_y = self.y + distance * math.sin(rad)
         if self.pen_down:
@@ -62,10 +62,10 @@ class Turtle:
         self.forward(-distance)
 
     def left(self, angle):
-        self.heading = (self.heading + angle) % 360.0
+        self._heading = (self._heading + angle) % 360.0
 
     def right(self, angle):
-        self.heading = (self.heading - angle) % 360.0
+        self._heading = (self._heading - angle) % 360.0
     def goto(self, x, y=None):
         if y is None:
             self.x, self.y = float(x[0]), float(x[1])
@@ -123,8 +123,8 @@ class Turtle:
 
     def speed(self, speed=None):
         if speed is not None:
-            self.speed = float(speed)
-        return self.speed
+            self._speed = float(speed)
+        return self._speed
 
     def hideturtle(self):
         self.is_visible = False
@@ -184,7 +184,7 @@ class Turtle:
                     "color": self.pen_color,
                     "size": self.pen_size,
                 })
-            rad = _radians(self.heading)
+            rad = _radians(self._heading)
             new_x = self.x + step_length * math.cos(rad)
             new_y = self.y + step_length * math.sin(rad)
             if self.pen_down:
@@ -211,10 +211,10 @@ class Turtle:
         return self.y
 
     def heading(self):
-        return self.heading
+        return self._heading
 
     def setheading(self, angle):
-        self.heading = float(angle) % 360.0
+        self._heading = float(angle) % 360.0
 
     def home(self):
         self.goto(0.0, 0.0)

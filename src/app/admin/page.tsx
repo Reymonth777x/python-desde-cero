@@ -56,22 +56,22 @@ export default async function AdminPage() {
 
           <div className="mt-8 grid gap-4 md:grid-cols-2">
             <div className="bg-[var(--theme-surface)] border border-[var(--theme-border)] p-6 rounded-lg">
-              <h3 className="font-semibold text-[var(--theme-ink)] mb-3">Usuarios</h3>
+              <h3 className="font-semibold text-[var(--theme-ink)] mb-3">Invitaciones</h3>
               <p className="text-sm text-[var(--theme-muted)] mb-4">
-                Revisa perfiles, roles y estado de cuenta de todos los estudiantes.
+                Gestiona códigos de invitación para nuevos estudiantes.
               </p>
-              <Link href="/admin/usuarios" className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--theme-accent)]">
-                Ver usuarios <span>→</span>
+              <Link href="/admin/invitaciones" className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--theme-accent)]">
+                Gestionar invitaciones <span>→</span>
               </Link>
             </div>
             <div className="bg-[var(--theme-surface)] border border-[var(--theme-border)] p-6 rounded-lg">
-              <h3 className="font-semibold text-[var(--theme-ink)] mb-3">Auditoría</h3>
+              <h3 className="font-semibold text-[var(--theme-ink)] mb-3">Estado del sistema</h3>
               <p className="text-sm text-[var(--theme-muted)] mb-4">
-                Registro de acciones sensibles en el sistema.
+                Información general del panel de administración.
               </p>
-              <Link href="/admin/auditoria" className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--theme-accent)]">
-                Ver auditoría <span>→</span>
-              </Link>
+              <p className="text-xs text-[var(--theme-muted)]">
+                Las secciones de usuarios y auditoría se activarán próximamente.
+              </p>
             </div>
           </div>
 

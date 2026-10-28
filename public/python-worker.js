@@ -53,6 +53,10 @@ self.onmessage = async (event) => {
 
     try {
         const pyodide = await pyodideReadyPromise;
+        // Bloquear acceso al módulo js y pyodide_js desde Python para evitar que el código
+        // de usuario haga fetch, toque el DOM o acceda a APIs del navegador.
+        try { pyodide.globals.set("js", undefined); } catch {}
+        try { pyodide.globals.set("pyodide_js", undefined); } catch {}
         let output = "";
         let outputTruncated = false;
         const appendOutput = (chunk) => {

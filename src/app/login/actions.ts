@@ -118,6 +118,7 @@ export async function requestPasswordReset(formData: FormData) {
   const supabase = await createClient();
   await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: emailRedirectTo,
+    captchaToken: captchaToken || undefined,
   });
 
   // A uniform response avoids revealing whether an account uses this email.
