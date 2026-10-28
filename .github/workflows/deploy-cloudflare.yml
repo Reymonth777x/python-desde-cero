@@ -63,9 +63,16 @@ jobs:
         shell: bash
         env:
           CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CF_ACCOUNT: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
+          RAW_CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           set -euo pipefail
+          account_id="$RAW_CF_ACCOUNT"
+          account_id="${account_id#"${account_id%%[![:space:]]*}"}"
+          account_id="${account_id%"${account_id##*[![:space:]]}"}"
+          if [[ ! "$account_id" =~ ^[A-Za-z0-9_-]{16,64}$ ]]; then
+            echo "::error::CLOUDFLARE_ACCOUNT_ID no tiene un formato válido. Copia solo el identificador de tu cuenta."
+            exit 1
+          fi
           verify_json="$(curl --silent --show-error --fail-with-body \
             -H "Authorization: Bearer $CF_TOKEN" \
             https://api.cloudflare.com/client/v4/user/tokens/verify)"
@@ -78,7 +85,7 @@ jobs:
           echo "El token de Cloudflare está activo."
           account_json="$(curl --silent --show-error --fail-with-body \
             -H "Authorization: Bearer $CF_TOKEN" \
-            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT")"
+            "https://api.cloudflare.com/client/v4/accounts/$account_id")"
           account_ok="$(jq -r '.success // false' <<< "$account_json")"
           if [[ "$account_ok" != "true" ]]; then
             codes="$(jq -r '[.errors[]?.code] | join(",")' <<< "$account_json")"
