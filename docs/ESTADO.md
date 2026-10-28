@@ -1,3 +1,55 @@
+# Estado del Proyecto — Python desde Cero
+
+## Hito actual: H2 (Editor, ejecutor sandbox, Turtle)
+
+## Hito H0 — COMPLETADO ✅
+- Rama `producto-v1` creada desde `fase-3-5-correctivos`
+- `npm install` exit 0, 440 paquetes, 0 vulnerabilidades
+- `postinstall` repara Pyodide y Monaco
+- `npx tsc --noEmit` exit 0
+- `npx vitest run` exit 0, 22 tests pasando
+- `npm run build` exit 0, 14 páginas estáticas
+- `npm run dev` — localhost:3000 responde HTTP 200
+- `npm run doctor` creado, exit 0
+- Supabase local: NO EJECUTADO (Docker no disponible)
+
+## Hito H1 — COMPLETADO ✅
+- 6 temas: Original, Oscuro, Drácula, Cyberpunk, Hacker, Rosa + Sistema
+- Tokens CSS semánticos completos en `src/app/themes.css`
+- 381+25 colores hardcoded migrados a `var(--theme-*)`
+- ThemeProvider con 7 temas, persistencia localStorage, data-theme en html
+- ThemeSelector con preview de color, estados hover/focus/active
+- Páginas 404, 500, offline con identidad propia
+- Scripts `check:theme-coverage` y `check:contrast` pasando
+- `docs/informes/h1-inventario-ui.md` — inventario de todos los elementos UI
+- `docs/informes/h1-temas/index.html` — hoja de contactos
+- `tests/theme-visual.test.ts` — pruebas visuales Playwright
+- tsc, vitest, build en exit 0
+
+## Hito H2 — EN PROGRESO ⏳
+- Editor: evaluar CodeMirror 6 vs Monaco
+- Ejecutor sandbox: iframe sin allow-same-origin, watchdog con worker.terminate()
+- Turtle: módulo real en sys.modules, comandos JSON, renderizado SVG animado
+- Traductor de errores Python → español
+- Pruebas hostiles en Chromium real
+
+## Próximos: H3-H10
+- H3: Originalidad total (limpieza Cisco/PE1/PCEP)
+- H4: Backend, cuentas, correos, antifraude
+- H5: Seguridad 7+1 capas
+- H6: Contenido 100+ ejercicios
+- H7: Juego de cocina determinista
+- H8: Portada, navegación, pulido UX
+- H9: Despliegue reproducible
+- H10: QA final y entrega
+
+## Bloqueos
+- Docker no disponible: Supabase local, pgTAP tests NO EJECUTADOS
+- .env.local apunta a Supabase remoto (debe apuntar a local para desarrollo)
+- npm run lint se cuelga en este entorno
+
+## Comando para retomar
+`cd c:\Users\USUARIO\python-pe1-academy && npm install && npm run build`
 # Estado del proyecto — Hito H1 (en progreso)
 
 **Rama:** `producto-v1` (desde `fase-3-5-correctivos`)

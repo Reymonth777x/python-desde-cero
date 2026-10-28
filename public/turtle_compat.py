@@ -413,3 +413,19 @@ def get_commands():
 def clear_commands():
     global _commands
     _commands = []
+
+
+def mainloop():
+    pass
+
+
+def exitonclick():
+    pass
+
+
+def clear_commands():
+    global _commands
+    _commands = []
+
+# Registrar el módulo para que "import turtle as t" funcione
+sys.modules["turtle"] = sys.modules[__name__]

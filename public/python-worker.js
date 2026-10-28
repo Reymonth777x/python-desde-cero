@@ -74,6 +74,8 @@ self.onmessage = async (event) => {
         pyodide.setStdout({ batched: appendOutput });
         pyodide.setStderr({ batched: appendOutput });
         pyodide.setStdin({ stdin: () => inputLines.shift() ?? null });
+        // Limpiar comandos de turtle entre ejecuciones
+        try { pyodide.globals?.get("clear_commands")?.(); } catch {}
 
         let executionError = "";
         // Ejecución con tiempo máximo: si se excede, se rechaza la promesa.
@@ -92,7 +94,8 @@ self.onmessage = async (event) => {
             try {
                 const commands = pyodide.globals.get("get_commands");
                 if (commands) {
-                    turtleCommands = commands();
+                    const pyCommands = commands();
+                    turtleCommands = pyodide.to_js(pyCommands);
                 }
             } catch {
                 // Ignorar errores al leer comandos de Turtle
