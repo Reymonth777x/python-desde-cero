@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useTheme, type ThemeName } from '@/app/theme-provider';
 
 const THEMES: Array<{ id: ThemeName; label: string; color: string }> = [
@@ -14,14 +15,23 @@ const THEMES: Array<{ id: ThemeName; label: string; color: string }> = [
 
 export default function ThemeSelectorNav() {
   const { theme, setTheme } = useTheme();
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="relative inline-block">
+    <div
+      className="relative inline-block"
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') setIsOpen(false);
+      }}
+    >
       <button
         type="button"
+        onClick={() => setIsOpen((current) => !current)}
         className="flex items-center gap-2 px-2 py-1 text-xs font-semibold text-[var(--theme-muted)] hover:text-[var(--theme-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"
         aria-label="Seleccionar tema"
         aria-haspopup="true"
+        aria-expanded={isOpen}
+        aria-controls="theme-selector-nav-options"
       >
         <span
           className="flex h-4 w-4 items-center justify-center rounded-full border border-current"
@@ -30,48 +40,54 @@ export default function ThemeSelectorNav() {
           <span className="h-1.5 w-1.5 rounded-full bg-current" />
         </span>
       </button>
-      <div
-        className="absolute right-0 mt-1 w-48 rounded-lg shadow-lg py-2 z-50"
-        style={{
-          backgroundColor: 'var(--theme-surface)',
-          borderColor: 'var(--theme-border)',
-          borderWidth: '1px',
-          borderStyle: 'solid',
-        }}
-      >
-        <p className="mx-3 mb-1 text-[10px] font-bold tracking-[0.2em] text-[var(--theme-muted)] uppercase">
-          Tema
-        </p>
-        <div className="space-y-0.5">
-          {THEMES.map((item) => {
-            const isSelected = theme === item.id;
-            const optionClass = isSelected
-              ? 'bg-[var(--theme-accent)] text-[var(--theme-ink-inverse)]'
-              : 'text-[var(--theme-ink)] hover:bg-[var(--theme-surface)] hover:text-[var(--theme-accent)]';
+      {isOpen && (
+        <div
+          id="theme-selector-nav-options"
+          className="absolute right-0 mt-1 w-48 rounded-lg shadow-lg py-2 z-50"
+          style={{
+            backgroundColor: 'var(--theme-surface)',
+            borderColor: 'var(--theme-border)',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+          }}
+        >
+          <p className="mx-3 mb-1 text-[10px] font-bold tracking-[0.2em] text-[var(--theme-muted)] uppercase">
+            Tema
+          </p>
+          <div className="space-y-0.5">
+            {THEMES.map((item) => {
+              const isSelected = theme === item.id;
+              const optionClass = isSelected
+                ? 'bg-[var(--theme-accent)] text-[var(--theme-ink-inverse)]'
+                : 'text-[var(--theme-ink)] hover:bg-[var(--theme-surface)] hover:text-[var(--theme-accent)]';
 
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setTheme(item.id)}
-                aria-pressed={isSelected}
-                className={[
-                  'flex w-full items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors',
-                  optionClass,
-                ].join(' ')}
-              >
-                <span
-                  className="flex h-4 w-4 items-center justify-center rounded-full border border-current"
-                  style={{ color: item.color }}
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => {
+                    setTheme(item.id);
+                    setIsOpen(false);
+                  }}
+                  aria-pressed={isSelected}
+                  className={[
+                    'flex w-full items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors',
+                    optionClass,
+                  ].join(' ')}
                 >
-                  <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                </span>
-                <span style={{ color: 'var(--theme-ink)' }}>{item.label}</span>
-              </button>
-            );
-          })}
+                  <span
+                    className="flex h-4 w-4 items-center justify-center rounded-full border border-current"
+                    style={{ color: item.color }}
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                  </span>
+                  <span style={{ color: 'var(--theme-ink)' }}>{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
