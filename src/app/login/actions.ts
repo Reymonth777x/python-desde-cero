@@ -86,11 +86,7 @@ export async function signup(formData: FormData) {
   });
 
   if (error) {
-    redirect(
-      /invitation/i.test(error.message)
-        ? '/login?error=invitation'
-        : '/login?error=signup',
-    );
+      redirect('/login?error=signup');
   }
 
   if (data.session) {

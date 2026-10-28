@@ -65,7 +65,7 @@
   --theme-font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
-/* ===== TEMA DRÃƒÂCULA ===== */
+/* ===== TEMA DRáCULA ===== */
 [data-theme="dracula"] {
   color-scheme: dark;
   --theme-bg: #282a36;

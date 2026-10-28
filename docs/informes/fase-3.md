@@ -1,4 +1,4 @@
-﻿# Informe FASE 3 — Plataforma estable, rápida y aislada
+# Informe FASE 3 — Plataforma estable, rápida y aislada
 
 **Rama base:** ase-3-plataforma
 **Entorno:** Windows PowerShell, Node.js, sin Docker/Supabase CLI disponible

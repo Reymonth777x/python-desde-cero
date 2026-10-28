@@ -1,4 +1,4 @@
-﻿-- Pruebas de permisos RLS/ACL para Python desde cero.
+-- Pruebas de permisos RLS/ACL para Python desde cero.
 -- Formato pgTAP para Supabase: ejecutar con \supabase test db\ (requiere Docker + Supabase CLI).
 -- ENTORNO ACTUAL: sin Docker ni Supabase CLI disponibles → PENDIENTE DE EJECUCIÓN.
 -- Roles probados: anon, estudiante A, estudiante B, admin.

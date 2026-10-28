@@ -1,4 +1,4 @@
-﻿-- 013_quiz_keys_and_submit_quiz
+-- 013_quiz_keys_and_submit_quiz
 -- Migración correctiva (no edita migraciones previas).
 --
 -- 1. Crea private.quiz_keys con las claves de corrección del quiz (origen de

@@ -1,4 +1,4 @@
-﻿export type GameAction =
+export type GameAction =
   | { type: 'mover'; direccion: 'arriba' | 'abajo' | 'izquierda' | 'derecha' }
   | { type: 'tomar'; ingrediente: string }
   | { type: 'cortar' }
@@ -42,6 +42,7 @@ export class KitchenAPI {
   private engine: any = null;
   private level: KitchenLevel | null = null;
   private initialized = false;
+
   async init(level: KitchenLevel): Promise<void> {
     this.level = level;
     this.initialized = true;
@@ -88,7 +89,7 @@ engine = KitchenEngine(level_data)
 
   async runAction(action: GameAction): Promise<GameResult> {
     if (!this.initialized) {
-      return { ok: false, error: 'El motor no estÃ¡ inicializado.' };
+      return { ok: false, error: 'El motor no est\u00e1 inicializado.' };
     }
     try {
       if (this.engine.runPythonAsync) {
@@ -105,6 +106,7 @@ engine = KitchenEngine(level_data)
     const pyodide = (window as any).pyodide;
     let methodName: string;
     let args: string = '';
+
     switch (action.type) {
       case 'mover':
         methodName = 'mover';
@@ -135,21 +137,26 @@ engine = KitchenEngine(level_data)
         args = String(action.pasos ?? 1);
         break;
       default:
-        return { ok: false, error: 'AcciÃ³n no reconocida.' };
+        return { ok: false, error: 'Acci\u00f3n no reconocida.' };
     }
+
     const result = await pyodide.runPythonAsync(`engine.${methodName}(${args})`);
     return pyodide.toJs(result) as GameResult;
   }
+
   private _runActionJS(action: GameAction): GameResult {
     const engine = this.engine as any;
+
     if (engine.game_over) {
-      return { ok: false, error: 'El juego ya terminÃ³.' };
+      return { ok: false, error: 'El juego ya termin\u00f3.' };
     }
+
     engine.step_count += 1;
     if (engine.step_count > engine.max_steps) {
       engine.game_over = true;
-      return { ok: false, error: 'LÃ­mite de pasos alcanzado.' };
+      return { ok: false, error: 'L\u00edmite de pasos alcanzado.' };
     }
+
     switch (action.type) {
       case 'mover':
         engine.chef_facing = action.direccion;
@@ -158,40 +165,49 @@ engine = KitchenEngine(level_data)
         if (action.direccion === 'izquierda') engine.chef_x -= 1;
         if (action.direccion === 'derecha') engine.chef_x += 1;
         return { ok: true, x: engine.chef_x, y: engine.chef_y, holding: engine.chef_holding };
+
       case 'tomar':
-        if (engine.chef_holding) return { ok: false, error: 'Ya estÃ¡s sosteniendo algo.' };
+        if (engine.chef_holding) return { ok: false, error: 'Ya est\u00e1s sosteniendo algo.' };
         engine.chef_holding = action.ingrediente;
         return { ok: true, ingrediente: action.ingrediente, holding: engine.chef_holding };
+
       case 'cortar':
-        if (!engine.chef_holding) return { ok: false, error: 'No estÃ¡s sosteniendo nada.' };
+        if (!engine.chef_holding) return { ok: false, error: 'No est\u00e1s sosteniendo nada.' };
         return { ok: true, ingrediente: engine.chef_holding, chopped: true };
+
       case 'cocinar':
-        if (!engine.chef_holding) return { ok: false, error: 'No estÃ¡s sosteniendo nada.' };
+        if (!engine.chef_holding) return { ok: false, error: 'No est\u00e1s sosteniendo nada.' };
         engine.events.push({ type: 'ingrediente_en_estufa', estufa: action.estufa, ingrediente: engine.chef_holding });
         engine.chef_holding = null;
         return { ok: true, estufa: action.estufa };
+
       case 'emplatar':
-        if (!engine.chef_holding) return { ok: false, error: 'No estÃ¡s sosteniendo nada.' };
+        if (!engine.chef_holding) return { ok: false, error: 'No est\u00e1s sosteniendo nada.' };
         engine.events.push({ type: 'ingrediente_emplatado', plato: action.plato });
         engine.chef_holding = null;
         return { ok: true, plato: action.plato };
+
       case 'servir':
         engine.events.push({ type: 'plato_servido', mesa: action.mesa });
         return { ok: true, mesa: action.mesa };
+
       case 'esperar':
         return { ok: true, steps: engine.step_count };
+
       default:
-        return { ok: false, error: 'AcciÃ³n no reconocida.' };
+        return { ok: false, error: 'Acci\u00f3n no reconocida.' };
     }
   }
 
   getState(): GameState | null {
     if (!this.initialized) return null;
+
     if (this.engine.get_state) {
       const pyodide = (window as any).pyodide;
       const state = pyodide.toJs(this.engine.get_state());
       return state as GameState;
     }
+
     const engine = this.engine as any;
     return {
       step: engine.step_count,
@@ -204,10 +220,12 @@ engine = KitchenEngine(level_data)
 
   getEvents(): GameEvent[] {
     if (!this.initialized) return [];
+
     if (this.engine.get_events) {
       const pyodide = (window as any).pyodide;
       return pyodide.toJs(this.engine.get_events()) as GameEvent[];
     }
+
     return (this.engine as any).events || [];
   }
 
