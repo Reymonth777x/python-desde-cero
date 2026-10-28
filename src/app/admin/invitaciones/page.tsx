@@ -3,6 +3,25 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { listInvitations, createInvitation, deleteInvitation } from "./actions";
 
+type InvitationRow = {
+  id: string;
+  code: string;
+  is_used: boolean;
+  used_by: string | null;
+  expires_at: string | null;
+  created_at: string;
+  created_by: string;
+};
+
+async function handleCreateInvitation(formData: FormData): Promise<void> {
+  await createInvitation(formData);
+}
+
+async function handleDeleteInvitation(formData: FormData): Promise<void> {
+  const id = formData.get("id") as string;
+  await deleteInvitation(id);
+}
+
 export default async function InvitacionesPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -56,7 +75,7 @@ export default async function InvitacionesPage() {
           )}
 
           <div className='mt-8 space-y-4'>
-            <form action={async (formData: FormData) => { await createInvitation(formData); }} className='bg-[var(--theme-surface)] border border-[var(--theme-border)] p-6 rounded-lg space-y-4'>
+            <form action={handleCreateInvitation} className='bg-[var(--theme-surface)] border border-[var(--theme-border)] p-6 rounded-lg space-y-4'>
               <h3 className='font-semibold text-[var(--theme-ink)]'>Nueva invitación</h3>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <div>
@@ -105,7 +124,7 @@ export default async function InvitacionesPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {invitations.map((inv) => (
+                  {invitations.map((inv: InvitationRow) => (
                     <tr key={inv.id} className='border-b border-[var(--theme-border)]'>
                       <td className='border border-[var(--theme-border)] px-3 py-2 text-sm font-mono text-[var(--theme-ink)]'>{inv.code}</td>
                       <td className='border border-[var(--theme-border)] px-3 py-2 text-sm text-[var(--theme-ink)]'>
@@ -123,7 +142,8 @@ export default async function InvitacionesPage() {
                       </td>
                       <td className='border border-[var(--theme-border)] px-3 py-2'>
                         {!inv.is_used && (
-                          <form action={async () => { await deleteInvitation(inv.id); }} className='inline'>
+                          <form action={handleDeleteInvitation} className='inline'>
+                            <input type='hidden' name='id' value={inv.id} />
                             <button type='submit' className='text-xs text-[var(--theme-error)] hover:underline'>
                               Eliminar
                             </button>
