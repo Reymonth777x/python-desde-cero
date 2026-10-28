@@ -59,42 +59,60 @@ jobs:
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
           NEXT_PUBLIC_SITE_URL: https://python-desde-cero.pythondesdecero.workers.dev
 
-      - name: Diagnosticar token y acceso a cuenta (sin revelar secretos)
+      - name: Diagnosticar y normalizar credenciales de Cloudflare sin revelarlas
         shell: bash
         env:
-          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          RAW_CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           RAW_CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           set -euo pipefail
+          token="$RAW_CF_TOKEN"
+          token="${token#"${token%%[![:space:]]*}"}"
+          token="${token%"${token##*[![:space:]]}"}"
+          if [[ "${token,,}" == "bearer "* ]]; then
+            token="${token#* }"
+          fi
+          if [[ "$token" == \"*\" && "${#token}" -ge 2 ]]; then
+            token="${token:1:${#token}-2}"
+          fi
+          if [[ -z "$token" ]]; then
+            echo "::error::CLOUDFLARE_API_TOKEN está vacío."
+            exit 1
+          fi
+
           account_id="$RAW_CF_ACCOUNT"
           account_id="${account_id#"${account_id%%[![:space:]]*}"}"
           account_id="${account_id%"${account_id##*[![:space:]]}"}"
           if [[ ! "$account_id" =~ ^[A-Fa-f0-9]{32}$ ]]; then
-            echo "::error::CLOUDFLARE_ACCOUNT_ID no parece un Account ID de Cloudflare válido. Debe ser exactamente 32 caracteres hexadecimales. Cópialo desde la página principal de Cloudflare y actualiza el secreto en GitHub."
+            echo "::error::CLOUDFLARE_ACCOUNT_ID debe tener exactamente 32 caracteres hexadecimales. Cópialo desde la página principal de Cloudflare."
             exit 1
           fi
+
           verify_json="$(curl --silent --show-error \
-            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Authorization: Bearer $token" \
             https://api.cloudflare.com/client/v4/user/tokens/verify)"
           verify_ok="$(jq -r '.success // false' <<< "$verify_json")"
           if [[ "$verify_ok" != "true" ]]; then
-            codes="$(jq -r '[.errors[]?.code] | join(",")' <<< "$verify_json")"
-            echo "::error::Cloudflare rechazó el API token (códigos: ${codes:-sin código}). Crea un token de cuenta con Workers Scripts:Edit y Account Settings:Read."
+            codes="$(jq -r '[.. | objects | .code? | select(. != null)] | unique | join(",")' <<< "$verify_json")"
+            messages="$(jq -r '[.. | objects | .message? | select(. != null)] | unique | join("; ")' <<< "$verify_json" | tr -d '\r\n')"
+            echo "::error::Cloudflare rechazó el API token (códigos: ${codes:-sin código}). Detalle: ${messages:-sin detalle}. Crea un token nuevo y guarda solo el valor del token, sin el prefijo Bearer."
             exit 1
           fi
+          printf 'CLOUDFLARE_API_TOKEN=%s\n' "$token" >> "$GITHUB_ENV"
           echo "El token de Cloudflare está activo."
+
           account_json="$(curl --silent --show-error \
-            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Authorization: Bearer $token" \
             "https://api.cloudflare.com/client/v4/accounts/$account_id")"
           account_ok="$(jq -r '.success // false' <<< "$account_json")"
           if [[ "$account_ok" != "true" ]]; then
-            codes="$(jq -r '[.errors[]?.code] | join(",")' <<< "$account_json")"
-            messages="$(jq -r '[.errors[]?.message] | join("; ")' <<< "$account_json" | tr -d '\r\n')"
+            codes="$(jq -r '[.. | objects | .code? | select(. != null)] | unique | join(",")' <<< "$account_json")"
+            messages="$(jq -r '[.. | objects | .message? | select(. != null)] | unique | join("; ")' <<< "$account_json" | tr -d '\r\n')"
             echo "::error::Cloudflare no acepta el Account ID o el token no tiene lectura de cuenta. Códigos: ${codes:-sin código}. Detalle: ${messages:-sin detalle}. Verifica Account ID y permisos Account Settings:Read."
             exit 1
           fi
           printf 'CLOUDFLARE_ACCOUNT_ID=%s\n' "$account_id" >> "$GITHUB_ENV"
-          echo "Token activo y cuenta accesible; credenciales no mostradas."
+          echo "Cuenta accesible; credenciales no mostradas."
 
       - name: Compilar para Cloudflare Workers
         run: npm run build:vinext
@@ -121,7 +139,6 @@ jobs:
       - name: Desplegar Worker
         run: npm run deploy:vinext
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
           NEXT_PUBLIC_SITE_URL: https://python-desde-cero.pythondesdecero.workers.dev
