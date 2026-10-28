@@ -145,9 +145,6 @@ jobs:
 
       - name: Alinear variable de URL administrada en Cloudflare
         shell: bash
-        env:
-          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           set -euo pipefail
           settings_url="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/python-desde-cero/settings"
