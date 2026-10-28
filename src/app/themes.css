@@ -180,6 +180,19 @@
 /* ===== TEMA SISTEMA ===== */
 /* Se resuelve en ThemeProvider aplicando original o dark */
 
+/* ===== TRANSICIONES SUAVES ENTRE TEMAS (150-250ms) ===== */
+* {
+  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease, box-shadow 200ms ease, outline-color 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* ===== ESTILOS BASE DEL CUERPO (aplican a todos los temas) ===== */
 body {
   color: var(--theme-ink);
