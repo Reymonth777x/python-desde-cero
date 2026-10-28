@@ -33,8 +33,7 @@
 - python-error-translator.ts: errores de Python → español con pista pedagógica
 - tsc, vitest (22 tests), build — todos exit 0
 
-## Próximos: H3-H10
-- H3: Originalidad total (limpieza Cisco/PE1/PCEP)
+## Próximos: H4-H10
 - H4: Backend, cuentas, correos, antifraude
 - H5: Seguridad 7+1 capas
 - H6: Contenido 100+ ejercicios
