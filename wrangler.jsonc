@@ -20,5 +20,15 @@
     ]
   }
 ,
-  "images": { "binding": "IMAGES" }
+  "images": { "binding": "IMAGES" },
+  "routes": [
+    {
+      "pattern": "python-desdecero.com",
+      "zone_name": "python-desdecero.com",
+      "custom_domain": true
+    }
+  ],
+  "vars": {
+    "NEXT_PUBLIC_SITE_URL": "https://python-desdecero.com"
+  }
 }
