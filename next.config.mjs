@@ -12,9 +12,8 @@ const supabaseConnect = supabaseHost
 // en producción usa enforce.
 const cspDirectives = [
   "default-src 'self'",
-  // 'unsafe-eval' necesario para Pyodide WebAssembly y Monaco Editor services.
-  // wasm-unsafe-eval es más específico para WebAssembly (soportado en navegadores modernos).
-  "script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' https://challenges.cloudflare.com",
+  // wasm-unsafe-eval es específico para WebAssembly (Pyodide). 'unsafe-eval' eliminado por seguridad.
+  "script-src 'self' 'wasm-unsafe-eval' https://challenges.cloudflare.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https:",
   "font-src 'self'",

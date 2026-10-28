@@ -103,31 +103,31 @@ for i in range(360):
     description: 'Dibuja una espiral matemática usando funciones seno y coseno.',
   },
   {
-    id: 'texto-interactivo',
-    title: 'Saludo interactivo',
-    subtitle: 'Entrada y cadenas',
+        id: 'contador-ascendente',
+    title: 'Contador ascendente',
+    subtitle: 'Bucles simples',
     level: 'Principiante',
-    concepts: ['input()', 'cadenas', 'variables'],
-    code: `nombre = input("¿Cómo te llamas? ")
-print("Hola, " + nombre + "!")
-print("Bienvenido a Python desde cero.")`,
-    description: 'Programa que pide tu nombre por entrada y te saluda personalmente.',
+    concepts: ['bucles', 'variables', 'imprimir'],
+    code: `for i in range(1, 11):
+    print(i)`,
+    description: 'Imprime los n?meros del 1 al 10 usando un bucle for.',
   },
   {
-    id: 'reto-logica',
-    title: 'Reto de lógica',
-    subtitle: 'Condiciones y comparaciones',
-    level: 'Intermedio',
-    concepts: ['condicionales', 'operadores de comparación'],
-    code: `edad = int(input("¿Cuántos años tienes? "))
+        id: 'calculo-areas',
+    title: 'C?lculo de ?reas',
+    subtitle: 'Funciones y par?metros',
+    level: 'Principiante',
+    concepts: ['funciones', 'par?metros', 'operadores'],
+    code: `def area_circulo(radio):
+    import math
+    return math.pi * radio ** 2
 
-if edad >= 18:
-    print("Eres mayor de edad.")
-elif edad >= 13:
-    print("Eres adolescente.")
-else:
-    print("Eres un niño.")`,
-    description: 'Programa que clasifica la edad de una persona usando condiciones.',
+def area_cuadrado(lado):
+    return lado ** 2
+
+print("?rea del c?rculo (radio 5):", area_circulo(5))
+print("?rea del cuadrado (lado 4):", area_cuadrado(4))`,
+    description: 'Define funciones para calcular ?reas y las ejecuta con valores de ejemplo.',
   },
 ];
 
