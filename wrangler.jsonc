@@ -1,0 +1,24 @@
+// wrangler.jsonc — Configuración para despliegue en Cloudflare Workers
+{
+  "name": "python-desdecero",
+  "compatibility_date": "2026-10-26",
+  "observability": {
+    "enabled": true
+  }
+,
+  "main": "vinext/server/fetch-handler"
+,
+  "assets": {
+    "directory": "dist/client",
+    "html_handling": "none",
+    "not_found_handling": "none",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/*",
+      "!/_next/static/*",
+      "!/*/_next/static/*"
+    ]
+  }
+,
+  "images": { "binding": "IMAGES" }
+}
