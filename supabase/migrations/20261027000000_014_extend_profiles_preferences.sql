@@ -25,8 +25,8 @@ CREATE POLICY "Admins actualizan cualquier perfil"
   ON public.profiles
   FOR UPDATE
   TO authenticated
-  USING (public.current_user_is_admin())
-  WITH CHECK (public.current_user_is_admin());
+  USING (private.current_user_is_admin())
+  WITH CHECK (private.current_user_is_admin());
 
 -- Comentario
 COMMENT ON COLUMN public.profiles.theme IS 'Tema visual preferido del usuario (sistema, original, dark, dracula, cyberpunk, hacker, rosa)';

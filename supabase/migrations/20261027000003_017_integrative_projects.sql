@@ -42,7 +42,7 @@ CREATE POLICY "Admins y docentes leen todos los proyectos"
   ON public.project_submissions
   FOR SELECT
   TO authenticated
-  USING (public.current_user_is_admin());
+  USING (private.current_user_is_admin());
 
 CREATE INDEX IF NOT EXISTS idx_project_submissions_user ON public.project_submissions(user_id);
 CREATE INDEX IF NOT EXISTS idx_project_submissions_block ON public.project_submissions(block_id);

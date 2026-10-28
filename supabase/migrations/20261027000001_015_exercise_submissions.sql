@@ -36,7 +36,7 @@ CREATE POLICY "Admins leen todos los envíos"
   ON public.exercise_submissions
   FOR SELECT
   TO authenticated
-  USING (public.current_user_is_admin());
+  USING (private.current_user_is_admin());
 
 CREATE INDEX IF NOT EXISTS idx_exercise_submissions_user ON public.exercise_submissions(user_id);
 CREATE INDEX IF NOT EXISTS idx_exercise_submissions_exercise ON public.exercise_submissions(exercise_id);

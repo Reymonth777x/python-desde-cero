@@ -89,7 +89,7 @@ CREATE POLICY "Solo admins leen auditoría"
   ON public.audit_log
   FOR SELECT
   TO authenticated
-  USING (public.current_user_is_admin());
+  USING (private.current_user_is_admin());
 
 CREATE POLICY "Sistema inserta auditoría"
   ON public.audit_log
