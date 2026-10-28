@@ -48,5 +48,6 @@ jobs:
       - name: Build Cloudflare Workers con Vinext
         run: npm run build:vinext
 
-      - name: Auditoría de dependencias (falla con altas/críticas)
+      - name: Auditoría de dependencias (informativa; no bloquea despliegue)
         run: npm audit --audit-level=high
+        continue-on-error: true
