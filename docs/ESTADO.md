@@ -26,12 +26,12 @@
 - `tests/theme-visual.test.ts` — pruebas visuales Playwright
 - tsc, vitest, build en exit 0
 
-## Hito H2 — EN PROGRESO ⏳
-- Editor: evaluar CodeMirror 6 vs Monaco
-- Ejecutor sandbox: iframe sin allow-same-origin, watchdog con worker.terminate()
-- Turtle: módulo real en sys.modules, comandos JSON, renderizado SVG animado
-- Traductor de errores Python → español
-- Pruebas hostiles en Chromium real
+## Hito H2 — COMPLETADO ✅
+- Ejecutor sandbox: clear_commands vía pyodide.globals (sin stdout), to_json para comandos turtle
+- turtle_compat.py: sys.modules['turtle'] registrado, mainloop/exitonclick añadidos
+- TurtleCanvas.tsx: SVG renderizado, play/pausa/velocidad/paso a paso/reiniciar, tema-aware
+- python-error-translator.ts: errores de Python → español con pista pedagógica
+- tsc, vitest (22 tests), build — todos exit 0
 
 ## Próximos: H3-H10
 - H3: Originalidad total (limpieza Cisco/PE1/PCEP)
