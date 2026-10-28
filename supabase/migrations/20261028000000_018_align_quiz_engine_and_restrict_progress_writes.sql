@@ -9,6 +9,7 @@
 -- (private.quiz_attempts) while using the current course lesson identifiers.
 
 CREATE SCHEMA IF NOT EXISTS private;
+GRANT USAGE ON SCHEMA private TO authenticated;
 
 CREATE TABLE IF NOT EXISTS private.quiz_keys (
   module_id TEXT NOT NULL CHECK (module_id ~ '^module-[0-9]+$'),
