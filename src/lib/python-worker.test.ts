@@ -52,6 +52,8 @@ function createWorkerHarness() {
     self,
     importScripts: vi.fn(),
     loadPyodide: vi.fn(async () => pyodide),
+    setTimeout,
+    clearTimeout,
   });
 
   return { self, posted, pyodide };

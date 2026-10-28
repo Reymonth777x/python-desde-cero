@@ -1,11 +1,14 @@
-importScripts("https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js");
+importScripts("/pyodide/0.29.5/full/pyodide.js");
 
 const MAX_CODE_LENGTH = 50000;
 const MAX_OUTPUT_LENGTH = 20000;
 const MAX_INPUT_LINES = 20;
 const MAX_INPUT_LINE_LENGTH = 1000;
+const MAX_EXECUTION_TIME_MS = 15000; // 15 segundos máximo de ejecución
 
-let pyodideReadyPromise = loadPyodide();
+let pyodideReadyPromise = loadPyodide({
+  indexURL: "/pyodide/0.29.5/full/",
+});
 let turtleLoaded = false;
 
 pyodideReadyPromise
@@ -71,10 +74,17 @@ self.onmessage = async (event) => {
         pyodide.setStdout({ batched: appendOutput });
         pyodide.setStderr({ batched: appendOutput });
         pyodide.setStdin({ stdin: () => inputLines.shift() ?? null });
+        // Limpiar comandos de turtle entre ejecuciones
+        try { pyodide.globals?.get("clear_commands")?.(); } catch {}
 
         let executionError = "";
+        // Ejecución con tiempo máximo: si se excede, se rechaza la promesa.
+        const executionPromise = pyodide.runPythonAsync(code);
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Tiempo de ejecución agotado")), MAX_EXECUTION_TIME_MS)
+        );
         try {
-            await pyodide.runPythonAsync(code);
+            await Promise.race([executionPromise, timeoutPromise]);
         } catch (error) {
             executionError = error?.message || String(error);
         }
@@ -84,7 +94,8 @@ self.onmessage = async (event) => {
             try {
                 const commands = pyodide.globals.get("get_commands");
                 if (commands) {
-                    turtleCommands = commands();
+                    const pyCommands = commands();
+                    turtleCommands = pyodide.to_js(pyCommands);
                 }
             } catch {
                 // Ignorar errores al leer comandos de Turtle

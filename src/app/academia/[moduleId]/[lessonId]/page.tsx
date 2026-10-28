@@ -1,7 +1,29 @@
 import { notFound, redirect } from 'next/navigation';
 import LessonStudy from '@/components/LessonStudy';
-import { courseModules, findCourseLesson, findCourseModule } from '@/lib/course';
+import {
+  courseModules,
+  findCourseLesson,
+  findCourseModule,
+  type CourseLesson,
+  type QuizQuestion,
+} from '@/lib/course';
 import { createClient } from '@/lib/supabase/server';
+
+type ClientSafeQuizQuestion = Omit<QuizQuestion, 'answer' | 'explanation'>;
+
+/**
+ * Devuelve una copia de la lección sin los campos `answer` ni `explanation`
+ * de cada pregunta. Así las respuestas correctas nunca viajan al cliente.
+ * El cliente solo recibe prompt, options y el contenido visible de la lección.
+ */
+function stripQuizAnswers(lesson: CourseLesson): Omit<CourseLesson, 'questions'> & {
+  questions: ClientSafeQuizQuestion[];
+} {
+  return {
+    ...lesson,
+    questions: lesson.questions.map(({ prompt, options }) => ({ prompt, options })),
+  };
+}
 
 type Props = {
   params: Promise<{
@@ -73,7 +95,7 @@ export default async function LessonPage({ params }: Props) {
   return (
     <LessonStudy
       key={`${courseModule.id}:${lesson.id}:${user.id}`}
-      lesson={lesson}
+      lesson={stripQuizAnswers(lesson)}
       moduleId={courseModule.id}
       moduleNumber={courseModule.number}
       moduleTitle={courseModule.title}

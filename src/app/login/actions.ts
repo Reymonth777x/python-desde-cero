@@ -1,15 +1,14 @@
-﻿
 'use server';
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { resolveAuthCallbackUrl } from '@/lib/auth-callback-url';
-import { parseOptionalInvitationCode } from '@/lib/invitation-code';
 import { createClient } from '@/lib/supabase/server';
 
 export async function login(formData: FormData) {
   const email = String(formData.get('email') ?? '').trim();
   const password = String(formData.get('password') ?? '');
+  const captchaToken = String(formData.get('captchaToken') ?? '');
 
   if (!email || !password) {
     redirect('/login?error=missing');
@@ -20,6 +19,9 @@ export async function login(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword({
     email,
     password,
+    options: {
+      captchaToken: captchaToken || undefined,
+    },
   });
 
   if (error) {
@@ -46,10 +48,7 @@ export async function signup(formData: FormData) {
   const fullName = String(formData.get('full_name') ?? '').trim();
   const email = String(formData.get('email') ?? '').trim();
   const password = String(formData.get('password') ?? '');
-  const invitationCodeValue = formData.get('invitation_code');
-  const invitation = parseOptionalInvitationCode(
-    invitationCodeValue ? String(invitationCodeValue) : '',
-  );
+  const captchaToken = String(formData.get('captchaToken') ?? '');
 
   if (!fullName || !email || !password) {
     redirect('/login?error=missing');
@@ -57,10 +56,6 @@ export async function signup(formData: FormData) {
 
   if (fullName.length > 100 || email.length > 254) {
     redirect('/login?error=missing');
-  }
-
-  if (!invitation.ok) {
-    redirect('/login?error=invitationFormat');
   }
 
   if (password.length < 8) {
@@ -84,18 +79,14 @@ export async function signup(formData: FormData) {
     options: {
       data: {
         full_name: fullName,
-        invitation_code: invitation.code,
       },
       emailRedirectTo,
+      captchaToken: captchaToken || undefined,
     },
   });
 
   if (error) {
-    redirect(
-      /invitation/i.test(error.message)
-        ? '/login?error=invitation'
-        : '/login?error=signup',
-    );
+      redirect('/login?error=signup');
   }
 
   if (data.session) {
@@ -108,6 +99,7 @@ export async function signup(formData: FormData) {
 
 export async function requestPasswordReset(formData: FormData) {
   const email = String(formData.get('email') ?? '').trim();
+  const captchaToken = String(formData.get('captchaToken') ?? '');
 
   if (!email || email.length > 254) {
     redirect('/login/forgot-password?error=missing');

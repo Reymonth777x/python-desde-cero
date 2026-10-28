@@ -8,6 +8,7 @@
 
 # testing
 /coverage
+/test-results
 
 # next.js
 /.next/
@@ -40,3 +41,16 @@ next-env.d.ts
 
 # Preview/check helpers (not part of the application)
 .codex-vinext-preview-check.cjs
+
+# playwright report
+/playwright-report
+
+# Dependencias de navegador vendored (se restauran con npm install + postinstall)
+/public/pyodide/
+/public/monaco/
+
+# Wrangler / Cloudflare local state
+/.wrangler/
+
+# Supabase CLI temp
+/supabase/.temp/

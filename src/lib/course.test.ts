@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { courseModules, gradeQuiz } from './course';
 
-describe('ruta de aprendizaje PE1', () => {
+describe('ruta de aprendizaje Python desde cero', () => {
   it('incluye los cuatro módulos y las secciones oficiales principales', () => {
     expect(courseModules.map((courseModule) => courseModule.id)).toEqual([
       'module-1',

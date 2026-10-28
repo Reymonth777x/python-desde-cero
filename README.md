@@ -111,8 +111,8 @@ Python code runs in the browser via Pyodide, loaded through a dedicated Web Work
 
 - **Never commit `.env.local` or any file containing secret values.** These are excluded by `.gitignore`.
 - Supabase RLS policies are the final layer of data protection; migration files in `supabase/migrations/` define the schema and policies but must be reviewed and applied deliberately.
-- Migration files are stored in `supabase/migrations/` with timestamp prefixes (Supabase CLI convention). Duplicate historical copies under `src/app/supabase/migrations/` were removed.
-- The remote Supabase project has migrations applied through `009_public_signup_optional_invitation_reasserted`, which enables public registration without a mandatory invitation code.
+- Migration files are stored in `supabase/migrations/` with timestamp prefixes (Supabase CLI convention). Historical copies under `src/app/supabase/migrations/` were retained as reference and not removed; they may be out of sync with the canonical folder.
+- The remote Supabase project migration state has not been independently inspected (Supabase CLI not available locally). Do not assume which migrations are applied remotely without verifying against the remote project.
 
 ## Configuración de correo electrónico (plan gratuito de Supabase)
 
@@ -161,4 +161,4 @@ No se incluyen credenciales SMTP, tokens ni claves API en este repositorio.
 
 No license has been applied yet. The repository is private until the owner decides on a license and visibility. Do not port or reuse course content without confirming licensing terms.
 
-This project is independent educational material and is not affiliated with or certified by Cisco Networking Academy or Cisco.
+This project is independent educational material, created from scratch.

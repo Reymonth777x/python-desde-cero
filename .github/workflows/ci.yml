@@ -2,13 +2,17 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: ['**']
   pull_request:
-    branches: [master]
+    branches: ['**']
 
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
+      NEXT_PUBLIC_SITE_URL: https://python-desde-cero.pythondesdecero.workers.dev
 
     steps:
       - name: Checkout repository
@@ -34,3 +38,15 @@ jobs:
 
       - name: Production build
         run: npm run build
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests contra build de producción
+        run: npm run test:e2e
+
+      - name: Build Cloudflare Workers con Vinext
+        run: npm run build:vinext
+
+      - name: Auditoría de dependencias (falla con altas/críticas)
+        run: npm audit --audit-level=high
