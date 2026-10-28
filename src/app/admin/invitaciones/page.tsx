@@ -14,15 +14,24 @@ type InvitationRow = {
 };
 
 async function handleCreateInvitation(formData: FormData): Promise<void> {
-  await createInvitation(formData);
+  const result = await createInvitation(formData);
+  if (result.error) {
+    redirect(`/admin/invitaciones?error=${encodeURIComponent(result.error)}`);
+  }
+  redirect('/admin/invitaciones?message=invitation-created');
 }
 
 async function handleDeleteInvitation(formData: FormData): Promise<void> {
   const id = formData.get("id") as string;
-  await deleteInvitation(id);
+  const result = await deleteInvitation(id);
+  if (result.error) {
+    redirect(`/admin/invitaciones?error=${encodeURIComponent(result.error)}`);
+  }
+  redirect('/admin/invitaciones?message=invitation-deleted');
 }
 
-export default async function InvitacionesPage() {
+export default async function InvitacionesPage({ searchParams }: { searchParams: Promise<{ error?: string; message?: string }> }) {
+  const params = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -40,7 +49,7 @@ export default async function InvitacionesPage() {
     redirect('/estudiante');
   }
 
-  const { invitations, error } = await listInvitations();
+  const { invitations, error: listError } = await listInvitations();
 
   return (
     <main className='min-h-screen bg-[var(--theme-bg)] text-[var(--theme-ink)]'>
@@ -68,9 +77,19 @@ export default async function InvitacionesPage() {
             Crea códigos de invitación para permitir el registro de nuevos estudiantes.
           </p>
 
-          {error && (
+          {listError && (
             <div role='alert' className='mt-6 border-l-4 border-[var(--theme-error)] bg-[var(--theme-error-light)] px-4 py-3 text-sm leading-6 text-[var(--theme-error-dark)]'>
-              {error}
+              {listError}
+            </div>
+          )}
+          {params.error && (
+            <div role='alert' className='mt-6 border-l-4 border-[var(--theme-error)] bg-[var(--theme-error-light)] px-4 py-3 text-sm leading-6 text-[var(--theme-error-dark)]'>
+              {params.error}
+            </div>
+          )}
+          {params.message && (
+            <div role='status' className='mt-6 border-l-4 border-[var(--theme-accent)] bg-[var(--theme-accent-light)] px-4 py-3 text-sm leading-6 text-[var(--theme-ink)]'>
+              {params.message}
             </div>
           )}
 
