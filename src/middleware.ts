@@ -41,7 +41,13 @@ const isProtectedLearningPage =
   pathname === '/practica' ||
   pathname.startsWith('/practica/') ||
   pathname === '/academia' ||
-  pathname.startsWith('/academia/');
+  pathname.startsWith('/academia/') ||
+  pathname === '/estudiante' ||
+  pathname.startsWith('/estudiante/') ||
+  pathname === '/docente' ||
+  pathname.startsWith('/docente/') ||
+  pathname === '/admin' ||
+  pathname.startsWith('/admin/');
 
 if (!claims && isProtectedLearningPage) {
   const redirectUrl = request.nextUrl.clone();
