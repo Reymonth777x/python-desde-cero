@@ -35,9 +35,14 @@ export default async function LoginPage({ searchParams }: Props) {
   const messageCode = firstParam(params.message);
 
   const error = errorCode
-    ? errorMessages[errorCode] ?? 'No se pudo completar la solicitud. Inténtalo de nuevo.'
+    ? Object.prototype.hasOwnProperty.call(errorMessages, errorCode)
+      ? errorMessages[errorCode]
+      : 'No se pudo completar la solicitud. Inténtalo de nuevo.'
     : undefined;
-  const message = messageCode ? statusMessages[messageCode] : undefined;
+  const message =
+    messageCode && Object.prototype.hasOwnProperty.call(statusMessages, messageCode)
+      ? statusMessages[messageCode]
+      : undefined;
 
   return <LoginForm error={error} message={message} />;
 }
