@@ -73,8 +73,8 @@ export default function LoginForm({ error, message }: Props) {
           )}
           <div className="mt-8">
             <div className="flex -mx-1">
-              <button type="button" onClick={() => setIsSignup(false)} aria-pressed={!isSignup} className={\`flex-1 py-3 text-sm font-semibold transition-colors border-b-2 \${btnClass}\`}>Iniciar sesión</button>
-              <button type="button" onClick={() => setIsSignup(true)} aria-pressed={isSignup} className={\`flex-1 py-3 text-sm font-semibold transition-colors border-b-2 \${signupBtnClass}\`}>Crear cuenta</button>
+              <button type="button" onClick={() => setIsSignup(false)} aria-pressed={!isSignup} className={["flex-1 py-3 text-sm font-semibold transition-colors border-b-2", btnClass].join(" ")}>Iniciar sesión</button>
+              <button type="button" onClick={() => setIsSignup(true)} aria-pressed={isSignup} className={["flex-1 py-3 text-sm font-semibold transition-colors border-b-2", signupBtnClass].join(" ")}>Crear cuenta</button>
             </div>
             {isSignup ? (
               <form action={signup} className="mt-6 space-y-4">
