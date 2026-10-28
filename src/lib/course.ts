@@ -1,219 +1,208 @@
-export type QuizQuestion = {
-  prompt: string;
-  options: string[];
-  answer: number;
-  explanation: string;
+﻿export type QuizQuestion = { prompt: string; options: string[]; answer: number; explanation: string; };
+export type CourseExercise = { id: string; title: string; statement: string; starterCode: string; solution: string; tests: Array<{ input: string[]; expected: string }>; hints: string[]; difficulty: 'facil' | 'medio' | 'dificil'; xp: number; length: number; };
+export type CourseLesson = { id: string; section: string; title: string; objectives: string[]; explanation: string[]; example: string; exercise: CourseExercise; questions: QuizQuestion[]; assessment?: boolean; };
+export type CourseModule = { id: string; number: string; title: string; summary: string; lessons: CourseLesson[]; };
+const q = (p: string, o: string[], a: number, e: string): QuizQuestion => ({ prompt: p, options: o, answer: a, explanation: e });
+const exercise = (id: string, t: string, s: string, sc: string, sol: string, ts: Array<{ input: string[]; expected: string }>, h: string[], d: 'facil' | 'medio' | 'dificil', x: number, len: number = 1): CourseExercise => ({ id, title: t, statement: s, starterCode: sc, solution: sol, tests: ts, hints: h, difficulty: d, xp: x, length: len });
+const lesson = (id: string, sec: string, t: string, obj: string[], exp: string[], ex: string, exer: CourseExercise, qs: QuizQuestion[], as = false): CourseLesson => ({ id, section: sec, title: t, objectives: obj, explanation: exp, example: ex, exercise: exer, questions: qs, assessment: as });
+const b1e1 = exercise('b1-e1', 'Hola, cocina', 'Imprime: "Hola, cocina".', '', 'print("Hola, cocina")', [{ input: [], expected: 'Hola, cocina' }], ['Usa print() con comillas.'], 'facil', 10);
+const b1e2 = exercise('b1-e2', 'Variables', 'Crea plato = "Paella" e imprímela.', 'plato = ', 'plato = "Paella"\nprint(plato)', [{ input: [], expected: 'Paella' }], ['Usa = para asignar.'], 'facil', 10);
+const b1e3 = exercise('b1-e3', 'Operadores', 'Dadas a=8 y b=12, imprime a+b.', 'a = 8\nb = 12\n', 'a = 8\nb = 12\nprint(a + b)', [{ input: [], expected: '20' }], ['Usa + para sumar.'], 'facil', 15);
+const b1e4 = exercise('b1-e4', 'Entrada y salida', 'Pide el nombre con input() e imprímelo.', '', 'nombre = input()\nprint(nombre)', [{ input: ['Ana'], expected: 'Ana' }], ['Usa input() para leer.'], 'facil', 15);
+const b1q1 = q('¿Qué imprime print(3 + 2 * 2)?', ['10', '7', '5', '12'], 1, 'Multiplicación primero: 2*2=4, luego 3+4=7.');
+const b1q2 = q('¿Cómo se llama a una función?', ['llamar(func)', 'func()', 'ejecutar func', 'run func'], 1, 'Escribe el nombre con paréntesis: func().');
+const b1q3 = q('¿Qué tipo es "25"?', ['int', 'float', 'str', 'bool'], 2, 'Texto entre comillas es str.');
+const b1q4 = q('¿Qué hace int("10")?', ['Convierte "10" al número 10', 'Devuelve 10 como texto', 'Da error', 'Devuelve 1.0'], 0, 'int() convierte texto en número.');
+
+const modulo1 = {
+  id: 'module-1',
+  number: '1',
+  title: 'Preparar la cocina',
+  summary: 'Print, variables, tipos, operadores, input.',
+  lessons: [
+    lesson('b1-l1', 'Bloque 1', 'Tu primera línea con print', ['Usar print()'], ['print() muestra texto en pantalla.'], 'print("Hola")', b1e1, [b1q1, b1q2]),
+    lesson('b1-l2', 'Bloque 1', 'Variables: guarda ingredientes', ['Crear variables'], ['Una variable guarda un valor.'], 'plato = "Paella"', b1e2, [b1q3]),
+    lesson('b1-l3', 'Bloque 1', 'Operadores matemáticos', ['Usar + - * /'], ['Son los operadores básicos.'], 'total = 8 + 12', b1e3, [b1q1]),
+    lesson('b1-l4', 'Bloque 1', 'Entrada con input()', ['Leer del usuario'], ['input() lee lo que escribe el usuario.'], 'nombre = input()', b1e4, [b1q4]),
+  ],
+};
+const b2e1 = exercise('b2-e1', 'Igualdad', 'Comprueba si 5 es igual a 5 e imprime el resultado.', '', 'print(5 == 5)', [{ input: [], expected: 'True' }], ['Usa == para comparar.'], 'facil', 10);
+const b2e2 = exercise('b2-e2', 'Mayor que', 'Comprueba si 10 es mayor que 3 e imprime el resultado.', '', 'print(10 > 3)', [{ input: [], expected: 'True' }], ['Usa > para mayor que.'], 'facil', 10);
+const b2e3 = exercise('b2-e3', 'If simple', 'Si precio es mayor a 20, imprime "Caro".', 'precio = 25\n', 'precio = 25\nif precio > 20:\n    print("Caro")', [{ input: [], expected: 'Caro' }], ['Usa if con dos puntos y sangría.'], 'facil', 15);
+const b2e4 = exercise('b2-e4', 'If-else', 'Si edad >= 18 imprime "Adulto", si no "Menor".', 'edad = 16\n', 'edad = 16\nif edad >= 18:\n    print("Adulto")\nelse:\n    print("Menor")', [{ input: [], expected: 'Menor' }], ['Usa else para el caso contrario.'], 'facil', 15);
+const b2e5 = exercise('b2-e5', 'Elif', 'Califica: 90+ "A", 80+ "B", si no "C".', 'nota = 85\n', 'nota = 85\nif nota >= 90:\n    print("A")\nelif nota >= 80:\n    print("B")\nelse:\n    print("C")', [{ input: [], expected: 'B' }], ['Usa elif para condiciones intermedias.'], 'medio', 20);
+const b2e6 = exercise('b2-e6', 'While contador', 'Imprime los números del 1 al 5 usando while.', '', 'i = 1\nwhile i <= 5:\n    print(i)\n    i = i + 1', [{ input: [], expected: '1\n2\n3\n4\n5' }], ['while se repite mientras la condición sea verdadera.'], 'medio', 20);
+const b2e7 = exercise('b2-e7', 'For con range', 'Imprime los números del 0 al 4 usando for y range.', '', 'for i in range(5):\n    print(i)', [{ input: [], expected: '0\n1\n2\n3\n4' }], ['range(5) genera 0,1,2,3,4.'], 'medio', 20);
+const b2e8 = exercise('b2-e8', 'Break en bucle', 'Imprime números hasta encontrar 3, luego detente con break.', '', 'for i in range(10):\n    if i == 3:\n        break\n    print(i)', [{ input: [], expected: '0\n1\n2' }], ['break detiene el bucle inmediatamente.'], 'medio', 20);
+const b2e9 = exercise('b2-e9', 'Continue en bucle', 'Imprime del 1 al 5, saltando el 3 con continue.', '', 'for i in range(1, 6):\n    if i == 3:\n        continue\n    print(i)', [{ input: [], expected: '1\n2\n4\n5' }], ['continue salta a la siguiente iteración.'], 'medio', 20);
+const b2e10 = exercise('b2-e10', 'Contador de platos', 'Cuenta cuántos platos hay en la lista usando un bucle.', 'platos = ["sopa", "arroz", "carne"]\n', 'platos = ["sopa", "arroz", "carne"]\ncontador = 0\nfor _ in platos:\n    contador = contador + 1\nprint(contador)', [{ input: [], expected: '3' }], ['Itera sobre la lista e incrementa un contador.'], 'medio', 20);
+const b2e11 = exercise('b2-e11', 'Validar edad', 'Pide la edad al usuario y dice si es mayor de edad.', '', 'edad = int(input())\nif edad >= 18:\n    print("Mayor de edad")\nelse:\n    print("Menor de edad")', [{ input: ['20'], expected: 'Mayor de edad' }], ['Convierte la entrada a int antes de comparar.'], 'medio', 20);
+const b2e12 = exercise('b2-e12', 'Tabla del 3', 'Imprime la tabla de multiplicar del 3 del 1 al 10.', '', 'for i in range(1, 11):\n    print(3 * i)', [{ input: [], expected: '3\n6\n9\n12\n15\n18\n21\n24\n27\n30' }], ['Usa range(1, 11) para ir del 1 al 10.'], 'medio', 20);
+const b2e13 = exercise('b2-e13', 'Suma de números', 'Suma todos los números del 1 al 100 usando un bucle.', '', 'total = 0\nfor i in range(1, 101):\n    total = total + i\nprint(total)', [{ input: [], expected: '5050' }], ['Acumula en una variable dentro del bucle.'], 'dificil', 25);
+const b2e14 = exercise('b2-e14', 'Factorial', 'Calcula el factorial de 5 usando un bucle.', '', 'n = 5\nresultado = 1\nfor i in range(1, n + 1):\n    resultado = resultado * i\nprint(resultado)', [{ input: [], expected: '120' }], ['El factorial de 5 es 5*4*3*2*1 = 120.'], 'dificil', 25);
+const b2e15 = exercise('b2-e15', 'Adivina el número', 'El número secreto es 7. Pide al usuario que adivine y dale pistas.', '', 'secreto = 7\nintento = int(input())\nif intento == secreto:\n    print("Correcto")\nelif intento < secreto:\n    print("Más alto")\nelse:\n    print("Más bajo")', [{ input: ['7'], expected: 'Correcto' }], ['Compara el intento con el secreto.'], 'dificil', 25);
+const b2e16 = exercise('b2-e16', 'Contador descendente', 'Imprime del 10 al 1 usando while.', '', 'i = 10\nwhile i >= 1:\n    print(i)\n    i = i - 1', [{ input: [], expected: '10\n9\n8\n7\n6\n5\n4\n3\n2\n1' }], ['while con condición i >= 1 y decremento.'], 'dificil', 25);
+const b2e17 = exercise('b2-e17', 'Pares del 1 al 20', 'Imprime solo los números pares del 1 al 20.', '', 'for i in range(1, 21):\n    if i % 2 == 0:\n        print(i)', [{ input: [], expected: '2\n4\n6\n8\n10\n12\n14\n16\n18\n20' }], ['Usa % 2 == 0 para detectar pares.'], 'dificil', 25);
+const b2e18 = exercise('b2-e18', 'Suma de pares', 'Suma todos los números pares del 1 al 20.', '', 'total = 0\nfor i in range(1, 21):\n    if i % 2 == 0:\n        total = total + i\nprint(total)', [{ input: [], expected: '110' }], ['Acumula solo los pares.'], 'dificil', 25);
+const b2e19 = exercise('b2-e19', 'Validar contraseña', 'Pide una contraseña y verifica que tenga al menos 8 caracteres.', '', 'password = input()\nif len(password) >= 8:\n    print("Válida")\nelse:\n    print("Demasiado corta")', [{ input: ['mipass123'], expected: 'Válida' }], ['Usa len() para contar caracteres.'], 'dificil', 25);
+const b2e20 = exercise('b2-e20', 'Menú de opciones', 'Muestra un menú y ejecuta según la opción elegida.', '', 'opcion = input()\nif opcion == "1":\n    print("Opción 1")\nelif opcion == "2":\n    print("Opción 2")\nelse:\n    print("Opción inválida")', [{ input: ['2'], expected: 'Opción 2' }], ['Compara la entrada con las opciones válidas.'], 'dificil', 25);
+const b2e21 = exercise('b2-e21', 'Contador de vocales', 'Cuenta cuántas vocales tiene la palabra "programacion".', '', 'palabra = "programacion"\ncontador = 0\nfor letra in palabra:\n    if letra in "aeiou":\n        contador = contador + 1\nprint(contador)', [{ input: [], expected: '5' }], ['Itera sobre cada letra y verifica si es vocal.'], 'dificil', 25);
+const b2e22 = exercise('b2-e22', 'Proyecto: Máquina de pedidos', 'Sistema de pedidos por consola con menú, precios y total.', '', 'total = 0\nwhile True:\n    opcion = input()\n    if opcion == "0":\n        break\n    elif opcion == "1":\n        total = total + 10\n    elif opcion == "2":\n        total = total + 15\nprint("Total:", total)', [{ input: ['1', '2', '0'], expected: 'Total: 25' }], ['Usa while True para repetir hasta que el usuario elija salir.'], 'dificil', 30);
+
+const b2q1 = q('¿Qué imprime 5 > 3?', ['True', 'False', '1', '0'], 0, '5 es mayor que 3, así que el resultado es True.');
+const b2q2 = q('¿Qué hace elif?', ['Condición alternativa', 'Bucle infinito', 'Fin del programa', 'Ignora errores'], 0, 'elif evalúa otra condición si el if anterior fue falso.');
+const b2q3 = q('¿Qué imprime range(3)?', ['0,1,2', '1,2,3', '0,1,2,3', '1,2'], 0, 'range(3) genera 0, 1, 2.');
+const b2q4 = q('¿Qué hace break?', ['Detiene el bucle', 'Salta a la siguiente', 'Reinicia el bucle', 'Nada'], 0, 'break detiene el bucle inmediatamente.');
+const b2q5 = q('¿Qué imprime bool(0)?', ['False', 'True', '0', '1'], 0, 'bool(0) es False porque cero es "falsy".');
+
+const modulo2 = {
+  id: 'module-2',
+  number: '2',
+  title: 'Decidir y repetir',
+  summary: 'Booleanos, if/elif/else, while, for, range, control de bucles.',
+  lessons: [
+    lesson('b2-l1', 'Bloque 2', 'Booleanos y comparaciones', ['Usar ==, !=, >, <'], ['Compara valores y obtén True o False.'], 'print(5 == 5)', b2e1, [b1q1]),
+    lesson('b2-l2', 'Bloque 2', 'If y else', ['Tomar decisiones'], ['if ejecuta si es verdadero, else si no.'], 'if x > 0:\n    print("positivo")', b2e4, [b2q1]),
+    lesson('b2-l3', 'Bloque 2', 'Elif para múltiples casos', ['Usar elif'], ['elif maneja condiciones intermedias.'], 'if x > 0:\n    print("positivo")\nelif x < 0:\n    print("negativo")', b2e5, [b2q2]),
+    lesson('b2-l4', 'Bloque 2', 'Bucle while', ['Repetir con while'], ['while se repite mientras sea verdadero.'], 'i = 0\nwhile i < 3:\n    print(i)\n    i = i + 1', b2e6, [b2q3]),
+    lesson('b2-l5', 'Bloque 2', 'Bucle for con range', ['Usar for y range'], ['range genera una secuencia de números.'], 'for i in range(3):\n    print(i)', b2e7, [b2q4]),
+    lesson('b2-l6', 'Bloque 2', 'Break y continue', ['Controlar el flujo del bucle'], ['break detiene, continue salta a la siguiente.'], 'for i in range(5):\n    if i == 2:\n        break\n    print(i)', b2e8, [b2q5]),
+    lesson('b2-l7', 'Bloque 2', 'Examen del bloque 2', ['Repasar todo el bloque'], ['Examen de 5 preguntas sobre booleanos y bucles.'], 'if True: print("ok")', b2e22, [b2q1, b2q2, b2q3, b2q4, b2q5], true),
+  ],
+};
+const b3e1 = exercise('b3-e1', 'Crear lista', 'Crea una lista con 3 frutas e imprímela.', '', 'frutas = ["manzana", "banana", "naranja"]\nprint(frutas)', [{ input: [], expected: "['manzana', 'banana', 'naranja']" }], ['Usa corchetes [] para crear listas.'], 'facil', 10);
+const b3e2 = exercise('b3-e2', 'Acceder a elemento', 'Dada lista = [10, 20, 30], imprime el segundo elemento (índice 1).', 'lista = [10, 20, 30]\n', 'lista = [10, 20, 30]\nprint(lista[1])', [{ input: [], expected: '20' }], ['Los índices empiezan en 0.'], 'facil', 10);
+const b3e3 = exercise('b3-e3', 'Agregar a lista', 'Agrega "pera" a la lista de frutas e imprímela.', 'frutas = ["manzana", "banana"]\n', 'frutas = ["manzana", "banana"]\nfrutas.append("pera")\nprint(frutas)', [{ input: [], expected: "['manzana', 'banana', 'pera']" }], ['Usa .append() para agregar al final.'], 'facil', 15);
+const b3e4 = exercise('b3-e4', 'Longitud de lista', 'Dada una lista de 5 elementos, imprime su longitud.', 'pedidos = [1, 2, 3, 4, 5]\n', 'pedidos = [1, 2, 3, 4, 5]\nprint(len(pedidos))', [{ input: [], expected: '5' }], ['Usa len() para contar elementos.'], 'facil', 10);
+const b3e5 = exercise('b3-e5', 'Diccionario simple', 'Crea un diccionario con clave "plato" y valor "Paella".', '', 'pedido = {"plato": "Paella"}\nprint(pedido)', [{ input: [], expected: "{'plato': 'Paella'}" }], ['Usa llaves {} para diccionarios.'], 'facil', 15);
+const b3e6 = exercise('b3-e6', 'Acceder a diccionario', 'Dado pedido = {"plato": "Paella", "precio": 15}, imprime el precio.', 'pedido = {"plato": "Paella", "precio": 15}\n', 'pedido = {"plato": "Paella", "precio": 15}\nprint(pedido["precio"])', [{ input: [], expected: '15' }], ['Usa corchetes con la clave para acceder.'], 'facil', 15);
+const b3e7 = exercise('b3-e7', 'Agregar clave a diccionario', 'Agrega "mesa": 5 al diccionario de pedido.', 'pedido = {"plato": "Paella"}\n', 'pedido = {"plato": "Paella"}\npedido["mesa"] = 5\nprint(pedido)', [{ input: [], expected: "{'plato': 'Paella', 'mesa': 5}" }], ['Asigna un valor a una nueva clave.'], 'facil', 15);
+const b3e8 = exercise('b3-e8', 'Recorrer lista con for', 'Imprime cada plato de la lista.', 'platos = ["sopa", "arroz", "carne"]\n', 'platos = ["sopa", "arroz", "carne"]\nfor plato in platos:\n    print(plato)', [{ input: [], expected: 'sopa\narroz\ncarne' }], ['for itera sobre cada elemento de la lista.'], 'facil', 15);
+const b3e9 = exercise('b3-e9', 'Contar elementos con for', 'Cuenta cuántos platos hay en la lista usando for.', 'platos = ["sopa", "arroz", "carne", "postre"]\n', 'platos = ["sopa", "arroz", "carne", "postre"]\ncontador = 0\nfor _ in platos:\n    contador = contador + 1\nprint(contador)', [{ input: [], expected: '4' }], ['Incrementa contador en cada iteración.'], 'medio', 20);
+const b3e10 = exercise('b3-e10', 'Lista de precios', 'Suma todos los precios de una lista.', 'precios = [10, 20, 30, 40]\n', 'precios = [10, 20, 30, 40]\ntotal = 0\nfor p in precios:\n    total = total + p\nprint(total)', [{ input: [], expected: '100' }], ['Acumula cada precio en total.'], 'medio', 20);
+const b3e11 = exercise('b3-e11', 'Tupla inmutable', 'Crea una tupla con coordenadas (x, y) e imprímela.', '', 'coordenadas = (10, 20)\nprint(coordenadas)', [{ input: [], expected: '(10, 20)' }], ['Usa paréntesis () para tuplas.'], 'facil', 10);
+const b3e12 = exercise('b3-e12', 'Conjunto para eliminar duplicados', 'Dada una lista con duplicados, conviértela a conjunto e imprímela.', 'numeros = [1, 2, 2, 3, 3, 4]\n', 'numeros = [1, 2, 2, 3, 3, 4]\nunicos = set(numeros)\nprint(unicos)', [{ input: [], expected: "{1, 2, 3, 4}" }], ['set() elimina duplicados.'], 'medio', 20);
+const b3e13 = exercise('b3-e13', 'Métodos de cadena', 'Dada texto = "Hola Mundo", imprime en minúsculas.', 'texto = "Hola Mundo"\n', 'texto = "Hola Mundo"\nprint(texto.lower())', [{ input: [], expected: 'hola mundo' }], ['Usa .lower() para minúsculas.'], 'facil', 10);
+const b3e14 = exercise('b3-e14', 'Dividir cadena', 'Dada texto = "paella,arroz,marisco", divídela por comas.', 'texto = "paella,arroz,marisco"\n', 'texto = "paella,arroz,marisco"\npartes = texto.split(",")\nprint(partes)', [{ input: [], expected: "['paella', 'arroz', 'marisco']" }], ['Usa .split(",") para dividir por comas.'], 'medio', 20);
+const b3e15 = exercise('b3-e15', 'Unir lista de cadenas', 'Dada palabras = ["Hola", "mundo"], únelas con un espacio.', 'palabras = ["Hola", "mundo"]\n', 'palabras = ["Hola", "mundo"]\nresultado = " ".join(palabras)\nprint(resultado)', [{ input: [], expected: 'Hola mundo' }], ['Usa " ".join() para unir con espacio.'], 'medio', 15);
+const b3e16 = exercise('b3-e16', 'Buscar en lista', 'Dada platos = ["sopa", "arroz", "carne"], verifica si "arroz" está en la lista.', 'platos = ["sopa", "arroz", "carne"]\n', 'platos = ["sopa", "arroz", "carne"]\nprint("arroz" in platos)', [{ input: [], expected: 'True' }], ['Usa in para verificar membresía.'], 'facil', 10);
+const b3e17 = exercise('b3-e17', 'Proyecto: Gestor de inventario', 'Sistema para agregar, listar y buscar ingredientes.', '', 'inventario = []\nwhile True:\n    opcion = input()\n    if opcion == "0":\n        break\n    elif opcion == "1":\n        ingrediente = input()\n        inventario.append(ingrediente)\n    elif opcion == "2":\n        for item in inventario:\n            print(item)\nprint("Inventario final:", inventario)', [{ input: ['1', 'sal', '1', 'azúcar', '2', '0'], expected: 'sal\nazúcar\nInventario final: [\'sal\', \'azúcar\']' }], ['Usa while para el menú principal.'], 'dificil', 30);
+const b3e18 = exercise('b3-e18', 'Diccionario de recetas', 'Crea un diccionario con recetas y sus ingredientes.', '', 'recetas = {"tortilla": ["huevos", "patatas"], "ensalada": ["lechuga", "tomate"]}\nprint(recetas["tortilla"])', [{ input: [], expected: "['huevos', 'patatas']" }], ['Los diccionarios pueden tener listas como valores.'], 'medio', 20);
+const b3e19 = exercise('b3-e19', 'Iterar sobre diccionario', 'Imprime cada clave y valor de un diccionario.', 'menu = {"plato": 15, "bebida": 5, "postre": 8}\n', 'menu = {"plato": 15, "bebida": 5, "postre": 8}\nfor clave, valor in menu.items():\n    print(clave, valor)', [{ input: [], expected: 'plato 15\nbebida 5\npostre 8' }], ['Usa .items() para obtener clave y valor.'], 'medio', 20);
+const b3e20 = exercise('b3-e20', 'Contar palabras', 'Cuenta cuántas veces aparece cada palabra en una frase.', 'frase = "sol sol luna sol luna"\n', 'frase = "sol sol luna sol luna"\npalabras = frase.split()\nconteo = {}\nfor p in palabras:\n    if p in conteo:\n        conteo[p] = conteo[p] + 1\n    else:\n        conteo[p] = 1\nprint(conteo)', [{ input: [], expected: "{'sol': 3, 'luna': 2}" }], ['Usa un diccionario para contar ocurrencias.'], 'dificil', 25);
+const b3e21 = exercise('b3-e21', 'Lista de tuplas', 'Crea una lista de tuplas con (nombre, precio) de platos.', '', 'platos = [("Paella", 15), ("Tortilla", 10), ("Gazpacho", 8)]\nprint(platos)', [{ input: [], expected: "[('Paella', 15), ('Tortilla', 10), ('Gazpacho', 8)]" }], ['Las listas pueden contener tuplas.'], 'facil', 15);
+const b3e22 = exercise('b3-e22', 'Filtrar lista', 'Crea una nueva lista solo con números mayores a 10.', 'numeros = [5, 12, 8, 20, 3, 15]\n', 'numeros = [5, 12, 8, 20, 3, 15]\nmayores = []\nfor n in numeros:\n    if n > 10:\n        mayores.append(n)\nprint(mayores)', [{ input: [], expected: '[12, 20, 15]' }], ['Usa if dentro del bucle para filtrar.'], 'medio', 20);
+
+const b3q1 = q('¿Qué imprime len([1, 2, 3])?', ['2', '3', '4', '1'], 1, 'len() cuenta los elementos: 3.');
+const b3q2 = q('¿Qué es un diccionario?', ['Pares clave-valor', 'Solo números', 'Solo texto', 'Sin orden'], 0, 'Los diccionarios almacenan pares clave-valor.');
+const b3q3 = q('¿Qué hace .append()?', ['Agrega al final de una lista', 'Elimina el último', 'Ordena la lista', 'Copia la lista'], 0, '.append() agrega un elemento al final.');
+
+const modulo3 = {
+  id: 'module-3',
+  number: '3',
+  title: 'La despensa y la comanda',
+  summary: 'Listas, tuplas, diccionarios, conjuntos, cadenas y métodos.',
+  lessons: [
+    lesson('b3-l1', 'Bloque 3', 'Listas: crear y acceder', ['Crear listas, acceder por índice'], ['Las listas guardan colecciones ordenadas.'], 'frutas = ["manzana", "banana"]', b3e1, [b3q1]),
+    lesson('b3-l2', 'Bloque 3', 'Modificar listas', ['append, modificar elementos'], ['Puedes agregar y cambiar elementos.'], 'frutas.append("pera")', b3e3, [b3q3]),
+    lesson('b3-l3', 'Bloque 3', 'Diccionarios', ['Crear y acceder a diccionarios'], ['Clave-valor para buscar rápido.'], 'pedido = {"plato": "Paella"}', b3e5, [b3q2]),
+    lesson('b3-l4', 'Bloque 3', 'Recorrer colecciones', ['for sobre listas y diccionarios'], ['Itera sobre cada elemento.'], 'for item in lista:\n    print(item)', b3e8, [b3q1]),
+    lesson('b3-l5', 'Bloque 3', 'Tuplas y conjuntos', ['Tuplas inmutables, conjuntos sin duplicados'], ['tuple() y set() para casos especiales.'], 'coordenadas = (10, 20)', b3e11, [b3q3]),
+    lesson('b3-l6', 'Bloque 3', 'Métodos de cadenas', ['upper, lower, split, join'], ['Transforma y divide texto fácilmente.'], 'texto = "Hola Mundo"', b3e13, [b3q3]),
+    lesson('b3-l7', 'Bloque 3', 'Proyecto: Gestor de inventario', ['Aplicar todo el bloque'], ['Sistema completo de inventario.'], 'Ejemplo de código Python', b3e17, [b3q3]),
+    lesson('b3-l8', 'Bloque 3', 'Examen del bloque 3', ['Repasar todo el bloque'], ['Examen de 3 preguntas sobre colecciones.'], 'lista = [1, 2]\nprint(len(lista))', b3e22, [b3q1, b3q2, b3q3], true),
+  ],
+};
+const b4e1 = exercise('b4-e1', 'Primera función', 'Crea una función saludar() que imprima "Hola".', '', 'def saludar():\n    print("Hola")\n\nsaludar()', [{ input: [], expected: 'Hola' }], ['Usa def para definir funciones.'], 'facil', 10);
+const b4e2 = exercise('b4-e2', 'Función con parámetro', 'Crea una función que reciba un nombre y lo imprima.', '', 'def decir(nombre):\n    print(nombre)\n\ndecir("Ana")', [{ input: [], expected: 'Ana' }], ['Los parámetros van entre paréntesis.'], 'facil', 10);
+const b4e3 = exercise('b4-e3', 'Función con return', 'Crea una función que sume dos números y retorne el resultado.', '', 'def sumar(a, b):\n    return a + b\n\nresultado = sumar(3, 4)\nprint(resultado)', [{ input: [], expected: '7' }], ['Usa return para devolver un valor.'], 'medio', 15);
+const b4e4 = exercise('b4-e4', 'Cálculo de propina', 'Crea una función que calcule el 10% de una cuenta.', '', 'def propina(cuenta):\n    return cuenta * 0.10\n\nprint(propina(50))', [{ input: [], expected: '5.0' }], ['Multiplica por 0.10 para el 10%.'], 'medio', 15);
+const b4e5 = exercise('b4-e5', 'Alcance local', 'Define una variable dentro de una función e intenta acceder desde fuera.', '', 'def mi_funcion():\n    interna = 42\n    return interna\n\nprint(mi_funcion())', [{ input: [], expected: '42' }], ['Las variables dentro de una función son locales.'], 'medio', 15);
+const b4e6 = exercise('b4-e6', 'Excepción ZeroDivision', 'Divide dos números manejando la excepción de división entre cero.', '', 'try:\n    resultado = 10 / 0\nexcept ZeroDivisionError:\n    print("No se puede dividir entre cero")', [{ input: [], expected: 'No se puede dividir entre cero' }], ['Usa try/except para capturar errores.'], 'medio', 20);
+const b4e7 = exercise('b4-e7', 'Excepción ValueError', 'Convierte texto a número manejando ValueError.', '', 'try:\n    numero = int("no es numero")\nexcept ValueError:\n    print("No es un número válido")', [{ input: [], expected: 'No es un número válido' }], ['ValueError ocurre al convertir texto inválido.'], 'medio', 20);
+const b4e8 = exercise('b4-e8', 'Importar módulo', 'Importa math e impira math.pi.', '', 'import math\nprint(math.pi)', [{ input: [], expected: '3.141592653589793' }], ['Usa import para cargar módulos.'], 'facil', 10);
+const b4e9 = exercise('b4-e9', 'Función con múltiples parámetros', 'Crea una función que reciba precio e impuesto y retorne el total.', '', 'def total_con_impuesto(precio, impuesto):\n    return precio + (precio * impuesto)\n\nprint(total_con_impuesto(100, 0.21))', [{ input: [], expected: '121.0' }], ['Múltiples parámetros separados por coma.'], 'medio', 20);
+const b4e10 = exercise('b4-e10', 'Valor por defecto', 'Crea una función con un parámetro que tenga valor por defecto.', '', 'def saludar(nombre = "invitado"):\n    print("Hola, " + nombre)\n\nsaludar()\nsaludar("Ana")', [{ input: [], expected: 'Hola, invitado\nHola, Ana' }], ['Asigna un valor en la definición del parámetro.'], 'medio', 20);
+const b4e11 = exercise('b4-e11', 'Retornar múltiples valores', 'Crea una función que retorne el doble y el triple de un número.', '', 'def doble_y_triple(n):\n    return n * 2, n * 3\n\nd, t = doble_y_triple(5)\nprint(d, t)', [{ input: [], expected: '10 15' }], ['Python puede retornar múltiples valores como tupla.'], 'medio', 20);
+const b4e12 = exercise('b4-e12', 'Validar entrada con while y excepción', 'Pide un número al usuario hasta que sea válido.', '', 'while True:\n    try:\n        numero = int(input())\n        break\n    except ValueError:\n        print("Intenta de nuevo")\nprint("Número válido:", numero)', [{ input: ['abc', '5'], expected: 'Intenta de nuevo\nNúmero válido: 5' }], ['Combina while con try/except.'], 'dificil', 25);
+const b4e13 = exercise('b4-e13', 'Función recursiva', 'Calcula el factorial de un número usando recursión.', '', 'def factorial(n):\n    if n <= 1:\n        return 1\n    return n * factorial(n - 1)\n\nprint(factorial(5))', [{ input: [], expected: '120' }], ['La función se llama a sí misma.'], 'dificil', 25);
+const b4e14 = exercise('b4-e14', 'Módulo propio', 'Crea una función en un módulo y úsala desde otro archivo.', '', '# modulo.py\ndef decir_hola():\n    return "Hola desde el módulo"\n\n# main.py\nimport modulo\nprint(modulo.decir_hola())', [{ input: [], expected: 'Hola desde el módulo' }], ['Usa import para cargar tu propio módulo.'], 'medio', 20);
+const b4e15 = exercise('b4-e15', 'Proyecto: Sistema de comandas', 'Sistema de comandas con funciones para agregar, calcular total y mostrar.', '', 'comanda = []\ndef agregar(plato, precio):\n    comanda.append((plato, precio))\ndef total():\n    return sum(p for _, p in comanda)\n\nagregar("Paella", 15)\nagregar("Tortilla", 10)\nprint("Total:", total())', [{ input: [], expected: 'Total: 25' }], ['Usa funciones para organizar el código.'], 'dificil', 30);
+const b4e16 = exercise('b4-e16', 'Manejo de archivos', 'Lee el contenido de un archivo e imprímelo.', '', 'with open("archivo.txt", "r") as f:\n    contenido = f.read()\nprint(contenido)', [{ input: [], expected: 'Contenido del archivo' }], ['Usa with open() para leer archivos.'], 'medio', 20);
+const b4e17 = exercise('b4-e17', 'Escribir archivo', 'Escribe un texto en un archivo.', '', 'with open("archivo.txt", "w") as f:\n    f.write("Hola desde Python")\nprint("Guardado")', [{ input: [], expected: 'Guardado' }], ['Usa "w" para escribir en un archivo.'], 'medio', 20);
+const b4e18 = exercise('b4-e18', 'Excepción FileNotFound', 'Intenta leer un archivo que no existe y maneja el error.', '', 'try:\n    with open("no_existe.txt", "r") as f:\n        contenido = f.read()\nexcept FileNotFoundError:\n    print("Archivo no encontrado")', [{ input: [], expected: 'Archivo no encontrado' }], ['FileNotFoundError cuando el archivo no existe.'], 'dificil', 25);
+const b4e19 = exercise('b4-e19', 'Función anónima lambda', 'Crea una función lambda que sume dos números.', '', 'sumar = lambda a, b: a + b\nprint(sumar(3, 4))', [{ input: [], expected: '7' }], ['lambda crea funciones pequeñas en una línea.'], 'dificil', 25);
+const b4e20 = exercise('b4-e20', 'Decorador simple', 'Crea un decorador que imprima antes y después de una función.', '', 'def mi_decorador(func):\n    def envoltura():\n        print("Antes")\n        func()\n        print("Después")\n    return envoltura\n\n@mi_decorador\ndef decir_hola():\n    print("Hola")\n\ndecir_hola()', [{ input: [], expected: 'Antes\nHola\nDespués' }], ['Los decoradores envuelven funciones.'], 'dificil', 25);
+
+const b4q1 = q('¿Qué hace return?', ['Devuelve un valor', 'Imprime en pantalla', 'Termina el programa', 'Define una variable'], 0, 'return devuelve el resultado de la función.');
+const b4q2 = q('¿Qué hace try/except?', ['Captura errores', 'Define funciones', 'Crea bucles', 'Importa módulos'], 0, 'try/except captura y maneja excepciones.');
+const b4q3 = q('¿Qué es un módulo?', ['Archivo con código Python', 'Una función', 'Una variable', 'Un tipo de dato'], 0, 'Un módulo es un archivo .py con código reutilizable.');
+
+const modulo4 = {
+  id: 'module-4',
+  number: '4',
+  title: 'Recetas reutilizables',
+  summary: 'Funciones, parámetros, return, alcance, excepciones, módulos.',
+  lessons: [
+    lesson('b4-l1', 'Bloque 4', 'Definir funciones', ['Usar def'], ['def crea una función reutilizable.'], 'def hola():\n    print("Hola")', b4e1, [b4q1]),
+    lesson('b4-l2', 'Bloque 4', 'Parámetros y argumentos', ['Pasar datos a funciones'], ['Los parámetros personalizan el comportamiento.'], 'def decir(nombre):\n    print(nombre)', b4e2, [b4q1]),
+    lesson('b4-l3', 'Bloque 4', 'Return: devolver resultados', ['Usar return'], ['return envía el resultado de vuelta.'], 'def sumar(a, b):\n    return a + b', b4e3, [b4q1]),
+    lesson('b4-l4', 'Bloque 4', 'Alcance de variables', ['Variables locales y globales'], ['Las variables dentro de funciones son locales.'], 'def f():\n    x = 10\n    return x', b4e5, [b4q2]),
+    lesson('b4-l5', 'Bloque 4', 'Excepciones try/except', ['Capturar y manejar errores'], ['try intenta, except maneja el error.'], 'try:\n    x = 1 / 0\nexcept:\n    print("Error")', b4e6, [b4q2]),
+    lesson('b4-l6', 'Bloque 4', 'Módulos e import', ['import y from'], ['Los módulos organizan el código en archivos.'], 'import math', b4e8, [b4q3]),
+    lesson('b4-l7', 'Bloque 4', 'Proyecto: Sistema de comandas', ['Aplicar funciones y excepciones'], ['Sistema completo de comandas.'], 'Ejemplo de código Python', b4e15, [b4q3]),
+    lesson('b4-l8', 'Bloque 4', 'Examen del bloque 4', ['Repasar todo el bloque'], ['Examen de 3 preguntas sobre funciones.'], 'def f():\n    return 1', b4e20, [b4q1, b4q2, b4q3], true),
+  ],
+};
+const b5e1 = exercise('b5-e1', 'Leer archivo', 'Lee un archivo e imprime su contenido línea por línea.', '', 'with open("archivo.txt", "r") as f:\n    for linea in f:\n        print(linea.strip())', [{ input: [], expected: 'Línea 1\nLínea 2' }], ['Usa with open() para leer archivos.'], 'medio', 20);
+const b5e2 = exercise('b5-e2', 'Escribir archivo', 'Escribe una lista de compras en un archivo.', '', 'compras = ["pan", "leche", "huevos"]\nwith open("compras.txt", "w") as f:\n    for item in compras:\n        f.write(item + "\n")\nprint("Guardado")', [{ input: [], expected: 'Guardado' }], ['Usa "w" para escribir.'], 'medio', 20);
+const b5e3 = exercise('b5-e3', 'Clase simple', 'Crea una clase Plato con nombre y precio.', '', 'class Plato:\n    def __init__(self, nombre, precio):\n        self.nombre = nombre\n        self.precio = precio\n\np = Plato("Paella", 15)\nprint(p.nombre, p.precio)', [{ input: [], expected: 'Paella 15' }], ['class define una plantilla para objetos.'], 'medio', 20);
+const b5e4 = exercise('b5-e4', 'Método en clase', 'Agrega un método describir() a la clase Plato.', '', 'class Plato:\n    def __init__(self, nombre, precio):\n        self.nombre = nombre\n        self.precio = precio\n    def describir(self):\n        return self.nombre + " cuesta " + str(self.precio)\n\np = Plato("Tortilla", 10)\nprint(p.describir())', [{ input: [], expected: 'Tortilla cuesta 10' }], ['self se refiere a la instancia del objeto.'], 'medio', 20);
+const b5e5 = exercise('b5-e5', 'Herencia', 'Crea una clase Postre que herede de Plato.', '', 'class Plato:\n    def __init__(self, nombre, precio):\n        self.nombre = nombre\n        self.precio = precio\n\nclass Postre(Plato):\n    pass\n\np = Postre("Flan", 5)\nprint(p.nombre, p.precio)', [{ input: [], expected: 'Flan 5' }], ['La herencia permite reutilizar código.'], 'dificil', 25);
+const b5e6 = exercise('b5-e6', 'Escribir y leer archivo', 'Escribe un texto en un archivo y luego léelo.', '', 'with open("prueba.txt", "w") as f:\n    f.write("Hola archivo")\nwith open("prueba.txt", "r") as f:\n    contenido = f.read()\nprint(contenido)', [{ input: [], expected: 'Hola archivo' }], ['Usa "w" para escribir y "r" para leer.'], 'medio', 20);
+const b5e7 = exercise('b5-e7', 'Manejo de errores en archivos', 'Intenta leer un archivo inexistente y muestra mensaje amigable.', '', 'try:\n    with open("no_existe.txt", "r") as f:\n        print(f.read())\nexcept FileNotFoundError:\n    print("El archivo no existe")', [{ input: [], expected: 'El archivo no existe' }], ['Usa try/except con FileNotFoundError.'], 'dificil', 25);
+const b5e8 = exercise('b5-e8', 'Proyecto: Restaurante completo', 'Sistema completo con clases, archivos y funciones.', '', 'class Plato:\n    def __init__(self, nombre, precio):\n        self.nombre = nombre\n        self.precio = precio\n\nclass Restaurante:\n    def __init__(self):\n        self.menu = []\n    def agregar(self, plato):\n        self.menu.append(plato)\n    def total(self):\n        return sum(p.precio for p in self.menu)\n\nr = Restaurante()\nr.agregar(Plato("Paella", 15))\nr.agregar(Plato("Tortilla", 10))\nprint("Total:", r.total())', [{ input: [], expected: 'Total: 25' }], ['Conecta clases, métodos y colecciones.'], 'dificil', 30);
+
+const b5q1 = q('¿Qué es una clase?', ['Plantilla para objetos', 'Una función', 'Una variable', 'Un módulo'], 0, 'Una clase define la estructura de los objetos.');
+const b5q2 = q('¿Qué hace __init__?', ['Inicializa el objeto', 'Elimina el objeto', 'Copia el objeto', 'Imprime el objeto'], 0, '__init__ se ejecuta al crear el objeto.');
+const b5q3 = q('¿Qué es self?', ['Se refiere a la instancia', 'Es una palabra reservada', 'Es una función', 'Es una clase'], 0, 'self accede a los atributos del objeto actual.');
+
+const modulo5 = {
+  id: 'module-5',
+  number: '5',
+  title: 'Cocina profesional',
+  summary: 'Archivos, módulos propios, clases, pruebas, buenas prácticas.',
+  lessons: [
+    lesson('b5-l1', 'Bloque 5', 'Leer y escribir archivos', ['with open()'], ['Lee y guarda datos en archivos.'], 'with open("f.txt", "r") as f:\n    print(f.read())', b5e1, [b5q1]),
+    lesson('b5-l2', 'Bloque 5', 'Clases y objetos', ['class, __init__, self'], ['Las clases definen objetos con datos y comportamiento.'], 'class Plato:\n    pass', b5e3, [b5q2, b5q3]),
+    lesson('b5-l3', 'Bloque 5', 'Herencia', ['Heredar de otras clases'], ['Reutiliza código con herencia.'], 'class Hijo(Padre):\n    pass', b5e5, [b5q1]),
+    lesson('b5-l4', 'Bloque 5', 'Proyecto: Restaurante completo', ['Aplicar todo el curso'], ['El nivel final: restaurante completo.'], 'Ejemplo de código Python', b5e8, [b5q2]),
+  ],
 };
 
-export type CourseLesson = {
-  id: string;
-  section: string;
-  title: string;
-  objectives: string[];
-  explanation: string[];
-  example: string;
-  exercise: string;
-  questions: QuizQuestion[];
-  assessment?: boolean;
-};
+export const courseModules: CourseModule[] = [modulo1, modulo2, modulo3, modulo4, modulo5];
 
-export type CourseModule = {
-  id: string;
-  number: string;
-  title: string;
-  summary: string;
-  lessons: CourseLesson[];
-};
 
-const q = (
-  prompt: string,
-  options: string[],
-  answer: number,
-  explanation: string,
-): QuizQuestion => ({ prompt, options, answer, explanation });
-
-const lesson = (
-  id: string,
-  section: string,
-  title: string,
-  objective: string,
-  explanation: string[],
-  example: string,
-  exercise: string,
-  questions: QuizQuestion[],
-  assessment = false,
-): CourseLesson => ({
-  id,
-  section,
-  title,
-  objectives: [objective],
-  explanation,
-  example,
-  exercise,
-  questions,
-  assessment,
-});
-
-export const courseModules: CourseModule[] = [
-  {
-    id: 'module-1',
-    number: '01',
-    title: 'IntroducciÃ³n a Python y la programaciÃ³n',
-    summary:
-      'Descubre cÃ³mo se resuelven problemas con instrucciones y cÃ³mo preparar Python para escribir y ejecutar programas.',
-    lessons: [
-      lesson(
-        'lesson-1',
-        '1.1',
-        'IntroducciÃ³n a la programaciÃ³n',
-        'Describir un problema como una secuencia de pasos claros y verificables.',
-        [
-          'Programar consiste en expresar una soluciÃ³n mediante instrucciones que una computadora puede ejecutar. Antes de escribir cÃ³digo, conviene identificar los datos de entrada, el proceso y el resultado esperado.',
-          'Un algoritmo es una secuencia finita y ordenada de pasos. Una receta sencilla puede servir como modelo: recibe datos, transforma esos datos y produce una salida.',
-        ],
-        'minutos = 90\nhoras = minutos // 60\nresto = minutos % 60\nprint(horas, resto)',
-        'Adapta el ejemplo para convertir 135 minutos. Anota quÃ© valor esperas y compruÃ©balo en el laboratorio.',
-        [q('Â¿QuÃ© describe mejor un algoritmo?', ['Una secuencia finita de pasos para resolver un problema', 'Una colecciÃ³n de imÃ¡genes del programa', 'El nombre de un lenguaje de programaciÃ³n'], 0, 'Un algoritmo organiza los pasos necesarios para transformar entradas en un resultado.')],
-      ),
-      lesson(
-        'lesson-2',
-        '1.2',
-        'IntroducciÃ³n a Python',
-        'Reconocer Python como un lenguaje y distinguir cÃ³digo fuente de su ejecuciÃ³n.',
-        [
-          'Python es un lenguaje de propÃ³sito general con una sintaxis diseÃ±ada para ser legible. El intÃ©rprete lee el cÃ³digo y ejecuta las instrucciones en el orden correspondiente.',
-          'Los espacios, los nombres y los signos de puntuaciÃ³n forman parte del programa. Un error de sintaxis impide que Python interprete una instrucciÃ³n; un error de ejecuciÃ³n aparece mientras el programa trabaja.',
-        ],
-        'print("Hola, Python")\nprint(2 + 3)',
-        'Escribe dos instrucciones print: una que muestre tu nombre y otra que muestre el resultado de una suma.',
-        [q('Â¿QuÃ© hace el intÃ©rprete de Python?', ['Lee y ejecuta instrucciones Python', 'Convierte cualquier programa en una pÃ¡gina web', 'Crea automÃ¡ticamente una base de datos'], 0, 'El intÃ©rprete ejecuta el cÃ³digo Python y comunica errores cuando no puede continuar.')],
-      ),
-      lesson(
-        'lesson-3',
-        '1.3',
-        'Descargar e instalar Python',
-        'Identificar las piezas necesarias para editar y ejecutar un programa local.',
-        [
-          'En una computadora propia se necesita una instalaciÃ³n de Python 3 y un editor de texto o entorno de desarrollo. La instalaciÃ³n oficial incluye el intÃ©rprete; el editor puede ser una aplicaciÃ³n separada.',
-          'DespuÃ©s de instalar, se puede verificar la versiÃ³n desde una terminal. En esta academia el laboratorio usa Pyodide en el navegador, por lo que no tienes que instalar nada para practicar aquÃ­.',
-        ],
-        'python --version\n# En algunos equipos el comando es: python3 --version',
-        'Explica la diferencia entre el intÃ©rprete local y el laboratorio del navegador. Prueba el cÃ³digo Python del laboratorio sin instalar programas.',
-        [q('Â¿QuÃ© necesitas para ejecutar Python en una computadora local?', ['Un intÃ©rprete de Python y un lugar para escribir cÃ³digo', 'Solamente una hoja de cÃ¡lculo', 'Una cuenta de administrador de la academia'], 0, 'El intÃ©rprete ejecuta Python; un editor facilita escribir y organizar los archivos.')],
-      ),
-      lesson(
-        'lesson-4',
-        '1.4',
-        'EvaluaciÃ³n del mÃ³dulo 1',
-        'Comprobar los conceptos iniciales de algoritmo, cÃ³digo e intÃ©rprete.',
-        [
-          'Antes de continuar, revisa cÃ³mo se representan los pasos de una soluciÃ³n, quÃ© papel cumple el lenguaje y quÃ© distingue un error de sintaxis de uno que ocurre durante la ejecuciÃ³n.',
-          'Esta comprobaciÃ³n es original y formativa. Para aprobarla necesitas responder correctamente al menos tres de las cuatro preguntas.',
-        ],
-        'entrada = 4\nresultado = entrada * 2\nprint(resultado)',
-        'Responde las cuatro preguntas. Si una respuesta no es correcta, vuelve a las lecciones del mÃ³dulo y reintenta.',
-        [
-          q('Â¿CuÃ¡l es un algoritmo?', ['Pasos ordenados para alcanzar un resultado', 'Un tipo de monitor', 'Una contraseÃ±a para Python'], 0, 'Un algoritmo define pasos finitos para resolver un problema.'),
-          q('Â¿QuÃ© ejecuta las instrucciones de Python?', ['El intÃ©rprete', 'El teclado', 'El nombre del archivo'], 0, 'El intÃ©rprete analiza y ejecuta el programa.'),
-          q('Â¿CuÃ¡ndo aparece un error de sintaxis?', ['Cuando el cÃ³digo no cumple las reglas del lenguaje', 'Cuando el programa imprime un resultado', 'Cuando se cambia el tamaÃ±o de la ventana'], 0, 'La sintaxis determina cÃ³mo deben escribirse las instrucciones.'),
-          q('Â¿QuÃ© suele formar parte de un problema computacional?', ['Entradas, proceso y salida', 'Solo una salida sin datos', 'Un botÃ³n sin instrucciones'], 0, 'Identificar entradas, proceso y salida ayuda a diseÃ±ar una soluciÃ³n.'),
-        ],
-        true,
-      ),
-    ],
-  },
-  {
-    id: 'module-2',
-    number: '02',
-    title: 'Tipos de datos, variables, operadores y entrada/salida',
-    summary:
-      'Trabaja con valores, expresiones, variables y la comunicaciÃ³n bÃ¡sica de un programa con una persona.',
-    lessons: [
-      lesson('lesson-1', '2.1', 'Tu primer programa: Hello, World!', 'Mostrar informaciÃ³n con print y reconocer una cadena de texto.', ['print() envÃ­a un valor a la salida estÃ¡ndar. Una cadena de texto se escribe entre comillas simples o dobles; las comillas no forman parte de lo que se muestra.', 'Cada instrucciÃ³n se ejecuta en orden. Puedes imprimir varias lÃ­neas y combinar texto con valores numÃ©ricos.'], 'print("Hola, mundo")\nprint(3 + 4)', 'Cambia el saludo y aÃ±ade una segunda lÃ­nea que muestre una operaciÃ³n aritmÃ©tica.', [q('Â¿QuÃ© muestra print("Hola")?', ['Hola', '"print"', 'Un error siempre'], 0, 'print muestra el contenido de la cadena, sin las comillas que delimitan el texto.')]),
-      lesson('lesson-2', '2.2', 'Literales y tipos de datos', 'Diferenciar enteros, nÃºmeros decimales, cadenas y valores booleanos.', ['Un literal es un valor escrito directamente en el cÃ³digo. Python reconoce, entre otros, enteros (int), decimales (float), cadenas (str) y valores lÃ³gicos (bool).', 'El tipo determina quÃ© operaciones tienen sentido. Por ejemplo, sumar dos enteros produce un nÃºmero; concatenar dos cadenas produce texto.'], 'edad = 16\nprecio = 2.5\nnombre = "Ana"\nactivo = True\nprint(type(precio))', 'Crea una variable de cada tipo y muestra su tipo con type().', [q('Â¿CuÃ¡l es el tipo de 2.5?', ['float', 'str', 'bool'], 0, 'Un nÃºmero con parte decimal se representa como float.')]),
-      lesson('lesson-3', '2.3', 'Operadores y expresiones', 'Aplicar operadores aritmÃ©ticos y respetar la precedencia.', ['Los operadores +, -, *, /, //, %, y ** permiten construir expresiones. Python evalÃºa primero los parÃ©ntesis, despuÃ©s potencias, multiplicaciones y divisiones, y finalmente sumas y restas.', 'La divisiÃ³n / produce un float. La divisiÃ³n entera // descarta la parte fraccionaria y % devuelve el residuo.'], 'print(2 + 3 * 4)\nprint((2 + 3) * 4)\nprint(17 % 5)', 'Calcula cuÃ¡ntos paquetes de 6 unidades se llenan con 29 unidades y cuÃ¡ntas sobran.', [q('Â¿QuÃ© resultado produce 17 % 5?', ['2', '3', '3.4'], 0, 'Cinco cabe tres veces en 17 y sobran 2; ese residuo lo devuelve %.')]),
-      lesson('lesson-4', '2.4', 'Variables y asignaciÃ³n', 'Usar nombres descriptivos para guardar y actualizar valores.', ['Una variable asocia un nombre con un valor. La asignaciÃ³n = guarda el valor de la expresiÃ³n de la derecha bajo el nombre de la izquierda; no es una igualdad matemÃ¡tica.', 'Los nombres pueden contener letras, nÃºmeros y guion bajo, pero no empezar con un nÃºmero. Python distingue mayÃºsculas y minÃºsculas.'], 'puntos = 10\npuntos = puntos + 5\nprint(puntos)', 'Crea precio y cantidad, calcula total con una nueva variable y muestra el resultado.', [q('Â¿QuÃ© ocurre en puntos = puntos + 5?', ['Se actualiza puntos sumÃ¡ndole cinco', 'Se comprueba si puntos vale cinco', 'Se crea una igualdad permanente'], 0, 'La expresiÃ³n de la derecha se calcula y su resultado se asigna al nombre de la izquierda.')]),
-      lesson('lesson-5', '2.5', 'Comentarios y legibilidad', 'AÃ±adir comentarios Ãºtiles sin cambiar el comportamiento del programa.', ['Un comentario empieza con # y continÃºa hasta el final de esa lÃ­nea. Python lo ignora al ejecutar el programa.', 'Los comentarios explican decisiones o intenciones que no son evidentes en el cÃ³digo. Conviene preferir nombres claros y comentarios breves, evitando repetir literalmente lo que ya dice la instrucciÃ³n.'], '# Calcula el precio con impuesto\nprecio = 100\nimpuesto = 0.13\nprint(precio * (1 + impuesto))', 'AÃ±ade un comentario que explique una decisiÃ³n del programa y deja que el cÃ³digo haga el cÃ¡lculo.', [q('Â¿QuÃ© hace Python con el texto despuÃ©s de # en una lÃ­nea?', ['Lo trata como comentario', 'Lo ejecuta como una variable', 'Lo convierte en nÃºmero'], 0, 'El texto que sigue a # en una lÃ­nea es un comentario.')]),
-      lesson('lesson-6', '2.6', 'InteracciÃ³n con la persona usuaria', 'Leer texto con input y convertirlo cuando se necesita un nÃºmero.', ['input() muestra una invitaciÃ³n opcional y devuelve siempre una cadena. Para hacer cÃ¡lculos, convierte la respuesta con int() o float() segÃºn corresponda.', 'En el laboratorio puedes proporcionar lÃ­neas de entrada antes de ejecutar el programa. Cada llamada a input() consume una lÃ­nea; si faltan lÃ­neas, Python informa que la entrada terminÃ³.'], 'nombre = input("Nombre: ")\nedad = int(input("Edad: "))\nprint("Hola", nombre)\nprint(edad + 1)', 'En el laboratorio, proporciona un nombre y una edad en la caja de entrada. Modifica el programa para mostrar la edad del prÃ³ximo aÃ±o.', [q('Â¿QuÃ© tipo devuelve input() antes de convertirlo?', ['str', 'int', 'bool'], 0, 'input devuelve texto; int() o float() convierten ese texto para cÃ¡lculos.')]),
-      lesson('lesson-7', '2.7', 'EvaluaciÃ³n del mÃ³dulo 2', 'Comprobar el uso de tipos, variables, operadores y entrada/salida.', ['En esta evaluaciÃ³n formativa se combinan literales, asignaciones, precedencia, comentarios y lectura de datos. Necesitas al menos tres respuestas correctas de cuatro para completar el mÃ³dulo.', 'Si fallas una pregunta, el sistema muestra retroalimentaciÃ³n y te permite revisar el tema antes de intentarlo de nuevo.'], 'unidades = int(input("Unidades: "))\nprecio = 12\nprint(unidades * precio)', 'Responde todas las preguntas. DespuÃ©s prueba el ejemplo en el laboratorio con un valor de entrada.', [q('Â¿QuÃ© tipo devuelve input()?', ['str', 'float', 'list'], 0, 'La conversiÃ³n de texto a nÃºmero debe ser explÃ­cita.'), q('Â¿QuÃ© resultado tiene 2 + 3 * 4?', ['14', '20', '24'], 0, 'La multiplicaciÃ³n se evalÃºa antes que la suma.'), q('Â¿QuÃ© operador obtiene el residuo?', ['%', '/', '**'], 0, 'El operador mÃ³dulo % devuelve el residuo de una divisiÃ³n entera.'), q('Â¿QuÃ© instrucciÃ³n asigna el resultado a total?', ['total = precio * unidades', 'total == precio * unidades', 'print = precio * unidades'], 0, 'La asignaciÃ³n usa un solo signo igual y guarda el valor calculado.')] , true),
-    ],
-  },
-  {
-    id: 'module-3',
-    number: '03',
-    title: 'Valores booleanos, control de flujo y listas',
-    summary:
-      'Toma decisiones, repite instrucciones y organiza colecciones de valores mediante listas.',
-    lessons: [
-      lesson('lesson-1', '3.1', 'Decisiones con if, elif y else', 'Elegir quÃ© bloque ejecutar segÃºn una condiciÃ³n.', ['Una condiciÃ³n produce True o False. if ejecuta su bloque cuando la condiciÃ³n es verdadera; elif permite probar otra condiciÃ³n y else cubre los casos restantes.', 'La indentaciÃ³n define los bloques en Python. MantÃ©n el mismo nivel de sangrÃ­a dentro de cada bloque.'], 'temperatura = 22\nif temperatura >= 30:\n    print("Calor")\nelif temperatura >= 18:\n    print("Templado")\nelse:\n    print("FrÃ­o")', 'Crea una condiciÃ³n que indique si una nota es aprobatoria cuando vale al menos 70.', [q('Â¿QuÃ© bloque cubre los casos que no cumplieron las condiciones anteriores?', ['else', 'elif obligatorio', 'finally'], 0, 'else se ejecuta cuando ninguna condiciÃ³n anterior fue verdadera.')]),
-      lesson('lesson-2', '3.2', 'RepeticiÃ³n con while y for', 'Repetir instrucciones con una condiciÃ³n o una secuencia.', ['while repite un bloque mientras su condiciÃ³n sea verdadera; actualiza el estado para evitar que el ciclo sea infinito. for recorre los elementos de una secuencia.', 'range(inicio, fin) produce valores desde inicio hasta antes de fin. Es comÃºn usarlo cuando se conoce cuÃ¡ntas repeticiones se necesitan.'], 'for numero in range(1, 4):\n    print(numero)\n\ncontador = 3\nwhile contador > 0:\n    contador -= 1', 'Imprime los nÃºmeros del 1 al 5 con for y luego repite el ejercicio con while.', [q('Â¿QuÃ© valores produce range(1, 4)?', ['1, 2 y 3', '1, 2, 3 y 4', '0, 1, 2, 3 y 4'], 0, 'El lÃ­mite final de range no se incluye.')]),
-      lesson('lesson-3', '3.3', 'LÃ³gica y operaciones booleanas', 'Combinar condiciones con and, or y not.', ['and requiere que ambas condiciones sean verdaderas; or requiere que al menos una lo sea; not invierte un valor lÃ³gico.', 'Las comparaciones como ==, !=, <, <=, > y >= producen booleanos. Puedes agrupar condiciones con parÃ©ntesis para hacer explÃ­cita la intenciÃ³n.'], 'edad = 20\ntiene_permiso = True\nprint(edad >= 18 and tiene_permiso)', 'Expresa una condiciÃ³n que permita entrar a una actividad si se tiene invitaciÃ³n o se es administrador.', [q('Â¿CuÃ¡ndo es verdadero A and B?', ['Cuando A y B son verdaderos', 'Cuando cualquiera es verdadero', 'Cuando ambos son falsos'], 0, 'and exige que sus dos operandos sean verdaderos.')]),
-      lesson('lesson-4', '3.4', 'Crear y recorrer listas', 'Guardar varios valores ordenados en una lista.', ['Una lista se escribe entre corchetes y conserva el orden de sus elementos. Los Ã­ndices empiezan en cero; un Ã­ndice fuera del rango produce IndexError.', 'len(lista) informa cuÃ¡ntos elementos tiene. Puedes recorrerla directamente con for para procesar cada valor.'], 'colores = ["verde", "crema", "gris"]\nprint(colores[0])\nfor color in colores:\n    print(color)', 'Crea una lista con tres temas que te interesen y muestra cada uno en una lÃ­nea.', [q('Â¿QuÃ© Ã­ndice tiene el primer elemento de una lista?', ['0', '1', '-1 siempre'], 0, 'Los Ã­ndices de las listas comienzan en cero.')]),
-      lesson('lesson-5', '3.5', 'Ordenamiento burbuja', 'Explicar cÃ³mo comparaciones vecinas pueden ordenar una lista.', ['El ordenamiento burbuja compara pares adyacentes e intercambia los que estÃ¡n en el orden incorrecto. Cada pasada mueve un valor grande hacia el final.', 'Es un algoritmo fÃ¡cil de estudiar, aunque no es adecuado para grandes volÃºmenes. Python ofrece sorted() y list.sort() para programas reales.'], 'datos = [4, 2, 3]\nfor i in range(len(datos) - 1):\n    if datos[i] > datos[i + 1]:\n        datos[i], datos[i + 1] = datos[i + 1], datos[i]\nprint(datos)', 'Traza a mano una pasada del algoritmo con [5, 1, 4]. Â¿QuÃ© lista resulta despuÃ©s de comparar pares vecinos una vez?', [q('Â¿QuÃ© hace una comparaciÃ³n de vecinos en bubble sort?', ['Intercambia el par si estÃ¡ en el orden incorrecto', 'Elimina ambos elementos', 'Convierte la lista en texto'], 0, 'El intercambio local desplaza valores hacia su posiciÃ³n ordenada.')]),
-      lesson('lesson-6', '3.6', 'Operaciones con listas', 'AÃ±adir, quitar y consultar elementos de una lista.', ['append(valor) agrega al final, remove(valor) elimina la primera coincidencia y el operador in comprueba pertenencia.', 'Modificar una lista mientras se recorre puede saltarse elementos. Para filtrar, suele ser mÃ¡s claro crear una lista nueva o recorrer una copia.'], 'notas = [80, 65]\nnotas.append(90)\nprint(65 in notas)\nnotas.remove(65)', 'Agrega una cuarta nota, comprueba si una nota aparece y elimina un valor que ya no corresponda.', [q('Â¿QuÃ© mÃ©todo agrega un elemento al final?', ['append()', 'remove()', 'sort()'], 0, 'append aÃ±ade un elemento al final de la lista.')]),
-      lesson('lesson-7', '3.7', 'Listas: recorridos y patrones', 'Procesar una lista para calcular un resultado agregado.', ['Una acumulaciÃ³n inicia con un valor neutro y actualiza el resultado en cada iteraciÃ³n. Para una suma, el acumulador comienza en cero.', 'Las expresiones por comprensiÃ³n ofrecen una forma compacta de crear listas; primero domina el recorrido explÃ­cito para comprender cada paso.'], 'valores = [3, 5, 2]\ntotal = 0\nfor valor in valores:\n    total += valor\nprint(total)', 'Calcula el promedio de una lista no vacÃ­a: suma sus valores y divide entre len(lista).', [q('Â¿Con quÃ© valor inicia normalmente un acumulador de suma?', ['0', '1', 'None siempre'], 0, 'Cero es el elemento neutro de la suma.')]),
-      lesson('lesson-8', '3.8', 'EvaluaciÃ³n del mÃ³dulo 3', 'Comprobar decisiones, ciclos, lÃ³gica y listas.', ['La evaluaciÃ³n reÃºne conceptos de condiciones, repeticiÃ³n, booleanos y procesamiento de listas. Se aprueba con al menos tres respuestas correctas de cuatro.', 'Revisa la retroalimentaciÃ³n antes de reintentar. Esta prueba original no sustituye la evaluaciÃ³n oficial del curso.'], 'valores = [2, 4, 6]\nif all(valor % 2 == 0 for valor in valores):\n    print("Todos son pares")', 'Responde las cuatro preguntas y luego cambia el ejemplo para incluir un nÃºmero impar.', [q('Â¿QuÃ© tipo de valor produce 5 > 2?', ['bool', 'str', 'list'], 0, 'Una comparaciÃ³n produce True o False.'), q('Â¿QuÃ© ciclo recorre directamente los valores de una lista?', ['for', 'while sin condiciÃ³n', 'if'], 0, 'for puede recorrer cada elemento de una secuencia.'), q('Â¿QuÃ© devuelve len([4, 9])?', ['2', '1', '13'], 0, 'La lista contiene dos elementos.'), q('Â¿QuÃ© operador lÃ³gico exige ambas condiciones verdaderas?', ['and', 'or', 'not'], 0, 'and requiere que las dos condiciones se cumplan.')], true),
-    ],
-  },
-  {
-    id: 'module-4',
-    number: '04',
-    title: 'Funciones, tuplas, diccionarios y excepciones',
-    summary:
-      'Divide programas en funciones y procesa colecciones y errores de forma controlada.',
-    lessons: [
-      lesson('lesson-1', '4.1', 'Definir y llamar funciones', 'Agrupar instrucciones reutilizables bajo un nombre.', ['def inicia una funciÃ³n. El bloque indentado contiene su cuerpo; la funciÃ³n solo se ejecuta cuando se la llama.', 'Las funciones pequeÃ±as con nombres claros facilitan probar y mantener un programa.'], 'def saludar():\n    print("Hola")\n\nsaludar()', 'Define una funciÃ³n mostrar_inicio que imprima el tÃ­tulo de tu proyecto y llÃ¡mala.', [q('Â¿QuÃ© palabra inicia una definiciÃ³n de funciÃ³n?', ['def', 'func', 'return'], 0, 'Python usa def para definir una funciÃ³n.')]),
-      lesson('lesson-2', '4.2', 'ParÃ¡metros y argumentos', 'Enviar informaciÃ³n a una funciÃ³n mediante parÃ¡metros.', ['Un parÃ¡metro es un nombre incluido en la definiciÃ³n; un argumento es el valor que se entrega al llamar la funciÃ³n.', 'Los argumentos posicionales se asocian por orden. Los argumentos con nombre hacen explÃ­cita la asociaciÃ³n y permiten mejorar la legibilidad.'], 'def saludar(nombre):\n    print("Hola", nombre)\n\nsaludar("Ada")', 'Modifica la funciÃ³n para recibir nombre y ciudad y producir un saludo con ambos datos.', [q('En saludar("Ada"), Â¿quÃ© es "Ada"?', ['Un argumento', 'Un parÃ¡metro', 'El nombre de la funciÃ³n'], 0, 'El valor pasado en la llamada es un argumento.')]),
-      lesson('lesson-3', '4.3', 'Devolver resultados', 'Usar return para entregar un valor calculado.', ['return termina la llamada y entrega un valor al punto donde se llamÃ³ la funciÃ³n. print muestra informaciÃ³n, pero no sustituye a return.', 'Un valor devuelto puede guardarse en una variable, combinarse en una expresiÃ³n o enviarse a otra funciÃ³n.'], 'def area_rectangulo(ancho, alto):\n    return ancho * alto\n\narea = area_rectangulo(4, 3)\nprint(area)', 'Escribe una funciÃ³n que reciba dos nÃºmeros y devuelva el menor de ellos.', [q('Â¿QuÃ© hace return?', ['Devuelve un valor y finaliza la funciÃ³n', 'Imprime siempre el valor', 'Repite la funciÃ³n'], 0, 'return entrega el resultado al cÃ³digo que llamÃ³ la funciÃ³n.')]),
-      lesson('lesson-4', '4.4', 'Alcance de las variables', 'Distinguir variables locales de valores globales.', ['Una variable creada dentro de una funciÃ³n es local a esa llamada. Los parÃ¡metros tambiÃ©n son locales.', 'Preferir parÃ¡metros y valores devueltos suele ser mÃ¡s claro que modificar variables globales, porque hace visibles las dependencias.'], 'tasa = 0.13\ndef calcular_impuesto(precio):\n    impuesto = precio * tasa\n    return impuesto\n\nprint(calcular_impuesto(100))', 'Refactoriza el ejemplo para pasar la tasa como segundo parÃ¡metro en lugar de leerla desde fuera.', [q('Â¿DÃ³nde existe una variable local creada dentro de una funciÃ³n?', ['Dentro del Ã¡mbito de esa funciÃ³n', 'En todas las funciones automÃ¡ticamente', 'Solo en el archivo del sistema'], 0, 'Una variable local se define y se usa en el Ã¡mbito de la funciÃ³n.')]),
-      lesson('lesson-5', '4.5', 'Funciones con varios parÃ¡metros', 'DiseÃ±ar funciones que reciban varios datos relacionados.', ['Una funciÃ³n puede recibir varios parÃ¡metros. El orden de los argumentos posicionales debe corresponder a la definiciÃ³n.', 'Los valores predeterminados permiten omitir argumentos opcionales. Coloca parÃ¡metros obligatorios antes de los parÃ¡metros con valor predeterminado.'], 'def presentar(nombre, curso="Python desde cero"):\n    return f"{nombre} estudia {curso}"\n\nprint(presentar("Sam"))', 'Crea una funciÃ³n convertir_a_minutos que reciba horas y minutos y devuelva el total.', [q('Â¿DÃ³nde se colocan los parÃ¡metros con valor predeterminado?', ['DespuÃ©s de los parÃ¡metros obligatorios', 'Antes de todos los parÃ¡metros', 'Fuera de los parÃ©ntesis'], 0, 'Los parÃ¡metros predeterminados van al final de la lista de parÃ¡metros.')]),
-      lesson('lesson-6', '4.6', 'Tuplas y diccionarios', 'Elegir una colecciÃ³n segÃºn cÃ³mo se organiza la informaciÃ³n.', ['Una tupla almacena una secuencia ordenada que normalmente no se modifica; un diccionario asocia claves Ãºnicas con valores.', 'Las tuplas se escriben normalmente con parÃ©ntesis; los diccionarios usan llaves y pares clave: valor. Usa una clave descriptiva para recuperar el dato asociado.'], 'coordenada = (9.9, -84.1)\nestudiante = {"nombre": "Luz", "nivel": 1}\nprint(estudiante["nombre"])', 'Crea un diccionario para un libro con tÃ­tulo y pÃ¡ginas y muestra el tÃ­tulo.', [q('Â¿QuÃ© estructura permite buscar un valor mediante una clave?', ['dict', 'tuple', 'float'], 0, 'Un diccionario asocia claves con valores.')]),
-      lesson('lesson-7', '4.7', 'Manejo de excepciones', 'Responder a un error esperado mediante try y except.', ['Una excepciÃ³n representa una condiciÃ³n anormal durante la ejecuciÃ³n. try contiene la operaciÃ³n que podrÃ­a fallar y except describe cÃ³mo recuperarse.', 'Captura el tipo de error que esperas. Evita un except general que silencie problemas que no sabes resolver.'], 'texto = "12"\ntry:\n    numero = int(texto)\nexcept ValueError:\n    print("Escribe un entero vÃ¡lido")', 'Prueba int("doce") y captura ValueError mostrando un mensaje que ayude a corregir la entrada.', [q('Â¿QuÃ© bloque maneja una excepciÃ³n lanzada dentro de try?', ['except', 'else obligatorio', 'import'], 0, 'except ejecuta el tratamiento previsto para una excepciÃ³n.')]),
-      lesson('lesson-8', '4.8', 'EvaluaciÃ³n del mÃ³dulo 4', 'Comprobar funciones, alcance, colecciones y excepciones.', ['La evaluaciÃ³n integra funciones y estructuras que permiten organizar un programa. Se aprueba con al menos tres respuestas correctas de cuatro.', 'El contenido es de elaboraciÃ³n propia y sirve como prÃ¡ctica; no es una reproducciÃ³n de la prueba oficial.'], 'def dividir_seguro(total, partes):\n    if partes == 0:\n        return None\n    return total / partes', 'Responde las preguntas y explica por quÃ© la funciÃ³n devuelve None cuando no se puede dividir.', [q('Â¿QuÃ© palabra define una funciÃ³n?', ['def', 'class', 'for'], 0, 'def introduce una definiciÃ³n de funciÃ³n.'), q('Â¿QuÃ© palabra entrega un valor desde una funciÃ³n?', ['return', 'print', 'input'], 0, 'return devuelve un resultado al llamador.'), q('Â¿QuÃ© colecciÃ³n asocia claves con valores?', ['dict', 'tuple', 'bool'], 0, 'Los diccionarios relacionan claves y valores.'), q('Â¿QuÃ© bloque maneja errores previstos?', ['except', 'elif', 'while'], 0, 'except captura las excepciones especificadas.')], true),
-    ],
-  },
-  {
-    id: 'module-5',
-    number: '05',
-    title: 'Cadenas de texto, archivos y mÃ³dulos',
-    summary: 'Trabaja con cadenas de caracteres, lectura y escritura de archivos, y la organizaciÃ³n de cÃ³digo en mÃ³dulos reutilizables.',
-    lessons: [
-      lesson(
-        'lesson-1',
-        '5.1',
-        'Cadenas de texto y mÃ©todos comunes',
-        'Manipular cadenas: longitud, recorte, bÃºsqueda y cambio de mayÃºsculas.',
-        ['Una cadena es una secuencia de caracteres. len(cadena) devuelve cuÃ¡ntos caracteres tiene.', 'MÃ©todos como .upper(), .lower(), .strip(), .find() y el acceso por Ã­ndice [n] permiten leer y transformar texto.'], 'mensaje = "  Hola Python  "\\nprint(len(mensaje))\\nprint(mensaje.strip().upper())\\nprint(mensaje.find("Python"))', 'Crea una cadena con tu nombre, elimina espacios sobrantes y muestra el resultado en mayÃºsculas.', [q('Â¿QuÃ© devuelve len("hola")?', ['4', '5', '3'], 0, 'La cadena "hola" tiene cuatro caracteres.')]),
-      lesson(
-        'lesson-2',
-        '5.2',
-        'Lectura y escritura de archivos',
-        'Guardar y recuperar informaciÃ³n usando open().',
-        ['open() abre un archivo para leer ("r") o escribir ("w"). Siempre conviene cerrar el archivo o usar with para que se cierre automÃ¡ticamente.', 'Escribir en modo "w" sobrescribe el contenido existente; modo "a" aÃ±ade al final sin borrar.'], 'with open("notas.txt", "w", encoding="utf-8") as archivo:\\n    archivo.write("LecciÃ³n completada\\\\n")\\n\\nwith open("notas.txt", "r", encoding="utf-8") as archivo:\\n    print(archivo.read())', 'Escribe un programa que guarde tu nombre en un archivo y luego lo lea y lo muestre.', [q('Â¿QuÃ© modo de open() sobrescribe el archivo?', ['"w"', '"r"', '"a"'], 0, 'El modo "w" abre para escritura y sobrescribe el contenido previo.')]),
-      lesson(
-        'lesson-3',
-        '5.3',
-        'MÃ³dulos y paquetes con import',
-        'Organizar el cÃ³digo en archivos reutilizables.',
-        ['import matematica carga un mÃ³dulo llamado matematica para usar sus funciones.', 'from nombre_modulo import funcion permite usar una funciÃ³n directamente sin el prefijo del mÃ³dulo.', 'La biblioteca estÃ¡ndar de Python incluye mÃ³dulos como math, random y datetime.'], 'import math\\nprint(math.sqrt(16))\\n\\nfrom random import randint\\nprint(randint(1, 10))', 'Escribe un programa que use math para calcular la raÃ­z cuadrada de un nÃºmero y muestre el resultado.', [q('Â¿QuÃ© hace import math?', ['Carga el mÃ³dulo math para usar sus funciones', 'Crea una carpeta llamada math', 'Ejecuta un programa llamado math'], 0, 'import math carga el mÃ³dulo estÃ¡ndar math para usar funciones como sqrt.')]),
-      lesson(
-        'lesson-4',
-        '5.4',
-        'EvaluaciÃ³n del mÃ³dulo 5',
-        'Comprobar cadenas, archivos y mÃ³dulos.',
-        ['Esta evaluaciÃ³n integra la manipulaciÃ³n de texto, el trabajo con archivos y la organizaciÃ³n en mÃ³dulos. Se aprueba con al menos tres respuestas correctas de cuatro.', 'El contenido es de elaboraciÃ³n propia y sirve como prÃ¡ctica; no es una reproducciÃ³n de la prueba oficial.'], 'nombre = "  Ana  "\\nprint(nombre.strip().lower())', 'Responde las preguntas y explica por quÃ© es importante cerrar los archivos despuÃ©s de usarlos.', [q('Â¿QuÃ© mÃ©todo convierte una cadena a mayÃºsculas?', ['.upper()', '.lower()', '.strip()'], 0, '.upper() devuelve la cadena en mayÃºsculas.')], true),
-    ],
-  },
-];
-
-export function findCourseModule(moduleId: string) {
-  return courseModules.find((courseModule) => courseModule.id === moduleId);
+export function findCourseModule(moduleId: string): CourseModule | undefined {
+  return courseModules.find((m) => m.id === moduleId);
 }
 
-export function findCourseLesson(moduleId: string, lessonId: string) {
-  return findCourseModule(moduleId)?.lessons.find(
-    (courseLesson) => courseLesson.id === lessonId,
-  );
+export function findCourseLesson(moduleId: string, lessonId: string): CourseLesson | undefined {
+  const module = findCourseModule(moduleId);
+  return module?.lessons.find((l) => l.id === lessonId);
 }
 
-export { gradeQuiz } from './course-grading';
+export function gradeQuiz(questions: QuizQuestion[], answers: number[]): { score: number; passed: boolean; correct: number; total: number } {
+  let correct = 0;
+  for (let i = 0; i < questions.length; i++) {
+    if (answers[i] === questions[i].answer) {
+      correct++;
+    }
+  }
+  const total = questions.length;
+  const score = total > 0 ? Math.round((correct / total) * 100) : 0;
+  const passed = score >= 75;
+  return { score, passed, correct, total };
+}
+
+

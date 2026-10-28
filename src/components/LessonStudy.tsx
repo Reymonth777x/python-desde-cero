@@ -201,7 +201,7 @@ export default function LessonStudy({
 
             <section aria-labelledby="exercise-title" className="border-l-2 border-[var(--theme-border-dark)] bg-[var(--theme-bg-secondary)] p-5 sm:p-6">
               <h2 id="exercise-title" className="font-serif text-xl">Práctica sugerida</h2>
-              <p className="mt-3 text-sm leading-7 text-[var(--theme-muted)]">{lesson.exercise}</p>
+              <p className="mt-3 text-sm leading-7 text-[var(--theme-muted)]">{lesson.exercise?.statement ?? ''}</p>
               <Link href="/practica" className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">Abrir el laboratorio</Link>
             </section>
 
