@@ -56,3 +56,5 @@ next-env.d.ts
 /supabase/.temp/
 # Supabase branches local state
 /supabase/.branches/
+# Dev server logs
+dev-server.*.log
