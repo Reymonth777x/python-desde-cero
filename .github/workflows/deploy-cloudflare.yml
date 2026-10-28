@@ -1,9 +1,10 @@
 name: Deploy Cloudflare Worker
 
 on:
-  push:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
     branches: [master]
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -14,6 +15,7 @@ concurrency:
 
 jobs:
   check-credentials:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     outputs:
       configured: ${{ steps.check.outputs.configured }}
@@ -41,7 +43,7 @@ jobs:
       - name: Checkout del código
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Configurar Node.js
         uses: actions/setup-node@v4
