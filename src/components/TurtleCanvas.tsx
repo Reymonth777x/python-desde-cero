@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -25,7 +25,6 @@ type TurtleCanvasProps = {
 const DEFAULT_WIDTH = 600;
 const DEFAULT_HEIGHT = 500;
 const VIEW_SIZE = 500;
-
 export default function TurtleCanvas({
   commands,
   width = DEFAULT_WIDTH,
@@ -79,7 +78,6 @@ export default function TurtleCanvas({
   const setSpeedValue = useCallback((newSpeed: number) => {
     setSpeed(newSpeed);
   }, []);
-
   useEffect(() => {
     if (!isPlaying) return;
 
@@ -221,7 +219,6 @@ export default function TurtleCanvas({
           )}
         </svg>
       </div>
-
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3 px-3 py-2 bg-[#theme-surface] border border-[#theme-border] rounded-md">
         <div className="flex items-center gap-2 text-xs text-[#theme-muted]">
           <span>Velocidad:</span>
@@ -314,5 +311,3 @@ export default function TurtleCanvas({
     </div>
   );
 }
-
-

@@ -1,0 +1,141 @@
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const animate = (timestamp: number) => {
+      if (lastTimeRef.current === 0) {
+        lastTimeRef.current = timestamp;
+      }
+
+      const elapsed = timestamp - lastTimeRef.current;
+      const interval = stepDuration();
+
+      if (elapsed >= interval) {
+        lastTimeRef.current = timestamp;
+        setCurrentStep((prev) => {
+          if (prev >= commandsRef.current.length) {
+            setIsPlaying(false);
+            return prev;
+          }
+          return prev + 1;
+        });
+      }
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (animationRef.current !== null) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [isPlaying, stepDuration]);
+
+  const visibleCommands = commandsRef.current.slice(0, currentStep);
+  const turtleStateRef = useRef<{ x: number; y: number; heading: number }>({
+    x: 0,
+    y: 0,
+    heading: 0,
+  });
+
+  const bgColorCmd = [...visibleCommands].reverse().find((c) => c.type === 'bgcolor');
+  const bgColor = bgColorCmd?.color || 'var(--theme-bg)';
+
+  return (
+    <div
+      className="relative w-full max-w-[600px] aspect-video rounded-lg overflow-hidden"
+      style={{
+        backgroundColor: 'var(--theme-code-bg)',
+        borderColor: 'var(--theme-code-border)',
+      }}
+    >
+      <div className="relative w-full h-full border border-[#theme-code-border]">
+        <svg
+          width="100%"
+          height="100%"
+          viewBox={'-' + (VIEW_SIZE / 2) + ' -' + (VIEW_SIZE / 2) + ' ' + VIEW_SIZE + ' ' + VIEW_SIZE}
+          preserveAspectRatio="xMidYMid meet"
+          className="w-full h-full"
+          style={{ backgroundColor: bgColor }}
+        >
+          {showGrid && (
+            <g stroke="var(--theme-border)" strokeOpacity="0.3" strokeWidth="1">
+              {[...Array(11)].map((_, i) => {
+                const pos = -250 + i * 50;
+                return (
+                  <g key={"grid-" + i}>
+                    <line x1={pos} y1={-250} x2={pos} y2={250} />
+                    <line x1={-250} y1={pos} x2={250} y2={pos} />
+                  </g>
+                );
+              })}
+            </g>
+          )}
+          {visibleCommands.map((cmd, idx) => {
+            if (cmd.type === 'line') {
+              return (
+                <line
+                  key={"turtle-line-" + idx}
+                  x1={cmd.x1!}
+                  y1={-cmd.y1!}
+                  x2={cmd.x2!}
+                  y2={-cmd.y2!}
+                  stroke={cmd.color || 'var(--theme-ink)'}
+                  strokeWidth={cmd.size || 1}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              );
+            }
+            if (cmd.type === 'dot') {
+              return (
+                <circle
+                  key={"turtle-dot-" + idx}
+                  cx={cmd.x!}
+                  cy={-cmd.y!}
+                  r={(cmd.size || 2) / 2}
+                  fill={cmd.color || 'var(--theme-ink)'}
+                />
+              );
+            }
+            if (cmd.type === 'fill') {
+              return (
+                <polygon
+                  key={"turtle-fill-" + idx}
+                  points={cmd.points?.map(([x, y]) => x + ',' + -y).join(' ') ?? ''}
+                  fill={cmd.color || 'var(--theme-ink)'}
+                  fillOpacity="0.6"
+                />
+              );
+            }
+            if (cmd.type === 'write') {
+              return (
+                <text
+                  key={"turtle-write-" + idx}
+                  x={cmd.x!}
+                  y={-cmd.y!}
+                  fill={cmd.color || 'var(--theme-ink)'}
+                  fontSize={12}
+                  fontFamily="monospace"
+                  textAnchor="start"
+                  dominantBaseline="middle"
+                >
+                  {cmd.text}
+                </text>
+              );
+            }
+            return null;
+          })}
+          {showTurtle && visibleCommands.length > 0 && (
+            <g transform={"translate(" + turtleStateRef.current.x + "," + -turtleStateRef.current.y + ") rotate(" + turtleStateRef.current.heading + ")"}>
+              <path
+                d="M-8,8 L8,8 L0,-12 Z"
+                fill="var(--theme-accent)"
+                stroke="var(--theme-accent-dark)"
+                strokeWidth="1"
+              />
+              <circle cx="0" cy="0" r="3" fill="var(--theme-ink-inverse)" />
+            </g>
+          )}
+        </svg>
+      </div>

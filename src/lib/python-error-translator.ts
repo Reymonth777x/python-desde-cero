@@ -116,8 +116,7 @@ export function formatPythonError(error: string | Error | unknown): string {
   const info = translatePythonError(error);
   let result = info.spanish;
   if (info.hint) {
-    result += `\nPista: ${info.hint}`;
+    result += '\nPista: ' + info.hint;
   }
   return result;
 }
-﻿

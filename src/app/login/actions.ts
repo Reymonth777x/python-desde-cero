@@ -3,7 +3,6 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { resolveAuthCallbackUrl } from '@/lib/auth-callback-url';
-import { parseOptionalInvitationCode } from '@/lib/invitation-code';
 import { createClient } from '@/lib/supabase/server';
 
 export async function login(formData: FormData) {
@@ -49,10 +48,6 @@ export async function signup(formData: FormData) {
   const fullName = String(formData.get('full_name') ?? '').trim();
   const email = String(formData.get('email') ?? '').trim();
   const password = String(formData.get('password') ?? '');
-  const invitationCodeValue = formData.get('invitation_code');
-  const invitation = parseOptionalInvitationCode(
-    invitationCodeValue ? String(invitationCodeValue) : '',
-  );
   const captchaToken = String(formData.get('captchaToken') ?? '');
 
   if (!fullName || !email || !password) {
@@ -61,10 +56,6 @@ export async function signup(formData: FormData) {
 
   if (fullName.length > 100 || email.length > 254) {
     redirect('/login?error=missing');
-  }
-
-  if (!invitation.ok) {
-    redirect('/login?error=invitationFormat');
   }
 
   if (password.length < 8) {
@@ -88,7 +79,6 @@ export async function signup(formData: FormData) {
     options: {
       data: {
         full_name: fullName,
-        invitation_code: invitation.code,
       },
       emailRedirectTo,
       captchaToken: captchaToken || undefined,

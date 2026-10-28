@@ -1,0 +1,80 @@
+'use client';
+
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+type TurtleCommand = {
+  type: 'line' | 'fill' | 'dot' | 'write' | 'bgcolor';
+  x?: number;
+  y?: number;
+  x1?: number;
+  y1?: number;
+  x2?: number;
+  y2?: number;
+  color?: string;
+  size?: number;
+  points?: Array<[number, number]>;
+  text?: string;
+};
+
+type TurtleCanvasProps = {
+  commands: TurtleCommand[];
+  width?: number;
+  height?: number;
+};
+
+const DEFAULT_WIDTH = 600;
+const DEFAULT_HEIGHT = 500;
+const VIEW_SIZE = 500;
+export default function TurtleCanvas({
+  commands,
+  width = DEFAULT_WIDTH,
+  height = DEFAULT_HEIGHT,
+}: TurtleCanvasProps) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [speed, setSpeed] = useState(1);
+  const [showGrid, setShowGrid] = useState(true);
+  const [showTurtle, setShowTurtle] = useState(true);
+
+  const animationRef = useRef<number | null>(null);
+  const lastTimeRef = useRef<number>(0);
+  const commandsRef = useRef(commands);
+  commandsRef.current = commands;
+
+  useEffect(() => {
+    setCurrentStep(0);
+    setIsPlaying(false);
+  }, [commands.length]);
+
+  useEffect(() => {
+    return () => {
+      if (animationRef.current !== null) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, []);
+
+  const stepDuration = useCallback(() => {
+    return Math.max(30, 100 / speed);
+  }, [speed]);
+
+  const togglePlay = useCallback(() => {
+    setIsPlaying((prev) => !prev);
+  }, []);
+
+  const restart = useCallback(() => {
+    setCurrentStep(0);
+    setIsPlaying(false);
+  }, []);
+
+  const stepForward = useCallback(() => {
+    setCurrentStep((prev) => Math.min(prev + 1, commandsRef.current.length));
+  }, []);
+
+  const stepBackward = useCallback(() => {
+    setCurrentStep((prev) => Math.max(prev - 1, 0));
+  }, []);
+
+  const setSpeedValue = useCallback((newSpeed: number) => {
+    setSpeed(newSpeed);
+  }, []);
