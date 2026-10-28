@@ -28,7 +28,7 @@ type RunnerResponse = {
 
 type ParentMessage = { type: 'run'; code: string; input: string[] } | { type: 'init' } | { type: 'terminate' };
 
-// Tiempo máximo de ejecución (ms). Coincide con el timeout del worker.
+// Tiempo mÃ¡ximo de ejecuciÃ³n (ms). Coincide con el timeout del worker.
 const MAX_EXECUTION_TIME_MS = 15000;
 
 export default function PythonRunner() {
@@ -93,7 +93,7 @@ export default function PythonRunner() {
     };
   }, [runnerMessageHandler, postToParent, clearRequestTimeout]);
 
-  // Escuchar mensajes del padre (la página que emite el iframe)
+  // Escuchar mensajes del padre (la pÃ¡gina que emite el iframe)
   useEffect(() => {
     const handleMessage = (event: MessageEvent<ParentMessage>) => {
       // Solo acepta mensajes del mismo origen y del window.parent (iframe same-origin).
@@ -111,7 +111,7 @@ export default function PythonRunner() {
       } else if (event.data.type === 'run') {
         clearRequestTimeout();
         // Timeout real desde el hilo principal: un setTimeout dentro del worker
-        // no interrumpe la ejecución síncrona de Pyodide; terminate() sí lo hace.
+        // no interrumpe la ejecuciÃ³n sÃ­ncrona de Pyodide; terminate() sÃ­ lo hace.
         lastRunIdRef.current = requestIdRef.current + 1;
         requestTimeoutRef.current = setTimeout(() => {
           terminateRunnerWorker();
@@ -119,7 +119,7 @@ export default function PythonRunner() {
           postToParent({
             status: 'error',
             id: lastRunIdRef.current ?? 0,
-            error: 'Tiempo de ejecución agotado',
+            error: 'Tiempo de ejecuciÃ³n agotado',
           });
         }, MAX_EXECUTION_TIME_MS + 1000);
         if (!ready) {
@@ -137,7 +137,7 @@ export default function PythonRunner() {
     return () => window.removeEventListener('message', handleMessage);
   }, [ready, postToParent, clearRequestTimeout]);
 
-  // Notificar al padre que el runner está listo
+  // Notificar al padre que el runner estÃ¡ listo
   useEffect(() => {
     if (ready) {
       postToParent({ status: 'ready' });
@@ -146,8 +146,8 @@ export default function PythonRunner() {
 
   const displayError = error ?? initError;
   if (displayError) {
-    return <div className="p-4 text-sm text-red-600">{displayError}</div>;
+    return <div className="p-4 text-sm text-[var(--theme-error)]">{displayError}</div>;
   }
 
-  return null; // Runner se comunica exclusivamente vía postMessage
+  return null; // Runner se comunica exclusivamente vÃ­a postMessage
 }

@@ -136,14 +136,14 @@ export default function LessonStudy({
   }
 
   return (
-    <main className="min-h-screen bg-[#f4f2e9] text-[#252b25]">
-      <header className="border-b border-[#d3d3c7]">
+    <main className="min-h-screen bg-[var(--theme-bg)] text-[var(--theme-ink)]">
+      <header className="border-b border-[var(--theme-border)]">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8">
-          <Link href="/academia" className="inline-flex min-h-11 items-center font-serif text-lg font-semibold text-[#294936]">Python desde cero</Link>
+          <Link href="/academia" className="inline-flex min-h-11 items-center font-serif text-lg font-semibold text-[var(--theme-accent)]">Python desde cero</Link>
           <nav aria-label="Navegación de la lección" className="flex flex-wrap items-center gap-4 text-sm">
-            <Link href="/practica" className="inline-flex min-h-11 items-center text-[#294936] underline underline-offset-4">Laboratorio</Link>
+            <Link href="/practica" className="inline-flex min-h-11 items-center text-[var(--theme-accent)] underline underline-offset-4">Laboratorio</Link>
             <form action={logout}>
-              <button type="submit" className="inline-flex min-h-11 items-center gap-2 text-[#596259] underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#294936]">
+              <button type="submit" className="inline-flex min-h-11 items-center gap-2 text-[var(--theme-muted)] underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--theme-focus-ring)]">
                 <LogOut aria-hidden="true" size={16} /> Cerrar sesión
               </button>
             </form>
@@ -152,23 +152,23 @@ export default function LessonStudy({
       </header>
 
       <div className="mx-auto max-w-5xl px-5 py-8 sm:px-8 sm:py-12">
-        <Link href="/academia" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#294936] underline underline-offset-4">
+        <Link href="/academia" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">
           <ArrowLeft aria-hidden="true" size={16} /> Ruta formativa
         </Link>
 
-        <div className="mt-7 border-b border-[#d3d3c7] pb-7">
-          <p className="text-xs font-bold tracking-[0.15em] text-[#294936]">MÓDULO {moduleNumber} · {lesson.section}</p>
+        <div className="mt-7 border-b border-[var(--theme-border)] pb-7">
+          <p className="text-xs font-bold tracking-[0.15em] text-[var(--theme-accent)]">MÓDULO {moduleNumber} · {lesson.section}</p>
           <h1 className="mt-3 max-w-3xl font-serif text-3xl leading-tight sm:text-4xl">{lesson.title}</h1>
-          <p className="mt-3 text-sm text-[#596259]">{moduleTitle}</p>
+          <p className="mt-3 text-sm text-[var(--theme-muted)]">{moduleTitle}</p>
         </div>
 
         {progressUnavailable && (
-          <p role="alert" className="mt-6 border-l-4 border-[#a04435] bg-white px-4 py-3 text-sm leading-6 text-[#7f3027]">
+          <p role="alert" className="mt-6 border-l-4 border-[var(--theme-error)] bg-[var(--theme-surface)] px-4 py-3 text-sm leading-6 text-[var(--theme-error)]">
             No se pudo consultar el progreso anterior. La evaluación seguirá disponible y se intentará guardar al aprobarla.
           </p>
         )}
         {!sessionValid && (
-          <p role="alert" className="mt-6 border-l-4 border-[#a04435] bg-white px-4 py-3 text-sm leading-6 text-[#7f3027]">
+          <p role="alert" className="mt-6 border-l-4 border-[var(--theme-error)] bg-[var(--theme-surface)] px-4 py-3 text-sm leading-6 text-[var(--theme-error)]">
             Tu sesión ya no corresponde a esta cuenta. Vuelve a autenticarte antes de guardar.
           </p>
         )}
@@ -177,7 +177,7 @@ export default function LessonStudy({
           <article className="min-w-0 space-y-8">
             <section aria-labelledby="objectives-title">
               <h2 id="objectives-title" className="font-serif text-2xl">Al terminar podrás</h2>
-              <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-6 text-[#596259]">
+              <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-6 text-[var(--theme-muted)]">
                 {lesson.objectives.map((objective) => <li key={objective}>{objective}</li>)}
               </ul>
             </section>
@@ -185,30 +185,30 @@ export default function LessonStudy({
             <section aria-labelledby="explanation-title" className="space-y-4">
               <h2 id="explanation-title" className="font-serif text-2xl">Conceptos clave</h2>
               {lesson.explanation.map((paragraph) => (
-                <p key={paragraph} className="text-sm leading-7 text-[#3f4940]">{paragraph}</p>
+                <p key={paragraph} className="text-sm leading-7 text-[var(--theme-muted)]">{paragraph}</p>
               ))}
             </section>
 
             <section aria-labelledby="example-title">
-              <div className="border border-[#d3d3c7] bg-white">
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#d3d3c7] px-4 py-3">
-                  <h2 id="example-title" className="text-xs font-bold tracking-[0.12em] text-[#294936]">EJEMPLO EXPLICADO</h2>
-                  <span className="text-xs text-[#596259]">Código didáctico original</span>
+              <div className="border border-[var(--theme-border)] bg-[var(--theme-surface)]">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--theme-border)] px-4 py-3">
+                  <h2 id="example-title" className="text-xs font-bold tracking-[0.12em] text-[var(--theme-accent)]">EJEMPLO EXPLICADO</h2>
+                  <span className="text-xs text-[var(--theme-muted)]">Código didáctico original</span>
                 </div>
-                <pre className="overflow-x-auto p-4 font-mono text-sm leading-7 text-[#203d31] sm:p-5"><code>{lesson.example}</code></pre>
+                <pre className="overflow-x-auto p-4 font-mono text-sm leading-7 text-[var(--theme-accent-dark)] sm:p-5"><code>{lesson.example}</code></pre>
               </div>
             </section>
 
-            <section aria-labelledby="exercise-title" className="border-l-2 border-[#b7a77d] bg-[#ebe9df] p-5 sm:p-6">
+            <section aria-labelledby="exercise-title" className="border-l-2 border-[var(--theme-border-dark)] bg-[var(--theme-bg-secondary)] p-5 sm:p-6">
               <h2 id="exercise-title" className="font-serif text-xl">Práctica sugerida</h2>
-              <p className="mt-3 text-sm leading-7 text-[#3f4940]">{lesson.exercise}</p>
-              <Link href="/practica" className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-[#294936] underline underline-offset-4">Abrir el laboratorio</Link>
+              <p className="mt-3 text-sm leading-7 text-[var(--theme-muted)]">{lesson.exercise}</p>
+              <Link href="/practica" className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">Abrir el laboratorio</Link>
             </section>
 
             <section aria-labelledby="quiz-title">
-              <div className="border-b border-[#d3d3c7] pb-4">
+              <div className="border-b border-[var(--theme-border)] pb-4">
                 <h2 id="quiz-title" className="font-serif text-2xl">{lesson.assessment ? 'Evaluación del módulo' : 'Comprueba lo aprendido'}</h2>
-                <p className="mt-2 text-sm leading-6 text-[#596259]">
+                <p className="mt-2 text-sm leading-6 text-[var(--theme-muted)]">
                   {lesson.assessment ? 'Necesitas al menos 75% para aprobar. Esta evaluación original es formativa y no sustituye una prueba oficial.' : 'Responde correctamente para registrar esta actividad como completada.'}
                 </p>
               </div>
@@ -225,7 +225,7 @@ export default function LessonStudy({
                         const isSelected = answers[questionIndex] === optionIndex;
 
                         return (
-                          <label key={option} htmlFor={id} className={`flex cursor-pointer items-start gap-3 border px-3 py-3 text-sm leading-6 ${isSelected ? 'border-[#294936] bg-white' : 'border-[#d3d3c7] bg-white hover:bg-[#ebe9df]'}`}>
+                          <label key={option} htmlFor={id} className={`flex cursor-pointer items-start gap-3 border px-3 py-3 text-sm leading-6 ${isSelected ? 'border-[var(--theme-accent)] bg-[var(--theme-surface)]' : 'border-[var(--theme-border)] bg-[var(--theme-surface)] hover:bg-[var(--theme-bg-secondary)]'}`}>
                             <input
                               id={id}
                               type="radio"
@@ -246,55 +246,55 @@ export default function LessonStudy({
                       })}
                     </div>
                     {result && (
-                      <p className="text-sm leading-6 text-[#596259]">
+                      <p className="text-sm leading-6 text-[var(--theme-muted)]">
                         {result.explanations[questionIndex]}
                       </p>
                     )}
                   </fieldset>
                 ))}
 
-                <button type="submit" disabled={saving || !sessionValid} className="min-h-12 bg-[#294936] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#203d31] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936] disabled:cursor-not-allowed disabled:opacity-50">
+                <button type="submit" disabled={saving || !sessionValid} className="min-h-12 bg-[var(--theme-accent)] px-5 py-3 text-sm font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50">
                   {saving ? 'Guardando resultado…' : 'Comprobar respuestas'}
                 </button>
               </form>
 
               {result && (
-                <div role="status" aria-live="polite" className={`mt-5 border-l-4 px-4 py-3 text-sm leading-6 ${result.passed ? 'border-[#294936] bg-[#e5ecdf] text-[#203d31]' : 'border-[#b7a77d] bg-[#ebe9df] text-[#3f4940]'}`}>
+                <div role="status" aria-live="polite" className={`mt-5 border-l-4 px-4 py-3 text-sm leading-6 ${result.passed ? 'border-[var(--theme-accent)] bg-[var(--theme-accent-light)] text-[var(--theme-accent-dark)]' : 'border-[var(--theme-border-dark)] bg-[var(--theme-bg-secondary)] text-[var(--theme-muted)]'}`}>
                   Resultado: {result.correct} de {result.total} · {result.score}%.
                   {result.passed && savedScore >= result.score && ` Mejor puntaje guardado: ${savedScore}%.`}
                   {feedback && <span className="mt-1 block">{feedback}</span>}
                 </div>
               )}
               {!result && feedback && (
-                <p role="status" aria-live="polite" className="mt-4 text-sm text-[#7f3027]">{feedback}</p>
+                <p role="status" aria-live="polite" className="mt-4 text-sm text-[var(--theme-error)]">{feedback}</p>
               )}
               {completed && (
-                <p className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#294936]">
+                <p className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[var(--theme-accent)]">
                   <CheckCircle2 aria-hidden="true" size={18} /> Actividad completada en tu cuenta.
                 </p>
               )}
             </section>
 
-            <nav aria-label="Navegación entre lecciones" className="flex flex-wrap justify-between gap-4 border-t border-[#d3d3c7] pt-5">
+            <nav aria-label="Navegación entre lecciones" className="flex flex-wrap justify-between gap-4 border-t border-[var(--theme-border)] pt-5">
               {previousHref ? (
-                <Link href={previousHref} className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#294936] underline underline-offset-4"><ArrowLeft aria-hidden="true" size={16} /> Lección anterior</Link>
+                <Link href={previousHref} className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4"><ArrowLeft aria-hidden="true" size={16} /> Lección anterior</Link>
               ) : <span />}
               {nextHref ? (
-                <Link href={nextHref} className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#294936] underline underline-offset-4">Siguiente lección <ArrowRight aria-hidden="true" size={16} /></Link>
-              ) : <Link href="/academia" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#294936] underline underline-offset-4">Volver a la ruta <ArrowRight aria-hidden="true" size={16} /></Link>}
+                <Link href={nextHref} className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">Siguiente lección <ArrowRight aria-hidden="true" size={16} /></Link>
+              ) : <Link href="/academia" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">Volver a la ruta <ArrowRight aria-hidden="true" size={16} /></Link>}
             </nav>
           </article>
 
-          <aside className="h-fit border-t-2 border-[#294936] bg-[#ebe9df] p-5">
+          <aside className="h-fit border-t-2 border-[var(--theme-accent)] bg-[var(--theme-bg-secondary)] p-5">
             <h2 className="font-serif text-xl">Tu avance</h2>
-            <p className="mt-3 text-sm leading-6 text-[#596259]">
+            <p className="mt-3 text-sm leading-6 text-[var(--theme-muted)]">
               {completed ? 'Esta actividad ya figura como completada.' : 'Aprueba la comprobación para guardar esta actividad.'}
             </p>
             {savedScore > 0 && (
-              <p className="mt-3 text-sm font-semibold text-[#294936]">Mejor puntaje guardado: {savedScore}%</p>
+              <p className="mt-3 text-sm font-semibold text-[var(--theme-accent)]">Mejor puntaje guardado: {savedScore}%</p>
             )}
-            {progressUnavailable && <p className="mt-3 text-xs leading-5 text-[#7f3027]">No se logró leer el puntaje anterior.</p>}
-            <Link href="/academia" className="mt-5 inline-flex min-h-11 items-center text-sm font-semibold text-[#294936] underline underline-offset-4">Ver todos los módulos</Link>
+            {progressUnavailable && <p className="mt-3 text-xs leading-5 text-[var(--theme-error)]">No se logró leer el puntaje anterior.</p>}
+            <Link href="/academia" className="mt-5 inline-flex min-h-11 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">Ver todos los módulos</Link>
           </aside>
         </div>
       </div>

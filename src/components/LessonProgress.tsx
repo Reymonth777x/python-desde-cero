@@ -92,14 +92,14 @@ export default function LessonProgress() {
   }, []);
 
   return (
-    <section className="mt-6 border border-[#d3d3c7] bg-[#ebe9df] p-5">
+    <section className="mt-6 border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] p-5">
       <h2 className="text-lg font-semibold">Progreso de la lección</h2>
 
-      <p className="mt-2 text-sm leading-6 text-[#596259]">
+      <p className="mt-2 text-sm leading-6 text-[var(--theme-muted)]">
         Tu avance se guarda en tu cuenta y se recupera al volver al laboratorio.
       </p>
 
-      <p className="mt-4 text-sm text-[#596259]" aria-live="polite">
+      <p className="mt-4 text-sm text-[var(--theme-muted)]" aria-live="polite">
         {status === 'loading' && 'Consultando tu progreso...'}
         {status === 'signed-out' && 'Estado: sesión no iniciada'}
         {status === 'pending' && 'Estado: pendiente'}
@@ -108,17 +108,17 @@ export default function LessonProgress() {
       </p>
 
       {status === 'signed-out' && (
-        <Link href="/login" className="mt-4 inline-flex min-h-11 items-center font-semibold text-[#294936] underline underline-offset-4">
+        <Link href="/login" className="mt-4 inline-flex min-h-11 items-center font-semibold text-[var(--theme-accent)] underline underline-offset-4">
           Iniciar sesión para consultar tu avance
         </Link>
       )}
       {(status === 'pending' || status === 'error') && (
-        <Link href="/academia/module-1/lesson-1" className="mt-4 inline-flex min-h-11 items-center font-semibold text-[#294936] underline underline-offset-4">
+        <Link href="/academia/module-1/lesson-1" className="mt-4 inline-flex min-h-11 items-center font-semibold text-[var(--theme-accent)] underline underline-offset-4">
           Completar la comprobación en la academia
         </Link>
       )}
       {status === 'completed' && (
-        <Link href="/academia" className="mt-4 inline-flex min-h-11 items-center font-semibold text-[#294936] underline underline-offset-4">
+        <Link href="/academia" className="mt-4 inline-flex min-h-11 items-center font-semibold text-[var(--theme-accent)] underline underline-offset-4">
           Ver el resto de la ruta formativa
         </Link>
       )}
@@ -127,7 +127,7 @@ export default function LessonProgress() {
         <p
           role="status"
           aria-live="polite"
-          className="mt-4 text-sm text-[#596259]"
+          className="mt-4 text-sm text-[var(--theme-muted)]"
         >
           {message}
         </p>

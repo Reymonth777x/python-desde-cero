@@ -1,50 +1,235 @@
 /* Sistema de temas de Python desde cero */
 /* Los temas usan variables CSS para ser aplicables en toda la app */
 
-/* ===== TEMA ORIGINAL (preservado) ===== */
+/* Tokens base (fallback cuando no hay data-theme) */
+:root {
+  color-scheme: light;
+  --theme-focus-ring: #294936;
+  --theme-font-serif: var(--font-geist-sans), Georgia, 'Times New Roman', serif;
+  --theme-font-mono: var(--font-geist-mono), Consolas, Monaco, monospace;
+}
+
+/* ===== TEMA ORIGINAL ===== */
 [data-theme="original"] {
   color-scheme: light;
   --theme-bg: #f4f2e9;
   --theme-bg-secondary: #ebe9df;
   --theme-surface: #ffffff;
   --theme-ink: #252b25;
-  --theme-forest: #294936;
-  --theme-forest-dark: #203d31;
+  --theme-ink-inverse: #ffffff;
+  --theme-muted: #596259;
+  --theme-border: #9c865e;
+  --theme-border-dark: #b7a77d;
   --theme-accent: #294936;
   --theme-accent-dark: #203d31;
   --theme-accent-light: #dce5d8;
-  --theme-muted: #596259;
-  --theme-border: #d3d3c7;
-  --theme-border-dark: #b7a77d;
-  --theme-text-secondary: #58645b;
   --theme-success: #294936;
   --theme-error: #a04435;
   --theme-warning: #776945;
+  --theme-warning-light: #f0ead6;
+  --theme-error-light: #f7e8e6;
   --theme-paper: #f4f2e9;
+  --theme-code-bg: #ebe9df;
+  --theme-code-border: #d3d3c7;
+  --theme-shadow: rgba(41, 73, 54, 0.12);
+  --theme-glow: rgba(41, 73, 54, 0.35);
   --theme-font-serif: var(--font-geist-sans), Georgia, 'Times New Roman', serif;
   --theme-font-mono: var(--font-geist-mono), Consolas, Monaco, monospace;
 }
 
-/* ===== TEMA DARK ===== */
+/* ===== TEMA OSCURO ===== */
 [data-theme="dark"] {
   color-scheme: dark;
   --theme-bg: #0f172a;
   --theme-bg-secondary: #1e293b;
   --theme-surface: #1e293b;
   --theme-ink: #f1f5f9;
-  --theme-forest: #3b82f6;
-  --theme-forest-dark: #2563eb;
+  --theme-ink-inverse: #0f172a;
+  --theme-muted: #94a3b8;
+  --theme-border: #64748b;
+  --theme-border-dark: #475569;
   --theme-accent: #3b82f6;
   --theme-accent-dark: #2563eb;
-  --theme-accent-light: #dbeafe;
-  --theme-muted: #94a3b8;
-  --theme-border: #334155;
-  --theme-border-dark: #475569;
-  --theme-text-secondary: #94a3b8;
+  --theme-accent-light: #1e3a8a;
   --theme-success: #22c55e;
   --theme-error: #ef4444;
   --theme-warning: #f59e0b;
+  --theme-warning-light: #3a2605;
+  --theme-error-light: #450d0d;
   --theme-paper: #1e293b;
+  --theme-code-bg: #0f172a;
+  --theme-code-border: #334155;
+  --theme-shadow: rgba(0, 0, 0, 0.45);
+  --theme-glow: rgba(59, 130, 246, 0.35);
   --theme-font-serif: var(--font-geist-sans), system-ui, sans-serif;
   --theme-font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+/* ===== TEMA DRÃƒÂCULA ===== */
+[data-theme="dracula"] {
+  color-scheme: dark;
+  --theme-bg: #282a36;
+  --theme-bg-secondary: #34354a;
+  --theme-surface: #34354a;
+  --theme-ink: #f8f8f2;
+  --theme-ink-inverse: #282a36;
+  --theme-muted: #a6adc8;
+  --theme-border: #6272a4;
+  --theme-border-dark: #8be9fd;
+  --theme-accent: #bd93f9;
+  --theme-accent-dark: #7a5af0;
+  --theme-accent-light: #44475a;
+  --theme-success: #50fa7b;
+  --theme-error: #ff5555;
+  --theme-warning: #f1fa8c;
+  --theme-warning-light: #44475a;
+  --theme-error-light: #4a0e0e;
+  --theme-paper: #34354a;
+  --theme-code-bg: #34354a;
+  --theme-code-border: #6272a4;
+  --theme-shadow: rgba(40, 42, 54, 0.5);
+  --theme-glow: rgba(189, 147, 249, 0.45);
+  --theme-font-serif: var(--font-geist-sans), system-ui, sans-serif;
+  --theme-font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+/* ===== TEMA CYBERPUNK ===== */
+[data-theme="cyberpunk"] {
+  color-scheme: dark;
+  --theme-bg: #050510;
+  --theme-bg-secondary: #0a0a1a;
+  --theme-surface: #0a0a1a;
+  --theme-ink: #00ffff;
+  --theme-ink-inverse: #050510;
+  --theme-muted: #66ccff;
+  --theme-border: #00ffff;
+  --theme-border-dark: #008b8b;
+  --theme-accent: #00ffff;
+  --theme-accent-dark: #00b3b3;
+  --theme-accent-light: #1a1a33;
+  --theme-success: #00ffff;
+  --theme-error: #ff00ff;
+  --theme-warning: #ffff00;
+  --theme-warning-light: #1a1a00;
+  --theme-error-light: #1a001a;
+  --theme-paper: #0a0a1a;
+  --theme-code-bg: #0a0a1a;
+  --theme-code-border: #00ffff;
+  --theme-shadow: rgba(0, 0, 0, 0.7);
+  --theme-glow: rgba(0, 255, 255, 0.45);
+  --theme-font-serif: 'Share Tech Mono', monospace;
+  --theme-font-mono: 'Share Tech Mono', monospace;
+}
+
+/* ===== TEMA HACKER ===== */
+[data-theme="hacker"] {
+  color-scheme: dark;
+  --theme-bg: #0a0a0a;
+  --theme-bg-secondary: #141414;
+  --theme-surface: #141414;
+  --theme-ink: #00ff41;
+  --theme-ink-inverse: #0a0a0a;
+  --theme-muted: #888888;
+  --theme-border: #666666;
+  --theme-border-dark: #4d4d4d;
+  --theme-accent: #00ff41;
+  --theme-accent-dark: #00cc33;
+  --theme-accent-light: #1a331a;
+  --theme-success: #00ff41;
+  --theme-error: #ff0044;
+  --theme-warning: #ffaa00;
+  --theme-warning-light: #1a1a00;
+  --theme-error-light: #1a0000;
+  --theme-paper: #141414;
+  --theme-code-bg: #141414;
+  --theme-code-border: #333333;
+  --theme-shadow: rgba(0, 0, 0, 0.8);
+  --theme-glow: rgba(0, 255, 65, 0.35);
+  --theme-font-serif: 'Courier New', monospace;
+  --theme-font-mono: 'Courier New', monospace;
+}
+
+/* ===== TEMA ROSA ===== */
+[data-theme="rosa"] {
+  color-scheme: light;
+  --theme-bg: #fdf2f8;
+  --theme-bg-secondary: #fce7f3;
+  --theme-surface: #ffffff;
+  --theme-ink: #831843;
+  --theme-ink-inverse: #ffffff;
+  --theme-muted: #9d174d;
+  --theme-border: #c026d3;
+  --theme-border-dark: #f0abfc;
+  --theme-accent: #be185d;
+  --theme-accent-dark: #9d174d;
+  --theme-accent-light: #fce7f3;
+  --theme-success: #be185d;
+  --theme-error: #e11d48;
+  --theme-warning: #b45309;
+  --theme-warning-light: #fdecea;
+  --theme-error-light: #fdecea;
+  --theme-paper: #fff1f2;
+  --theme-code-bg: #fce7f3;
+  --theme-code-border: #fbcfe8;
+  --theme-shadow: rgba(190, 24, 93, 0.15);
+  --theme-glow: rgba(190, 24, 93, 0.35);
+  --theme-font-serif: var(--font-geist-sans), Georgia, 'Times New Roman', serif;
+  --theme-font-mono: var(--font-geist-mono), Consolas, Monaco, monospace;
+}
+
+/* ===== TEMA SISTEMA ===== */
+/* Se resuelve en ThemeProvider aplicando original o dark */
+
+/* ===== ESTILOS BASE DEL CUERPO (aplican a todos los temas) ===== */
+body {
+  color: var(--theme-ink);
+  background: var(--theme-bg);
+  font-family: var(--theme-font-serif), Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  color: var(--theme-ink-inverse);
+  background: var(--theme-accent);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--theme-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--theme-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-muted);
+}
+
+/* Forced colors mode (alto contraste) */
+@media (forced-colors: active) {
+  :root {
+    --theme-focus-ring: Highlight;
+  }
+  button,
+  a,
+  [role="button"] {
+    border: 1px solid CanvasText !important;
+  }
+}
+
+/* Reducir movimiento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -1,11 +1,19 @@
-'use client';
+﻿'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react';
 
-type ThemeName = 'original' | 'dark';
+type ThemeName =
+  | 'original'
+  | 'dark'
+  | 'dracula'
+  | 'cyberpunk'
+  | 'hacker'
+  | 'rosa'
+  | 'sistema';
 
 type ThemeContextValue = {
   theme: ThemeName;
+  resolvedTheme: 'original' | 'dark';
   setTheme: (theme: ThemeName) => void;
 };
 
@@ -14,20 +22,40 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 const THEME_KEY = 'python-desde-cero-theme';
 
 function leerTemaGuardado(): ThemeName {
-  if (typeof window === 'undefined') return 'original';
+  if (typeof window === 'undefined') return 'sistema';
   try {
     const guardado = localStorage.getItem(THEME_KEY);
-    if (guardado === 'original' || guardado === 'dark') {
+    if (
+      guardado === 'original' ||
+      guardado === 'dark' ||
+      guardado === 'dracula' ||
+      guardado === 'cyberpunk' ||
+      guardado === 'hacker' ||
+      guardado === 'rosa' ||
+      guardado === 'sistema'
+    ) {
       return guardado;
     }
   } catch {
     // Ignorar errores de localStorage
   }
-  return 'original';
+  return 'sistema';
+}
+
+function resolverTemaSistema(): 'original' | 'dark' {
+  if (typeof window === 'undefined') return 'original';
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? 'dark'
+    : 'original';
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<ThemeName>(leerTemaGuardado);
+
+  const resolvedTheme = useMemo(() => {
+    if (theme === 'sistema') return resolverTemaSistema();
+    return theme === 'dark' ? 'dark' : 'original';
+  }, [theme]);
 
   const setTheme = useCallback((next: ThemeName) => {
     setThemeState(next);
@@ -40,11 +68,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const root = document.documentElement;
-    root.setAttribute('data-theme', theme);
-  }, [theme]);
+    root.setAttribute('data-theme', theme === 'sistema' ? resolvedTheme : theme);
+    root.setAttribute('data-color-scheme', resolvedTheme);
+  }, [theme, resolvedTheme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
+    <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );

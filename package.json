@@ -13,7 +13,9 @@
     "preview": "wrangler pages dev .next",
     "deploy": "wrangler pages deploy .next",
     "postinstall": "node scripts/restore-browser-assets.js",
-    "doctor": "node scripts/doctor.mjs"
+    "doctor": "node scripts/doctor.mjs",
+    "check:theme-coverage": "node scripts/check-theme-coverage.mjs",
+    "check:contrast": "node scripts/check-contrast.mjs"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",

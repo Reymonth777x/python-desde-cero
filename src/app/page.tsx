@@ -136,24 +136,24 @@ export default function Home() {
   useTheme();
 
   return (
-    <main className="min-h-screen bg-[#f4f2e9] text-[#252b25]">
-      <header className="border-b border-[#d3d3c7]">
+    <main className="min-h-screen bg-[var(--theme-bg)] text-[var(--theme-ink)]">
+      <header className="border-b border-[var(--theme-border)]">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <Link href="/" className="flex min-h-11 items-center gap-3" aria-label="Python desde cero, inicio">
-            <span className="flex h-10 w-10 items-center justify-center bg-[#294936] font-serif text-xl text-white">
+            <span className="flex h-10 w-10 items-center justify-center bg-[var(--theme-accent)] font-serif text-xl text-[var(--theme-ink-inverse)]">
               Py
             </span>
             <span>
               <span className="block text-sm font-bold tracking-wide">PYTHON</span>
-              <span className="block text-xs tracking-[0.16em] text-[#657267]">DESDE CERO</span>
+              <span className="block text-xs tracking-[0.16em] text-[var(--theme-muted)]">DESDE CERO</span>
             </span>
           </Link>
 
-          <nav aria-label="Navegación principal" className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-[#596259]">
+          <nav aria-label="Navegación principal" className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-[var(--theme-muted)]">
             <a href="#ruta" className="inline-flex min-h-11 items-center underline-offset-4 hover:underline">Ruta formativa</a>
             <a href="#ejemplo" className="inline-flex min-h-11 items-center underline-offset-4 hover:underline">Ejemplo de Python</a>
-            <Link href="/academia" className="inline-flex min-h-11 items-center font-semibold text-[#294936] underline underline-offset-4">Academia</Link>
-            <Link href="/login" className="inline-flex min-h-11 items-center font-semibold text-[#294936] underline underline-offset-4">Iniciar sesión</Link>
+            <Link href="/academia" className="inline-flex min-h-11 items-center font-semibold text-[var(--theme-accent)] underline underline-offset-4">Academia</Link>
+            <Link href="/login" className="inline-flex min-h-11 items-center font-semibold text-[var(--theme-accent)] underline underline-offset-4">Iniciar sesión</Link>
           </nav>
 
           <ThemeSelector />
@@ -162,70 +162,70 @@ export default function Home() {
 
       <section className="mx-auto grid max-w-7xl gap-10 px-5 py-14 sm:py-20 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
         <div>
-          <p className="text-xs font-bold tracking-[0.2em] text-[#294936]">PYTHON DESDE CERO / RUTA DE APRENDIZAJE</p>
+          <p className="text-xs font-bold tracking-[0.2em] text-[var(--theme-accent)]">PYTHON DESDE CERO / RUTA DE APRENDIZAJE</p>
           <h1 className="mt-5 max-w-3xl font-serif text-4xl leading-tight sm:text-5xl lg:text-6xl">
             Aprende Python, una idea clara a la vez.
           </h1>
-          <p className="mt-6 max-w-2xl text-base leading-8 text-[#58645b] sm:text-lg">
+          <p className="mt-6 max-w-2xl text-base leading-8 text-[var(--theme-muted)] sm:text-lg">
             Una ruta pr&aacute;ctica para comprender los fundamentos, escribir tus primeros programas y avanzar con confianza.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <a href="#ruta" className="inline-flex min-h-12 items-center justify-center bg-[#294936] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#203d31] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936]">
+            <a href="#ruta" className="inline-flex min-h-12 items-center justify-center bg-[var(--theme-accent)] px-6 py-3 text-sm font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">
               Explorar la ruta
             </a>
-            <Link href="/academia" className="inline-flex min-h-12 items-center justify-center border border-[#294936] px-6 py-3 text-sm font-semibold text-[#294936] transition-colors hover:bg-[#ebe9df]">
+            <Link href="/academia" className="inline-flex min-h-12 items-center justify-center border border-[var(--theme-accent)] px-6 py-3 text-sm font-semibold text-[var(--theme-accent)] transition-colors hover:bg-[var(--theme-bg-secondary)]">
               Entrar a la academia
             </Link>
           </div>
         </div>
 
-        <aside className="border-l-2 border-[#b7a77d] bg-white/70 p-6 sm:p-8">
-          <p className="text-xs font-bold tracking-[0.18em] text-[#776945]">APRENDER / PRACTICAR / AVANZAR</p>
-          <p className="mt-5 font-serif text-2xl leading-snug text-[#252b25]">
+        <aside className="border-l-2 border-[var(--theme-border-dark)] bg-[var(--theme-surface)]/70 p-6 sm:p-8">
+          <p className="text-xs font-bold tracking-[0.18em] text-[var(--theme-warning)]">APRENDER / PRACTICAR / AVANZAR</p>
+          <p className="mt-5 font-serif text-2xl leading-snug text-[var(--theme-ink)]">
             De los primeros valores al pensamiento algor&iacute;tmico.
           </p>
-          <p className="mt-4 text-sm leading-7 text-[#596259]">
+          <p className="mt-4 text-sm leading-7 text-[var(--theme-muted)]">
             Cada m&oacute;dulo suma una herramienta. El editor ejecutable y el guardado de avance est&aacute;n en el laboratorio.
           </p>
-          <a href="#ejemplo" className="mt-6 inline-flex min-h-11 items-center text-sm font-semibold text-[#294936] underline underline-offset-4">
+          <a href="#ejemplo" className="mt-6 inline-flex min-h-11 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">
             Ver un ejemplo ilustrativo
           </a>
         </aside>
       </section>
 
-      <section id="ruta" className="border-y border-[#d3d3c7] bg-[#ebe9df]">
+      <section id="ruta" className="border-y border-[var(--theme-border)] bg-[var(--theme-bg-secondary)]">
         <div className="mx-auto max-w-7xl px-5 py-14 sm:py-16">
           <div className="max-w-2xl">
-            <p className="text-xs font-bold tracking-[0.18em] text-[#294936]">RUTA FORMATIVA / M&Oacute;DULOS 01 Y 02</p>
+            <p className="text-xs font-bold tracking-[0.18em] text-[var(--theme-accent)]">RUTA FORMATIVA / M&Oacute;DULOS 01 Y 02</p>
             <h2 className="mt-3 font-serif text-3xl sm:text-4xl">Una base s&oacute;lida, paso a paso.</h2>
-            <p className="mt-4 leading-7 text-[#596259]">
+            <p className="mt-4 leading-7 text-[var(--theme-muted)]">
               Empieza con datos y operaciones; despu&eacute;s, usa la l&oacute;gica para decidir y repetir acciones.
             </p>
           </div>
 
           <div className="mt-9 grid gap-5 md:grid-cols-2">
-            <article className="border-t-2 border-[#294936] bg-[#f4f2e9] p-6 sm:p-8">
-              <p className="text-xs font-bold tracking-[0.16em] text-[#294936]">M&Oacute;DULO 01 / FUNDAMENTOS</p>
+            <article className="border-t-2 border-[var(--theme-accent)] bg-[var(--theme-bg)] p-6 sm:p-8">
+              <p className="text-xs font-bold tracking-[0.16em] text-[var(--theme-accent)]">M&Oacute;DULO 01 / FUNDAMENTOS</p>
               <h3 className="mt-4 font-serif text-2xl">Variables y operadores</h3>
-              <p className="mt-3 text-sm leading-7 text-[#596259]">
+              <p className="mt-3 text-sm leading-7 text-[var(--theme-muted)]">
                 Da nombre a los datos, guarda valores y combina operaciones para resolver problemas sencillos.
               </p>
-              <ul className="mt-5 space-y-2 text-sm text-[#252b25]">
+              <ul className="mt-5 space-y-2 text-sm text-[var(--theme-ink)]">
                 <li>Variables, asignaci&oacute;n y tipos de datos</li>
                 <li>Operadores aritm&eacute;ticos y orden de operaciones</li>
-                <li>Mostrar resultados con <code className="font-mono text-[#294936]">print()</code></li>
+                <li>Mostrar resultados con <code className="font-mono text-[var(--theme-accent)]">print()</code></li>
               </ul>
             </article>
 
-            <article className="border-t-2 border-[#b7a77d] bg-[#f4f2e9] p-6 sm:p-8">
-              <p className="text-xs font-bold tracking-[0.16em] text-[#776945]">M&Oacute;DULO 02 / CONTROL DE FLUJO</p>
+            <article className="border-t-2 border-[var(--theme-border-dark)] bg-[var(--theme-bg)] p-6 sm:p-8">
+              <p className="text-xs font-bold tracking-[0.16em] text-[var(--theme-warning)]">M&Oacute;DULO 02 / CONTROL DE FLUJO</p>
               <h3 className="mt-4 font-serif text-2xl">Decisiones y ciclos</h3>
-              <p className="mt-3 text-sm leading-7 text-[#596259]">
+              <p className="mt-3 text-sm leading-7 text-[var(--theme-muted)]">
                 Construye programas que responden a condiciones y repiten tareas de forma organizada.
               </p>
-              <ul className="mt-5 space-y-2 text-sm text-[#252b25]">
-                <li>Condiciones con <code className="font-mono text-[#294936]">if</code>, <code className="font-mono text-[#294936]">elif</code> y <code className="font-mono text-[#294936]">else</code></li>
-                <li>Repetici&oacute;n con ciclos <code className="font-mono text-[#294936]">for</code> y <code className="font-mono text-[#294936]">while</code></li>
+              <ul className="mt-5 space-y-2 text-sm text-[var(--theme-ink)]">
+                <li>Condiciones con <code className="font-mono text-[var(--theme-accent)]">if</code>, <code className="font-mono text-[var(--theme-accent)]">elif</code> y <code className="font-mono text-[var(--theme-accent)]">else</code></li>
+                <li>Repetici&oacute;n con ciclos <code className="font-mono text-[var(--theme-accent)]">for</code> y <code className="font-mono text-[var(--theme-accent)]">while</code></li>
                 <li>Dividir un problema en instrucciones peque&ntilde;as</li>
               </ul>
             </article>
@@ -236,13 +236,13 @@ export default function Home() {
       <section id="ejemplo" className="mx-auto max-w-7xl px-5 py-14 sm:py-16">
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="lg:w-1/3 flex-shrink-0">
-            <p className="text-xs font-bold tracking-[0.18em] text-[#294936]">
+            <p className="text-xs font-bold tracking-[0.18em] text-[var(--theme-accent)]">
               LABORATORIO INTERACTIVO
             </p>
             <h2 className="mt-3 font-serif text-3xl sm:text-4xl">
               Ejecuta código Python ahora
             </h2>
-            <p className="mt-4 leading-7 text-[#596259]">
+            <p className="mt-4 leading-7 text-[var(--theme-muted)]">
               Cambia de ejemplo, edita el código y pulsa Ejecutar para ver el
               resultado en tiempo real.
             </p>
@@ -254,25 +254,25 @@ export default function Home() {
                   onClick={() => setSelectedExample(example)}
                   className={`flex w-full items-start gap-3 px-4 py-3 rounded-lg border transition-colors text-left ${
                     selectedExample.id === example.id
-                      ? 'border-[#294936] bg-[#ebe9df] shadow-sm'
-                      : 'border-transparent hover:border-[#d3d3c7] hover:bg-[#f4f2e9]'
+                      ? 'border-[var(--theme-accent)] bg-[var(--theme-bg-secondary)] shadow-sm'
+                      : 'border-transparent hover:border-[var(--theme-border)] hover:bg-[var(--theme-bg)]'
                   }`}
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline gap-2">
-                      <span className="font-semibold text-[#252b25]">
+                      <span className="font-semibold text-[var(--theme-ink)]">
                         {example.title}
                       </span>
-                      <span className="text-[10px] font-bold text-[#294936] uppercase tracking-[0.2em]">
+                      <span className="text-[10px] font-bold text-[var(--theme-accent)] uppercase tracking-[0.2em]">
                         {example.level}
                       </span>
                     </div>
-                    <p className="text-xs text-[#596259] mt-1">
+                    <p className="text-xs text-[var(--theme-muted)] mt-1">
                       {example.description}
                     </p>
                     <div className="flex flex-wrap gap-1 mt-2">
                       {example.concepts.map((c) => (
-                        <span key={c} className="text-[10px] px-1.5 py-0.5 bg-[#dce5d8] text-[#294936] rounded">
+                        <span key={c} className="text-[10px] px-1.5 py-0.5 bg-[var(--theme-accent-light)] text-[var(--theme-accent)] rounded">
                           {c}
                         </span>
                       ))}
@@ -288,8 +288,8 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-[#d3d3c7]">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-6 text-sm text-[#596259] sm:flex-row sm:items-center sm:justify-between">
+      <footer className="border-t border-[var(--theme-border)]">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-6 text-sm text-[var(--theme-muted)] sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p>Python desde cero</p>
             <p className="mt-1 max-w-xl text-xs leading-5">

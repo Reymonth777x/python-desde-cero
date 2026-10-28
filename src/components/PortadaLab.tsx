@@ -44,37 +44,37 @@ export default function PortadaLab({
   }, []);
 
   return (
-    <div className="border border-[#d3d3c7] rounded-lg bg-[#ebe9df] overflow-hidden">
-      <div className="flex items-center justify-between border-b border-[#d3d3c7] bg-[#dce5d8] px-4 py-3">
+    <div className="border border-[var(--theme-border)] rounded-lg bg-[var(--theme-bg-secondary)] overflow-hidden">
+      <div className="flex items-center justify-between border-b border-[var(--theme-border)] bg-[var(--theme-accent-light)] px-4 py-3">
         <div className="flex items-center gap-2">
-          <div className="flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[#294936]" />
-          <div className="flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[#f4a261]" />
-          <div className="flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[#e76f51]" />
+          <div className="flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[var(--theme-accent)]" />
+          <div className="flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[var(--theme-warning)]" />
+          <div className="flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[var(--theme-error)]" />
         </div>
-        <div className="text-[10px] font-bold tracking-[0.17em] text-[#294936]">
+        <div className="text-[10px] font-bold tracking-[0.17em] text-[var(--theme-accent)]">
           PYTHON DESDE CERO / LABORATORIO
         </div>
-        <div className="flex items-center gap-1 text-xs text-[#294936]">
-          <span className={`px-2 py-0.5 rounded border border-current text-[10px] ${workerState === 'ready' ? 'bg-[#294936]/20 text-[#294936]' : 'bg-[#f4f2e9] text-[#596259]'}`}>
+        <div className="flex items-center gap-1 text-xs text-[var(--theme-accent)]">
+          <span className={`px-2 py-0.5 rounded border border-current text-[10px] ${workerState === 'ready' ? 'bg-[var(--theme-accent)]/20 text-[var(--theme-accent)]' : 'bg-[var(--theme-bg)] text-[var(--theme-muted)]'}`}>
             {workerState === 'ready' ? 'Listo' : workerState === 'loading' ? 'Cargando...' : 'Error'}
           </span>
         </div>
       </div>
       <div className="flex flex-col lg:flex-row h-[340px]">
-        <div className="flex-1 border-r border-[#d3d3c7] bg-white relative">
+        <div className="flex-1 border-r border-[var(--theme-border)] bg-[var(--theme-surface)] relative">
           <textarea
-            className="h-full w-full p-4 whitespace-pre-wrap break-words border-0 bg-transparent font-mono text-sm leading-6 text-[#252b25] focus:outline-none"
+            className="h-full w-full p-4 whitespace-pre-wrap break-words border-0 bg-transparent font-mono text-sm leading-6 text-[var(--theme-ink)] focus:outline-none"
             value={code}
             onChange={(e) => setCode(e.target.value)}
             spellCheck={false}
             placeholder="Escribe tu código Python aquí..."
           />
-          <div className="absolute bottom-0 left-0 right-0 px-3 py-2 bg-[#f4f2e9] border-t border-[#d3d3c7] flex items-center justify-between">
+          <div className="absolute bottom-0 left-0 right-0 px-3 py-2 bg-[var(--theme-bg)] border-t border-[var(--theme-border)] flex items-center justify-between">
             <button
               type="button"
               onClick={runCode}
               disabled={isRunning}
-              className="flex min-h-9 items-center gap-2 px-3 py-1 text-xs font-semibold text-[#294936] border border-[#294936] hover:bg-[#294936] hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex min-h-9 items-center gap-2 px-3 py-1 text-xs font-semibold text-[var(--theme-accent)] border border-[var(--theme-accent)] hover:bg-[var(--theme-accent)] hover:text-[var(--theme-ink-inverse)] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isRunning ? 'Ejecutando...' : 'Ejecutar'}
             </button>
@@ -83,28 +83,28 @@ export default function PortadaLab({
               onClick={() => {
                 setCode(defaultCode);
               }}
-              className="flex min-h-9 items-center gap-2 px-3 py-1 text-xs font-semibold text-[#596259] border border-[#d3d3c7] hover:bg-[#f4f2e9] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936] disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex min-h-9 items-center gap-2 px-3 py-1 text-xs font-semibold text-[var(--theme-muted)] border border-[var(--theme-border)] hover:bg-[var(--theme-bg)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50"
             >
               Restaurar
             </button>
           </div>
         </div>
-        <div className="flex-1 border-l border-[#d3d3c7] flex flex-col">
-          <div className="flex items-center justify-between border-b border-[#d3d3c7] bg-[#dce5d8] px-3 py-2">
-            <h3 className="text-xs font-semibold text-[#294936]">Resultado</h3>
-            <span className="text-[10px] text-[#294936]">{isRunning ? 'Ejecutando...' : 'Listo'}</span>
+        <div className="flex-1 border-l border-[var(--theme-border)] flex flex-col">
+          <div className="flex items-center justify-between border-b border-[var(--theme-border)] bg-[var(--theme-accent-light)] px-3 py-2">
+            <h3 className="text-xs font-semibold text-[var(--theme-accent)]">Resultado</h3>
+            <span className="text-[10px] text-[var(--theme-accent)]">{isRunning ? 'Ejecutando...' : 'Listo'}</span>
           </div>
           <div className="flex-1 relative">
             <pre
-              className="h-full w-full overflow-auto p-4 whitespace-pre-wrap break-words border-0 bg-transparent font-mono text-sm leading-6 text-[#252b25]"
+              className="h-full w-full overflow-auto p-4 whitespace-pre-wrap break-words border-0 bg-transparent font-mono text-sm leading-6 text-[var(--theme-ink)]"
               aria-live="polite"
             >
               {output || (workerState === 'ready' ? '> Escribe código y pulsa Ejecutar.' : '> Preparando entorno Python...')}
             </pre>
             {turtleCommands.length > 0 && (
-              <div className="absolute bottom-4 right-4 w-[140px] bg-[#ebe9df] border border-[#d3d3c7] rounded p-2 shadow-sm">
-                <p className="text-[10px] font-semibold text-[#294936] mb-1">Salida gráfica (Turtle)</p>
-                <div className="w-full h-[120px] border border-[#d3d3c7] bg-[#f4f2e9] relative">
+              <div className="absolute bottom-4 right-4 w-[140px] bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded p-2 shadow-sm">
+                <p className="text-[10px] font-semibold text-[var(--theme-accent)] mb-1">Salida gráfica (Turtle)</p>
+                <div className="w-full h-[120px] border border-[var(--theme-border)] bg-[var(--theme-bg)] relative">
                   <svg
                     className="w-full h-full"
                     viewBox="-250 -250 500 500"

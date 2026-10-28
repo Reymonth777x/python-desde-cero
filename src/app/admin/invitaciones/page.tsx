@@ -55,9 +55,9 @@ export default async function InvitationsPage({ searchParams }: Props) {
   const invitationsError = invitationsResult.error;
 
   return (
-    <main className="min-h-screen bg-[#f4f2e9] px-5 py-8 text-[#252b25] sm:px-8 sm:py-10">
+    <main className="min-h-screen bg-[var(--theme-bg)] px-5 py-8 text-[var(--theme-ink)] sm:px-8 sm:py-10">
       <div className="mx-auto max-w-5xl">
-        <a href="/practica" className="inline-flex min-h-11 items-center text-sm font-semibold text-[#294936] underline underline-offset-4">
+        <a href="/practica" className="inline-flex min-h-11 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">
           ← Volver al laboratorio
         </a>
 
@@ -65,33 +65,33 @@ export default async function InvitationsPage({ searchParams }: Props) {
           Administración de invitaciones
         </h1>
 
-        <p className="mt-3 text-[#596259]">
+        <p className="mt-3 text-[var(--theme-muted)]">
           Gestiona los códigos de acceso de Python desde cero.
         </p>
 
         {params?.created === '1' && (
-          <p role="status" className="mt-6 border-l-4 border-[#294936] bg-[#ebe9df] px-4 py-3 text-sm text-[#203d31]">
+          <p role="status" className="mt-6 border-l-4 border-[var(--theme-accent)] bg-[var(--theme-bg-secondary)] px-4 py-3 text-sm text-[var(--theme-accent-dark)]">
             Invitación creada correctamente.
           </p>
         )}
 
         {params?.error === 'create' && (
-          <p role="alert" className="mt-6 border-l-4 border-[#a04435] bg-white px-4 py-3 text-sm text-[#7f3027]">
+          <p role="alert" className="mt-6 border-l-4 border-[var(--theme-error)] bg-[var(--theme-surface)] px-4 py-3 text-sm text-[var(--theme-error)]">
             No se pudo crear la invitación. Comprueba los permisos de Supabase.
           </p>
         )}
 
-        <section className="mt-8 border border-[#d3d3c7] bg-white p-5 sm:p-6">
+        <section className="mt-8 border border-[var(--theme-border)] bg-[var(--theme-surface)] p-5 sm:p-6">
           <h2 className="font-serif text-xl font-semibold">Crear una invitación</h2>
 
-          <p className="mt-2 text-sm text-[#596259]">
+          <p className="mt-2 text-sm text-[var(--theme-muted)]">
             Los códigos tendrán una vigencia de siete días.
           </p>
 
           <form action={createInvitation} className="mt-5">
             <button
               type="submit"
-              className="min-h-12 w-full px-5 py-3 font-semibold text-white transition-colors hover:bg-[#203d31] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936] sm:w-auto bg-[#294936]"
+              className="min-h-12 w-full px-5 py-3 font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] sm:w-auto bg-[var(--theme-accent)]"
             >
               Generar código de invitación
             </button>
@@ -102,11 +102,11 @@ export default async function InvitationsPage({ searchParams }: Props) {
           <h2 className="font-serif text-xl font-semibold">Códigos existentes</h2>
 
           {invitationsError ? (
-            <p role="alert" className="mt-4 text-sm text-[#7f3027]">
+            <p role="alert" className="mt-4 text-sm text-[var(--theme-error)]">
               No se pudieron cargar las invitaciones.
             </p>
           ) : !invitations?.length ? (
-            <p className="mt-4 text-sm text-[#596259]">
+            <p className="mt-4 text-sm text-[var(--theme-muted)]">
               Todavía no hay invitaciones creadas.
             </p>
           ) : (
@@ -120,23 +120,23 @@ export default async function InvitationsPage({ searchParams }: Props) {
                     ? 'Caducada'
                     : 'Disponible';
                 const statusStyle = invitation.is_used
-                  ? 'bg-[#ebe9df] text-[#596259]'
+                  ? 'bg-[var(--theme-bg-secondary)] text-[var(--theme-muted)]'
                   : expired
-                    ? 'bg-[#f7e8df] text-[#7f3027]'
-                    : 'bg-[#e5ecdf] text-[#203d31]';
+                    ? 'bg-[var(--theme-warning-light)] text-[var(--theme-error)]'
+                    : 'bg-[var(--theme-accent-light)] text-[var(--theme-accent-dark)]';
 
                 return (
                   <article
                     key={invitation.id}
-                    className="border border-[#d3d3c7] bg-white p-4 sm:p-5"
+                    className="border border-[var(--theme-border)] bg-[var(--theme-surface)] p-4 sm:p-5"
                   >
-                    <p className="break-all font-mono text-base font-semibold text-[#203d31] sm:text-lg" title={invitation.code}>
+                    <p className="break-all font-mono text-base font-semibold text-[var(--theme-accent-dark)] sm:text-lg" title={invitation.code}>
                       {invitation.code}
                     </p>
-                    <p className="mt-1 text-sm text-[#596259]">
+                    <p className="mt-1 text-sm text-[var(--theme-muted)]">
                       Creada: {new Date(invitation.created_at).toLocaleDateString('es-CR', { timeZone: 'America/Costa_Rica' })}
                     </p>
-                    <p className="text-sm text-[#596259]">
+                    <p className="text-sm text-[var(--theme-muted)]">
                       Caducidad:{' '}
                       {invitation.expires_at
                         ? new Date(invitation.expires_at).toLocaleDateString('es-CR', { timeZone: 'America/Costa_Rica' })

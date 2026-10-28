@@ -83,13 +83,13 @@ export default function PythonEditor({
   };
 
   return (
-    <section className="w-full" aria-label="Espacio de práctica de Python">
-      <div role="tablist" aria-label="Paneles del laboratorio" className="mb-4 grid grid-cols-3 border-b border-[#d3d3c7] md:hidden">
+    <section className="w-full" aria-label="Espacio de prÃ¡ctica de Python">
+      <div role="tablist" aria-label="Paneles del laboratorio" className="mb-4 grid grid-cols-3 border-b border-[var(--theme-border)] md:hidden">
         {([
-          ['instructions', 'Guía'],
-          ['editor', 'Código'],
+          ['instructions', 'GuÃ­a'],
+          ['editor', 'CÃ³digo'],
           ['output', 'Resultado'],
-          ['turtle', 'Gráficos'],
+          ['turtle', 'GrÃ¡ficos'],
         ] as const).map(([panel, label]) => (
           <button
             key={panel}
@@ -106,7 +106,7 @@ export default function PythonEditor({
                 }
               }
             }}
-            className={`min-h-12 border-b-2 px-2 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936] ${mobilePanel === panel ? 'border-[#294936] text-[#294936]' : 'border-transparent text-[#596259]'}`}
+            className={`min-h-12 border-b-2 px-2 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] ${mobilePanel === panel ? 'border-[var(--theme-accent)] text-[var(--theme-accent)]' : 'border-transparent text-[var(--theme-muted)]'}`}
           >
             {label}
           </button>
@@ -114,9 +114,9 @@ export default function PythonEditor({
       </div>
 
       {workerState !== 'ready' && (
-        <p role="status" aria-live="polite" className="mb-4 flex min-h-11 items-center gap-2 text-sm text-[#596259]">
-          {workerState === 'loading' && <span aria-hidden="true" className="h-4 w-4 animate-spin rounded-full border-2 border-[#d3d3c7] border-t-[#294936] motion-reduce:animate-none" />}
-          {workerState === 'idle' ? 'Python se prepara al abrir el editor o iniciar la primera ejecución.' : workerState === 'loading' ? 'Preparando Python en este dispositivo. La primera carga puede tardar.' : 'El ejecutor necesita atención. Consulta el resultado para ver opciones.'}
+        <p role="status" aria-live="polite" className="mb-4 flex min-h-11 items-center gap-2 text-sm text-[var(--theme-muted)]">
+          {workerState === 'loading' && <span aria-hidden="true" className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--theme-border)] border-t-[var(--theme-accent)] motion-reduce:animate-none" />}
+          {workerState === 'idle' ? 'Python se prepara al abrir el editor o iniciar la primera ejecuciÃ³n.' : workerState === 'loading' ? 'Preparando Python en este dispositivo. La primera carga puede tardar.' : 'El ejecutor necesita atenciÃ³n. Consulta el resultado para ver opciones.'}
         </p>
       )}
 
@@ -126,9 +126,9 @@ export default function PythonEditor({
         aria-labelledby="practice-tab-instructions"
         className={`${mobilePanel === 'instructions' ? 'block' : 'hidden'} md:hidden`}
       >
-        <section className="border-l-2 border-[#b7a77d] bg-[#ebe9df] p-4 sm:p-5">
-          <h2 className="font-serif text-xl">Guía de práctica</h2>
-          <p className="mt-2 text-sm leading-6 text-[#3f4940]">{instructions}</p>
+        <section className="border-l-2 border-[var(--theme-border-dark)] bg-[var(--theme-bg-secondary)] p-4 sm:p-5">
+          <h2 className="font-serif text-xl">GuÃ­a de prÃ¡ctica</h2>
+          <p className="mt-2 text-sm leading-6 text-[var(--theme-muted)]">{instructions}</p>
           <button
             type="button"
             onClick={() => {
@@ -137,7 +137,7 @@ export default function PythonEditor({
               if (workerState === 'idle') {
               }
             }}
-            className="mt-4 min-h-12 w-full bg-[#294936] px-5 py-3 text-sm font-semibold text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936]"
+            className="mt-4 min-h-12 w-full bg-[var(--theme-accent)] px-5 py-3 text-sm font-semibold text-[var(--theme-ink-inverse)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"
           >
             Ir al editor
           </button>
@@ -152,7 +152,7 @@ export default function PythonEditor({
       >
         {(editorRequested || desktopLayout) && (
           <>
-        <div className="h-[min(42svh,420px)] min-h-[280px] w-full overflow-hidden border border-[#d3d3c7] bg-white sm:h-[460px]">
+        <div className="h-[min(42svh,420px)] min-h-[280px] w-full overflow-hidden border border-[var(--theme-border)] bg-[var(--theme-surface)] sm:h-[460px]">
           <Editor
             height="100%"
             defaultLanguage="python"
@@ -173,37 +173,37 @@ export default function PythonEditor({
           />
         </div>
 
-        <div aria-label="Teclas de Python para pantalla táctil" className="flex flex-wrap gap-2 md:hidden">
+        <div aria-label="Teclas de Python para pantalla tÃ¡ctil" className="flex flex-wrap gap-2 md:hidden">
           {[
-            { label: '()', accessible: 'Insertar paréntesis', text: '()', cursor: 1 },
+            { label: '()', accessible: 'Insertar parÃ©ntesis', text: '()', cursor: 1 },
             { label: '""', accessible: 'Insertar comillas', text: '""', cursor: 1 },
             { label: ':', accessible: 'Insertar dos puntos', text: ':' },
             { label: '=', accessible: 'Insertar signo igual', text: '=' },
-            { label: '+', accessible: 'Insertar signo más', text: '+' },
+            { label: '+', accessible: 'Insertar signo mÃ¡s', text: '+' },
             { label: '*', accessible: 'Insertar asterisco', text: '*' },
-            { label: 'Tab', accessible: 'Insertar sangría de cuatro espacios', text: '    ' },
+            { label: 'Tab', accessible: 'Insertar sangrÃ­a de cuatro espacios', text: '    ' },
           ].map((key) => (
             <button
               key={key.accessible}
               type="button"
               aria-label={key.accessible}
               onClick={() => insertOnMobile(key.text, key.cursor)}
-              className="min-h-11 min-w-11 border border-[#d3d3c7] bg-white px-3 font-mono text-base text-[#252b25] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936]"
+              className="min-h-11 min-w-11 border border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 font-mono text-base text-[var(--theme-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"
             >
               {key.label}
             </button>
           ))}
         </div>
 
-        <label className="block text-base font-semibold text-[#252b25] sm:text-sm">
-          Entrada para input() <span className="font-normal text-[#596259]">(una línea por solicitud)</span>
+        <label className="block text-base font-semibold text-[var(--theme-ink)] sm:text-sm">
+          Entrada para input() <span className="font-normal text-[var(--theme-muted)]">(una lÃ­nea por solicitud)</span>
           <textarea
             value={input}
             onChange={(event) => setInput(event.target.value)}
             maxLength={10000}
             rows={3}
-            placeholder="Escribe aquí las líneas que leerá tu programa"
-            className="mt-2 block min-h-20 w-full resize-y border border-[#d3d3c7] bg-white px-3 py-3 font-mono text-base font-normal text-[#252b25] outline-none focus:border-[#294936] focus:ring-1 focus:ring-[#294936] sm:text-sm"
+            placeholder="Escribe aquÃ­ las lÃ­neas que leerÃ¡ tu programa"
+            className="mt-2 block min-h-20 w-full resize-y border border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 py-3 font-mono text-base font-normal text-[var(--theme-ink)] outline-none focus:border-[var(--theme-accent)] focus:ring-1 focus:ring-[var(--theme-focus-ring)] sm:text-sm"
           />
         </label>
           </>
@@ -213,9 +213,9 @@ export default function PythonEditor({
           type="button"
           onClick={runCode}
           disabled={isRunning || workerState === 'loading'}
-          className="flex min-h-12 w-full items-center justify-center bg-[#294936] px-5 py-3 text-base font-semibold text-white transition-colors hover:bg-[#203d31] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:text-sm"
+          className="flex min-h-12 w-full items-center justify-center bg-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:text-sm"
         >
-          {isRunning ? 'Ejecutando...' : workerState === 'loading' ? 'Preparando Python...' : 'Ejecutar código'}
+          {isRunning ? 'Ejecutando...' : workerState === 'loading' ? 'Preparando Python...' : 'Ejecutar cÃ³digo'}
         </button>
 
         {workerState === 'error' && (
@@ -223,7 +223,7 @@ export default function PythonEditor({
             type="button"
             onClick={() => {
             }}
-            className="flex min-h-11 w-full items-center justify-center border border-[#294936] px-4 py-2 text-sm font-semibold text-[#294936] hover:bg-[#ebe9df] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936] sm:w-auto"
+            className="flex min-h-11 w-full items-center justify-center border border-[var(--theme-accent)] px-4 py-2 text-sm font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] sm:w-auto"
           >
             Reintentar carga
           </button>
@@ -237,21 +237,21 @@ export default function PythonEditor({
         className={`${mobilePanel === 'output' ? 'block' : 'hidden'} mt-4 md:block`}
       >
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-sm font-semibold text-[#252b25]">Salida del programa</h2>
-          <span className="text-xs text-[#596259]">{isRunning ? 'Ejecución en curso' : workerState === 'ready' ? 'Ejecución local en el navegador' : 'Entorno Python'}</span>
+          <h2 className="text-sm font-semibold text-[var(--theme-ink)]">Salida del programa</h2>
+          <span className="text-xs text-[var(--theme-muted)]">{isRunning ? 'EjecuciÃ³n en curso' : workerState === 'ready' ? 'EjecuciÃ³n local en el navegador' : 'Entorno Python'}</span>
         </div>
         <pre
           aria-live="polite"
           aria-atomic="true"
-          className="max-h-[42svh] min-h-28 overflow-auto whitespace-pre-wrap break-words border border-[#d3d3c7] bg-[#ebe9df] p-4 font-mono text-sm leading-6 text-[#252b25] sm:max-h-64"
+          className="max-h-[42svh] min-h-28 overflow-auto whitespace-pre-wrap break-words border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] p-4 font-mono text-sm leading-6 text-[var(--theme-ink)] sm:max-h-64"
         >
-          {output || (workerState === 'ready' ? '> Entorno listo. Ejecuta código para consultar el resultado.' : '> Preparando el entorno Python en el navegador...')}
+          {output || (workerState === 'ready' ? '> Entorno listo. Ejecuta cÃ³digo para consultar el resultado.' : '> Preparando el entorno Python en el navegador...')}
         </pre>
         <button
           type="button"
           onClick={runCode}
           disabled={isRunning || workerState === 'loading'}
-          className="mt-3 flex min-h-12 w-full items-center justify-center border border-[#294936] px-5 py-3 text-base font-semibold text-[#294936] hover:bg-[#ebe9df] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936] disabled:cursor-not-allowed disabled:opacity-50 md:hidden"
+          className="mt-3 flex min-h-12 w-full items-center justify-center border border-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50 md:hidden"
         >
           {isRunning ? 'Ejecutando...' : 'Ejecutar de nuevo'}
         </button>
@@ -259,7 +259,7 @@ export default function PythonEditor({
           <button
             type="button"
             onClick={stopWorker}
-            className="mt-3 flex min-h-12 w-full items-center justify-center border border-[#b7a77d] px-5 py-3 text-base font-semibold text-[#3f4940] hover:bg-[#ebe9df] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b7a77d] md:hidden"
+            className="mt-3 flex min-h-12 w-full items-center justify-center border border-[var(--theme-border-dark)] px-5 py-3 text-base font-semibold text-[var(--theme-muted)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-border-dark)] md:hidden"
           >
             Detener
           </button>
@@ -269,7 +269,7 @@ export default function PythonEditor({
             type="button"
             onClick={() => {
             }}
-            className="mt-2 flex min-h-11 w-full items-center justify-center border border-[#294936] px-4 py-2 text-sm font-semibold text-[#294936] hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936] md:hidden"
+            className="mt-2 flex min-h-11 w-full items-center justify-center border border-[var(--theme-accent)] px-4 py-2 text-sm font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-surface)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] md:hidden"
           >
             Reintentar carga de Python
           </button>
@@ -283,18 +283,18 @@ export default function PythonEditor({
         className={`${mobilePanel === 'turtle' ? 'block' : 'hidden'} mt-4 md:block`}
       >
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-sm font-semibold text-[#252b25]">Gráficos de Turtle</h2>
-          <span className="text-xs text-[#596259]">{turtleCommands.length > 0 ? `${turtleCommands.length} trazo(s) dibujado(s)` : 'Ejecuta código con Turtle para ver el dibujo'}</span>
+          <h2 className="text-sm font-semibold text-[var(--theme-ink)]">GrÃ¡ficos de Turtle</h2>
+          <span className="text-xs text-[var(--theme-muted)]">{turtleCommands.length > 0 ? `${turtleCommands.length} trazo(s) dibujado(s)` : 'Ejecuta cÃ³digo con Turtle para ver el dibujo'}</span>
         </div>
         {turtleError && (
-          <p className="mb-2 text-sm text-[#7f3027] bg-[#fdf3f3] border border-[#a04435] px-3 py-2 rounded">
+          <p className="mb-2 text-sm text-[var(--theme-error)] bg-[var(--theme-error-light)] border border-[var(--theme-error)] px-3 py-2 rounded">
             {turtleError}
           </p>
         )}
-        <div className="flex flex-col items-center justify-center min-h-[200px] max-h-[600px] overflow-auto border border-[#d3d3c7] bg-[#ebe9df] rounded-lg">
+        <div className="flex flex-col items-center justify-center min-h-[200px] max-h-[600px] overflow-auto border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] rounded-lg">
           {turtleCommands.length === 0 ? (
-            <p className="text-sm text-[#596259] py-4">
-              Ejecuta código Python con la librería turtle para ver el dibujo aquí.
+            <p className="text-sm text-[var(--theme-muted)] py-4">
+              Ejecuta cÃ³digo Python con la librerÃ­a turtle para ver el dibujo aquÃ­.
             </p>
           ) : (
             <svg
@@ -376,9 +376,9 @@ export default function PythonEditor({
           type="button"
           onClick={() => {}}
           disabled={turtleCommands.length === 0}
-          className="mt-3 flex min-h-11 w-full items-center justify-center border border-[#294936] px-4 py-2 text-sm font-semibold text-[#294936] hover:bg-[#ebe9df] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#294936] disabled:cursor-not-allowed disabled:opacity-50 md:hidden"
+          className="mt-3 flex min-h-11 w-full items-center justify-center border border-[var(--theme-accent)] px-4 py-2 text-sm font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50 md:hidden"
         >
-          Limpiar gráfico
+          Limpiar grÃ¡fico
         </button>
       </div>
     </section>
