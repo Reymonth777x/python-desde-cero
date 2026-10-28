@@ -161,4 +161,4 @@ No se incluyen credenciales SMTP, tokens ni claves API en este repositorio.
 
 No license has been applied yet. The repository is private until the owner decides on a license and visibility. Do not port or reuse course content without confirming licensing terms.
 
-This project is independent educational material and is not affiliated with or certified by Cisco Networking Academy or Cisco.
+This project is independent educational material, created from scratch.

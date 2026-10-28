@@ -278,7 +278,7 @@ export default async function LoginPage({ searchParams }: Props) {
         </div>
 
         <footer className="mt-16 border-t border-[var(--theme-border)] pt-5 text-xs leading-6 text-[var(--theme-muted)]">
-          Python desde cero · Material educativo propio e independiente, no oficial ni afiliado a Cisco Networking Academy o Cisco.
+          Python desde cero · Material educativo propio e independiente.
         </footer>
       </div>
     </main>

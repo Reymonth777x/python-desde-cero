@@ -52,7 +52,7 @@ Tras la adición del módulo 5, todos los temas principales del programa PE1 tie
 ## Notas sobre el contenido
 
 - Todo el contenido del curso es de elaboración propia e independiente.
-- El curso no está afiliado ni acreditado por Cisco Networking Academy.
+- El curso es de elaboración propia e independiente.
 - Cada lección incluye: objetivos, explicación, ejemplo ejecutable, ejercicio práctico y preguntas de evaluación con retroalimentación.
 - Las evaluaciones de módulo requieren al menos 75% de respuestas correctas para completarse.
 - El progreso se guarda por usuario autenticado con restricción `UNIQUE(user_id, module_id, lesson_id)` para evitar duplicados.

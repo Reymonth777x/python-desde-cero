@@ -1,5 +1,5 @@
 {
-  "name": "python-pe1-academy",
+  "name": "python-desdecero",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -15,7 +15,8 @@
     "postinstall": "node scripts/restore-browser-assets.js",
     "doctor": "node scripts/doctor.mjs",
     "check:theme-coverage": "node scripts/check-theme-coverage.mjs",
-    "check:contrast": "node scripts/check-contrast.mjs"
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "check:originality": "node scripts/check-originality.mjs"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",

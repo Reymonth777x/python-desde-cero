@@ -3,7 +3,7 @@
 # Para full-stack (SSR, Server Actions, middleware) se requiere vinext
 # (beta, recomendado por Cloudflare pero excluido por Decisión 3.1).
 
-name = "python-pe1-academy"
+name = "python-desdecero"
 compatibility_date = "2026-10-26"
 
 [pages]

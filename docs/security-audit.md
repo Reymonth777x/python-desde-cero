@@ -1,7 +1,7 @@
 # Auditoría de seguridad y preparación para producción
 
 - **Fecha:** 25 de octubre de 2026
-- **Repositorio auditado:** `C:\Users\USUARIO\python-pe1-academy`
+- **Repositorio auditado:** `C:\Users\USUARIO\python-desdecero`
 - **Alcance:** inspección del código y migraciones locales, comprobaciones locales y referencias oficiales. No se accedió a Supabase remoto ni se leyó el contenido de `.env.local`.
 
 ## Resumen ejecutivo

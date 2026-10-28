@@ -293,7 +293,7 @@ export default function Home() {
           <div>
             <p>Python desde cero</p>
             <p className="mt-1 max-w-xl text-xs leading-5">
-              Material educativo propio e independiente; no es oficial ni está afiliado a Cisco Networking Academy o Cisco.
+              Material educativo propio e independiente.
             </p>
           </div>
           <div className="flex gap-5">
