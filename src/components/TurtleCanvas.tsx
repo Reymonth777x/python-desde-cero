@@ -38,13 +38,17 @@ export default function TurtleCanvas({
 
   const animationRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
-  const commandsRef = useRef(commands);
-  commandsRef.current = commands;
+  const currentStepRef = useRef(0);
 
   useEffect(() => {
-    setCurrentStep(0);
-    setIsPlaying(false);
-  }, [commands.length]);
+    const frame = requestAnimationFrame(() => {
+      currentStepRef.current = 0;
+      lastTimeRef.current = 0;
+      setCurrentStep(0);
+      setIsPlaying(false);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [commands]);
 
   useEffect(() => {
     return () => {
@@ -58,22 +62,35 @@ export default function TurtleCanvas({
     return Math.max(30, 100 / speed);
   }, [speed]);
 
+  const setStep = useCallback((requestedStep: number) => {
+    const boundedStep = Math.min(Math.max(requestedStep, 0), commands.length);
+    currentStepRef.current = boundedStep;
+    setCurrentStep(boundedStep);
+  }, [commands.length]);
+
   const togglePlay = useCallback(() => {
-    setIsPlaying((prev) => !prev);
-  }, []);
+    if (isPlaying) {
+      setIsPlaying(false);
+      return;
+    }
+    if (commands.length === 0) return;
+    if (currentStepRef.current >= commands.length) setStep(0);
+    lastTimeRef.current = 0;
+    setIsPlaying(true);
+  }, [commands.length, isPlaying, setStep]);
 
   const restart = useCallback(() => {
-    setCurrentStep(0);
+    setStep(0);
     setIsPlaying(false);
-  }, []);
+  }, [setStep]);
 
   const stepForward = useCallback(() => {
-    setCurrentStep((prev) => Math.min(prev + 1, commandsRef.current.length));
-  }, []);
+    setStep(currentStepRef.current + 1);
+  }, [setStep]);
 
   const stepBackward = useCallback(() => {
-    setCurrentStep((prev) => Math.max(prev - 1, 0));
-  }, []);
+    setStep(currentStepRef.current - 1);
+  }, [setStep]);
 
   const setSpeedValue = useCallback((newSpeed: number) => {
     setSpeed(newSpeed);
@@ -91,17 +108,23 @@ export default function TurtleCanvas({
 
       if (elapsed >= interval) {
         lastTimeRef.current = timestamp;
-        setCurrentStep((prev) => {
-          if (prev >= commandsRef.current.length) {
-            setIsPlaying(false);
-            return prev;
-          }
-          return prev + 1;
-        });
+        const nextStep = Math.min(currentStepRef.current + 1, commands.length);
+        currentStepRef.current = nextStep;
+        setCurrentStep(nextStep);
+
+        if (nextStep >= commands.length) {
+          setIsPlaying(false);
+          return;
+        }
       }
 
       animationRef.current = requestAnimationFrame(animate);
     };
+
+    if (currentStepRef.current >= commands.length) {
+      setIsPlaying(false);
+      return;
+    }
 
     animationRef.current = requestAnimationFrame(animate);
     return () => {
@@ -109,14 +132,27 @@ export default function TurtleCanvas({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isPlaying, stepDuration]);
+  }, [commands.length, isPlaying, stepDuration]);
 
-  const visibleCommands = commandsRef.current.slice(0, currentStep);
-  const turtleStateRef = useRef<{ x: number; y: number; heading: number }>({
-    x: 0,
-    y: 0,
-    heading: 0,
-  });
+  const visibleCommands = commands.slice(0, currentStep);
+  const lastLineCommand = [...visibleCommands].reverse().find(
+    (command) =>
+      command.type === 'line' &&
+      typeof command.x1 === 'number' &&
+      typeof command.y1 === 'number' &&
+      typeof command.x2 === 'number' &&
+      typeof command.y2 === 'number',
+  );
+  const turtleState = lastLineCommand
+    ? {
+        x: lastLineCommand.x2 ?? 0,
+        y: lastLineCommand.y2 ?? 0,
+        heading: Math.atan2(
+          (lastLineCommand.y2 ?? 0) - (lastLineCommand.y1 ?? 0),
+          (lastLineCommand.x2 ?? 0) - (lastLineCommand.x1 ?? 0),
+        ) * 180 / Math.PI,
+      }
+    : { x: 0, y: 0, heading: 0 };
 
   const bgColorCmd = [...visibleCommands].reverse().find((c) => c.type === 'bgcolor');
   const bgColor = bgColorCmd?.color || 'var(--theme-bg)';
@@ -207,7 +243,7 @@ export default function TurtleCanvas({
             return null;
           })}
           {showTurtle && visibleCommands.length > 0 && (
-            <g transform={"translate(" + turtleStateRef.current.x + "," + -turtleStateRef.current.y + ") rotate(" + turtleStateRef.current.heading + ")"}>
+            <g transform={"translate(" + turtleState.x + "," + -turtleState.y + ") rotate(" + turtleState.heading + ")"}>
               <path
                 d="M-8,8 L8,8 L0,-12 Z"
                 fill="var(--theme-accent)"
