@@ -24,13 +24,7 @@ CREATE TABLE private.quiz_keys (
 
 ALTER TABLE private.quiz_keys ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Claves de quiz legibles por authenticated"
-ON private.quiz_keys
-FOR SELECT
-TO authenticated
-USING (true);
 
-GRANT SELECT ON TABLE private.quiz_keys TO authenticated;
 
 CREATE INDEX IF NOT EXISTS idx_quiz_keys_module_lesson
 ON private.quiz_keys (module_id, lesson_id);
@@ -92,7 +86,7 @@ RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = ''
-AS Parte 1 escrita
+AS $$
 DECLARE
     v_user_id UUID;
     v_question_count INTEGER := 0;
@@ -132,7 +126,7 @@ BEGIN
         FROM private.quiz_keys
         WHERE module_id = p_module_id
           AND lesson_id = p_lesson_id
-          AND question_index = v_idx
+          AND question_index = v_idx - 1
         LIMIT 1;
 
         IF p_answers[v_idx] < 0 OR p_answers[v_idx] >= v_key.options_count THEN
@@ -198,7 +192,7 @@ BEGIN
         'total', v_question_count
     );
 END;
-Parte 1 escrita;
+$$;
 
 -- --- 3. Eliminar record_quiz_attempt y revocar permisos ---
 REVOKE ALL ON FUNCTION public.record_quiz_attempt FROM PUBLIC;
