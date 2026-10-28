@@ -4,6 +4,8 @@ export default defineConfig({
   worker: defineWorker({
     name: "python-desde-cero",
     domains: ["python-desdecero.com"],
+    workersDev: true,
+    previewUrls: true,
     entrypoint: "vinext/server/fetch-handler",
     compatibilityDate: "2026-10-26",
     compatibilityFlags: ["nodejs_compat"],
@@ -13,6 +15,7 @@ export default defineConfig({
       runWorkerFirst: ["/*", "!/_next/static/*", "!/*/_next/static/*"],
     },
     env: {
+      NEXT_PUBLIC_SITE_URL: { type: "text", value: "https://python-desdecero.com" },
       ASSETS: bindings.assets(),
     },
   }),
