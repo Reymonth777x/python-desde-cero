@@ -153,8 +153,8 @@ export async function middleware(request: NextRequest) {
       redirectUrl.search = '';
       const redirect = NextResponse.redirect(redirectUrl);
       redirect.headers.set('Content-Security-Policy', cspHeader);
-      response.cookies.getAll().forEach(({ name, value }) => {
-        redirect.cookies.set(name, value);
+      response.cookies.getAll().forEach((cookie) => {
+        redirect.cookies.set(cookie);
       });
       return redirect;
     }
@@ -164,8 +164,8 @@ export async function middleware(request: NextRequest) {
     if (userRole !== 'admin' && userRole !== 'administrador') {
       const redirect = NextResponse.redirect(new URL('/estudiante', request.url));
       redirect.headers.set('Content-Security-Policy', cspHeader);
-      response.cookies.getAll().forEach(({ name, value }) => {
-        redirect.cookies.set(name, value);
+      response.cookies.getAll().forEach((cookie) => {
+        redirect.cookies.set(cookie);
       });
       return redirect;
     }
