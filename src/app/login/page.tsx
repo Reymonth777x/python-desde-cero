@@ -20,7 +20,7 @@ const errorMessages: Record<string, string> = {
 };
 
 const statusMessages: Record<string, string> = {
-  'check-email': 'La cuenta se registró. Revisa tu correo para confirmar la dirección antes de iniciar sesión. En el entorno local, revisa Mailpit.',
+  'check-email': 'La cuenta se registró. Revisa tu correo para confirmar la dirección antes de iniciar sesión.',
   'signed-out': 'Has cerrado la sesión correctamente.',
   sent: 'Si existe una cuenta para ese correo, recibirás instrucciones para restablecer la contraseña.',
 };
