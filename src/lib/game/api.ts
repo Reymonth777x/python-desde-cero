@@ -7,22 +7,47 @@ export type GameAction =
   | { type: 'servir'; mesa: string }
   | { type: 'esperar'; pasos?: number };
 
-export type GameResult = { ok: boolean; error?: string; [key: string]: any };
+export type KitchenEntity = {
+  x: number;
+  y: number;
+  available?: boolean;
+  [attribute: string]: unknown;
+};
+
+export type GameResult = {
+  ok: boolean;
+  error?: string;
+  x?: number;
+  y?: number;
+  holding?: string | null;
+  ingrediente?: string;
+  estufa?: string;
+  plato?: string;
+  mesa?: string;
+  chopped?: boolean;
+  steps?: number;
+  [property: string]: unknown;
+};
 
 export type GameState = {
   step: number;
   max_steps: number;
   chef: { x: number; y: number; facing: string; holding: string | null };
-  ingredients: Record<string, any>;
-  stoves: Record<string, any>;
-  plates: Record<string, any>;
+  ingredients: Record<string, KitchenEntity>;
+  stoves: Record<string, KitchenEntity>;
+  plates: Record<string, KitchenEntity>;
   orders: Array<{ id: number; items: string[]; completed: boolean }>;
   current_order_index: number;
   game_over: boolean;
   won: boolean;
 };
 
-export type GameEvent = { type: string; step: number; data: Record<string, any> };
+export type GameEvent = {
+  type: string;
+  step?: number;
+  data?: Record<string, unknown>;
+  [property: string]: unknown;
+};
 
 export type KitchenLevel = {
   id: string;
@@ -31,54 +56,152 @@ export type KitchenLevel = {
   max_steps: number;
   chef_start_x: number;
   chef_start_y: number;
-  ingredients: Record<string, any>;
-  stoves: Record<string, any>;
-  plates: Record<string, any>;
+  ingredients: Record<string, KitchenEntity>;
+  stoves: Record<string, KitchenEntity>;
+  plates: Record<string, KitchenEntity>;
   orders: Array<{ items: string[] }>;
   hint: string;
 };
 
+type PyodideRuntime = {
+  runPythonAsync(source: string): Promise<unknown>;
+  toJs(
+    value: unknown,
+    options?: {
+      dict_converter?: (entries: Map<string, unknown>) => Record<string, unknown>;
+    },
+  ): unknown;
+  globals: {
+    get(name: string): unknown;
+  };
+};
+
+declare global {
+  interface Window {
+    pyodide?: PyodideRuntime;
+  }
+}
+
+type FallbackEngine = {
+  step_count: number;
+  max_steps: number;
+  chef_x: number;
+  chef_y: number;
+  chef_facing: string;
+  chef_holding: string | null;
+  game_over: boolean;
+  won: boolean;
+  events: GameEvent[];
+  level: KitchenLevel;
+};
+
+type PythonEngineProxy = {
+  get_state?: () => unknown;
+  get_events?: () => unknown;
+  reset?: () => unknown;
+};
+
+type Engine = FallbackEngine | PythonEngineProxy;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function dictToRecord(entries: Map<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(entries);
+}
+
+function normalizeGameResult(value: unknown): GameResult {
+  const record = isRecord(value) ? value : null;
+  if (!record || typeof record.ok !== 'boolean') {
+    return { ok: false, error: 'El motor de Python devolvió una respuesta no reconocida.' };
+  }
+
+  return {
+    ...record,
+    ok: record.ok,
+    ...(typeof record.error === 'string' ? { error: record.error } : {}),
+  } as GameResult;
+}
+
+function normalizeGameState(value: unknown): GameState | null {
+  if (!isRecord(value) || !isRecord(value.chef)) return null;
+  if (typeof value.step !== 'number' || typeof value.max_steps !== 'number') return null;
+  if (!isRecord(value.ingredients) || !isRecord(value.stoves) || !isRecord(value.plates)) return null;
+  if (!Array.isArray(value.orders)) return null;
+  if (typeof value.current_order_index !== 'number') return null;
+  if (typeof value.game_over !== 'boolean' || typeof value.won !== 'boolean') return null;
+  return value as unknown as GameState;
+}
+
+function normalizeGameEvents(value: unknown): GameEvent[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((event): event is Record<string, unknown> => isRecord(event) && typeof event.type === 'string')
+    .map((event) => event as GameEvent);
+}
+
 export class KitchenAPI {
-  private engine: any = null;
-  private level: KitchenLevel | null = null;
+  private engine: Engine | null = null;
+  private pyodide: PyodideRuntime | null = null;
   private initialized = false;
 
   async init(level: KitchenLevel): Promise<void> {
-    this.level = level;
-    this.initialized = true;
-    try {
-      const pyodide = (window as any).pyodide;
-      if (pyodide && pyodide.runPythonAsync) {
-        await this._initWithPyodide(level);
-      } else {
-        this._initJSFallback(level);
+    this.engine = null;
+    this.pyodide = null;
+    this.initialized = false;
+
+    const runtime = typeof window !== 'undefined' ? window.pyodide : undefined;
+    if (runtime && typeof runtime.runPythonAsync === 'function') {
+      try {
+        await this.initWithPyodide(level, runtime);
+        this.initialized = true;
+        return;
+      } catch (error) {
+        console.error('Error inicializando motor de cocina; se usará el modo alternativo:', error);
+        this.engine = null;
+        this.pyodide = null;
       }
-    } catch (err) {
-      console.error('Error inicializando motor de cocina:', err);
-      this._initJSFallback(level);
     }
+
+    this.initJavaScriptFallback(level);
+    this.initialized = true;
   }
 
-  private async _initWithPyodide(level: KitchenLevel): Promise<void> {
-    const pyodide = (window as any).pyodide;
-    const engineCode = await fetch('/game-engine.py').then((r) => r.text());
-    await pyodide.runPythonAsync(engineCode);
-    const levelJson = JSON.stringify(level);
-    await pyodide.runPythonAsync(`
-from game_engine import KitchenEngine
-import json
-level_data = json.loads('''${levelJson.replace(/'/g, "\\'")}''')
-engine = KitchenEngine(level_data)
-    `);
-    this.engine = pyodide.globals.get('engine');
+  private async initWithPyodide(level: KitchenLevel, runtime: PyodideRuntime): Promise<void> {
+    const engineCodeResponse = await fetch('/game-engine.py');
+    if (!engineCodeResponse.ok) {
+      throw new Error('No se pudo descargar el motor de cocina.');
+    }
+
+    const engineCode = await engineCodeResponse.text();
+    await runtime.runPythonAsync(engineCode);
+
+    const serializedLevel = JSON.stringify(level);
+    const pythonSource = [
+      'from game_engine import KitchenEngine',
+      'import json',
+      'level_data = json.loads(' + JSON.stringify(serializedLevel) + ')',
+      'engine = KitchenEngine(level_data)',
+    ].join('\n');
+
+    await runtime.runPythonAsync(pythonSource);
+
+    const engine = runtime.globals.get('engine');
+    if (typeof engine !== 'object' || engine === null) {
+      throw new Error('El motor Python no se inicializó correctamente.');
+    }
+
+    this.pyodide = runtime;
+    this.engine = engine as PythonEngineProxy;
   }
 
-  private _initJSFallback(level: KitchenLevel): void {
+  private initJavaScriptFallback(level: KitchenLevel): void {
     this.engine = {
       step_count: 0,
       max_steps: level.max_steps,
       chef_x: level.chef_start_x,
       chef_y: level.chef_start_y,
+      chef_facing: 'right',
       chef_holding: null,
       game_over: false,
       won: false,
@@ -87,74 +210,92 @@ engine = KitchenEngine(level_data)
     };
   }
 
-  async runAction(action: GameAction): Promise<GameResult> {
-    if (!this.initialized) {
-      return { ok: false, error: 'El motor no est\u00e1 inicializado.' };
+  private fallbackEngine(): FallbackEngine {
+    if (!this.engine || this.pyodide) {
+      throw new Error('El motor alternativo no está inicializado.');
     }
+    return this.engine as FallbackEngine;
+  }
+
+  private pythonEngine(): PythonEngineProxy {
+    if (!this.engine || !this.pyodide) {
+      throw new Error('El motor Python no está inicializado.');
+    }
+    return this.engine as PythonEngineProxy;
+  }
+
+  async runAction(action: GameAction): Promise<GameResult> {
+    if (!this.initialized || !this.engine) {
+      return { ok: false, error: 'El motor no está inicializado.' };
+    }
+
     try {
-      if (this.engine.runPythonAsync) {
-        return this._runActionPyodide(action);
-      } else {
-        return this._runActionJS(action);
-      }
-    } catch (err: any) {
-      return { ok: false, error: err.message || String(err) };
+      return this.pyodide
+        ? await this.runActionWithPyodide(action)
+        : this.runActionWithJavaScript(action);
+    } catch (error) {
+      return {
+        ok: false,
+        error: error instanceof Error ? error.message : String(error),
+      };
     }
   }
 
-  private async _runActionPyodide(action: GameAction): Promise<GameResult> {
-    const pyodide = (window as any).pyodide;
+  private async runActionWithPyodide(action: GameAction): Promise<GameResult> {
+    const runtime = this.pyodide;
+    if (!runtime) {
+      return { ok: false, error: 'El motor Python no está disponible.' };
+    }
+
     let methodName: string;
-    let args: string = '';
+    const args: string[] = [];
 
     switch (action.type) {
       case 'mover':
         methodName = 'mover';
-        args = `"${action.direccion}"`;
+        args.push(JSON.stringify(action.direccion));
         break;
       case 'tomar':
         methodName = 'tomar';
-        args = `"${action.ingrediente}"`;
+        args.push(JSON.stringify(action.ingrediente));
         break;
       case 'cortar':
         methodName = 'cortar';
-        args = '';
         break;
       case 'cocinar':
         methodName = 'cocinar';
-        args = `"${action.estufa}"`;
+        args.push(JSON.stringify(action.estufa));
         break;
       case 'emplatar':
         methodName = 'emplatar';
-        args = `"${action.plato}"`;
+        args.push(JSON.stringify(action.plato));
         break;
       case 'servir':
         methodName = 'servir';
-        args = `"${action.mesa}"`;
+        args.push(JSON.stringify(action.mesa));
         break;
       case 'esperar':
         methodName = 'esperar';
-        args = String(action.pasos ?? 1);
+        args.push(String(action.pasos ?? 1));
         break;
-      default:
-        return { ok: false, error: 'Acci\u00f3n no reconocida.' };
     }
 
-    const result = await pyodide.runPythonAsync(`engine.${methodName}(${args})`);
-    return pyodide.toJs(result) as GameResult;
+    const source = 'engine.' + methodName + '(' + args.join(', ') + ')';
+    const result = await runtime.runPythonAsync(source);
+    return normalizeGameResult(runtime.toJs(result, { dict_converter: dictToRecord }));
   }
 
-  private _runActionJS(action: GameAction): GameResult {
-    const engine = this.engine as any;
+  private runActionWithJavaScript(action: GameAction): GameResult {
+    const engine = this.fallbackEngine();
 
     if (engine.game_over) {
-      return { ok: false, error: 'El juego ya termin\u00f3.' };
+      return { ok: false, error: 'El juego ya terminó.' };
     }
 
     engine.step_count += 1;
     if (engine.step_count > engine.max_steps) {
       engine.game_over = true;
-      return { ok: false, error: 'L\u00edmite de pasos alcanzado.' };
+      return { ok: false, error: 'Límite de pasos alcanzado.' };
     }
 
     switch (action.type) {
@@ -167,79 +308,114 @@ engine = KitchenEngine(level_data)
         return { ok: true, x: engine.chef_x, y: engine.chef_y, holding: engine.chef_holding };
 
       case 'tomar':
-        if (engine.chef_holding) return { ok: false, error: 'Ya est\u00e1s sosteniendo algo.' };
+        if (engine.chef_holding) return { ok: false, error: 'Ya estás sosteniendo algo.' };
         engine.chef_holding = action.ingrediente;
         return { ok: true, ingrediente: action.ingrediente, holding: engine.chef_holding };
 
       case 'cortar':
-        if (!engine.chef_holding) return { ok: false, error: 'No est\u00e1s sosteniendo nada.' };
+        if (!engine.chef_holding) return { ok: false, error: 'No estás sosteniendo nada.' };
         return { ok: true, ingrediente: engine.chef_holding, chopped: true };
 
       case 'cocinar':
-        if (!engine.chef_holding) return { ok: false, error: 'No est\u00e1s sosteniendo nada.' };
-        engine.events.push({ type: 'ingrediente_en_estufa', estufa: action.estufa, ingrediente: engine.chef_holding });
+        if (!engine.chef_holding) return { ok: false, error: 'No estás sosteniendo nada.' };
+        engine.events.push({
+          type: 'ingrediente_en_estufa',
+          step: engine.step_count,
+          data: { estufa: action.estufa, ingrediente: engine.chef_holding },
+        });
         engine.chef_holding = null;
         return { ok: true, estufa: action.estufa };
 
       case 'emplatar':
-        if (!engine.chef_holding) return { ok: false, error: 'No est\u00e1s sosteniendo nada.' };
-        engine.events.push({ type: 'ingrediente_emplatado', plato: action.plato });
+        if (!engine.chef_holding) return { ok: false, error: 'No estás sosteniendo nada.' };
+        engine.events.push({
+          type: 'ingrediente_emplatado',
+          step: engine.step_count,
+          data: { plato: action.plato, ingrediente: engine.chef_holding },
+        });
         engine.chef_holding = null;
         return { ok: true, plato: action.plato };
 
       case 'servir':
-        engine.events.push({ type: 'plato_servido', mesa: action.mesa });
+        engine.events.push({
+          type: 'plato_servido',
+          step: engine.step_count,
+          data: { mesa: action.mesa },
+        });
         return { ok: true, mesa: action.mesa };
 
       case 'esperar':
         return { ok: true, steps: engine.step_count };
-
-      default:
-        return { ok: false, error: 'Acci\u00f3n no reconocida.' };
     }
   }
 
   getState(): GameState | null {
-    if (!this.initialized) return null;
+    if (!this.initialized || !this.engine) return null;
 
-    if (this.engine.get_state) {
-      const pyodide = (window as any).pyodide;
-      const state = pyodide.toJs(this.engine.get_state());
-      return state as GameState;
+    if (this.pyodide) {
+      const pythonEngine = this.pythonEngine();
+      if (typeof pythonEngine.get_state !== 'function') return null;
+      const value = this.pyodide.toJs(pythonEngine.get_state(), { dict_converter: dictToRecord });
+      return normalizeGameState(value);
     }
 
-    const engine = this.engine as any;
+    const engine = this.fallbackEngine();
     return {
       step: engine.step_count,
       max_steps: engine.max_steps,
-      chef: { x: engine.chef_x, y: engine.chef_y, facing: engine.chef_facing, holding: engine.chef_holding },
-      ingredients: {}, stoves: {}, plates: {}, orders: [], current_order_index: 0,
-      game_over: engine.game_over, won: engine.won,
+      chef: {
+        x: engine.chef_x,
+        y: engine.chef_y,
+        facing: engine.chef_facing,
+        holding: engine.chef_holding,
+      },
+      ingredients: engine.level.ingredients,
+      stoves: engine.level.stoves,
+      plates: engine.level.plates,
+      orders: engine.level.orders.map((order, index) => ({
+        id: index,
+        items: order.items,
+        completed: false,
+      })),
+      current_order_index: 0,
+      game_over: engine.game_over,
+      won: engine.won,
     };
   }
 
   getEvents(): GameEvent[] {
-    if (!this.initialized) return [];
+    if (!this.initialized || !this.engine) return [];
 
-    if (this.engine.get_events) {
-      const pyodide = (window as any).pyodide;
-      return pyodide.toJs(this.engine.get_events()) as GameEvent[];
+    if (this.pyodide) {
+      const pythonEngine = this.pythonEngine();
+      if (typeof pythonEngine.get_events !== 'function') return [];
+      const value = this.pyodide.toJs(pythonEngine.get_events(), { dict_converter: dictToRecord });
+      return normalizeGameEvents(value);
     }
 
-    return (this.engine as any).events || [];
+    return this.fallbackEngine().events;
   }
 
   reset(): void {
-    if (this.engine.reset) {
-      this.engine.reset();
-    } else {
-      const engine = this.engine as any;
-      engine.step_count = 0;
-      engine.game_over = false;
-      engine.won = false;
-      engine.events = [];
-      engine.chef_holding = null;
+    if (!this.initialized || !this.engine) return;
+
+    if (this.pyodide) {
+      const pythonEngine = this.pythonEngine();
+      if (typeof pythonEngine.reset === 'function') {
+        pythonEngine.reset();
+      }
+      return;
     }
+
+    const engine = this.fallbackEngine();
+    engine.step_count = 0;
+    engine.game_over = false;
+    engine.won = false;
+    engine.events = [];
+    engine.chef_holding = null;
+    engine.chef_x = engine.level.chef_start_x;
+    engine.chef_y = engine.level.chef_start_y;
+    engine.chef_facing = 'right';
   }
 }
 
