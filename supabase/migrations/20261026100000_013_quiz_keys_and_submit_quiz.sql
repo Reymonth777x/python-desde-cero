@@ -1,44 +1,27 @@
 -- 013_quiz_keys_and_submit_quiz
--- Migración correctiva (no edita migraciones previas).
---
--- 1. Crea private.quiz_keys con las claves de corrección del quiz (origen de
---    verdad en la base de datos, generadas desde src/lib/course.ts).
--- 2. Crea public.submit_quiz(p_module_id, p_lesson_id, p_answers) SECURITY DEFINER
---    con search_path vacío: valida autenticación, existencia de la lección,
---    cantidad y rango de respuestas, calcula score y passed en SQL, aplica
---    límite de intentos (global y por lección), inserta quiz_attempts y hace
---    upsert de progress sin bajar best_score ni desmarcar is_completed.
--- 3. Elimina public.record_quiz_attempt y revoca EXECUTE a PUBLIC y anon.
+-- Keys are server-only; the RPC grades choices and records attempts/progress.
+-- Supports fresh installs (public.quiz_attempts) and the hardened hosted schema
+-- (private.quiz_attempts) while using the current course lesson identifiers.
 
--- --- 1. Tabla de claves de quiz en la base de datos ---
 CREATE SCHEMA IF NOT EXISTS private;
 
-CREATE TABLE private.quiz_keys (
-    module_id TEXT NOT NULL,
-    lesson_id TEXT NOT NULL,
-    question_index INTEGER NOT NULL,
-    correct_index INTEGER NOT NULL,
-    options_count INTEGER NOT NULL,
-    PRIMARY KEY (module_id, lesson_id, question_index)
+CREATE TABLE IF NOT EXISTS private.quiz_keys (
+  module_id TEXT NOT NULL CHECK (module_id ~ '^module-[0-9]+$'),
+  lesson_id TEXT NOT NULL CHECK (lesson_id ~ '^b[0-9]+-l[0-9]+$'),
+  question_index INTEGER NOT NULL CHECK (question_index >= 0),
+  correct_index INTEGER NOT NULL CHECK (correct_index >= 0),
+  options_count INTEGER NOT NULL CHECK (options_count >= 2),
+  PRIMARY KEY (module_id, lesson_id, question_index),
+  CHECK (correct_index < options_count)
 );
 
 ALTER TABLE private.quiz_keys ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Claves de quiz legibles por authenticated"
-ON private.quiz_keys
-FOR SELECT
-TO authenticated
-USING (true);
-
-GRANT SELECT ON TABLE private.quiz_keys TO authenticated;
-
+REVOKE ALL ON TABLE private.quiz_keys FROM PUBLIC, anon, authenticated;
 CREATE INDEX IF NOT EXISTS idx_quiz_keys_module_lesson
-ON private.quiz_keys (module_id, lesson_id);
+  ON private.quiz_keys (module_id, lesson_id);
 
--- Claves generadas desde src/lib/course.ts (scripts/gen-quiz-keys.ts)
-TRUNCATE TABLE private.quiz_keys RESTART IDENTITY CASCADE;
--- Claves generadas desde src/lib/course.ts
--- Claves generadas desde src/lib/course.ts
+-- Generated from src/lib/course.ts; this is server-only answer metadata.
+TRUNCATE TABLE private.quiz_keys;
 INSERT INTO private.quiz_keys (module_id, lesson_id, question_index, correct_index, options_count) VALUES ('module-1', 'b1-l1', 0, 1, 4);
 INSERT INTO private.quiz_keys (module_id, lesson_id, question_index, correct_index, options_count) VALUES ('module-1', 'b1-l1', 1, 1, 4);
 INSERT INTO private.quiz_keys (module_id, lesson_id, question_index, correct_index, options_count) VALUES ('module-1', 'b1-l2', 0, 2, 4);
@@ -81,131 +64,191 @@ INSERT INTO private.quiz_keys (module_id, lesson_id, question_index, correct_ind
 INSERT INTO private.quiz_keys (module_id, lesson_id, question_index, correct_index, options_count) VALUES ('module-5', 'b5-l3', 0, 0, 4);
 INSERT INTO private.quiz_keys (module_id, lesson_id, question_index, correct_index, options_count) VALUES ('module-5', 'b5-l4', 0, 0, 4);
 
-
--- --- 2. Función submit_quiz (SECURITY DEFINER, search_path vacío) ---
-CREATE OR REPLACE FUNCTION public.submit_quiz(
-    p_module_id TEXT,
-    p_lesson_id TEXT,
-    p_answers INTEGER[]
+CREATE OR REPLACE FUNCTION private.submit_quiz_authoritative(
+  p_module_id TEXT,
+  p_lesson_id TEXT,
+  p_answers INTEGER[]
 )
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = ''
-AS Parte 1 escrita
+AS $function$
 DECLARE
-    v_user_id UUID;
-    v_question_count INTEGER := 0;
-    v_correct INTEGER := 0;
-    v_score NUMERIC := 0;
-    v_passed BOOLEAN := FALSE;
-    v_attempt_count INTEGER := 0;
-    v_global_attempt_count INTEGER := 0;
-    v_completed BOOLEAN := FALSE;
-    v_key RECORD;
-    v_idx INTEGER := 0;
-    v_answers JSONB := '[]'::jsonb;
+  v_user_id UUID := auth.uid();
+  v_question_count INTEGER := 0;
+  v_correct INTEGER := 0;
+  v_score INTEGER := 0;
+  v_passed BOOLEAN := FALSE;
+  v_attempt_count INTEGER := 0;
+  v_global_attempt_count INTEGER := 0;
+  v_completed BOOLEAN := FALSE;
+  v_best_score NUMERIC := 0;
+  v_key RECORD;
+  v_index INTEGER;
+  v_is_correct BOOLEAN;
+  v_answers_json JSONB := '[]'::jsonb;
+  v_answer_correct JSONB := '[]'::jsonb;
 BEGIN
-    v_user_id := auth.uid();
+  IF v_user_id IS NULL THEN
+    RAISE EXCEPTION 'quiz_auth_required' USING ERRCODE = '28000';
+  END IF;
 
-    IF v_user_id IS NULL THEN
-        RAISE EXCEPTION 'Usuario no autenticado';
+  IF p_module_id IS NULL OR p_module_id !~ '^module-[0-9]+$'
+    OR p_lesson_id IS NULL OR p_lesson_id !~ '^b[0-9]+-l[0-9]+$'
+    OR p_answers IS NULL
+    OR COALESCE(array_ndims(p_answers), 0) <> 1
+    OR COALESCE(array_lower(p_answers, 1), 0) <> 1
+    OR COALESCE(cardinality(p_answers), 0) = 0
+    OR cardinality(p_answers) > 100
+    OR array_position(p_answers, NULL) IS NOT NULL
+  THEN
+    RAISE EXCEPTION 'quiz_invalid_input' USING ERRCODE = '22023';
+  END IF;
+
+  SELECT count(*)::integer
+    INTO v_question_count
+    FROM private.quiz_keys AS key
+   WHERE key.module_id = p_module_id
+     AND key.lesson_id = p_lesson_id;
+
+  IF v_question_count = 0 OR cardinality(p_answers) <> v_question_count THEN
+    RAISE EXCEPTION 'quiz_invalid_lesson_or_answer_count' USING ERRCODE = '22023';
+  END IF;
+
+  PERFORM pg_catalog.pg_advisory_xact_lock(
+    pg_catalog.hashtextextended(v_user_id::text || ':' || p_module_id || ':' || p_lesson_id, 0)
+  );
+
+  FOR v_index IN 1..v_question_count LOOP
+    SELECT key.correct_index, key.options_count
+      INTO v_key
+      FROM private.quiz_keys AS key
+     WHERE key.module_id = p_module_id
+       AND key.lesson_id = p_lesson_id
+       AND key.question_index = v_index - 1;
+
+    IF NOT FOUND THEN
+      RAISE EXCEPTION 'quiz_key_incomplete' USING ERRCODE = '22023';
     END IF;
 
-    -- Validar que la lección exista y tenga preguntas
-    SELECT COUNT(*) INTO v_question_count
-    FROM private.quiz_keys
-    WHERE module_id = p_module_id AND lesson_id = p_lesson_id;
-
-    IF v_question_count = 0 THEN
-        RAISE EXCEPTION 'Lección no encontrada o sin quiz';
+    IF p_answers[v_index] < 0 OR p_answers[v_index] >= v_key.options_count THEN
+      RAISE EXCEPTION 'quiz_invalid_option' USING ERRCODE = '22023';
     END IF;
 
-    -- Validar cantidad de respuestas
-    IF array_length(p_answers, 1) IS DISTINCT FROM v_question_count THEN
-        RAISE EXCEPTION 'Número de respuestas incorrecto';
+    v_is_correct := p_answers[v_index] = v_key.correct_index;
+    IF v_is_correct THEN
+      v_correct := v_correct + 1;
     END IF;
+    v_answer_correct := v_answer_correct || pg_catalog.jsonb_build_array(v_is_correct);
+  END LOOP;
 
-    -- Validar rango de cada respuesta (0 a options_count - 1)
-    FOR v_idx IN 1 .. array_length(p_answers, 1) LOOP
-        SELECT correct_index, options_count INTO v_key
-        FROM private.quiz_keys
-        WHERE module_id = p_module_id
-          AND lesson_id = p_lesson_id
-          AND question_index = v_idx
-        LIMIT 1;
+  v_score := round((v_correct::numeric / v_question_count) * 100)::integer;
+  v_passed := v_score >= 75;
+  v_answers_json := pg_catalog.to_jsonb(p_answers);
 
-        IF p_answers[v_idx] < 0 OR p_answers[v_idx] >= v_key.options_count THEN
-            RAISE EXCEPTION 'Respuesta fuera de rango en la pregunta %', v_idx;
-        END IF;
+  -- Hosted projects created before this migration may use the hardened private
+  -- attempt table. Fresh installs start with the original public table.
+  IF pg_catalog.to_regclass('private.quiz_attempts') IS NOT NULL THEN
+    EXECUTE
+      'SELECT count(*) FROM private.quiz_attempts
+        WHERE user_id = $1 AND module_id = $2 AND lesson_id = $3
+          AND submitted_at > pg_catalog.now() - interval ''1 minute'''
+      INTO v_attempt_count
+      USING v_user_id, p_module_id, p_lesson_id;
+    EXECUTE
+      'SELECT count(*) FROM private.quiz_attempts
+        WHERE user_id = $1 AND submitted_at > pg_catalog.now() - interval ''1 minute'''
+      INTO v_global_attempt_count
+      USING v_user_id;
+  ELSE
+    EXECUTE
+      'SELECT count(*) FROM public.quiz_attempts
+        WHERE user_id = $1 AND module_id = $2 AND lesson_id = $3
+          AND created_at > pg_catalog.now() - interval ''1 minute'''
+      INTO v_attempt_count
+      USING v_user_id, p_module_id, p_lesson_id;
+    EXECUTE
+      'SELECT count(*) FROM public.quiz_attempts
+        WHERE user_id = $1 AND created_at > pg_catalog.now() - interval ''1 minute'''
+      INTO v_global_attempt_count
+      USING v_user_id;
+  END IF;
 
-        IF p_answers[v_idx] = v_key.correct_index THEN
-            v_correct := v_correct + 1;
-        END IF;
-    END LOOP;
+  IF v_attempt_count >= 5 OR v_global_attempt_count >= 20 THEN
+    RAISE EXCEPTION 'quiz_rate_limited' USING ERRCODE = 'P0001';
+  END IF;
 
-    v_score := CASE WHEN v_question_count > 0
-        THEN round((v_correct::numeric / v_question_count) * 100)
-        ELSE 0 END;
+  IF pg_catalog.to_regclass('private.quiz_attempts') IS NOT NULL THEN
+    EXECUTE
+      'INSERT INTO private.quiz_attempts (user_id, module_id, lesson_id, score, passed)
+       VALUES ($1, $2, $3, $4, $5)'
+      USING v_user_id, p_module_id, p_lesson_id, v_score, v_passed;
+    EXECUTE
+      'DELETE FROM private.quiz_attempts WHERE submitted_at < pg_catalog.now() - interval ''30 days''';
+  ELSE
+    EXECUTE
+      'INSERT INTO public.quiz_attempts (user_id, module_id, lesson_id, score, answers)
+       VALUES ($1, $2, $3, $4, $5)'
+      USING v_user_id, p_module_id, p_lesson_id, v_score, v_answers_json;
+    EXECUTE
+      'DELETE FROM public.quiz_attempts WHERE created_at < pg_catalog.now() - interval ''30 days''';
+  END IF;
 
-    v_passed := v_question_count > 0 AND v_score >= 75;
-
-    -- Límite de intentos: máximo 5 por minuto por usuario y lección
-    SELECT COUNT(*) INTO v_attempt_count
-    FROM public.quiz_attempts
-    WHERE user_id = v_user_id
-      AND module_id = p_module_id
-      AND lesson_id = p_lesson_id
-      AND created_at > NOW() - INTERVAL '1 minute';
-
-    IF v_attempt_count >= 5 THEN
-        RAISE EXCEPTION 'Demasiados intentos por lección. Inténtalo de nuevo en un minuto.';
-    END IF;
-
-    -- Límite global: máximo 20 intentos por minuto por usuario
-    SELECT COUNT(*) INTO v_global_attempt_count
-    FROM public.quiz_attempts
-    WHERE user_id = v_user_id
-      AND created_at > NOW() - INTERVAL '1 minute';
-
-    IF v_global_attempt_count >= 20 THEN
-        RAISE EXCEPTION 'Demasiados intentos globales. Inténtalo de nuevo en un minuto.';
-    END IF;
-
-    -- Preparar answers como JSONB para almacenar
-    v_answers := p_answers::jsonb;
-
-    -- Insertar el intento
-    INSERT INTO public.quiz_attempts (user_id, module_id, lesson_id, score, answers)
-    VALUES (v_user_id, p_module_id, p_lesson_id, v_score, v_answers);
-
-    -- Upsert en progress: completed solo se pone true (nunca se desmarca),
-    -- best_score es el máximo (nunca baja).
-    INSERT INTO public.progress (user_id, module_id, lesson_id, is_completed, best_score, last_attempt)
-    VALUES (v_user_id, p_module_id, p_lesson_id, v_passed, v_score, NOW())
+  IF v_passed THEN
+    INSERT INTO public.progress (
+      user_id, module_id, lesson_id, is_completed, best_score, last_attempt
+    )
+    VALUES (v_user_id, p_module_id, p_lesson_id, TRUE, v_score, pg_catalog.now())
     ON CONFLICT (user_id, module_id, lesson_id) DO UPDATE
-    SET
-        is_completed = public.progress.is_completed OR v_passed,
-        best_score = GREATEST(public.progress.best_score, v_score),
-        last_attempt = NOW()
-    RETURNING is_completed INTO v_completed;
+      SET is_completed = public.progress.is_completed OR EXCLUDED.is_completed,
+          best_score = GREATEST(public.progress.best_score, EXCLUDED.best_score),
+          last_attempt = EXCLUDED.last_attempt
+    RETURNING is_completed, best_score INTO v_completed, v_best_score;
+  ELSE
+    SELECT progress.is_completed, progress.best_score
+      INTO v_completed, v_best_score
+      FROM public.progress AS progress
+     WHERE progress.user_id = v_user_id
+       AND progress.module_id = p_module_id
+       AND progress.lesson_id = p_lesson_id;
+    v_completed := COALESCE(v_completed, FALSE);
+    v_best_score := COALESCE(v_best_score, 0);
+  END IF;
 
-    RETURN jsonb_build_object(
-        'completed', v_completed,
-        'score', v_score,
-        'passed', v_passed,
-        'correct', v_correct,
-        'total', v_question_count
-    );
+  RETURN pg_catalog.jsonb_build_object(
+    'correct', v_correct,
+    'total', v_question_count,
+    'score', v_score,
+    'passed', v_passed,
+    'answerCorrect', v_answer_correct,
+    'bestScore', COALESCE(v_best_score, 0),
+    'completed', COALESCE(v_completed, FALSE)
+  );
 END;
-Parte 1 escrita;
+$function$;
 
--- --- 3. Eliminar record_quiz_attempt y revocar permisos ---
-REVOKE ALL ON FUNCTION public.record_quiz_attempt FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.record_quiz_attempt FROM anon;
-REVOKE ALL ON FUNCTION public.record_quiz_attempt FROM authenticated;
+REVOKE ALL ON FUNCTION private.submit_quiz_authoritative(TEXT, TEXT, INTEGER[]) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION private.submit_quiz_authoritative(TEXT, TEXT, INTEGER[]) TO authenticated;
 
+CREATE OR REPLACE FUNCTION public.submit_quiz(
+  p_module_id TEXT,
+  p_lesson_id TEXT,
+  p_answers INTEGER[]
+)
+RETURNS JSONB
+LANGUAGE sql
+SECURITY INVOKER
+SET search_path = ''
+AS $function$
+  SELECT private.submit_quiz_authoritative(p_module_id, p_lesson_id, p_answers);
+$function$;
+
+REVOKE ALL ON FUNCTION public.submit_quiz(TEXT, TEXT, INTEGER[]) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.submit_quiz(TEXT, TEXT, INTEGER[]) TO authenticated;
+
+REVOKE ALL ON FUNCTION public.record_quiz_attempt(TEXT, TEXT, NUMERIC, BOOLEAN, JSONB) FROM PUBLIC, anon, authenticated;
 DROP FUNCTION IF EXISTS public.record_quiz_attempt(TEXT, TEXT, NUMERIC, BOOLEAN, JSONB);
 
--- --- 4. Conceder EXECUTE solo a authenticated en submit_quiz ---
-GRANT EXECUTE ON FUNCTION public.submit_quiz(TEXT, TEXT, INTEGER[]) TO authenticated;
+-- The progress row is updated only by the authenticated server-side quiz RPC.
+REVOKE INSERT, UPDATE, DELETE ON TABLE public.progress FROM PUBLIC, anon, authenticated;
