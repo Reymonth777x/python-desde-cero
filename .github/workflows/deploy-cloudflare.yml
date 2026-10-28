@@ -57,7 +57,7 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
-          NEXT_PUBLIC_SITE_URL: https://python-desde-cero.pythondesdecero.workers.dev
+          NEXT_PUBLIC_SITE_URL: https://python-desdecero.com
 
       - name: Diagnosticar y normalizar credenciales de Cloudflare sin revelarlas
         shell: bash
@@ -129,7 +129,7 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
-          NEXT_PUBLIC_SITE_URL: https://python-desde-cero.pythondesdecero.workers.dev
+          NEXT_PUBLIC_SITE_URL: https://python-desdecero.com
 
       - name: Normalizar y validar Account ID sin exponerlo
         shell: bash
@@ -151,12 +151,12 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
-          NEXT_PUBLIC_SITE_URL: https://python-desde-cero.pythondesdecero.workers.dev
+          NEXT_PUBLIC_SITE_URL: https://python-desdecero.com
 
       - name: Comprobar la web publicada
         shell: bash
         run: |
           curl --fail --silent --show-error --location --retry 5 --retry-delay 3 --retry-all-errors \
-            https://python-desde-cero.pythondesdecero.workers.dev/ -o /tmp/python-desde-cero-home.html
+            https://python-desdecero.com/ -o /tmp/python-desde-cero-home.html
           grep -qi "Python desde cero" /tmp/python-desde-cero-home.html
           echo "La página pública respondió y contiene el título esperado."
