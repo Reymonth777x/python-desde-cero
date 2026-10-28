@@ -35,8 +35,13 @@ jobs:
       - name: Production build
         run: npm run build
 
-      - name: Run E2E tests contra build de producción
-        run: npm run test:e2e
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
 
-      - name: Auditoría de dependencias (falla con altas/críticas)
+      - name: Run E2E tests against production build
+        run: npm run test:e2e
+        env:
+          PLAYWRIGHT_SKIP_BUILD: '1'
+
+      - name: Dependency audit (fail on high/critical)
         run: npm audit --audit-level=high
