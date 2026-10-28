@@ -3,7 +3,7 @@
 /**
  * Traductor de errores de Python a español con mensajes pedagógicos.
  * Convierte tracebacks de Pyodide en mensajes claros en español
- * con número de línea y pista sugerida.
+ * con número de lÃ­nea y pista sugerida.
  */
 
 type PythonErrorInfo = {
@@ -19,14 +19,14 @@ type PythonErrorInfo = {
 const ERROR_MESSAGES: Record<string, { base: string; hint?: string }> = {
   SyntaxError: {
     base: "Error de sintaxis en el código Python.",
-    hint: "Revisa paréntesis, comillas, dos puntos y sangría.",
+    hint: "Revisa paréntesis, comillas, dos puntos y sangrÃ­a.",
   },
   IndentationError: {
-    base: "Error de sangría (indentation).",
-    hint: "En Python, los bloques de código deben tener la misma sangría. Usa 4 espacios consistentes.",
+    base: "Error de sangrÃ­a (indentation).",
+    hint: "En Python, los bloques de código deben tener la misma sangrÃ­a. Usa 4 espacios consistentes.",
   },
   TabError: {
-    base: "Mezcla de tabuladores y espacios en la sangría.",
+    base: "Mezcla de tabuladores y espacios en la sangrÃ­a.",
     hint: "Usa solo espacios (4 por nivel) o solo tabuladores, no ambos.",
   },
   NameError: {
@@ -46,7 +46,7 @@ const ERROR_MESSAGES: Record<string, { base: string; hint?: string }> = {
     hint: "Revisa que el valor pasado a la función sea del tipo y rango esperados.",
   },
   IndexError: {
-    base: "Índice de lista fuera de rango.",
+    base: "Ãndice de lista fuera de rango.",
     hint: "Estás intentando acceder a una posición que no existe en la lista.",
   },
   KeyError: {
@@ -55,7 +55,7 @@ const ERROR_MESSAGES: Record<string, { base: string; hint?: string }> = {
   },
   AttributeError: {
     base: "Atributo o método no encontrado en el objeto.",
-    hint: "Revisa que el objeto tenga ese atributo o método. Verifica la ortografía.",
+    hint: "Revisa que el objeto tenga ese atributo o método. Verifica la ortografÃ­a.",
   },
   ImportError: {
     base: "No se pudo importar el módulo.",
@@ -67,14 +67,14 @@ const ERROR_MESSAGES: Record<string, { base: string; hint?: string }> = {
   },
   TimeoutError: {
     base: "El programa tardó demasiado en ejecutarse.",
-    hint: "¿Tienes un bucle infinito? Revisa while True o bucles sin condición de salida.",
+    hint: "Â¿Tienes un bucle infinito? Revisa while True o bucles sin condición de salida.",
   },
 };
 
-// Patrones para extraer número de línea de mensajes de error de Python
+// Patrones para extraer número de lÃ­nea de mensajes de error de Python
 const LINE_PATTERNS = [
   /line\s+(\d+)/i,
-  /línea\s+(\d+)/i,
+  /lÃ­nea\s+(\d+)/i,
   /file\s+".*?",\s+line\s+(\d+)/i,
 ];
 
@@ -100,7 +100,7 @@ export function translatePythonError(
 
   let spanish = `${spanishBase}`;
   if (line !== undefined) {
-    spanish += ` (línea ${line})`;
+    spanish += ` (lÃ­nea ${line})`;
   }
 
   return {
@@ -120,3 +120,4 @@ export function formatPythonError(error: string | Error | unknown): string {
   }
   return result;
 }
+

@@ -80,15 +80,34 @@ class KitchenEngine:
         self.won = False
 
     def _add_event(self, event_type: str, data: Dict[str, Any] = None) -> None:
+        self.events.append(GameEvent(type=event_type, step=self.step_count, data=data or {}))
+
+    def _get_current_order(self) -> Optional[Order]:
+        if self.current_order_index < len(self.orders):
+            return self.orders[self.current_order_index]
+        return None
+
+    def _order_completed(self) -> bool:
+        order = self._get_current_order()
+        if order is None:
+            return True
+        return order.completed
+
+    def _next_order(self) -> None:
+        self.current_order_index += 1
+        if self.current_order_index >= len(self.orders):
+            self.won = True
+            self.game_over = True
+
     def mover(self, direccion: str) -> Dict[str, Any]:
         if self.game_over:
-            return {"ok": False, "error": "El juego ya termin\u00f3."}
+            return {"ok": False, "error": "El juego ya terminó."}
 
         self.step_count += 1
         if self.step_count > self.max_steps:
             self.game_over = True
-            self._add_event("game_over", {"reason": "limite_de_pasos", "steps": self.step_count})
-            return {"ok": False, "error": "L\u00edmite de pasos alcanzado."}
+            self._add_event("game_over", {"reason": "límite_de_pasos", "steps": self.step_count})
+            return {"ok": False, "error": "Límite de pasos alcanzado."}
 
         dx, dy = 0, 0
         if direccion == "arriba":
@@ -104,7 +123,7 @@ class KitchenEngine:
             dx = 1
             self.chef_facing = "right"
         else:
-            return {"ok": False, "error": "Direcci\u00f3n no v\u00e1lida."}
+            return {"ok": False, "error": "Dirección no válida."}
 
         nuevo_x = self.chef_x + dx
         nuevo_y = self.chef_y + dy
@@ -112,75 +131,104 @@ class KitchenEngine:
         if nuevo_x < 0 or nuevo_x > 9 or nuevo_y < 0 or nuevo_y > 9:
             self._add_event("movimiento_bloqueado", {"x": self.chef_x, "y": self.chef_y})
             return {"ok": False, "error": "No puedes salir de la cocina."}
+
+        self.chef_x = nuevo_x
+        self.chef_y = nuevo_y
+        self._add_event("chef_movido", {"x": self.chef_x, "y": self.chef_y, "dirección": direccion})
+
+        return {"ok": True, "x": self.chef_x, "y": self.chef_y, "holding": self.chef_holding}
+
     def tomar(self, ingrediente_id: str) -> Dict[str, Any]:
         if self.game_over:
-            return {"ok": False, "error": "El juego ya termin\u00f3."}
+            return {"ok": False, "error": "El juego ya terminó."}
 
         if self.chef_holding is not None:
-            return {"ok": False, "error": "Ya est\u00e1s sosteniendo algo. Empl\u00e1talo primero."}
+            return {"ok": False, "error": "Ya estás sosteniendo algo. Emplátalo primero."}
 
         self.step_count += 1
         if self.step_count > self.max_steps:
             self.game_over = True
-            return {"ok": False, "error": "L\u00edmite de pasos alcanzado."}
+            return {"ok": False, "error": "Límite de pasos alcanzado."}
 
         ing = self.ingredients.get(ingrediente_id)
         if ing is None:
             return {"ok": False, "error": "Ese ingrediente no existe."}
 
         if not ing["available"]:
-            return {"ok": False, "error": "Ese ingrediente ya no est\u00e1 disponible."}
+            return {"ok": False, "error": "Ese ingrediente ya no está disponible."}
 
         distancia = abs(self.chef_x - ing["x"]) + abs(self.chef_y - ing["y"])
         if distancia > 1:
+            return {"ok": False, "error": "Estás demasiado lejos del ingrediente.", "distancia": distancia}
+
+        ing["available"] = False
+        self.chef_holding = ingrediente_id
+        self._add_event("ingrediente_tomado", {"ingrediente": ingrediente_id, "x": ing["x"], "y": ing["y"]})
+
+        return {"ok": True, "ingrediente": ingrediente_id, "holding": self.chef_holding}
+
     def cortar(self) -> Dict[str, Any]:
         if self.game_over:
-            return {"ok": False, "error": "El juego ya termin\u00f3."}
+            return {"ok": False, "error": "El juego ya terminó."}
 
         if self.chef_holding is None:
-            return {"ok": False, "error": "No est\u00e1s sosteniendo ning\u00fan ingrediente."}
+            return {"ok": False, "error": "No estás sosteniendo ningún ingrediente."}
 
         self.step_count += 1
         if self.step_count > self.max_steps:
             self.game_over = True
-            return {"ok": False, "error": "L\u00edmite de pasos alcanzado."}
+            return {"ok": False, "error": "Límite de pasos alcanzado."}
 
         ing_id = self.chef_holding
         ing = self.ingredients.get(ing_id)
         if ing is None or ing["chopped"]:
             return {"ok": False, "error": "No se puede cortar este ingrediente."}
+
+        ing["chopped"] = True
+        self._add_event("ingrediente_cortado", {"ingrediente": ing_id})
+
+        return {"ok": True, "ingrediente": ing_id, "chopped": True}
+
     def cocinar(self, estufa_id: str) -> Dict[str, Any]:
         if self.game_over:
-            return {"ok": False, "error": "El juego ya termin\u00f3."}
+            return {"ok": False, "error": "El juego ya terminó."}
 
         if self.chef_holding is None:
-            return {"ok": False, "error": "No est\u00e1s sosteniendo ning\u00fan ingrediente."}
+            return {"ok": False, "error": "No estás sosteniendo ningún ingrediente."}
 
         self.step_count += 1
         if self.step_count > self.max_steps:
             self.game_over = True
-            return {"ok": False, "error": "L\u00edmite de pasos alcanzado."}
+            return {"ok": False, "error": "Límite de pasos alcanzado."}
 
         stove = self.stoves.get(estufa_id)
         if stove is None:
             return {"ok": False, "error": "Esa estufa no existe."}
 
         if stove["has_item"]:
-            return {"ok": False, "error": "La estufa ya est\u00e1 ocupada."}
+            return {"ok": False, "error": "La estufa ya está ocupada."}
 
         distancia = abs(self.chef_x - stove["x"]) + abs(self.chef_y - stove["y"])
         if distancia > 1:
-            return {"ok": False, "error": "Est\u00e1s demasiado lejos de la estufa.", "distancia": distancia}
+            return {"ok": False, "error": "Estás demasiado lejos de la estufa.", "distancia": distancia}
 
         stove["has_item"] = True
+        stove["item"] = self.chef_holding
+        stove["cooking"] = True
+        stove["cook_progress"] = 0
+        self.chef_holding = None
+        self._add_event("ingrediente_en_estufa", {"estufa": estufa_id, "ingrediente": stove["item"]})
+
+        return {"ok": True, "estufa": estufa_id, "ingrediente": stove["item"]}
+
     def emplatar(self, plato_id: str) -> Dict[str, Any]:
         if self.game_over:
-            return {"ok": False, "error": "El juego ya termin\u00f3."}
+            return {"ok": False, "error": "El juego ya terminó."}
 
         self.step_count += 1
         if self.step_count > self.max_steps:
             self.game_over = True
-            return {"ok": False, "error": "L\u00edmite de pasos alcanzado."}
+            return {"ok": False, "error": "Límite de pasos alcanzado."}
 
         plate = self.plates.get(plato_id)
         if plate is None:
@@ -206,7 +254,7 @@ class KitchenEngine:
                     ingrediente_cocinado = self.chef_holding
                     self.chef_holding = None
                 else:
-                    return {"ok": False, "error": "El ingrediente no est\u00e1 listo para emplatar."}
+                    return {"ok": False, "error": "El ingrediente no está listo para emplatar."}
             else:
                 return {"ok": False, "error": "No hay ingrediente cocinado para emplatar."}
 
@@ -216,14 +264,26 @@ class KitchenEngine:
             self.stoves[estufa_origen]["cooking"] = False
 
         plate["has_item"] = True
+        plate["item"] = ingrediente_cocinado
+
+        order = self._get_current_order()
+        if order and ingrediente_cocinado in order.items and not order.completed:
+            order.completed = True
+            self._add_event("pedido_completado", {"pedido": order.id})
+            self._next_order()
+
+        self._add_event("ingrediente_emplatado", {"plato": plato_id, "ingrediente": ingrediente_cocinado})
+
+        return {"ok": True, "plato": plato_id, "ingrediente": ingrediente_cocinado}
+
     def servir(self, mesa_id: str) -> Dict[str, Any]:
         if self.game_over:
-            return {"ok": False, "error": "El juego ya termin\u00f3."}
+            return {"ok": False, "error": "El juego ya terminó."}
 
         self.step_count += 1
         if self.step_count > self.max_steps:
             self.game_over = True
-            return {"ok": False, "error": "L\u00edmite de pasos alcanzado."}
+            return {"ok": False, "error": "Límite de pasos alcanzado."}
 
         plato_cerca = None
         for pid, plate in self.plates.items():
@@ -242,13 +302,13 @@ class KitchenEngine:
 
     def esperar(self, pasos: int = 1) -> Dict[str, Any]:
         if self.game_over:
-            return {"ok": False, "error": "El juego ya termin\u00f3."}
+            return {"ok": False, "error": "El juego ya terminó."}
 
         for _ in range(pasos):
             self.step_count += 1
             if self.step_count > self.max_steps:
                 self.game_over = True
-                return {"ok": False, "error": "L\u00edmite de pasos alcanzado."}
+                return {"ok": False, "error": "Límite de pasos alcanzado."}
 
             for sid, stove in self.stoves.items():
                 if stove["cooking"]:
@@ -288,57 +348,3 @@ class KitchenEngine:
 
     def reset(self) -> None:
         self.__init__(self.level_data)
-        plate["item"] = ingrediente_cocinado
-
-        order = self._get_current_order()
-        if order and ingrediente_cocinado in order.items and not order.completed:
-            order.completed = True
-            self._add_event("pedido_completado", {"pedido": order.id})
-            self._next_order()
-
-        self._add_event("ingrediente_emplatado", {"plato": plato_id, "ingrediente": ingrediente_cocinado})
-
-        return {"ok": True, "plato": plato_id, "ingrediente": ingrediente_cocinado}
-        stove["item"] = self.chef_holding
-        stove["cooking"] = True
-        stove["cook_progress"] = 0
-        self.chef_holding = None
-        self._add_event("ingrediente_en_estufa", {"estufa": estufa_id, "ingrediente": stove["item"]})
-
-        return {"ok": True, "estufa": estufa_id, "ingrediente": stove["item"]}
-
-        ing["chopped"] = True
-        self._add_event("ingrediente_cortado", {"ingrediente": ing_id})
-
-        return {"ok": True, "ingrediente": ing_id, "chopped": True}
-            return {"ok": False, "error": "Est\u00e1s demasiado lejos del ingrediente.", "distancia": distancia}
-
-        ing["available"] = False
-        self.chef_holding = ingrediente_id
-        self._add_event("ingrediente_tomado", {"ingrediente": ingrediente_id, "x": ing["x"], "y": ing["y"]})
-
-        return {"ok": True, "ingrediente": ingrediente_id, "holding": self.chef_holding}
-
-        self.chef_x = nuevo_x
-        self.chef_y = nuevo_y
-        self._add_event("chef_movido", {"x": self.chef_x, "y": self.chef_y, "direccion": direccion})
-
-        return {"ok": True, "x": self.chef_x, "y": self.chef_y, "holding": self.chef_holding}
-        self.events.append(GameEvent(type=event_type, step=self.step_count, data=data or {}))
-
-    def _get_current_order(self) -> Optional[Order]:
-        if self.current_order_index < len(self.orders):
-            return self.orders[self.current_order_index]
-        return None
-
-    def _order_completed(self) -> bool:
-        order = self._get_current_order()
-        if order is None:
-            return True
-        return order.completed
-
-    def _next_order(self) -> None:
-        self.current_order_index += 1
-        if self.current_order_index >= len(self.orders):
-            self.won = True
-            self.game_over = True

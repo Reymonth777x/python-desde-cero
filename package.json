@@ -16,7 +16,8 @@
     "doctor": "node scripts/doctor.mjs",
     "check:theme-coverage": "node scripts/check-theme-coverage.mjs",
     "check:contrast": "node scripts/check-contrast.mjs",
-    "check:originality": "node scripts/check-originality.mjs"
+    "check:originality": "node scripts/check-originality.mjs",
+    "verify": "node scripts/check-encoding.mjs"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
