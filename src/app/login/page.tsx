@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { use } from 'react';
 import Link from 'next/link';
 import { TurnstileWidget } from '@/components/TurnstileWidget';
 import { signup, login } from './actions';
 
 type Props = {
-  searchParams?: { error?: string; message?: string };
+  searchParams?: Promise<{ error?: string; message?: string }>;
 };
 
 const errors: Record<string, string> = {
@@ -23,7 +24,10 @@ const inputStyle =
   'mt-2 min-h-12 w-full border border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 py-3 text-base text-[var(--theme-ink)] outline-none focus:border-[var(--theme-accent)] focus:ring-1 focus:ring-[var(--theme-focus-ring)]';
 
 export default function LoginPage({ searchParams }: Props) {
-  const params = searchParams || {};
+  const params = use(searchParams ?? Promise.resolve({})) as {
+    error?: string;
+    message?: string;
+  };
   const [isSignup, setIsSignup] = useState(false);
 
   const btnClass = isSignup
