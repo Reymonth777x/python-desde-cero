@@ -39,12 +39,18 @@ export default function TurtleCanvas({
   const animationRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
   const commandsRef = useRef(commands);
-  commandsRef.current = commands;
 
   useEffect(() => {
-    setCurrentStep(0);
-    setIsPlaying(false);
-  }, [commands.length]);
+    commandsRef.current = commands;
+  }, [commands]);
+
+  useEffect(() => {
+    const resetFrame = requestAnimationFrame(() => {
+      setCurrentStep(0);
+      setIsPlaying(false);
+    });
+    return () => cancelAnimationFrame(resetFrame);
+  }, [commands]);
 
   useEffect(() => {
     return () => {
@@ -111,12 +117,26 @@ export default function TurtleCanvas({
     };
   }, [isPlaying, stepDuration]);
 
-  const visibleCommands = commandsRef.current.slice(0, currentStep);
-  const turtleStateRef = useRef<{ x: number; y: number; heading: number }>({
-    x: 0,
-    y: 0,
-    heading: 0,
-  });
+  const visibleCommands = commands.slice(0, currentStep);
+  const turtleState = visibleCommands.reduce(
+    (position, command) => {
+      if (
+        command.type !== 'line' ||
+        command.x1 === undefined ||
+        command.y1 === undefined ||
+        command.x2 === undefined ||
+        command.y2 === undefined
+      ) {
+        return position;
+      }
+      return {
+        x: command.x2,
+        y: command.y2,
+        heading: -Math.atan2(command.y2 - command.y1, command.x2 - command.x1) * (180 / Math.PI),
+      };
+    },
+    { x: 0, y: 0, heading: 0 },
+  );
 
   const bgColorCmd = [...visibleCommands].reverse().find((c) => c.type === 'bgcolor');
   const bgColor = bgColorCmd?.color || 'var(--theme-bg)';
@@ -207,7 +227,7 @@ export default function TurtleCanvas({
             return null;
           })}
           {showTurtle && visibleCommands.length > 0 && (
-            <g transform={"translate(" + turtleStateRef.current.x + "," + -turtleStateRef.current.y + ") rotate(" + turtleStateRef.current.heading + ")"}>
+            <g transform={"translate(" + turtleState.x + "," + -turtleState.y + ") rotate(" + turtleState.heading + ")"}>
               <path
                 d="M-8,8 L8,8 L0,-12 Z"
                 fill="var(--theme-accent)"

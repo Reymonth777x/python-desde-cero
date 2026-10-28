@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react';
 
-type ThemeName =
+export type ThemeName =
   | 'original'
   | 'dark'
   | 'dracula'
