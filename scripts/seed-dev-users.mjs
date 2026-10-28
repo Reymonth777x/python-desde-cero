@@ -1,84 +1,141 @@
 #!/usr/bin/env node
-"""
-Script de semilla de usuarios de desarrollo.
-Solo funciona contra Supabase LOCAL (localhost:54322).
-Rechaza cualquier URL que no sea local para evitar accidentes en producción.
-"""
-
+/**
+ * Creates local-only test accounts for Supabase development.
+ * Refuses every remote hostname to prevent accidental production changes.
+ */
+import { randomBytes } from 'node:crypto';
+import { writeFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = process.env.SUPABASE_URL || 'http://localhost:54322';
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.';
+const ROOT = path.dirname(fileURLToPath(import.meta.url));
+const SUPABASE_URL = process.env.SUPABASE_URL || 'http://127.0.0.1:54321';
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-// Validar que sea URL local
-if (!SUPABASE_URL.includes('localhost') && !SUPABASE_URL.includes('127.0.0.1')) {
-  console.error('❌ ERROR: seed-dev-users.mjs solo permite URLs locales (localhost/127.0.0.1)');
-  console.error(`   URL detectada: ${SUPABASE_URL}`);
+let parsedUrl;
+try {
+  parsedUrl = new URL(SUPABASE_URL);
+} catch {
+  console.error('ERROR: SUPABASE_URL must be a valid local URL.');
   process.exit(1);
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+if (!['localhost', '127.0.0.1'].includes(parsedUrl.hostname)) {
+  console.error('ERROR: seed-dev-users.mjs only permits localhost or 127.0.0.1.');
+  process.exit(1);
+}
+
+if (!SUPABASE_SERVICE_ROLE_KEY) {
+  console.error('ERROR: set SUPABASE_SERVICE_ROLE_KEY using the local value from npx supabase status -o env.');
+  console.error('Never use a production key and never commit or share this value.');
+  process.exit(1);
+}
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false,
+  },
+});
 
 const DEV_USERS = [
   {
     email: 'estudiante@python-desdecero.local',
-    password: 'Estudiante123!',
     role: 'student',
     full_name: 'Estudiante de Prueba',
   },
   {
     email: 'docente@python-desdecero.local',
-    password: 'Docente123!',
     role: 'teacher',
     full_name: 'Docente de Prueba',
   },
   {
     email: 'admin@python-desdecero.local',
-    password: 'Admin123!',
     role: 'admin',
     full_name: 'Administrador de Prueba',
   },
 ];
 
 async function main() {
-  console.log('🌱 Creando usuarios de desarrollo en Supabase local...\n');
+  console.log('Creating test accounts in local Supabase only...');
+
+  const { data: usersResult, error: listError } = await supabase.auth.admin.listUsers({
+    page: 1,
+    perPage: 1000,
+  });
+
+  if (listError) {
+    throw new Error('Could not list local users: ' + listError.message);
+  }
+
+  const existingUsers = usersResult.users;
+  const credentials = [];
+  let hadFailure = false;
 
   for (const user of DEV_USERS) {
-    try {
-      const { data, error } = await supabase.auth.admin.createUser({
-        email: user.email,
-        password: user.password,
-        user_metadata: {
-          full_name: user.full_name,
-          role: user.role,
-        },
-        email_confirm: true, // Auto-confirmar en entorno local
-      });
+    const password = randomBytes(24).toString('base64url');
+    const existing = existingUsers.find((candidate) => candidate.email === user.email);
+    const userMetadata = {
+      full_name: user.full_name,
+      role: user.role,
+    };
 
-      if (error) {
-        if (error.message.includes('already registered') || error.message.includes('User already registered')) {
-          console.log(`⚠️  ${user.email} ya existe, saltando...`);
-        } else {
-          console.error(`❌ Error creando ${user.email}: ${error.message}`);
-        }
+    try {
+      if (existing) {
+        const { error } = await supabase.auth.admin.updateUserById(existing.id, {
+          password,
+          user_metadata: userMetadata,
+          email_confirm: true,
+        });
+        if (error) throw new Error(error.message);
+        console.log('Updated local account: ' + user.email);
       } else {
-        console.log(`✅ ${user.email} creado (rol: ${user.role})`);
+        const { error } = await supabase.auth.admin.createUser({
+          email: user.email,
+          password,
+          user_metadata: userMetadata,
+          email_confirm: true,
+        });
+        if (error) throw new Error(error.message);
+        console.log('Created local account: ' + user.email);
       }
-    } catch (err) {
-      console.error(`❌ Excepción creando ${user.email}: ${err.message}`);
+
+      credentials.push({
+        email: user.email,
+        password,
+        role: user.role,
+      });
+    } catch (error) {
+      hadFailure = true;
+      console.error('Failed for ' + user.email + ': ' + (error instanceof Error ? error.message : String(error)));
     }
   }
 
-  console.log('\n📋 Credenciales de desarrollo:');
-  console.log('----------------------------------------');
-  for (const user of DEV_USERS) {
-    console.log(`${user.email} / ${user.password} (${user.role})`);
+  if (credentials.length > 0) {
+    const credentialsPath = path.join(ROOT, '..', '.local-dev-users.json');
+    writeFileSync(
+      credentialsPath,
+      JSON.stringify(
+        {
+          generatedAt: new Date().toISOString(),
+          supabaseUrl: SUPABASE_URL,
+          users: credentials,
+        },
+        null,
+        2,
+      ) + '\n',
+      { mode: 0o600 },
+    );
+    console.log('Local credentials saved to .local-dev-users.json (git-ignored). Do not share or commit this file.');
   }
-  console.log('----------------------------------------');
-  console.log('\n⚠️  Solo para entorno de desarrollo local. Nunca usar en producción.');
+
+  if (hadFailure) {
+    process.exitCode = 1;
+  }
 }
 
-main().catch((err) => {
-  console.error('Error fatal:', err.message);
-  process.exit(1);
+main().catch((error) => {
+  console.error('Fatal error: ' + (error instanceof Error ? error.message : String(error)));
+  process.exitCode = 1;
 });
