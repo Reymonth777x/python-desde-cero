@@ -14,7 +14,11 @@ export default async function EstudiantePage() {
     .from('profiles')
     .select('*')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
+
+  if (!profile) {
+    redirect('/login');
+  }
 
   const { data: progress } = await supabase
     .from('progress')

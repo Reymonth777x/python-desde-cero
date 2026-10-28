@@ -175,7 +175,7 @@ export default function PythonEditor({
 
         <div aria-label="Teclas de Python para pantalla táctil" className="flex flex-wrap gap-2 md:hidden">
           {[
-            { label: '()', accessible: 'Insertar parÃ©ntesis', text: '()', cursor: 1 },
+            { label: '()', accessible: 'Insertar par )ntesis', text: '()', cursor: 1 },
             { label: '""', accessible: 'Insertar comillas', text: '""', cursor: 1 },
             { label: ':', accessible: 'Insertar dos puntos', text: ':' },
             { label: '=', accessible: 'Insertar signo igual', text: '=' },
