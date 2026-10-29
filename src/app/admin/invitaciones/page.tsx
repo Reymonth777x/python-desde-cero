@@ -10,6 +10,7 @@ type InvitationRow = {
   is_used: boolean;
   used_by: string | null;
   expires_at: string | null;
+  is_expired: boolean;
   created_at: string;
   created_by: string;
 };
@@ -29,9 +30,6 @@ function feedbackCode(error: string | null | undefined, success: string) {
   return 'failed';
 }
 
-function isExpired(expiresAt: string | null): boolean {
-  return Boolean(expiresAt && Date.parse(expiresAt) < Date.now());
-}
 
 async function handleCreateInvitation(formData: FormData): Promise<void> {
   'use server';
@@ -169,7 +167,7 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
                       <td className='border border-[var(--theme-border)] px-3 py-2 text-sm text-[var(--theme-ink)]'>
                         {inv.is_used ? (
                           <span className='text-[var(--theme-muted)]'>Usada</span>
-                        ) : isExpired(inv.expires_at) ? (
+                        ) : inv.is_expired ? (
                           <span className='text-[var(--theme-error)]'>Vencida</span>
                         ) : (
                           <span className='text-[var(--theme-accent)]'>Activa</span>
