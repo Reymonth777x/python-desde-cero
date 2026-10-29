@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const crypto = require("crypto");
+import { randomBytes } from 'node:crypto';
 
 /**
  * Semilla de usuarios de desarrollo.
@@ -55,7 +55,7 @@ const DEV_USERS = [
 ];
 
 function generateSecurePassword() {
-  return crypto.randomBytes(16).toString('base64url');
+  return randomBytes(16).toString('base64url');
 }
 
 async function main() {
