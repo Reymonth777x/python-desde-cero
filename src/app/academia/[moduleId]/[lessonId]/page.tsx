@@ -72,7 +72,7 @@ export default async function LessonPage({ params }: Props) {
         .eq('lesson_id', assessmentLesson.id)
         .maybeSingle();
 
-      if (!gateError && gate?.is_completed !== true) redirect('/academia');
+      if (gateError || gate?.is_completed !== true) redirect('/academia');
     }
   }
 
