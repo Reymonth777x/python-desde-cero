@@ -283,7 +283,7 @@ export default function Home() {
             </div>
           </div>
           <div className="lg:w-2/3">
-            <PortadaLab defaultCode={selectedExample.code} />
+            <PortadaLab key={selectedExample.id} defaultCode={selectedExample.code} />
           </div>
         </div>
       </section>

@@ -50,7 +50,11 @@ test.describe('Ejemplos de portada', () => {
 
     for (const nombre of nombres) {
       const btn = page.locator(`button:has-text("${nombre}")`);
-      await expect(btn).toBeVisible();
+      const renderedButtons = (await page.locator('button').allTextContents())
+        .map((text) => text.replace(/\s+/g, ' ').trim())
+        .filter(Boolean)
+        .join(' | ');
+      await expect(btn, `No se encontró el ejemplo "${nombre}". Botones renderizados: ${renderedButtons}`).toBeVisible();
     }
   });
 });
@@ -65,10 +69,8 @@ test.describe('Turtle y fondo', () => {
     await expect(ejecutar).toBeVisible();
     await ejecutar.click();
 
-    await page.waitForTimeout(10000);
-
-    const svg = page.locator('svg');
-    await expect(svg).toBeVisible();
+    const svg = page.locator('svg').first();
+    await expect(svg).toBeVisible({ timeout: 60000 });
 
     const rectNegro = page.locator('rect[fill="black"]');
     await expect(rectNegro.first()).toBeVisible();
@@ -82,15 +84,13 @@ test.describe('Turtle y fondo', () => {
     const limpiar = page.locator('button:has-text("Limpiar gráfico")');
     if (await limpiar.isVisible()) {
       await limpiar.click();
-      await page.waitForTimeout(1000);
+      await expect(page.locator('line')).toHaveCount(0, { timeout: 5000 });
       const lineasDespues = await page.locator('line').count();
       expect(lineasDespues).toBe(0);
     }
 
     await ejecutar.click();
-    await page.waitForTimeout(10000);
-    const svgDespues = page.locator('svg');
-    await expect(svgDespues).toBeVisible();
+    await expect(page.locator('svg').first()).toBeVisible({ timeout: 60000 });
   });
 });
 
