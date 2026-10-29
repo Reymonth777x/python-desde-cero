@@ -5,7 +5,6 @@ on:
     workflows: ["CI"]
     types: [completed]
     branches: [master]
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -30,21 +29,9 @@ jobs:
           WORKFLOW_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
         run: |
           set -euo pipefail
-          if [[ "$GITHUB_EVENT_NAME" == "workflow_run" ]]; then
-            if [[ "$WORKFLOW_HEAD_BRANCH" != "master" || "$WORKFLOW_CONCLUSION" != "success" ]]; then
-              echo "configured=false" >> "$GITHUB_OUTPUT"
-              echo "::notice::Despliegue omitido: CI de master no terminó correctamente."
-              exit 0
-            fi
-          elif [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
-            if [[ "$GITHUB_REF" != "refs/heads/master" ]]; then
-              echo "configured=false" >> "$GITHUB_OUTPUT"
-              echo "::notice::Despliegue manual permitido solo desde master."
-              exit 0
-            fi
-          else
+          if [[ "$GITHUB_EVENT_NAME" != "workflow_run" || "$WORKFLOW_HEAD_BRANCH" != "master" || "$WORKFLOW_CONCLUSION" != "success" ]]; then
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Evento no permitido para despliegue."
+            echo "::notice::Despliegue omitido: solo se publica el SHA de master tras CI exitoso."
             exit 0
           fi
 
