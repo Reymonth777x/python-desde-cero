@@ -9,10 +9,10 @@ const b1e1 = exercise('b1-e1', 'Hola, cocina', 'Imprime: "Hola, cocina".', '', '
 const b1e2 = exercise('b1-e2', 'Variables', 'Crea plato = "Paella" e imprímela.', 'plato = ', 'plato = "Paella"\nprint(plato)', [{ input: [], expected: 'Paella' }], ['Usa = para asignar.'], 'facil', 10);
 const b1e3 = exercise('b1-e3', 'Operadores', 'Dadas a=8 y b=12, imprime a+b.', 'a = 8\nb = 12\n', 'a = 8\nb = 12\nprint(a + b)', [{ input: [], expected: '20' }], ['Usa + para sumar.'], 'facil', 15);
 const b1e4 = exercise('b1-e4', 'Entrada y salida', 'Pide el nombre con input() e imprímelo.', '', 'nombre = input()\nprint(nombre)', [{ input: ['Ana'], expected: 'Ana' }], ['Usa input() para leer.'], 'facil', 15);
-const b1q1 = q('¿Qué imprime print(3 + 2 * 2)?', ['10', '7', '5', '12'], 1, 'Multiplicación primero: 2*2=4, luego 3+4=7.');
-const b1q2 = q('¿Cómo se llama a una función?', ['llamar(func)', 'func()', 'ejecutar func', 'run func'], 1, 'Escribe el nombre con paréntesis: func().');
-const b1q3 = q('¿Qué tipo es "25"?', ['int', 'float', 'str', 'bool'], 2, 'Texto entre comillas es str.');
-const b1q4 = q('¿Qué hace int("10")?', ['Convierte "10" al número 10', 'Devuelve 10 como texto', 'Da error', 'Devuelve 1.0'], 0, 'int() convierte texto en número.');
+const b1q1 = q('¿Qué imprime print(3 + 2 * 2)?', ['10', '5', '7', '12'], 2, 'Multiplicación primero: 2*2=4, luego 3+4=7.');
+const b1q2 = q('¿Cómo se llama a una función?', ['llamar(func)', 'ejecutar func', 'run func', 'func()'], 3, 'Escribe el nombre con paréntesis: func().');
+const b1q3 = q('¿Qué tipo es "25"?', ['str', 'int', 'float', 'bool'], 0, 'Texto entre comillas es str.');
+const b1q4 = q('¿Qué hace int("10")?', ['Devuelve 10 como texto', 'Da error', 'Devuelve 1.0', 'Convierte "10" al número 10'], 3, 'int() convierte texto en número.');
 
 const modulo1 = {
   id: 'module-1',
@@ -49,11 +49,11 @@ const b2e20 = exercise('b2-e20', 'Menú de opciones', 'Muestra un menú y ejecut
 const b2e21 = exercise('b2-e21', 'Contador de vocales', 'Cuenta cuántas vocales tiene la palabra "programacion".', '', 'palabra = "programacion"\ncontador = 0\nfor letra in palabra:\n    if letra in "aeiou":\n        contador = contador + 1\nprint(contador)', [{ input: [], expected: '5' }], ['Itera sobre cada letra y verifica si es vocal.'], 'dificil', 25);
 const b2e22 = exercise('b2-e22', 'Proyecto: Máquina de pedidos', 'Sistema de pedidos por consola con menú, precios y total.', '', 'total = 0\nwhile True:\n    opcion = input()\n    if opcion == "0":\n        break\n    elif opcion == "1":\n        total = total + 10\n    elif opcion == "2":\n        total = total + 15\nprint("Total:", total)', [{ input: ['1', '2', '0'], expected: 'Total: 25' }], ['Usa while True para repetir hasta que el usuario elija salir.'], 'dificil', 30);
 
-const b2q1 = q('¿Qué imprime 5 > 3?', ['True', 'False', '1', '0'], 0, '5 es mayor que 3, así que el resultado es True.');
+const b2q1 = q('¿Qué imprime 5 > 3?', ['False', 'True', '1', '0'], 1, '5 es mayor que 3, así que el resultado es True.');
 const b2q2 = q('¿Qué hace elif?', ['Condición alternativa', 'Bucle infinito', 'Fin del programa', 'Ignora errores'], 0, 'elif evalúa otra condición si el if anterior fue falso.');
-const b2q3 = q('¿Qué imprime range(3)?', ['0,1,2', '1,2,3', '0,1,2,3', '1,2'], 0, 'range(3) genera 0, 1, 2.');
-const b2q4 = q('¿Qué hace break?', ['Detiene el bucle', 'Salta a la siguiente', 'Reinicia el bucle', 'Nada'], 0, 'break detiene el bucle inmediatamente.');
-const b2q5 = q('¿Qué imprime bool(0)?', ['False', 'True', '0', '1'], 0, 'bool(0) es False porque cero es "falsy".');
+const b2q3 = q('¿Qué imprime range(3)?', ['1,2,3', '0,1,2', '0,1,2,3', '1,2'], 1, 'range(3) genera 0, 1, 2.');
+const b2q4 = q('¿Qué hace break?', ['Salta a la siguiente', 'Reinicia el bucle', 'Detiene el bucle', 'Nada'], 2, 'break detiene el bucle inmediatamente.');
+const b2q5 = q('¿Qué imprime bool(0)?', ['True', '0', '1', 'False'], 3, 'bool(0) es False porque cero es "falsy".');
 
 const modulo2 = {
   id: 'module-2',
@@ -93,7 +93,7 @@ const b3e20 = exercise('b3-e20', 'Contar palabras', 'Cuenta cuántas veces apare
 const b3e21 = exercise('b3-e21', 'Lista de tuplas', 'Crea una lista de tuplas con (nombre, precio) de platos.', '', 'platos = [("Paella", 15), ("Tortilla", 10), ("Gazpacho", 8)]\nprint(platos)', [{ input: [], expected: "[('Paella', 15), ('Tortilla', 10), ('Gazpacho', 8)]" }], ['Las listas pueden contener tuplas.'], 'facil', 15);
 const b3e22 = exercise('b3-e22', 'Filtrar lista', 'Crea una nueva lista solo con números mayores a 10.', 'numeros = [5, 12, 8, 20, 3, 15]\n', 'numeros = [5, 12, 8, 20, 3, 15]\nmayores = []\nfor n in numeros:\n    if n > 10:\n        mayores.append(n)\nprint(mayores)', [{ input: [], expected: '[12, 20, 15]' }], ['Usa if dentro del bucle para filtrar.'], 'medio', 20);
 
-const b3q1 = q('¿Qué imprime len([1, 2, 3])?', ['2', '3', '4', '1'], 1, 'len() cuenta los elementos: 3.');
+const b3q1 = q('¿Qué imprime len([1, 2, 3])?', ['2', '4', '1', '3'], 3, 'len() cuenta los elementos: 3.');
 const b3q2 = q('¿Qué es un diccionario?', ['Pares clave-valor', 'Solo números', 'Solo texto', 'Sin orden'], 0, 'Los diccionarios almacenan pares clave-valor.');
 const b3q3 = q('¿Qué hace .append()?', ['Agrega al final de una lista', 'Elimina el último', 'Ordena la lista', 'Copia la lista'], 0, '.append() agrega un elemento al final.');
 
@@ -134,9 +134,9 @@ const b4e18 = exercise('b4-e18', 'Excepción FileNotFound', 'Intenta leer un arc
 const b4e19 = exercise('b4-e19', 'Función anónima lambda', 'Crea una función lambda que sume dos números.', '', 'sumar = lambda a, b: a + b\nprint(sumar(3, 4))', [{ input: [], expected: '7' }], ['lambda crea funciones pequeñas en una línea.'], 'dificil', 25);
 const b4e20 = exercise('b4-e20', 'Decorador simple', 'Crea un decorador que imprima antes y después de una función.', '', 'def mi_decorador(func):\n    def envoltura():\n        print("Antes")\n        func()\n        print("Después")\n    return envoltura\n\n@mi_decorador\ndef decir_hola():\n    print("Hola")\n\ndecir_hola()', [{ input: [], expected: 'Antes\nHola\nDespués' }], ['Los decoradores envuelven funciones.'], 'dificil', 25);
 
-const b4q1 = q('¿Qué hace return?', ['Devuelve un valor', 'Imprime en pantalla', 'Termina el programa', 'Define una variable'], 0, 'return devuelve el resultado de la función.');
-const b4q2 = q('¿Qué hace try/except?', ['Captura errores', 'Define funciones', 'Crea bucles', 'Importa módulos'], 0, 'try/except captura y maneja excepciones.');
-const b4q3 = q('¿Qué es un módulo?', ['Archivo con código Python', 'Una función', 'Una variable', 'Un tipo de dato'], 0, 'Un módulo es un archivo .py con código reutilizable.');
+const b4q1 = q('¿Qué hace return?', ['Imprime en pantalla', 'Devuelve un valor', 'Termina el programa', 'Define una variable'], 1, 'return devuelve el resultado de la función.');
+const b4q2 = q('¿Qué hace try/except?', ['Define funciones', 'Crea bucles', 'Captura errores', 'Importa módulos'], 2, 'try/except captura y maneja excepciones.');
+const b4q3 = q('¿Qué es un módulo?', ['Una función', 'Una variable', 'Un tipo de dato', 'Archivo con código Python'], 3, 'Un módulo es un archivo .py con código reutilizable.');
 
 const modulo4 = {
   id: 'module-4',
@@ -163,8 +163,8 @@ const b5e6 = exercise('b5-e6', 'Escribir y leer archivo', 'Escribe un texto en u
 const b5e7 = exercise('b5-e7', 'Manejo de errores en archivos', 'Intenta leer un archivo inexistente y muestra mensaje amigable.', '', 'try:\n    with open("no_existe.txt", "r") as f:\n        print(f.read())\nexcept FileNotFoundError:\n    print("El archivo no existe")', [{ input: [], expected: 'El archivo no existe' }], ['Usa try/except con FileNotFoundError.'], 'dificil', 25);
 const b5e8 = exercise('b5-e8', 'Proyecto: Restaurante completo', 'Sistema completo con clases, archivos y funciones.', '', 'class Plato:\n    def __init__(self, nombre, precio):\n        self.nombre = nombre\n        self.precio = precio\n\nclass Restaurante:\n    def __init__(self):\n        self.menu = []\n    def agregar(self, plato):\n        self.menu.append(plato)\n    def total(self):\n        return sum(p.precio for p in self.menu)\n\nr = Restaurante()\nr.agregar(Plato("Paella", 15))\nr.agregar(Plato("Tortilla", 10))\nprint("Total:", r.total())', [{ input: [], expected: 'Total: 25' }], ['Conecta clases, métodos y colecciones.'], 'dificil', 30);
 
-const b5q1 = q('¿Qué es una clase?', ['Plantilla para objetos', 'Una función', 'Una variable', 'Un módulo'], 0, 'Una clase define la estructura de los objetos.');
-const b5q2 = q('¿Qué hace __init__?', ['Inicializa el objeto', 'Elimina el objeto', 'Copia el objeto', 'Imprime el objeto'], 0, '__init__ se ejecuta al crear el objeto.');
+const b5q1 = q('¿Qué es una clase?', ['Una función', 'Plantilla para objetos', 'Una variable', 'Un módulo'], 1, 'Una clase define la estructura de los objetos.');
+const b5q2 = q('¿Qué hace __init__?', ['Elimina el objeto', 'Copia el objeto', 'Inicializa el objeto', 'Imprime el objeto'], 2, '__init__ se ejecuta al crear el objeto.');
 const b5q3 = q('¿Qué es self?', ['Se refiere a la instancia', 'Es una palabra reservada', 'Es una función', 'Es una clase'], 0, 'self accede a los atributos del objeto actual.');
 
 const modulo5 = {
