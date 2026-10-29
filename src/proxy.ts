@@ -56,7 +56,7 @@ function applySecurityHeaders(response: NextResponse, csp: string) {
 export async function proxy(request: NextRequest) {
   // Next.js needs this per-response nonce in the incoming request CSP so its
   // framework and inline flight scripts can be authorized without unsafe-inline.
-  const nonce = btoa(crypto.randomUUID());
+  const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
   const csp = createContentSecurityPolicy(nonce);
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-nonce', nonce);
