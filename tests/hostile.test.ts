@@ -25,8 +25,8 @@ test.describe('Seguridad y ejecución real', () => {
       if (!allowed) external.push(url);
     });
 
-    await page.goto('/', { waitUntil: 'networkidle' });
-    await page.goto('/login', { waitUntil: 'networkidle' });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.goto('/login', { waitUntil: 'domcontentloaded' });
     expect(external).toEqual([]);
   });
 
