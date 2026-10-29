@@ -2,7 +2,22 @@
 
 import math
 
-_commands = []
+MAX_TURTLE_COMMANDS = 5000
+
+
+class _TurtleCommandBuffer(list):
+    """Bound drawing memory so accidental loops cannot exhaust browser resources."""
+
+    def append(self, command):
+        if len(self) >= MAX_TURTLE_COMMANDS:
+            raise RuntimeError(
+                f"Se alcanzó el límite de {MAX_TURTLE_COMMANDS} comandos Turtle. "
+                "Reduce las repeticiones y vuelve a ejecutar el programa."
+            )
+        super().append(command)
+
+
+_commands = _TurtleCommandBuffer()
 _turtles = {}
 _current = None
 _screen = None
