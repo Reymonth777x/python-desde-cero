@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { courseModules } from '@/lib/course';
+import { courseModules } from './course';
 
 describe('quiz answer position balance', () => {
   it('does not reveal a reliable correct-answer position pattern', () => {
