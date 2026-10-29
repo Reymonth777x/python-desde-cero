@@ -1,47 +1,40 @@
-# Estado del Proyecto — Ronda 2
+# Estado del proyecto — revisión de entrega para el equipo
 
-## Resumen
-Proyecto "Python desde cero" (https://python-desdecero.com) en reparación y auditoría completa.
+## Estado de publicación
 
-## Rama actual
-- `fix/local-login-searchparams-20261028` (publicada en origin)
-- SHA: 94ff1a3
+- Repositorio: `Reymonth777x/python-desde-cero`.
+- Rama de trabajo: `fix/lider-20261028`.
+- Revisión de integración: [PR #6](https://github.com/Reymonth777x/python-desde-cero/pull/6), dirigida a `master`.
+- **No publicar mientras CI no esté verde.** La última ejecución completa confirmada antes de la corrección CSP pasó las pruebas unitarias, TypeScript, ESLint y build de Next.js, pero falló Playwright con 18 pruebas. Se han agregado correcciones de CSP/hidratación, se ha eliminado el runner iframe obsoleto y se están ejecutando nuevas pruebas. La PR debe permanecer sin fusionar hasta revisar el resultado del commit final.
+- La URL de producción configurada por el workflow es `https://python-desdecero.com`; también existe la URL de respaldo en `workers.dev`. Verificar ambas tras un despliegue real.
 
-## Cambios aplicados en Ronda 2 (FASE 1 COMPLETADA)
-1. Reemplazado `src/app/login/page.tsx` y creado `src/app/login/LoginForm.tsx` desde PR #5 de ChatGPT
-   - Antes: Client Component con `use(searchParams ?? Promise.resolve({}))` — frágil
-   - Después: Server Component con `await searchParams` + `LoginForm` client component separado
-   - `SearchParams` type: `error?: string | string[]`, `message?: string | string[]`
-   - `useFormStatus()` para estados de carga en botones
-   - `aria-live="polite"` en mensajes de error/mensaje
-2. Corregido `src/app/admin/invitaciones/page.tsx`:
-   - `handleCreateInvitation` ahora captura errores de `createInvitation` y redirige con mensaje
-   - `handleDeleteInvitation` ahora captura errores de `deleteInvitation` y redirige con mensaje
-   - Agregado `searchParams` prop para mostrar errores/mensajes desde URL
-   - `listError` renombrado para no colisionar con `params.error`
-3. `.gitignore`: agregado `dev-server.*.log`
-4. `docs/team/` creado con ESTADO.md, DECISIONES.md, AUDITORIA-CHATGPT.md, MIGRACIONES.md
+## Cambios ya aplicados al repo de trabajo
 
-## Verificaciones completadas
-- `npx tsc --noEmit`: 0 errores
-- `npx vitest run`: 22/22 tests pasando
-- Todas las rutas principales responden HTTP 200 en localhost
+- Middleware vuelve a verificar `profiles.is_admin` para rutas `/admin` y conserva la protección de rutas de aprendizaje.
+- El login valida el destino `next`, presenta mensajes accesibles y separa el formulario cliente de la página servidor.
+- El quiz no devuelve puntuación ni explicaciones si falla el RPC.
+- Los datos serializados al navegador omiten respuestas correctas y soluciones.
+- Las invitaciones permiten expiración vacía usando el valor predeterminado de la base y reportan errores comprensibles.
+- Los índices de respuesta se equilibraron; la migración 020 agrega la segunda versión `correct_option_v2` y `submit_quiz_v2` sin modificar la clave que usa el código antiguo.
+- Se reemplazó la CSP estática por CSP con nonce por respuesta y se dejó un tema inicial en HTML servidor; requiere verificación de navegador en CI.
+- Se eliminó el route/worker auxiliar `/python-runner`, que no tenía consumidores en la aplicación actual; Python se ejecuta mediante `public/python-worker.js`.
+- Se agregó guía de incorporación, roles, accesos y publicación para cuatro socios.
 
-## Fase 2 EN CURSO
-- Verificación completa en localhost con Playwright (360px, 768px, 1280px)
-- Flujo de auth completo: registro, confirmación por correo, login, logout, recuperar contraseña, restablecer contraseña, sesión persistente, rutas protegidas
-- Laboratorio de Python: Pyodide, ejecutar código, turtle, input()
-- Guardado de progreso en Supabase
-- Panel admin e invitaciones
+## Verificaciones remotas confirmadas
 
-## Fase 3 pendiente
-- Pruebas automatizadas exhaustivas con Playwright
+- Supabase remoto: `nuqydanbbgqcofcftshk`.
+- Las migraciones 018, 019 y 020 aparecen en el historial remoto.
+- 41 preguntas tienen clave `correct_option_v2`; el RPC v2 está autorizado para `authenticated` y denegado a `anon`.
+- La migración 020 conserva intacta la columna `correct_option` antigua para que la versión anterior pueda seguir funcionando durante la transición.
 
-## Fase 4 pendiente
-- Revisión crítica final
+## Pendientes antes de publicar
 
-## Fase 5 pendiente
-- Reporte final
+1. CI verde del último commit: tests, typecheck, lint, build Next, E2E y build Vinext.
+2. Smoke test de producción del login, recuperación de contraseña, tema, quiz, progreso e invitaciones con cuentas de prueba.
+3. Probar la ejecución Pyodide/Turtle real en navegador y confirmar que el límite de 5.000 comandos detiene programas demasiado gráficos.
+4. Verificar cuál Worker responde por el dominio y confirmar la página después del despliegue.
+5. Revisar las políticas de acceso de los cuatro socios, usar cuentas individuales y nunca compartir secretos del propietario.
 
-## Bloqueos
-- Ninguno por el momento
+## Regla de release
+
+No se afirma que producción está actualizada hasta que el workflow de Cloudflare termine y la comprobación HTTP del dominio sea exitosa. No aplicar migraciones manuales fuera de `supabase/migrations/`.
