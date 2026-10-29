@@ -87,7 +87,7 @@ export default async function LessonPage({ params }: Props) {
   return (
     <LessonStudy
       key={`${courseModule.id}:${lesson.id}:${user.id}`}
-      lesson={toClientLesson(lesson)}
+      lesson={toClientLesson(lesson) as unknown as CourseLesson}
       moduleId={courseModule.id}
       moduleNumber={courseModule.number}
       moduleTitle={courseModule.title}
