@@ -79,7 +79,7 @@ export async function submitQuiz(
     return { ...EMPTY_RESULT, total, error: 'Número de respuestas incorrecto' };
   }
 
-  const { data: rpcResult, error: rpcError } = await supabase.rpc('submit_quiz', {
+  const { data: rpcResult, error: rpcError } = await supabase.rpc('submit_quiz_v2', {
     p_module_id: moduleId,
     p_lesson_id: lessonId,
     p_answers: answers,
