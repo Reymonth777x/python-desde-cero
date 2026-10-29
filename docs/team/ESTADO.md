@@ -10,7 +10,7 @@
 
 ## Cambios ya aplicados al repo de trabajo
 
-- Middleware vuelve a verificar `profiles.is_admin` para rutas `/admin` y conserva la protección de rutas de aprendizaje.
+- Proxy vuelve a verificar `profiles.is_admin` para rutas `/admin` y conserva la protección de rutas de aprendizaje.
 - El login valida el destino `next`, presenta mensajes accesibles y separa el formulario cliente de la página servidor.
 - El quiz no devuelve puntuación ni explicaciones si falla el RPC.
 - Los datos serializados al navegador omiten respuestas correctas y soluciones.
@@ -38,3 +38,7 @@
 ## Regla de release
 
 No se afirma que producción está actualizada hasta que el workflow de Cloudflare termine y la comprobación HTTP del dominio sea exitosa. No aplicar migraciones manuales fuera de `supabase/migrations/`.
+
+
+## Última revisión técnica
+- Se sustituyó la entrada `src/middleware.ts` por `src/proxy.ts`, según la convención de Next.js 16. El CI debe confirmar que los scripts HTML reciben nonce no vacío y que la interfaz hidrata antes de abrir la PR para revisión.
