@@ -20,7 +20,8 @@
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:originality": "node scripts/check-originality.mjs",
     "verify": "node scripts/check-encoding.mjs",
-    "check:dead-controls": "node scripts/check-dead-controls.mjs"
+    "check:dead-controls": "node scripts/check-dead-controls.mjs",
+    "check:release": "npm run verify && npm test && npm run typecheck && npm run lint && npm run build && npm run test:e2e && npm run build:vinext"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
