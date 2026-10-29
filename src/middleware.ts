@@ -1,81 +1,70 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
-    request,
-  });
+const LEARNING_PREFIXES = ['/practica', '/academia', '/estudiante', '/docente'];
 
+function matchesPrefix(pathname: string, prefix: string) {
+  return pathname === prefix || pathname.startsWith(`${prefix}/`);
+}
+
+export async function middleware(request: NextRequest) {
+  let response = NextResponse.next({ request });
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
+        getAll() { return request.cookies.getAll(); },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => {
-            request.cookies.set(name, value);
-          });
-
-          response = NextResponse.next({
-            request,
-          });
-
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
-          });
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          response = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
         },
       },
-    }
+    },
   );
+
+  const redirectTo = (url: URL) => {
+    const redirect = NextResponse.redirect(url);
+    response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie));
+    return redirect;
+  };
 
   const { data, error } = await supabase.auth.getClaims();
   const claims = data && !error ? data.claims : null;
+  const { pathname, search } = request.nextUrl;
+  const isGuestOnlyPage = pathname === '/login' || pathname === '/login/forgot-password';
 
-  const pathname = request.nextUrl.pathname;
-
-  // Rutas protegidas que requieren autenticación
-  const isAuthPage = pathname === '/login' || pathname.startsWith('/login/');
-  const isAuthCallback = pathname === '/auth/callback' || pathname.startsWith('/auth/callback/');
-
-  // Rutas protegidas de aprendizaje (requieren autenticación)
-  const isProtectedLearningPage =
-    pathname === '/practica' ||
-    pathname.startsWith('/practica/') ||
-    pathname === '/academia' ||
-    pathname.startsWith('/academia/') ||
-    pathname === '/estudiante' ||
-    pathname.startsWith('/estudiante/') ||
-    pathname === '/docente' ||
-    pathname.startsWith('/docente/');
-
-  // Rutas de admin (requieren rol admin)
-  const isAdminRoute = pathname === '/admin' || pathname.startsWith('/admin/');
-
-  // Redirigir usuarios autenticados fuera de login
-  if (claims && (isAuthPage || isAuthCallback)) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = '/estudiante';
-    redirectUrl.search = '';
-    return NextResponse.redirect(redirectUrl);
+  if (claims && isGuestOnlyPage) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/estudiante';
+    url.search = '';
+    return redirectTo(url);
   }
 
-  // Proteger rutas de aprendizaje: requieren autenticación
-  if (!claims && isProtectedLearningPage) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = '/login';
-    redirectUrl.search = '';
-    return NextResponse.redirect(redirectUrl);
+  const isLearningRoute = LEARNING_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix));
+  const isAdminRoute = matchesPrefix(pathname, '/admin');
+
+  if (!claims && (isLearningRoute || isAdminRoute)) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/login';
+    url.search = `?next=${encodeURIComponent(pathname + search)}`;
+    return redirectTo(url);
   }
 
-  // Proteger rutas de admin: requieren autenticación (verificación de rol completa en cada página)
-  if (isAdminRoute && !claims) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = '/login';
-    redirectUrl.search = '';
-    return NextResponse.redirect(redirectUrl);
+  if (claims && isAdminRoute) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', claims.sub)
+      .maybeSingle();
+
+    if (profile?.is_admin !== true) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/estudiante';
+      url.search = '';
+      return redirectTo(url);
+    }
   }
 
   return response;
