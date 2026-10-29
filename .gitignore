@@ -26,7 +26,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# local env files
+# Local/private environment files; keep only the safe template under version control
+.env
+.env.*
+!.env.example
 .env*.local
 
 # vercel
