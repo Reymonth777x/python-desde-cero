@@ -125,7 +125,7 @@ export default function LessonStudy({
 
       if (serverResult.passed) {
         setCompleted(true);
-        setSavedScore(Math.max(initialScore, serverResult.score));
+        setSavedScore(Math.max(savedScore, serverResult.score));
         setFeedback('Evaluación aprobada y progreso guardado en tu cuenta.');
       } else {
         setFeedback('Aún no alcanzas el puntaje necesario. Revisa la retroalimentación y vuelve a intentarlo.');
