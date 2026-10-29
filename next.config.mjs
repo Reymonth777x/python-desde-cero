@@ -8,30 +8,7 @@ const supabaseConnect = supabaseHost
   ? [`https://${supabaseHost}`, `wss://${supabaseHost}`]
   : [];
 
-// CSP completa. En desarrollo usa Report-Only para recoger violaciones;
-// en producción usa enforce.
-const cspDirectives = [
-  "default-src 'self'",
-  // wasm-unsafe-eval es específico para WebAssembly (Pyodide). 'unsafe-eval' eliminado por seguridad.
-  "script-src 'self' 'wasm-unsafe-eval' https://challenges.cloudflare.com",
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: https:",
-  "font-src 'self'",
-  `connect-src 'self' ${supabaseConnect.join(' ')}`,
-  "worker-src 'self' blob:",
-  "frame-src 'self' https://challenges.cloudflare.com",
-  "object-src 'none'",
-  "base-uri 'self'",
-  // Permite iframe del runner de Python mismo origen (aislado por sandbox y postMessage).
-  "frame-ancestors 'self'",
-  "report-uri /api/csp-report",
-].join('; ');
-
 const securityHeaders = [
-  {
-    key: isProd ? 'Content-Security-Policy' : 'Content-Security-Policy-Report-Only',
-    value: cspDirectives,
-  },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   // Permite iframe same-origin para el runner aislado de Python.
   { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
