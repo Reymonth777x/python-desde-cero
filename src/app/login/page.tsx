@@ -1,8 +1,10 @@
 import LoginForm from './LoginForm';
+import { safeNext } from '@/lib/safe-next';
 
 type SearchParams = {
   error?: string | string[];
   message?: string | string[];
+  next?: string | string[];
 };
 
 type Props = {
@@ -33,6 +35,7 @@ export default async function LoginPage({ searchParams }: Props) {
   const params = await searchParams;
   const errorCode = firstParam(params.error);
   const messageCode = firstParam(params.message);
+  const next = safeNext(firstParam(params.next), '');
 
   const error = errorCode
     ? Object.prototype.hasOwnProperty.call(errorMessages, errorCode)
@@ -44,5 +47,5 @@ export default async function LoginPage({ searchParams }: Props) {
       ? statusMessages[messageCode]
       : undefined;
 
-  return <LoginForm error={error} message={message} />;
+  return <LoginForm error={error} message={message} next={next} />;
 }

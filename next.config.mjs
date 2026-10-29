@@ -18,7 +18,7 @@ const cspDirectives = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https:",
   "font-src 'self'",
-  `connect-src 'self' ${supabaseConnect.join(' ')}`,
+  `connect-src 'self' https://challenges.cloudflare.com ${supabaseConnect.join(' ')}`,
   "worker-src 'self' blob:",
   "frame-src 'self' https://challenges.cloudflare.com",
   "object-src 'none'",

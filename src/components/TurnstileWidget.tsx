@@ -14,6 +14,7 @@ export function TurnstileWidget({
   const widgetRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [loadError, setLoadError] = useState(false);
   const [isReady, setIsReady] = useState(() => {
     if (typeof window === 'undefined') return false;
     return !!window.turnstile;
@@ -27,7 +28,16 @@ export function TurnstileWidget({
         'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
       script.async = true;
       script.defer = true;
-      script.onload = () => setIsReady(true);
+      script.dataset.turnstileScript = 'true';
+      // The production CSP may use strict-dynamic; dynamically-created scripts
+      // must carry the request nonce to be trusted by the browser.
+      const nonce = document.querySelector<HTMLScriptElement>('script[nonce]')?.nonce;
+      if (nonce) script.nonce = nonce;
+      script.onload = () => {
+        setLoadError(false);
+        setIsReady(true);
+      };
+      script.onerror = () => setLoadError(true);
       document.head.appendChild(script);
     }
   }, []);
@@ -82,6 +92,11 @@ export function TurnstileWidget({
 
   return (
     <>
+      {loadError && (
+        <p role="alert" className="text-sm text-[var(--theme-error)]">
+          No se pudo cargar la verificación de seguridad. Recarga la página y vuelve a intentarlo.
+        </p>
+      )}
       <div ref={containerRef} />
       <input
         ref={inputRef}

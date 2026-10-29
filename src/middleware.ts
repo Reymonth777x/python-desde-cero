@@ -1,10 +1,33 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { safeNext } from '@/lib/safe-next';
+
+const LEARNING_PREFIXES = ['/practica', '/academia', '/estudiante', '/docente'];
+
+function matchesPrefix(pathname: string, prefix: string) {
+  return pathname === prefix || pathname.startsWith(prefix + '/');
+}
+
+function redirectWithRefreshedCookies(source: NextResponse, destination: URL) {
+  const redirectResponse = NextResponse.redirect(destination);
+
+  // A redirect is a new response. Copy every refreshed Supabase cookie,
+  // including its security options, or the browser can lose the new session.
+  source.cookies.getAll().forEach((cookie) => {
+    redirectResponse.cookies.set(cookie);
+  });
+
+  // Preserve the cache protections Supabase SSR supplies during token refresh.
+  for (const header of ['cache-control', 'expires', 'pragma']) {
+    const value = source.headers.get(header);
+    if (value) redirectResponse.headers.set(header, value);
+  }
+
+  return redirectResponse;
+}
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
-    request,
-  });
+  let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,75 +37,75 @@ export async function middleware(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet, headers) {
           cookiesToSet.forEach(({ name, value }) => {
             request.cookies.set(name, value);
           });
 
-          response = NextResponse.next({
-            request,
-          });
+          response = NextResponse.next({ request });
 
           cookiesToSet.forEach(({ name, value, options }) => {
             response.cookies.set(name, value, options);
           });
+
+          Object.entries(headers ?? {}).forEach(([name, value]) => {
+            if (typeof value === 'string') response.headers.set(name, value);
+          });
         },
       },
-    }
+    },
   );
 
   const { data, error } = await supabase.auth.getClaims();
   const claims = data && !error ? data.claims : null;
+  const { pathname, search } = request.nextUrl;
 
-  const pathname = request.nextUrl.pathname;
+  // Only the login screen and the "forgot password" screen are guest-only.
+  // The callback and reset-password routes must remain reachable to complete
+  // Supabase PKCE flows, even when a stale session cookie is present.
+  const isGuestOnlyPage =
+    pathname === '/login' || pathname === '/login/forgot-password';
 
-  // Rutas protegidas que requieren autenticación
-  const isAuthPage = pathname === '/login' || pathname.startsWith('/login/');
-  const isAuthCallback = pathname === '/auth/callback' || pathname.startsWith('/auth/callback/');
-
-  // Rutas protegidas de aprendizaje (requieren autenticación)
-  const isProtectedLearningPage =
-    pathname === '/practica' ||
-    pathname.startsWith('/practica/') ||
-    pathname === '/academia' ||
-    pathname.startsWith('/academia/') ||
-    pathname === '/estudiante' ||
-    pathname.startsWith('/estudiante/') ||
-    pathname === '/docente' ||
-    pathname.startsWith('/docente/');
-
-  // Rutas de admin (requieren rol admin)
-  const isAdminRoute = pathname === '/admin' || pathname.startsWith('/admin/');
-
-  // Redirigir usuarios autenticados fuera de login
-  if (claims && (isAuthPage || isAuthCallback)) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = '/estudiante';
-    redirectUrl.search = '';
-    return NextResponse.redirect(redirectUrl);
+  if (claims && isGuestOnlyPage) {
+    const destinationPath = safeNext(
+      request.nextUrl.searchParams.get('next'),
+      '/estudiante',
+    );
+    return redirectWithRefreshedCookies(
+      response,
+      new URL(destinationPath, request.url),
+    );
   }
 
-  // Proteger rutas de aprendizaje: requieren autenticación
-  if (!claims && isProtectedLearningPage) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = '/login';
-    redirectUrl.search = '';
-    return NextResponse.redirect(redirectUrl);
+  const isLearningRoute = LEARNING_PREFIXES.some((prefix) =>
+    matchesPrefix(pathname, prefix),
+  );
+  const isAdminRoute = matchesPrefix(pathname, '/admin');
+
+  if (!claims && (isLearningRoute || isAdminRoute)) {
+    const destination = request.nextUrl.clone();
+    destination.pathname = '/login';
+    destination.search = '';
+    // URLSearchParams encodes the path and query as one parameter. The login
+    // Server Action validates it again with safeNext before redirecting.
+    destination.searchParams.set('next', pathname + search);
+    return redirectWithRefreshedCookies(response, destination);
   }
 
-  // Proteger rutas de admin: requieren autenticación + rol admin
-  if (isAdminRoute) {
-    if (!claims) {
-      const redirectUrl = request.nextUrl.clone();
-      redirectUrl.pathname = '/login';
-      redirectUrl.search = '';
-      return NextResponse.redirect(redirectUrl);
-    }
+  if (claims && isAdminRoute) {
+    // Supabase's JWT "role" is normally "authenticated"; admin authorization
+    // must come from the server-controlled profile, not that claim.
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', claims.sub)
+      .maybeSingle();
 
-    // Verificar rol de admin en los claims de JWT
-    const userRole = claims.role || claims['role'];
-    if (userRole !== 'admin' && userRole !== 'administrador') {
-      return NextResponse.redirect(new URL('/estudiante', request.url));
+    if (profileError || profile?.is_admin !== true) {
+      return redirectWithRefreshedCookies(
+        response,
+        new URL('/estudiante', request.url),
+      );
     }
   }
 

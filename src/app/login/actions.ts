@@ -4,14 +4,20 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { resolveAuthCallbackUrl } from '@/lib/auth-callback-url';
 import { createClient } from '@/lib/supabase/server';
+import { safeNext } from '@/lib/safe-next';
 
 export async function login(formData: FormData) {
   const email = String(formData.get('email') ?? '').trim();
   const password = String(formData.get('password') ?? '');
   const captchaToken = String(formData.get('captchaToken') ?? '');
+  const next = safeNext(formData.get('next'), '/academia');
 
   if (!email || !password) {
     redirect('/login?error=missing');
+  }
+
+  if (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !captchaToken) {
+    redirect('/login?error=captcha');
   }
 
   const supabase = await createClient();
@@ -25,11 +31,12 @@ export async function login(formData: FormData) {
   });
 
   if (error) {
-    redirect('/login?error=login');
+    const errorCode = typeof error.code === 'string' ? error.code : '';
+    redirect(errorCode.toLowerCase().includes('captcha') ? '/login?error=captcha' : '/login?error=login');
   }
 
   revalidatePath('/', 'layout');
-  redirect('/academia');
+  redirect(next);
 }
 
 export async function logout() {
@@ -91,7 +98,7 @@ export async function signup(formData: FormData) {
 
   if (data.session) {
     revalidatePath('/', 'layout');
-    redirect('/academia');
+    redirect(safeNext(formData.get('next'), '/academia'));
   }
 
   redirect('/login?message=check-email');

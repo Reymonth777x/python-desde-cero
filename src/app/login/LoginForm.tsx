@@ -9,6 +9,7 @@ import { signup, login } from './actions';
 type Props = {
   error?: string;
   message?: string;
+  next?: string;
 };
 
 function SubmitButton({
@@ -35,16 +36,13 @@ function SubmitButton({
 const inputStyle =
   'mt-2 min-h-12 w-full border border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 py-3 text-base text-[var(--theme-ink)] outline-none focus:border-[var(--theme-accent)] focus:ring-1 focus:ring-[var(--theme-focus-ring)]';
 
-export default function LoginForm({ error, message }: Props) {
+export default function LoginForm({ error, message, next = '' }: Props) {
   const [isSignup, setIsSignup] = useState(false);
 
-  const btnClass = isSignup
-    ? 'border-[var(--theme-accent)] text-[var(--theme-accent)]'
-    : 'border-transparent text-[var(--theme-muted)]';
-
-  const signupBtnClass = isSignup
-    ? 'border-[var(--theme-accent)] text-[var(--theme-accent)]'
-    : 'border-transparent text-[var(--theme-muted)]';
+  const activeTabClass = 'border-[var(--theme-accent)] text-[var(--theme-accent)]';
+  const idleTabClass = 'border-transparent text-[var(--theme-muted)]';
+  const loginTabClass = isSignup ? idleTabClass : activeTabClass;
+  const signupTabClass = isSignup ? activeTabClass : idleTabClass;
 
   return (
     <main className="min-h-screen bg-[var(--theme-bg)] text-[var(--theme-ink)]">
@@ -73,11 +71,12 @@ export default function LoginForm({ error, message }: Props) {
           )}
           <div className="mt-8">
             <div className="flex -mx-1">
-              <button type="button" onClick={() => setIsSignup(false)} aria-pressed={!isSignup} className={["flex-1 py-3 text-sm font-semibold transition-colors border-b-2", btnClass].join(" ")}>Iniciar sesión</button>
-              <button type="button" onClick={() => setIsSignup(true)} aria-pressed={isSignup} className={["flex-1 py-3 text-sm font-semibold transition-colors border-b-2", signupBtnClass].join(" ")}>Crear cuenta</button>
+              <button type="button" onClick={() => setIsSignup(false)} aria-pressed={!isSignup} className={["flex-1 py-3 text-sm font-semibold transition-colors border-b-2", loginTabClass].join(" ")}>Entrar</button>
+              <button type="button" onClick={() => setIsSignup(true)} aria-pressed={isSignup} className={["flex-1 py-3 text-sm font-semibold transition-colors border-b-2", signupTabClass].join(" ")}>Crear cuenta</button>
             </div>
             {isSignup ? (
               <form action={signup} className="mt-6 space-y-4">
+                <input type="hidden" name="next" value={next} />
                 <div>
                   <label htmlFor="full-name" className="text-sm font-semibold">Nombre completo</label>
                   <input id="full-name" name="full_name" type="text" autoComplete="name" maxLength={100} required className={inputStyle} />
@@ -98,6 +97,7 @@ export default function LoginForm({ error, message }: Props) {
               </form>
             ) : (
               <form action={login} className="mt-6 space-y-4">
+                <input type="hidden" name="next" value={next} />
                 <div>
                   <label htmlFor="login-email" className="text-sm font-semibold">Correo electrónico</label>
                   <input id="login-email" name="email" type="email" autoComplete="email" required className={inputStyle} />
@@ -109,7 +109,7 @@ export default function LoginForm({ error, message }: Props) {
                 {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
                   <TurnstileWidget siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onReset={() => {}} />
                 )}
-                <SubmitButton pendingText="Iniciando sesión...">Iniciar sesión</SubmitButton>
+                <SubmitButton pendingText="Entrando...">Continuar</SubmitButton>
               </form>
             )}
           </div>
