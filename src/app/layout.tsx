@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import "./themes.css";
 import { ThemeProvider } from "./theme-provider";
+import { headers } from "next/headers";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -51,13 +52,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Reading request headers makes nonce-bearing pages render per request.
+  await headers();
+
   return (
-    <html lang="es">
+    <html lang="es" data-theme="original" data-color-scheme="original">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
