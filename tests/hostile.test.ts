@@ -57,7 +57,7 @@ async function setupRunner(page: Page): Promise<RunnerHarness> {
         const ifrs = document.querySelectorAll('iframe[src="/python-runner"]');
         const ifr = ifrs[ifrs.length - 1] as HTMLIFrameElement | null;
         if (ifr?.contentWindow) {
-          ifr.contentWindow.postMessage({ type: 'run', code: c, input: i }, window.location.origin);
+          ifr.contentWindow.postMessage({ type: 'run', code: c, input: i }, '*');
         }
       },
       { c: code, i: input },
