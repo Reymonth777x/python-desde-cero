@@ -34,6 +34,7 @@ interface RunnerHarness {
 }
 
 async function setupRunner(page: Page): Promise<RunnerHarness> {
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
   const msgs: unknown[] = [];
   await page.exposeFunction('collect', (m: unknown) => msgs.push(m));
   await page.exposeFunction('getMsgs', () => msgs);
