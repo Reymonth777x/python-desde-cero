@@ -30,10 +30,10 @@ function createContentSecurityPolicy(nonce: string) {
     "font-src 'self'",
     `connect-src ${connectSources.join(' ')}`,
     "worker-src 'self' blob:",
-    "frame-src 'self' https://challenges.cloudflare.com",
+    "frame-src https://challenges.cloudflare.com",
     "object-src 'none'",
     "base-uri 'self'",
-    "frame-ancestors 'self'",
+    "frame-ancestors 'none'",
     "report-uri /api/csp-report",
   ].join('; ');
 }
@@ -41,7 +41,7 @@ function createContentSecurityPolicy(nonce: string) {
 function applySecurityHeaders(response: NextResponse, csp: string) {
   response.headers.set('Content-Security-Policy', csp);
   response.headers.set('X-Content-Type-Options', 'nosniff');
-  response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+  response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
   if (process.env.NODE_ENV === 'production') {
