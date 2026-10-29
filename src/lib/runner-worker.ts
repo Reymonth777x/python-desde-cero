@@ -3,18 +3,17 @@ type RunnerMessage =
   | { type: 'init' }
   | { type: 'terminate' };
 
+// Shape returned by public/python-worker.js.
 type RunnerResponse =
   | { status: 'ready' }
   | { status: 'init-error'; error: string }
   | {
-      status: 'result';
-      id: number;
-      resultStatus: 'success' | 'error';
+      status: 'success' | 'error';
+      id?: number;
       output?: string;
       error?: string;
       turtle_commands?: unknown;
-    }
-  | { status: 'error'; id: number; error: string };
+    };
 
 // El Web Worker solo existe en el navegador. Se crea al importar el módulo
 // (API imperativa del navegador, fuera del ciclo de render de React) para que
