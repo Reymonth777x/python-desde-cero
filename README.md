@@ -33,7 +33,7 @@ The platform is organized into modules and lessons, each with learning objective
 | Backend / Auth / Database | Supabase (Auth, PostgreSQL, RLS) |
 | Code editor | Monaco Editor (`@monaco-editor/react`) |
 | Python execution | Pyodide in a Web Worker (`public/python-worker.js`) |
-| State management | Zustand |
+| State management | React hooks and local component state |
 | Testing | Vitest |
 | Deployment target | Cloudflare Workers (Vinext) |
 
