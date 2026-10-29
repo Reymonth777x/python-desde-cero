@@ -33,6 +33,9 @@ describe('quiz answer-key drift detection', () => {
       'utf8',
     );
     const actual = keysFromBalanceMigration(sql);
+    expect(sql).toContain('SET correct_option_v2 = mapping.correct_option_v2');
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION public.submit_quiz_v2');
+    expect(sql).not.toContain('SET correct_option = mapping.correct_option');
     expect(actual).toHaveLength(expected.length);
     expect(actual).toEqual(expected);
   });
