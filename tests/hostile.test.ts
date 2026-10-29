@@ -45,7 +45,8 @@ async function setupRunner(page: Page): Promise<RunnerHarness> {
   });
   await page.evaluate(() => new Promise<void>((res) => {
     const h = (e: MessageEvent) => {
-      if (e.source !== document.querySelector('iframe[src="/python-runner"]')?.contentWindow) return;
+      const runnerFrame = document.querySelector('iframe[src="/python-runner"]') as HTMLIFrameElement | null;
+      if (e.source !== runnerFrame?.contentWindow) return;
       if (e.data?.status === 'ready' || e.data?.type === 'ready') {
         window.removeEventListener('message', h);
         res();
