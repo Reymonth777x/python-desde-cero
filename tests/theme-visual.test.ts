@@ -7,10 +7,11 @@ test.describe("Temas visuales — cada página × cada tema", () => {
   for (const theme of themes) {
     for (const route of routes) {
       test(`${route} en tema ${theme}`, async ({ page }) => {
-        await page.goto(route);
-        await page.evaluate((t) => {
-          document.documentElement.setAttribute("data-theme", t);
+        await page.addInitScript((selectedTheme) => {
+          localStorage.setItem("python-desde-cero-theme", selectedTheme);
         }, theme);
+        await page.goto(route);
+        await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
 
         // Esperar a que se apliquen los estilos
         await page.waitForTimeout(300);
@@ -46,11 +47,11 @@ test.describe("Temas visuales — cada página × cada tema", () => {
 test("Cada tema produce colores de fondo distintos", async ({ page }) => {
   const backgrounds: Record<string, string> = {};
   for (const theme of themes) {
-    await page.goto("/");
-    await page.evaluate((t) => {
-      document.documentElement.setAttribute("data-theme", t);
+    await page.addInitScript((selectedTheme) => {
+      localStorage.setItem("python-desde-cero-theme", selectedTheme);
     }, theme);
-    await page.waitForTimeout(300);
+    await page.goto("/");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
     backgrounds[theme] = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
   }
 
@@ -61,11 +62,11 @@ test("Cada tema produce colores de fondo distintos", async ({ page }) => {
 test("Cada tema produce colores de texto distintos", async ({ page }) => {
   const colors: Record<string, string> = {};
   for (const theme of themes) {
-    await page.goto("/");
-    await page.evaluate((t) => {
-      document.documentElement.setAttribute("data-theme", t);
+    await page.addInitScript((selectedTheme) => {
+      localStorage.setItem("python-desde-cero-theme", selectedTheme);
     }, theme);
-    await page.waitForTimeout(300);
+    await page.goto("/");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
     colors[theme] = await page.evaluate(() => getComputedStyle(document.body).color);
   }
 

@@ -50,7 +50,7 @@ function resolverTemaSistema(): 'original' | 'dark' {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeName>(leerTemaGuardado);
+  const [theme, setThemeState] = useState<ThemeName>('sistema');
 
   const resolvedTheme = useMemo(() => {
     if (theme === 'sistema') return resolverTemaSistema();
@@ -64,6 +64,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     } catch {
       // Silently ignore if localStorage is unavailable
     }
+  }, []);
+
+  useEffect(() => {
+    // Read localStorage after hydration to keep the server and client initial render identical.
+    setThemeState(leerTemaGuardado());
   }, []);
 
   useEffect(() => {
