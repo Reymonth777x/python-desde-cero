@@ -39,7 +39,10 @@ function createContentSecurityPolicy(nonce: string) {
 }
 
 function applySecurityHeaders(response: NextResponse, csp: string) {
-  response.headers.set('Content-Security-Policy', csp);
+  const cspHeader = process.env.NODE_ENV === 'production'
+    ? 'Content-Security-Policy'
+    : 'Content-Security-Policy-Report-Only';
+  response.headers.set(cspHeader, csp);
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
