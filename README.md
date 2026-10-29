@@ -2,7 +2,9 @@
 
 A self-paced educational platform for learning Python programming from scratch, with an in-browser code editor, guided lessons, quizzes, and student progress tracking.
 
-**Live application:** https://python-desde-cero.pythondesdecero.workers.dev
+**Production domain:** https://python-desdecero.com
+
+The `workers.dev` address is the Cloudflare fallback; confirm the custom domain after each production release.
 
 ## Overview
 
@@ -46,7 +48,7 @@ The application follows Next.js App Router conventions:
 
 ## Requirements
 
-- Node.js 20.9 or later
+- Node.js 24 (same major as CI)
 - npm (dependencies are locked in `package-lock.json`)
 - A Supabase project with Auth and PostgreSQL enabled
 
@@ -55,7 +57,7 @@ The application follows Next.js App Router conventions:
 1. Clone the repository and install dependencies:
 
 ```bash
-npm install
+npm ci
 ```
 
 2. Create a `.env.local` file in the project root with the following variables (values are **never** committed to Git):
@@ -73,6 +75,12 @@ npm run dev
 ```
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Contributing as a team
+
+This project is prepared for four individual contributors. Read [the four-partner onboarding guide](docs/team/GUIA-INICIO-4-SOCIOS.md) before changing production code. Each person uses their own GitHub account; never share passwords, personal tokens, service-role keys, or `.env.local`.
+
+Production deployments are gated by successful CI on `master`. Do not merge a pull request while any required check is failing. Canonical database migrations live under `supabase/migrations/`; reconcile the remote migration history before applying pending SQL.
 
 ## Available Scripts
 
