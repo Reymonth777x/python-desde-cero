@@ -43,7 +43,7 @@ The application follows Next.js App Router conventions:
 
 - **Server-side**: Supabase server client (`@supabase/ssr` with `server-only`) for Auth and database operations in Server Components and Server Actions
 - **Client-side**: Supabase browser client for interactive components; Monaco Editor and Pyodide Worker for Python execution
-- **Middleware**: Next.js middleware verifies Supabase session claims and redirects unauthenticated users from protected learning pages
+- **Proxy (`src/proxy.ts`)**: Next.js 16 verifies session claims, applies admin authorization to `/admin`, and generates a per-request CSP nonce
 - **Database**: `profiles`, `invitations`, and `progress` tables with RLS policies enforcing user-level row isolation
 
 ## Requirements
@@ -92,6 +92,7 @@ Production deployments are gated by successful CI on `master`. Do not merge a pu
 | `npm test` | Run Vitest unit tests |
 | `npm run typecheck` | Run TypeScript type checking |
 | `npm run lint` | Run ESLint |
+| `npm run check:release` | Run the complete local release verification sequence |
 
 ## Authentication and Supabase
 
