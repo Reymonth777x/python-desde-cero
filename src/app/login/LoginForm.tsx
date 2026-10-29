@@ -109,7 +109,7 @@ export default function LoginForm({ error, message, next = '' }: Props) {
                   <p className="mt-2 text-xs text-[var(--theme-muted)]">Mínimo 8 caracteres.</p>
                 </div>
                 {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-                  <TurnstileWidget siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onReset={() => {}} />
+                  <TurnstileWidget siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} />
                 )}
                 <SubmitButton pendingText="Creando cuenta...">Crear cuenta</SubmitButton>
               </form>
@@ -125,7 +125,7 @@ export default function LoginForm({ error, message, next = '' }: Props) {
                   <input id="login-password" name="password" type="password" autoComplete="current-password" required className={inputStyle} />
                 </div>
                 {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-                  <TurnstileWidget siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} onReset={() => {}} />
+                  <TurnstileWidget siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} />
                 )}
                 <SubmitButton pendingText="Entrando...">Continuar</SubmitButton>
               </form>
