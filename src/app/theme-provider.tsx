@@ -7,6 +7,7 @@ import {
   useEffect,
   useMemo,
   useSyncExternalStore,
+  useState,
 } from 'react';
 
 export type ThemeName =
@@ -74,11 +75,16 @@ function resolveSystemTheme(): 'original' | 'dark' {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const theme = useSyncExternalStore(
+  const persistedTheme = useSyncExternalStore(
     subscribeToTheme,
     readStoredTheme,
     getServerThemeSnapshot,
   );
+  // Keep an immediate in-memory selection as well as the persisted snapshot.
+  // This makes a click update the UI synchronously; the subscription remains
+  // responsible for re-reading a saved theme on reload and across browser tabs.
+  const [themeOverride, setThemeOverride] = useState<ThemeName | null>(null);
+  const theme = themeOverride ?? persistedTheme;
 
   const resolvedTheme = useMemo(() => {
     if (theme === 'sistema') return resolveSystemTheme();
@@ -86,6 +92,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [theme]);
 
   const setTheme = useCallback((next: ThemeName) => {
+    setThemeOverride(next);
     try {
       window.localStorage.setItem(THEME_KEY, next);
     } catch {
