@@ -44,28 +44,35 @@ async function setupRunner(page: Page): Promise<RunnerHarness> {
     });
   });
   await page.evaluate(() => new Promise<void>((res) => {
+    const ifr = document.createElement('iframe');
+    ifr.src = '/python-runner';
+    ifr.setAttribute('sandbox', 'allow-scripts');
+    ifr.style.display = 'none';
+
+    const sendInit = () => {
+      // Sandbox without allow-same-origin has an opaque origin; wildcard is
+      // required for delivery. The runner validates event.source and event.origin.
+      ifr.contentWindow?.postMessage({ type: 'init' }, '*');
+    };
+
     const h = (e: MessageEvent) => {
-      const runnerFrame = document.querySelector('iframe[src="/python-runner"]') as HTMLIFrameElement | null;
-      if (e.source !== runnerFrame?.contentWindow) return;
-      if (e.data?.status === 'ready' || e.data?.type === 'ready') {
+      if (e.source !== ifr.contentWindow) return;
+      if (e.data?.status === 'ready' || e.data?.status === 'init-error' || e.data?.type === 'ready') {
+        window.clearInterval(initInterval);
         window.removeEventListener('message', h);
         res();
       }
     };
     window.addEventListener('message', h);
 
-    const ifr = document.createElement('iframe');
-    ifr.src = '/python-runner';
-    ifr.setAttribute('sandbox', 'allow-scripts');
-    ifr.style.display = 'none';
-    ifr.addEventListener('load', () => {
-      // Sandbox without allow-same-origin has an opaque origin; wildcard is
-      // required for delivery. The runner validates event.source and event.origin.
-      ifr.contentWindow?.postMessage({ type: 'init' }, '*');
-    }, { once: true });
+    // The route may hydrate after iframe load. Retry the harmless init handshake
+    // until the runner responds or the outer timeout expires.
+    const initInterval = window.setInterval(sendInit, 100);
+    ifr.addEventListener('load', sendInit, { once: true });
     document.body.appendChild(ifr);
 
     setTimeout(() => {
+      window.clearInterval(initInterval);
       window.removeEventListener('message', h);
       res();
     }, 20000);
