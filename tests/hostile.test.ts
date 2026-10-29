@@ -10,7 +10,12 @@ test.describe('Seguridad y ejecución real', () => {
     expect(scriptPolicy).toContain("'nonce-");
     expect(scriptPolicy.split(/\s+/)).not.toContain("'unsafe-inline'");
     expect(scriptPolicy.split(/\s+/)).not.toContain("'unsafe-eval'");
-    await expect(page.locator('script[nonce]').first()).toHaveAttribute('nonce', /.+/);
+    const scriptNonce = await page.locator('script[nonce]').first().evaluate(
+      (element) => (element as HTMLScriptElement).nonce,
+    );
+    const policyNonce = scriptPolicy.match(/'nonce-([^']+)'/)?.[1];
+    expect(policyNonce).toBeTruthy();
+    expect(scriptNonce).toBe(policyNonce);
   });
 
   test('la aplicación no solicita recursos externos no autorizados', async ({ page }) => {

@@ -45,7 +45,7 @@ export default function PortadaLab({
   }, []);
 
   return (
-    <div id="ejemplo" className="border border-[var(--theme-border)] rounded-lg bg-[var(--theme-bg-secondary)] overflow-hidden">
+    <div className="border border-[var(--theme-border)] rounded-lg bg-[var(--theme-bg-secondary)] overflow-hidden">
       <div className="flex items-center justify-between border-b border-[var(--theme-border)] bg-[var(--theme-accent-light)] px-4 py-3">
         <div className="flex items-center gap-2">
           <div className="flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[var(--theme-accent)]" />
