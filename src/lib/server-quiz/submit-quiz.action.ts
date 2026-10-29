@@ -1,10 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import {
-  getCorrectAnswers,
-  getExplanations,
-} from './quiz-answers.server';
+import { getCorrectAnswers, getExplanations } from './quiz-answers.server';
 
 export interface SubmitQuizResult {
   score: number;
@@ -16,162 +13,101 @@ export interface SubmitQuizResult {
   error?: string;
 }
 
-const PASSING_SCORE = 75;
+const EMPTY_RESULT: SubmitQuizResult = {
+  score: 0,
+  passed: false,
+  correct: 0,
+  total: 0,
+  explanations: [],
+  completed: false,
+};
+
+function friendlyQuizError(message: string | undefined): string {
+  const m = message ?? '';
+  if (m.includes('quiz_rate_limited')) return 'Hiciste demasiados intentos seguidos. Espera unos minutos y vuelve a intentarlo.';
+  if (m.includes('quiz_auth_required')) return 'Tu sesión expiró. Inicia sesión de nuevo.';
+  if (m.includes('quiz_invalid')) return 'Esta evaluación no está disponible en este momento. Avísanos si el problema continúa.';
+  return 'No se pudo guardar tu resultado. Inténtalo de nuevo.';
+}
 
 function parseAnswers(formData: FormData): number[] | null {
   const raw = formData.get('answers');
-  if (typeof raw !== 'string') {
-    return null;
-  }
+  if (typeof raw !== 'string') return null;
   try {
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) {
-      return null;
-    }
-    return parsed.filter((a): a is number => typeof a === 'number');
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed) || !parsed.every((a) => Number.isInteger(a) && a >= 0)) return null;
+    return parsed as number[];
   } catch {
     return null;
   }
 }
 
-/**
- * Server Action: califica el quiz del lado del servidor y registra el intento.
- * Se invoca desde el cliente mediante <form action={submitQuiz}>.
- * Las respuestas correctas viven en quiz-answers.server.ts (server-only) y
- * nunca viajan al cliente. La escritura en progress y quiz_attempts se hace
- * a través de una función RPC SECURITY DEFINER, nunca directamente desde el cliente.
- */
 export async function submitQuiz(
   _prevState: SubmitQuizResult | null,
-  formData: FormData
+  formData: FormData,
 ): Promise<SubmitQuizResult> {
   const supabase = await createClient();
-
   const moduleId = String(formData.get('moduleId') ?? '');
   const lessonId = String(formData.get('lessonId') ?? '');
   const answers = parseAnswers(formData);
 
   if (!moduleId || !lessonId) {
-    return {
-      score: 0,
-      passed: false,
-      correct: 0,
-      total: 0,
-      explanations: [],
-      completed: false,
-      error: 'Datos de la lección incompletos',
-    };
+    return { ...EMPTY_RESULT, error: 'Datos de la lección incompletos' };
   }
-
   if (answers === null) {
-    return {
-      score: 0,
-      passed: false,
-      correct: 0,
-      total: 0,
-      explanations: [],
-      completed: false,
-      error: 'Respuestas inválidas',
-    };
+    return { ...EMPTY_RESULT, error: 'Respuestas inválidas' };
   }
 
-  // 1. Autenticar usuario
   const {
     data: { user },
     error: authError,
   } = await supabase.auth.getUser();
   if (authError || !user) {
-    return {
-      score: 0,
-      passed: false,
-      correct: 0,
-      total: 0,
-      explanations: [],
-      completed: false,
-      error: 'No autenticado',
-    };
+    return { ...EMPTY_RESULT, error: 'No autenticado' };
   }
 
-  // 2. Obtener respuestas correctas desde el módulo server-only
   let correctAnswers: number[];
   let total: number;
   try {
     correctAnswers = getCorrectAnswers(moduleId, lessonId);
     total = correctAnswers.length;
   } catch {
-    return {
-      score: 0,
-      passed: false,
-      correct: 0,
-      total: 0,
-      explanations: [],
-      completed: false,
-      error: 'Lección no encontrada',
-    };
+    return { ...EMPTY_RESULT, error: 'Lección no encontrada' };
   }
 
-  // 3. Validar cantidad de respuestas
   if (answers.length !== total) {
-    return {
-      score: 0,
-      passed: false,
-      correct: 0,
-      total,
-      explanations: [],
-      completed: false,
-      error: 'Número de respuestas incorrecto',
-    };
+    return { ...EMPTY_RESULT, total, error: 'Número de respuestas incorrecto' };
   }
 
-  // 4. Calcular puntuación real
-  let correct = 0;
-  for (let i = 0; i < total; i++) {
-    if (answers[i] === correctAnswers[i]) {
-      correct += 1;
-    }
-  }
-  const score = total > 0 ? Math.round((correct / total) * 100) : 0;
-  const passed = score >= PASSING_SCORE;
-
-  // 5. Obtener explicaciones (solo se devuelven tras enviar)
-  const explanations = getExplanations(moduleId, lessonId);
-
-  // 6. Registrar intento y progreso vía submit_quiz (SECURITY DEFINER).
-  //    El servidor solo envía las respuestas; la base de datos calcula score,
-  //    passed, aplica límites de intentos y hace upsert de progress.
-  const { data: rpcResult, error: rpcError } = await supabase.rpc(
-    'submit_quiz',
-    {
-      p_module_id: moduleId,
-      p_lesson_id: lessonId,
-      p_answers: answers,
-    }
-  );
+  const { data: rpcResult, error: rpcError } = await supabase.rpc('submit_quiz', {
+    p_module_id: moduleId,
+    p_lesson_id: lessonId,
+    p_answers: answers,
+  });
 
   if (rpcError) {
     return {
-      score,
-      passed,
-      correct,
+      score: 0,
+      passed: false,
+      correct: 0,
       total,
-      explanations,
+      explanations: [],
       completed: false,
-      error: rpcError.message,
+      error: friendlyQuizError(rpcError.message),
     };
   }
 
-  const completed = Boolean(rpcResult?.completed);
-  const rpcScore = Number(rpcResult?.score ?? score);
-  const rpcPassed = Boolean(rpcResult?.passed ?? passed);
-  const rpcCorrect = Number(rpcResult?.correct ?? correct);
-  const rpcTotal = Number(rpcResult?.total ?? total);
+  if (!rpcResult || typeof rpcResult !== 'object') {
+    return { ...EMPTY_RESULT, total, error: 'No se pudo calificar la evaluación. Inténtalo de nuevo.' };
+  }
 
+  const rpcPassed = Boolean(rpcResult.passed);
   return {
-    score: rpcScore,
+    score: Number(rpcResult.score ?? 0),
     passed: rpcPassed,
-    correct: rpcCorrect,
-    total: rpcTotal,
-    explanations,
-    completed,
+    correct: Number(rpcResult.correct ?? 0),
+    total: Number(rpcResult.total ?? total),
+    explanations: getExplanations(moduleId, lessonId),
+    completed: rpcPassed,
   };
 }
