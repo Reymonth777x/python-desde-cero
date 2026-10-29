@@ -44,12 +44,30 @@ async function setupRunner(page: Page): Promise<RunnerHarness> {
     });
   });
   await page.evaluate(() => new Promise<void>((res) => {
-    const ifr = document.createElement('iframe');
-    ifr.src = '/python-runner'; ifr.sandbox = 'allow-scripts';
-    ifr.style.display = 'none'; document.body.appendChild(ifr);
-    const h = (e: MessageEvent) => { if (e.data?.type === 'ready') { window.removeEventListener('message', h); res(); } };
+    const h = (e: MessageEvent) => {
+      if (e.source !== document.querySelector('iframe[src="/python-runner"]')?.contentWindow) return;
+      if (e.data?.status === 'ready' || e.data?.type === 'ready') {
+        window.removeEventListener('message', h);
+        res();
+      }
+    };
     window.addEventListener('message', h);
-    setTimeout(() => { window.removeEventListener('message', h); res(); }, 15000);
+
+    const ifr = document.createElement('iframe');
+    ifr.src = '/python-runner';
+    ifr.setAttribute('sandbox', 'allow-scripts');
+    ifr.style.display = 'none';
+    ifr.addEventListener('load', () => {
+      // Sandbox without allow-same-origin has an opaque origin; wildcard is
+      // required for delivery. The runner validates event.source and event.origin.
+      ifr.contentWindow?.postMessage({ type: 'init' }, '*');
+    }, { once: true });
+    document.body.appendChild(ifr);
+
+    setTimeout(() => {
+      window.removeEventListener('message', h);
+      res();
+    }, 20000);
   }));
   const run = (code: string, input: string[] = []) => {
     page.evaluate(
