@@ -107,7 +107,9 @@ export default function PythonRunner() {
 
       if (event.data.type === 'init') {
         clearRequestTimeout();
-        postToRunner({ type: 'init' });
+        // The parent handshake establishes a safe reply origin. Do not send a
+        // fake "init" payload to python-worker.js: it expects executable code.
+        if (ready) postToParent({ status: 'ready' });
       } else if (event.data.type === 'run') {
         clearRequestTimeout();
         // Timeout real desde el hilo principal: un setTimeout dentro del worker
