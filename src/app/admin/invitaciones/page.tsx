@@ -29,6 +29,10 @@ function feedbackCode(error: string | null | undefined, success: string) {
   return 'failed';
 }
 
+function isExpired(expiresAt: string | null): boolean {
+  return Boolean(expiresAt && Date.parse(expiresAt) < Date.now());
+}
+
 async function handleCreateInvitation(formData: FormData): Promise<void> {
   'use server';
   const result = await createInvitation(formData);
@@ -165,7 +169,7 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
                       <td className='border border-[var(--theme-border)] px-3 py-2 text-sm text-[var(--theme-ink)]'>
                         {inv.is_used ? (
                           <span className='text-[var(--theme-muted)]'>Usada</span>
-                        ) : inv.expires_at && new Date(inv.expires_at).getTime() < Date.now() ? (
+                        ) : isExpired(inv.expires_at) ? (
                           <span className='text-[var(--theme-error)]'>Vencida</span>
                         ) : (
                           <span className='text-[var(--theme-accent)]'>Activa</span>
