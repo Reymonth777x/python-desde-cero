@@ -22,7 +22,12 @@ export async function listInvitations() {
     .order('created_at', { ascending: false });
 
   if (error) return { invitations: [], error: 'No se pudieron cargar las invitaciones.' };
-  return { invitations: invitations ?? [], error: null };
+  const now = Date.now();
+  const withExpiryStatus = (invitations ?? []).map((invitation) => ({
+    ...invitation,
+    is_expired: Boolean(invitation.expires_at && new Date(invitation.expires_at).getTime() < now),
+  }));
+  return { invitations: withExpiryStatus, error: null };
 }
 
 export async function createInvitation(formData: FormData) {
