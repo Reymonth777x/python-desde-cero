@@ -14,7 +14,7 @@
 - ¿Laboratorio público con demo y sesión solo para guardar? (pendiente con el líder)
 
 ## D003: CSP con nonce por respuesta
-**Decisión:** La CSP de páginas se genera en middleware, con nonce único por respuesta, se reenvía a la solicitud para que Next.js pueda autorizar sus scripts y el layout lee headers para forzar render por petición. Se elimina el encabezado CSP estático que no incluía nonce.
+**Decisión:** La CSP de páginas se genera en `src/proxy.ts`, con nonce único por respuesta, se reenvía a la solicitud para que Next.js pueda autorizar sus scripts y el layout lee headers para forzar render por petición. Se elimina el encabezado CSP estático que no incluía nonce.
 **Motivo:** El CI de navegador mostró HTML servido pero fallos de interactividad; una CSP estática sin nonce bloquea scripts inline que Next usa para hidratar componentes. No habilitar `unsafe-inline` ni `unsafe-eval` de forma general en producción. Validar la compatibilidad también con Vinext/Cloudflare antes de publicar.
 
 ## D004: Un solo ejecutor de Python
