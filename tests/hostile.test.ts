@@ -84,7 +84,11 @@ async function setupRunner(page: Page): Promise<RunnerHarness> {
   };
   const waitForOutput = (timeoutMs = 15000) =>
     page.waitForFunction(
-      () => (window as unknown as { getMsgs: () => unknown[] }).getMsgs().length > 0,
+      () => (window as unknown as { getMsgs: () => unknown[] }).getMsgs().some((message) => {
+        if (!message || typeof message !== 'object') return false;
+        const status = (message as { status?: unknown }).status;
+        return status === 'result' || status === 'error' || status === 'init-error';
+      }),
       { timeout: timeoutMs },
     ).then(() => {});
   const getMsgs = () => page.evaluate(() => (window as unknown as { getMsgs: () => unknown[] }).getMsgs?.());
