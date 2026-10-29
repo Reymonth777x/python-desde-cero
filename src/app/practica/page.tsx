@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 export default async function PracticaPage() {
-  'use server';
   const supabase = await createClient();
   const {
     data: { user },
