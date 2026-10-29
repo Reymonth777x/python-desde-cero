@@ -12,9 +12,9 @@ test.describe('Autenticacion y flujo de usuario', () => {
     await page.goto('/login');
     await page.waitForLoadState('networkidle');
     await expect(page.getByRole('heading', { name: /Bienvenido de vuelta/ })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Iniciar ses/ })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Crear cuenta/ })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Crea una aqu/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Entrar' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Crear cuenta' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Continuar' })).toBeVisible();
   });
 
   test('Visitante anonimo es redirigido al acceder a rutas protegidas', async ({ page }) => {
@@ -32,14 +32,14 @@ test.describe('Autenticacion y flujo de usuario', () => {
   test('Mensaje de exito se muestra tras registro', async ({ page }) => {
     await page.goto('/login?message=check-email');
     await page.waitForLoadState('networkidle');
-    const status = page.getByRole('status').filter({ hasText: /La cuenta se registr/ });
+    const status = page.getByRole('status').filter({ hasText: /Cuenta creada\. Revisa tu correo/ });
     await expect(status).toBeVisible();
   });
 
   test('Mensaje de exito se muestra tras recuperacion de contrasena', async ({ page }) => {
     await page.goto('/login/forgot-password?message=sent');
     await page.waitForLoadState('networkidle');
-    const status = page.getByRole('status').filter({ hasText: /Si la cuenta/ });
+    const status = page.getByRole('status').filter({ hasText: /Si la cuenta existe/ });
     await expect(status).toBeVisible();
   });
 });
