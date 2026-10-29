@@ -29,7 +29,7 @@ describe('quiz answer-key drift detection', () => {
   it('las claves finales de la migración 020 coinciden con src/lib/course.ts', () => {
     const expected = expectedKeysFromCourse();
     const sql = readFileSync(
-      new URL('../../supabase/migrations/20261029050000_020_balance_quiz_answer_positions.sql', import.meta.url),
+      new URL('../../supabase/migrations/20261029051953_020_balance_quiz_answer_positions_v2.sql', import.meta.url),
       'utf8',
     );
     const actual = keysFromBalanceMigration(sql);
