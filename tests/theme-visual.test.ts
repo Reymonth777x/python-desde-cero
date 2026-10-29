@@ -52,6 +52,7 @@ test("Cada tema produce colores de fondo distintos", async ({ page }) => {
     }, theme);
     await page.goto("/");
     await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+    await page.waitForTimeout(250); // Let the CSS transition settle before reading computed colors.
     backgrounds[theme] = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
   }
 
@@ -67,6 +68,7 @@ test("Cada tema produce colores de texto distintos", async ({ page }) => {
     }, theme);
     await page.goto("/");
     await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+    await page.waitForTimeout(250); // Let the CSS transition settle before reading computed colors.
     colors[theme] = await page.evaluate(() => getComputedStyle(document.body).color);
   }
 
