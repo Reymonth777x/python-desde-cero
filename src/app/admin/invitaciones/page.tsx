@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { listInvitations, createInvitation, deleteInvitation } from "./actions";
 
@@ -13,25 +14,40 @@ type InvitationRow = {
   created_by: string;
 };
 
+const FEEDBACK: Record<string, { ok: boolean; text: string }> = {
+  created: { ok: true, text: 'Invitación creada.' },
+  deleted: { ok: true, text: 'Invitación eliminada.' },
+  invalid: { ok: false, text: 'Revisa los datos: el código y la fecha no son válidos.' },
+  duplicate: { ok: false, text: 'Ya existe una invitación con ese código.' },
+  failed: { ok: false, text: 'La operación no se pudo completar. Inténtalo de nuevo.' },
+};
+
+function feedbackCode(error: string | null | undefined, success: string) {
+  if (!error) return success;
+  if (error.includes('Ya existe')) return 'duplicate';
+  if (error.includes('inválid') || error.includes('requerido') || error.includes('hexadecimales') || error.includes('futura')) return 'invalid';
+  return 'failed';
+}
+
 async function handleCreateInvitation(formData: FormData): Promise<void> {
+  'use server';
   const result = await createInvitation(formData);
-  if (result.error) {
-    redirect(`/admin/invitaciones?error=${encodeURIComponent(result.error)}`);
-  }
-  redirect('/admin/invitaciones?message=invitation-created');
+  revalidatePath('/admin/invitaciones');
+  redirect(`/admin/invitaciones?r=${feedbackCode(result.error, 'created')}`);
 }
 
 async function handleDeleteInvitation(formData: FormData): Promise<void> {
-  const id = formData.get("id") as string;
-  const result = await deleteInvitation(id);
-  if (result.error) {
-    redirect(`/admin/invitaciones?error=${encodeURIComponent(result.error)}`);
-  }
-  redirect('/admin/invitaciones?message=invitation-deleted');
+  'use server';
+  const result = await deleteInvitation(String(formData.get('id') ?? ''));
+  revalidatePath('/admin/invitaciones');
+  redirect(`/admin/invitaciones?r=${feedbackCode(result.error, 'deleted')}`);
 }
 
-export default async function InvitacionesPage({ searchParams }: { searchParams: Promise<{ error?: string; message?: string }> }) {
-  const params = await searchParams;
+type PageProps = { searchParams?: Promise<{ r?: string }> };
+
+export default async function InvitacionesPage({ searchParams }: PageProps) {
+  const query = (await searchParams) ?? {};
+  const feedback = query.r && Object.hasOwn(FEEDBACK, query.r) ? FEEDBACK[query.r] : null;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -82,14 +98,14 @@ export default async function InvitacionesPage({ searchParams }: { searchParams:
               {listError}
             </div>
           )}
-          {params.error && (
-            <div role='alert' className='mt-6 border-l-4 border-[var(--theme-error)] bg-[var(--theme-error-light)] px-4 py-3 text-sm leading-6 text-[var(--theme-error-dark)]'>
-              {params.error}
-            </div>
-          )}
-          {params.message && (
-            <div role='status' className='mt-6 border-l-4 border-[var(--theme-accent)] bg-[var(--theme-accent-light)] px-4 py-3 text-sm leading-6 text-[var(--theme-ink)]'>
-              {params.message}
+          {feedback && (
+            <div
+              role={feedback.ok ? 'status' : 'alert'}
+              className={feedback.ok
+                ? 'mt-6 border-l-4 border-[var(--theme-accent)] bg-[var(--theme-surface)] px-4 py-3 text-sm leading-6'
+                : 'mt-6 border-l-4 border-[var(--theme-error)] bg-[var(--theme-error-light)] px-4 py-3 text-sm leading-6 text-[var(--theme-error-dark)]'}
+            >
+              {feedback.text}
             </div>
           )}
 
@@ -149,6 +165,8 @@ export default async function InvitacionesPage({ searchParams }: { searchParams:
                       <td className='border border-[var(--theme-border)] px-3 py-2 text-sm text-[var(--theme-ink)]'>
                         {inv.is_used ? (
                           <span className='text-[var(--theme-muted)]'>Usada</span>
+                        ) : inv.expires_at && new Date(inv.expires_at).getTime() < Date.now() ? (
+                          <span className='text-[var(--theme-error)]'>Vencida</span>
                         ) : (
                           <span className='text-[var(--theme-accent)]'>Activa</span>
                         )}
