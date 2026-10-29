@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { safeNext } from '@/lib/safe-next';
+import { isGuestOnlyAuthPage } from '@/lib/auth-route-policy';
 
 const LEARNING_PREFIXES = ['/practica', '/academia', '/estudiante', '/docente'];
 
@@ -57,14 +58,26 @@ export async function middleware(request: NextRequest) {
   );
 
   const { data, error } = await supabase.auth.getClaims();
-  const claims = data && !error ? data.claims : null;
+  let claims = data && !error ? data.claims : null;
   const { pathname, search } = request.nextUrl;
 
-  // Only the login screen and the "forgot password" screen are guest-only.
-  // The callback and reset-password routes must remain reachable to complete
-  // Supabase PKCE flows, even when a stale session cookie is present.
-  const isGuestOnlyPage =
-    pathname === '/login' || pathname === '/login/forgot-password';
+  // Only these two screens should redirect an already-authenticated user.
+  // In particular, never intercept /auth/callback or /login/reset-password:
+  // they must be able to finish Supabase's PKCE exchange.
+  const isGuestOnlyPage = isGuestOnlyAuthPage(pathname);
+  const isLearningRoute = LEARNING_PREFIXES.some((prefix) =>
+    matchesPrefix(pathname, prefix),
+  );
+  const isAdminRoute = matchesPrefix(pathname, '/admin');
+
+  // getClaims validates a JWT locally; it cannot tell us whether the session
+  // was revoked in Auth. A stale cookie can otherwise create a redirect loop
+  // between login and protected pages (Supabase logs showed session_not_found).
+  // Check the live session on auth-gated pages only, not every static request.
+  if (claims && (isGuestOnlyPage || isLearningRoute || isAdminRoute)) {
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError || !userData.user) claims = null;
+  }
 
   if (claims && isGuestOnlyPage) {
     const destinationPath = safeNext(
@@ -76,11 +89,6 @@ export async function middleware(request: NextRequest) {
       new URL(destinationPath, request.url),
     );
   }
-
-  const isLearningRoute = LEARNING_PREFIXES.some((prefix) =>
-    matchesPrefix(pathname, prefix),
-  );
-  const isAdminRoute = matchesPrefix(pathname, '/admin');
 
   if (!claims && (isLearningRoute || isAdminRoute)) {
     const destination = request.nextUrl.clone();
