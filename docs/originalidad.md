@@ -14,8 +14,8 @@ Todo el contenido de la plataforma **Python desde cero** es de elaboración prop
 - **Temas visuales**: 6 temas + Sistema, con paletas de color propias
 - **Ilustraciones y personajes**: Dibujados por código (SVG/Canvas), sin imágenes protegidas
 - **Sonidos**: Generados con Web Audio API, sin archivos de audio externos
-- **Contenido del curso**: 5 bloques, 31 lecciones, 100+ ejercicios, escritos desde cero
-- **Juego de cocina**: Motor determinista, niveles definidos en datos, sin azar
+- **Contenido del curso**: cuatro módulos principales y una extensión práctica opcional; el catálogo vigente es la fuente del recuento exacto
+- **Juegos**: no hay ningún juego publicado en el producto actual; los prototipos retirados no forman parte de la oferta
 
 ## Elementos excluidos (prohibidos)
 

@@ -20,3 +20,11 @@
 ## D005: Equipo de cuatro socios y secretos individuales
 **Decisión:** Cada socio usa su cuenta; el acceso a GitHub, Supabase y Cloudflare se concede de forma individual y con privilegios mínimos. Los secretos de producción solo se administran desde GitHub Actions y las plataformas.
 **Motivo:** Evitar compartir credenciales del propietario, mejorar la trazabilidad y facilitar la rotación de responsabilidades.
+
+## D006: No publicar roles que el modelo de datos no soporta
+**Decisión:** El producto mantiene dos permisos: estudiante y administrador mediante `profiles.is_admin`. No se publica ni se anuncia un rol docente hasta que existan su modelo de autorización y sus pantallas reales. `/estudiante` queda únicamente como redirección de compatibilidad a `/academia`; `/docente` se retira.
+**Motivo:** Una ruta de redirección no es un panel ni constituye un rol. Los permisos deben reflejar el esquema y las capacidades disponibles.
+
+## D007: Retirar el prototipo de cocina del producto activo
+**Decisión:** El componente `GameCanvas` y `src/lib/game/**` se retiran del árbol ejecutable porque no tienen consumidores activos. No hay juego publicado en el producto actual. El historial Git conserva el prototipo.
+**Motivo:** Evitar mantener código muerto y documentación que presenta una función inexistente como completada. Orilla queda como proyecto futuro independiente y no forma parte del alcance ni de la readiness de esta versión.

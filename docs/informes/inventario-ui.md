@@ -1,6 +1,8 @@
+> **Inventario histórico.** La tabla refleja una captura anterior de la interfaz y no debe usarse como lista actual de funciones. El juego de cocina y los roles que no aparecen en el esquema activo no forman parte del producto publicado. Consulta `docs/team/ESTADO.md` para el estado vigente.
+
 # Inventario de Interfaz de Usuario
 
-Inventario de todos los botones, enlaces y controles interactivos de la aplicación Python desde Cero.
+Captura antigua de los controles de una versión anterior. Las filas son evidencia histórica, no una enumeración de controles activos.
 
 ## Navegación Principal
 

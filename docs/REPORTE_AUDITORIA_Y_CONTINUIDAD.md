@@ -1,3 +1,5 @@
+> **INFORME HISTÓRICO — NO USAR COMO ESTADO DE PRODUCCIÓN.** Los datos de rama, SHA, dominio, errores de despliegue y rutas de este documento pertenecen a una auditoría anterior. Para decisiones operativas usa `docs/team/ESTADO.md` y los resultados recientes de GitHub Actions.
+
 # REPORTE DE AUDITORIA Y CONTINUIDAD — Python desde Cero
 
 ## Estado del Proyecto

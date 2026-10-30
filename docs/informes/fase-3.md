@@ -1,3 +1,5 @@
+> **INFORME HISTÓRICO — ARCHIVO.** Evidencias y decisiones de octubre de 2026 anteriores a la arquitectura vigente. No usar como readiness ni como guía de despliegue actual; consultar `docs/team/ESTADO.md`.
+
 # Informe FASE 3 — Plataforma estable, rápida y aislada
 
 **Rama base:** ase-3-plataforma

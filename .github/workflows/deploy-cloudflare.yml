@@ -35,26 +35,26 @@ jobs:
           if [[ "$GITHUB_EVENT_NAME" == "workflow_run" ]]; then
             if [[ "$WORKFLOW_HEAD_BRANCH" != "master" || "$WORKFLOW_CONCLUSION" != "success" ]]; then
               echo "configured=false" >> "$GITHUB_OUTPUT"
-              echo "::notice::Despliegue omitido: solo se publica master tras CI exitoso."
+              echo "::notice::Despliegue omitido de forma segura: solo se publica master después de un CI exitoso (rama: ${WORKFLOW_HEAD_BRANCH:-desconocida}; resultado: ${WORKFLOW_CONCLUSION:-sin estado})."
               exit 0
             fi
           elif [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
             if [[ "$GITHUB_REF_NAME" != "master" ]]; then
               echo "configured=false" >> "$GITHUB_OUTPUT"
-              echo "::notice::Despliegue manual omitido: selecciona la rama master."
-              exit 0
+              echo "::error::Despliegue manual rechazado: selecciona la rama master."
+              exit 1
             fi
           else
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Despliegue omitido: evento no autorizado."
-            exit 0
+            echo "::error::Despliegue rechazado: evento no autorizado."
+            exit 1
           fi
 
           site_key="$(printf '%s' "$RAW_TURNSTILE_SITE_KEY" | tr -d '[:space:]')"
           if [[ -z "$CLOUDFLARE_API_TOKEN" || -z "$CLOUDFLARE_ACCOUNT_ID" ]]; then
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Despliegue omitido. Faltan CLOUDFLARE_API_TOKEN o CLOUDFLARE_ACCOUNT_ID en GitHub Actions Secrets."
-            exit 0
+            echo "::error::No se publica: faltan CLOUDFLARE_API_TOKEN o CLOUDFLARE_ACCOUNT_ID en GitHub Actions Secrets."
+            exit 1
           fi
 
           is_real_site_key() {
@@ -95,8 +95,8 @@ jobs:
 
           if ! is_real_site_key "$site_key"; then
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::error::Despliegue omitido: no se encontró una Sitekey real única para python-desdecero.com. Define NEXT_PUBLIC_TURNSTILE_SITE_KEY en GitHub Actions Variables. No uses llaves de prueba."
-            exit 0
+            echo "::error::No se publica: no se encontró una Sitekey real única para python-desdecero.com. Define NEXT_PUBLIC_TURNSTILE_SITE_KEY en GitHub Actions Variables. No uses llaves de prueba."
+            exit 1
           fi
 
           # A Turnstile sitekey is public and is required by the browser build.
@@ -264,4 +264,19 @@ jobs:
             echo "::error::La ruta /login no muestra el widget Turnstile después del despliegue."
             exit 1
           fi
-          echo "Dominio público sirve la nueva portada y el widget Turnstile en /login."
+          curl --fail --silent --show-error --location --retry 5 --retry-delay 3 --retry-all-errors \
+            "https://python-desdecero.com/muestra?release=$GITHUB_SHA" -o /tmp/python-desde-cero-sample.html
+          grep -Fq "Resolver problemas mediante algoritmos" /tmp/python-desde-cero-sample.html
+
+          curl --fail --silent --show-error --location --retry 5 --retry-delay 3 --retry-all-errors \
+            "https://python-desdecero.com/sitemap.xml?release=$GITHUB_SHA" -o /tmp/python-desde-cero-sitemap.xml
+          grep -Fq "https://python-desdecero.com/muestra" /tmp/python-desde-cero-sitemap.xml
+
+          www_status="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' \
+            "https://www.python-desdecero.com/?release=$GITHUB_SHA")"
+          if [[ "$www_status" != "308" ]]; then
+            echo "::error::www debe redirigir al dominio principal con HTTP 308. Estado recibido: $www_status."
+            exit 1
+          fi
+
+          echo "Producción sirve la portada, /muestra, sitemap, el widget Turnstile y la redirección canónica www → apex."

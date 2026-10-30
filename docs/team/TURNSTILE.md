@@ -1,59 +1,38 @@
-# Cloudflare Turnstile para acceso, registro y recuperación
+# Turnstile y autenticación — producción
 
-## Diagnóstico
-La web pública se revisó el 30-10-2026 y la ruta `/login` no mostraba el widget. El componente solo se renderiza cuando está definida `NEXT_PUBLIC_TURNSTILE_SITE_KEY`. El workflow anterior construía el Worker de producción sin inyectar esa variable, aunque el entorno local podía tenerla en `.env.local`.
+## Estado comprobado el 30 de octubre de 2026
 
-El workflow de producción:
-- exige una sitekey real antes de publicar;
-- acepta una variable de GitHub Actions llamada `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (preferida) o un secreto heredado con ese nombre;
-- inyecta la llave durante la compilación de Vinext y en el comando de despliegue;
-- rechaza las llaves de prueba oficiales;
-- si no hay una Sitekey configurada, consulta la API de Turnstile en modo solo lectura y usa el Sitekey público únicamente cuando encuentra un solo widget que permite el hostname exacto `python-desdecero.com`;
-- si la consulta no está autorizada, no hay widget o aparecen varios candidatos, omite el despliegue y pide configuración manual; nunca selecciona entre varios ni accede a la Secret key.
+- La variable pública `NEXT_PUBLIC_TURNSTILE_SITE_KEY` está disponible en GitHub Actions y el workflow la inyecta durante el build de Vinext.
+- El workflow de publicación más reciente, **41046973667**, finalizó correctamente para el commit `994a579b7c1750a55de6f2302668bafdea8725cf`.
+- El log confirma que Cloudflare publicó el Worker, que el dominio está conectado al servicio `python-desdecero` y que el HTML de `/login` contiene `data-testid="turnstile-widget"`.
+- Esto confirma que el componente y la Sitekey pública llegaron al build/HTML. No demuestra que el script cliente haya cargado, que un usuario haya completado el desafío ni que Supabase Auth haya validado un token.
+- La Secret key privada de Turnstile y el estado de CAPTCHA protection no se pueden leer mediante la inspección del repositorio ni el estado básico del proyecto Supabase. Su configuración en Supabase Auth sigue pendiente de confirmación.
+- Tampoco se completó una prueba real de correo, registro o restablecimiento; estos puntos siguen abiertos.
 
-El PR `#27`, en la rama `chore/verify-turnstile-on-live-login`, añade una comprobación HTTP posterior al despliegue para validar que la portada está actualizada y que el HTML de `/login` contiene el widget. La validación anterior solo comprobaba la portada. No se debe considerar completo un despliegue si el widget no aparece en la ruta de autenticación.
+## Separación de llaves
 
-Si no hay una Sitekey manual, el workflow intenta encontrar un único widget existente para el hostname exacto mediante la API de solo lectura. Si no puede verificar una única coincidencia, omite el despliegue y deja la versión de producción intacta.
+1. **Sitekey pública:** se guarda como GitHub Actions Variable `NEXT_PUBLIC_TURNSTILE_SITE_KEY`. Es visible para el navegador y puede incluirse en el build.
+2. **Secret key privada:** se configura únicamente en Supabase Dashboard → Authentication → Bot and Abuse Protection, con Cloudflare Turnstile seleccionado. Nunca se guarda en Git, en el navegador o en una variable `NEXT_PUBLIC_*`.
+3. Producción y desarrollo deben utilizar los widgets y secretos correspondientes a sus hostnames y proyectos separados.
 
-## Estado verificado — 30 de octubre de 2026
+## Prueba pendiente en Supabase Auth
 
-- El commit `99e39027409682ed3bf21d64754769b21199854f` está integrado en `master`; contiene la mejora de flujo móvil del laboratorio (PR #28).
-- CI #501 terminó correctamente para ese commit, incluyendo Vitest, TypeScript, ESLint, build Next, Playwright y build Vinext.
-- El workflow de publicación #54 (run `41038244192`) no desplegó ese commit: `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID` estaban disponibles, pero `RAW_TURNSTILE_SITE_KEY` llegó vacío y el job `deploy` quedó omitido.
-- El PR #29 intenta resolverlo buscando un único widget de producción mediante la API de solo lectura. Requiere `Turnstile Sites Read` o `Account Settings Read`; si el token no dispone de permiso, habrá que configurar la Sitekey manualmente.
-- No usar claves de prueba en producción ni habilitar CAPTCHA de Supabase antes de que el widget esté visible en la web publicada.
+En el proyecto de producción `nuqydanbbgqcofcftshk`:
 
-## Reintentar el despliegue después de guardar la Sitekey
+1. Abrir Authentication → Bot and Abuse Protection.
+2. Verificar que CAPTCHA protection esté habilitada y que el proveedor sea Cloudflare Turnstile.
+3. Confirmar que se guardó la Secret key del widget que permite `python-desdecero.com` y `www.python-desdecero.com` si ese hostname sigue siendo aceptado.
+4. No copiar la Secret key en un chat, issue, commit, log o variable pública.
+5. Completar pruebas con una dirección de correo controlada: registro y confirmación, inicio de sesión y recuperación/cambio de contraseña.
 
-El workflow también permite un inicio manual, limitado a la rama `master`. Esto evita tener que crear un commit vacío o modificar código solo para volver a probar el despliegue después de guardar la variable pública:
+El código de servidor envía `captchaToken` en sign-in, sign-up y password reset. Si el build tiene Sitekey pero no llega token, las acciones rechazan la solicitud.
 
-1. Abre GitHub → Actions → **Deploy Cloudflare Worker**.
-2. Selecciona **Run workflow** y la rama `master`.
-3. Ejecuta el workflow. Volverá a validar la Sitekey y las credenciales antes de compilar o publicar.
-4. Si no hay una Sitekey real válida, la publicación seguirá omitida y producción permanecerá intacta.
+## Despliegue y señal de fallo
 
-El inicio manual no omite CI, no permite desplegar ramas distintas de `master`, ni lee la Secret key privada de Turnstile.
+La publicación requiere CI exitoso en `master`, credenciales válidas de Cloudflare y una Sitekey real. El workflow también realiza una comprobación HTTP posterior del HTML de `/login`. Un deploy omitido no debe confundirse con uno publicado; el workflow debe terminar en estado no exitoso cuando los prerrequisitos fallen.
 
-## Configuración de Cloudflare
-1. En Cloudflare Dashboard → Turnstile, abre o crea el widget correspondiente al sitio `python-desdecero.com`.
-2. En Hostname Management incluye `python-desdecero.com` y cualquier hostname público que realmente uses (por ejemplo `www.python-desdecero.com`, solo si está activo). No uses hostnames de localhost en el widget de producción.
-3. Copia la **Sitekey** y guárdala en GitHub → Settings → Secrets and variables → Actions → Variables con el nombre `NEXT_PUBLIC_TURNSTILE_SITE_KEY`. La Sitekey es pública y se entrega al navegador; nunca pegues aquí la Secret key.
-4. Confirma que la variable quedó guardada en el repositorio correcto (`Reymonth777x/python-desde-cero`) y no como variable personal o de otro repositorio.
+## Desarrollo y pruebas automatizadas
 
-## Configuración de Supabase Auth
-Para que el desafío no sea solo visual:
-1. En el proyecto Supabase de producción `nuqydanbbgqcofcftshk`, abre Authentication → Bot and Abuse Protection.
-2. Activa CAPTCHA protection, selecciona Cloudflare Turnstile y pega la **Secret key** correspondiente al widget de producción.
-3. Guarda y prueba inicio de sesión, registro y recuperación de contraseña. La Secret key se queda en Supabase Auth; no debe añadirse al repositorio, al navegador, ni a `NEXT_PUBLIC_*`.
-4. Configura el proyecto DEV por separado con su propio widget/secret de desarrollo. No reutilices el secreto de producción en DEV.
-
-El frontend envía `captchaToken` a Supabase Auth en sign-in, sign-up y password reset. Las acciones de servidor rechazan la solicitud si el build incluye una sitekey pero no llega un token.
-
-## Pruebas
-- CI usa la sitekey de prueba oficial `1x00000000000000000000AA` exclusivamente en builds y pruebas automatizadas; nunca la usa el workflow de producción.
-- La prueba E2E confirma que los formularios de acceso, registro y recuperación incluyen el widget cuando la llave está configurada.
-- Cloudflare recomienda sitekeys de prueba para suites automatizadas y exige usar sitekey/secret reales en producción: https://developers.cloudflare.com/turnstile/troubleshooting/testing/
-- Supabase Auth documenta la configuración del proveedor y el envío del token: https://supabase.com/docs/guides/auth/auth-captcha
-
-## Desarrollo local
-En `.env.local`, define `NEXT_PUBLIC_TURNSTILE_SITE_KEY` con una sitekey compatible con el proyecto Supabase que apunta tu configuración local. Para pruebas automatizadas puedes usar la sitekey oficial de prueba; no la publiques en producción.
+- CI utiliza una Sitekey de prueba oficial únicamente en el entorno automatizado.
+- Nunca publicar llaves de prueba en producción.
+- Referencias: [Cloudflare Turnstile testing](https://developers.cloudflare.com/turnstile/troubleshooting/testing/) · [Supabase Auth CAPTCHA](https://supabase.com/docs/guides/auth/auth-captcha).

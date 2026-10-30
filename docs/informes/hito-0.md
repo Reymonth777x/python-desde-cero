@@ -1,3 +1,5 @@
+> **EVIDENCIA HISTÓRICA.** Este documento conserva una verificación puntual de una fase anterior; no certifica el estado actual de producción. Consultar `docs/team/ESTADO.md`.
+
 # Informe Hito H0 — Línea base que arranca y compila
 
 **Rama:** `producto-v1`
