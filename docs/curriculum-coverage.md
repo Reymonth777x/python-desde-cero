@@ -157,13 +157,13 @@ El contenido de esta plataforma debe ser original y didácticamente equivalente 
 - b4-l10 contiene el proyecto obligatorio de inventario y cinco casos de prueba locales.
 - b4-l11 contiene el examen global de 12 preguntas y requiere haber completado el proyecto.
 - El módulo 5 permanece opcional y pasa a tratar persistencia con archivos.
-- La migración 024 agrega/actualiza 23 claves privadas sin borrar filas ni modificar intentos o progreso.
+- La migración 024 agrega/actualiza 24 claves privadas sin borrar filas ni modificar intentos o progreso.
 - **Bloqueo antes de producción:** la migración 024 no está aplicada. El remoto todavía contiene 44 claves; el nuevo catálogo espera 66. Probarla primero en una instancia de desarrollo y coordinar su aplicación antes de desplegar el nuevo código.
 - **Calidad pendiente:** la ruta principal aún debe completar el repaso de “Hello, World!” y la numeración de M2, y ampliar las prácticas regulares con casos límite y depuración.
 
 ## Integración y estado real de la rama
 
-La evaluación de M1, el proyecto y el examen global ya están escritos en el catálogo de la rama. La migración 024 aporta 23 claves privadas (una clave de M1 actualizada y 22 nuevas) y debe dejar 66 claves para el catálogo actual. La base remota aún muestra 44 claves.
+La evaluación de M1, el proyecto y el examen global ya están escritos en el catálogo de la rama. La migración 024 aporta 24 claves privadas (dos claves existentes actualizadas (M1 y la nueva pregunta de la extensión) y 22 nuevas) y debe dejar 66 claves para el catálogo actual. La base remota aún muestra 44 claves.
 
 No fusionar ni desplegar el cambio de catálogo hasta:
 1. Probar 024 en una instancia de desarrollo con esquema equivalente.
