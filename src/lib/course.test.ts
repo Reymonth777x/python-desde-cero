@@ -23,7 +23,7 @@ describe('ruta de aprendizaje Python desde cero', () => {
     ]);
     expect(courseModules[4].lessons).toHaveLength(4);
     expect(courseModules[1].lessons.at(-1)?.id).toBe('b2-l8');
-    expect(courseModules[2].lessons.at(-1)?.id).toBe('b3-l9');
+    expect(courseModules[2].lessons.at(-1)?.id).toBe('b3-l8');
     expect(courseModules[3].lessons.at(-1)?.id).toBe('b4-l9');
   });
 
@@ -99,7 +99,7 @@ describe('ruta de aprendizaje Python desde cero', () => {
       'b3-l9',
       'b3-l8',
     ]);
-    expect(lesson('module-1', 'b1-l4').section).toBe('1.3 práctica');
+    expect(courseModules[0].lessons.find((item) => item.id === 'b1-l4')?.section).toBe('1.3 práctica');
   });
 
   it('incluye estructuras y herramientas necesarias para resolver problemas reales', () => {
