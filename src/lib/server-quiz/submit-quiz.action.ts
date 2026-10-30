@@ -72,7 +72,10 @@ export async function submitQuiz(
   }
 
   const expectedUserId = String(formData.get('expectedUserId') ?? '');
-  if (expectedUserId && expectedUserId !== user.id) {
+  if (!expectedUserId) {
+    return { ...EMPTY_RESULT, error: 'No se pudo validar la sesión de esta lección. Recarga la página e inténtalo de nuevo.' };
+  }
+  if (expectedUserId !== user.id) {
     return { ...EMPTY_RESULT, error: 'La sesión cambió de cuenta. Recarga la lección antes de guardar el resultado.' };
   }
 
