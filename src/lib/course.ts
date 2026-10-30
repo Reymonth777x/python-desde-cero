@@ -751,408 +751,110 @@ export const courseModules: CourseModule[] = [
   {
     "id": "module-3",
     "number": "3",
-    "title": "Colecciones y tratamiento de datos",
-    "summary": "Guarda varios valores, consulta y modifica listas, procesa texto y organiza registros con diccionarios y otras colecciones.",
+    "title": "Valores booleanos, control de flujo, ciclos y listas",
+    "summary": "Combina condiciones, toma decisiones, automatiza repeticiones y procesa listas con operadores lógicos, bit a bit y ordenamiento.",
     "lessons": [
       {
         "id": "b3-l1",
         "section": "3.1",
-        "title": "Listas: agrupar datos en orden",
+        "title": "Valores booleanos y comparaciones",
         "objectives": [
-          "Crear listas con corchetes.",
-          "Acceder a elementos mediante índices.",
-          "Comprender que el primer índice es 0."
+          "Reconocer True y False como valores bool.",
+          "Utilizar operadores de comparación.",
+          "Predecir el resultado de una expresión booleana."
         ],
         "explanation": [
-          "Una lista agrupa varios valores en una sola variable y conserva su orden. Se escribe entre corchetes, con los elementos separados por comas; puede contener números, cadenas u otros tipos.",
-          "Cada elemento ocupa una posición llamada índice. En Python el primer índice es 0, el segundo es 1 y así sucesivamente. Un índice fuera del rango provoca IndexError, por lo que conviene comprobar la longitud antes de acceder a posiciones dinámicas.",
-          "len(lista) devuelve cuántos elementos contiene. También puedes acceder al último elemento con índice -1, una forma útil cuando no conoces de antemano cuántos elementos hay."
+          "El tipo bool representa dos valores: True y False. Una comparación produce uno de ellos y permite expresar si una condición se cumple, por ejemplo si una nota alcanza el mínimo o si una cuenta está activa.",
+          "== y != comprueban igualdad y diferencia; >, <, >= y <= comparan magnitudes. El signo = realiza una asignación, por lo que no debe utilizarse como sustituto de ==.",
+          "Antes de comparar, comprueba que los valores sean compatibles. Si la edad procede de input(), conviértela primero en entero; una comparación correcta facilita construir decisiones fiables."
         ],
-        "example": "herramientas = [\"teclado\", \"mouse\", \"monitor\"]\nprint(herramientas[0])\nprint(herramientas[-1])\nprint(len(herramientas))",
-        "exampleOutput": "teclado\nmonitor\n3",
+        "example": "nota = 82\naprobado = nota >= 70\nprint(aprobado)\nprint(nota == 100)",
+        "exampleOutput": "True\nFalse",
         "walkthrough": [
-          "herramientas[0] consulta el primer elemento.",
-          "herramientas[-1] consulta el último y len() cuenta los tres elementos."
+          "nota >= 70 comprueba si la nota alcanza el mínimo.",
+          "nota == 100 compara igualdad exacta.",
+          "Cada comparación produce un booleano."
         ],
         "commonMistakes": [
-          "Pensar que el primer índice es 1 en lugar de 0.",
-          "Consultar una posición que no existe, como lista[5] en una lista de tres elementos."
+          "Usar = en vez de == al comparar.",
+          "Creer que una comparación modifica la variable original."
         ],
         "exercise": {
           "id": "b3-e1",
-          "title": "Consultar una lista de tareas",
-          "statement": "Crea la lista tareas con tres textos: estudiar, practicar y descansar. Imprime el segundo elemento.",
-          "starterCode": "# crea la lista\n",
-          "solution": "tareas = [\"estudiar\", \"practicar\", \"descansar\"]\nprint(tareas[1])",
+          "title": "Comprobar una temperatura",
+          "statement": "Guarda temperatura = 29 e imprime si es mayor o igual a 25.",
+          "starterCode": "temperatura = 29\n",
+          "solution": "temperatura = 29\nprint(temperatura >= 25)",
           "tests": [
             {
               "input": [],
-              "expected": "practicar"
+              "expected": "True"
             }
           ],
           "hints": [
-            "El segundo elemento tiene índice 1.",
-            "Usa corchetes para acceder a la lista."
+            "Usa >=.",
+            "Imprime la comparación."
           ],
           "difficulty": "facil",
-          "xp": 10,
+          "xp": 20,
           "length": 5
         },
         "questions": [
           {
-            "prompt": "¿Qué índice permite acceder al primer elemento de una lista?",
+            "prompt": "¿Qué operador comprueba que dos valores son distintos?",
             "options": [
-              "1",
-              "-1",
-              "len(lista)",
-              "0"
+              "=",
+              "==",
+              ">=",
+              "!="
             ],
             "answer": 3,
-            "explanation": "En Python los índices de lista comienzan en cero."
+            "explanation": "!= devuelve True cuando los valores comparados no son iguales."
           }
         ],
         "assessment": false,
-        "estimatedMinutes": 13
+        "estimatedMinutes": 45
       },
       {
         "id": "b3-l2",
         "section": "3.2",
-        "title": "Modificar listas: añadir, reemplazar y quitar",
+        "title": "Operadores lógicos y operaciones bit a bit",
         "objectives": [
-          "Añadir elementos con append().",
-          "Reemplazar un elemento usando su índice.",
-          "Eliminar elementos con remove() o pop()."
+          "Combinar condiciones con and, or y not.",
+          "Diferenciar operadores lógicos y bit a bit.",
+          "Interpretar operaciones &, | y ^ sobre enteros."
         ],
         "explanation": [
-          "Las listas son mutables: se pueden modificar después de crearlas. append(valor) añade un elemento al final y len() permite comprobar cómo cambió el tamaño.",
-          "Para reemplazar un elemento, asigna un nuevo valor a su posición, por ejemplo tareas[0] = \"leer\". remove(valor) elimina la primera coincidencia; pop(indice) elimina y devuelve el elemento de la posición indicada.",
-          "Antes de quitar un valor, asegúrate de que existe. remove() produce ValueError cuando no encuentra el elemento y pop() produce IndexError si el índice no existe."
+          "and exige que ambas condiciones sean verdaderas; or requiere que al menos una lo sea y not invierte un valor booleano. Estos operadores expresan reglas compuestas como comprobar que una cuenta esté activa y tenga saldo suficiente.",
+          "Los operadores bit a bit actúan sobre la representación binaria de los enteros: & realiza AND, | realiza OR, ^ XOR, ~ invierte bits y << o >> desplazan posiciones. No son equivalentes a and y or, que evalúan condiciones.",
+          "El número 5 se representa como 0101 y el 3 como 0011. La operación 5 & 3 conserva los bits que son uno en ambos operandos y produce 0001, que equivale a 1; estas operaciones se utilizan en máscaras, permisos y protocolos."
         ],
-        "example": "tareas = [\"leer\", \"estudiar\"]\ntareas.append(\"practicar\")\ntareas[0] = \"investigar\"\ntareas.remove(\"estudiar\")\nprint(tareas)",
-        "exampleOutput": "['investigar', 'practicar']",
+        "example": "activo = True\nsaldo = 1200\nprint(activo and saldo >= 1000)\nprint(not activo)\nprint(5 & 3)\nprint(5 | 3)",
+        "exampleOutput": "True\nFalse\n1\n7",
         "walkthrough": [
-          "append() agrega practicar al final.",
-          "La primera posición cambia y remove() retira estudiar."
+          "and combina dos condiciones.",
+          "not invierte True a False.",
+          "5 & 3 conserva bits comunes y 5 | 3 combina posiciones activas."
         ],
         "commonMistakes": [
-          "Confundir append() con extend(): append añade un elemento, aunque ese elemento sea otra lista.",
-          "Intentar eliminar un valor que no está presente."
+          "Usar & como sustituto automático de and.",
+          "Confundir | con or en cualquier contexto."
         ],
         "exercise": {
           "id": "b3-e2",
-          "title": "Actualizar una lista de invitados",
-          "statement": "Parte de invitados = [\"Ana\", \"Luis\"]. Añade Marta, cambia Luis por Lucía y muestra la lista completa.",
-          "starterCode": "invitados = [\"Ana\", \"Luis\"]\n",
-          "solution": "invitados = [\"Ana\", \"Luis\"]\ninvitados.append(\"Marta\")\ninvitados[1] = \"Lucía\"\nprint(invitados)",
+          "title": "Combinar condiciones",
+          "statement": "Crea edad = 22 y tiene_entrada = True. Imprime True si tiene edad suficiente y entrada.",
+          "starterCode": "edad = 22\ntiene_entrada = True\n",
+          "solution": "edad = 22\ntiene_entrada = True\nprint(edad >= 18 and tiene_entrada)",
           "tests": [
             {
               "input": [],
-              "expected": "['Ana', 'Lucía', 'Marta']"
+              "expected": "True"
             }
           ],
           "hints": [
-            "Agrega primero con append().",
-            "El índice 1 corresponde al segundo nombre."
-          ],
-          "difficulty": "facil",
-          "xp": 15,
-          "length": 5
-        },
-        "questions": [
-          {
-            "prompt": "¿Qué método añade un único elemento al final de una lista?",
-            "options": [
-              "append()",
-              "remove()",
-              "sort()",
-              "clear()"
-            ],
-            "answer": 0,
-            "explanation": "append() incorpora el elemento al final de la lista."
-          }
-        ],
-        "assessment": false,
-        "estimatedMinutes": 14
-      },
-      {
-        "id": "b3-l3",
-        "section": "3.3",
-        "title": "Cadenas: analizar y transformar texto",
-        "objectives": [
-          "Reconocer que str es una secuencia de caracteres.",
-          "Usar lower(), upper(), strip() y split().",
-          "Buscar texto y unir palabras con join()."
-        ],
-        "explanation": [
-          "Una cadena (str) representa texto y es inmutable: los métodos no cambian la cadena original, sino que devuelven una nueva. Puedes guardar ese resultado en otra variable o sobrescribir la anterior.",
-          "lower() y upper() cambian el uso de mayúsculas; strip() elimina espacios al inicio y al final; split() separa una cadena y devuelve una lista. Estos métodos ayudan a normalizar datos ingresados por personas.",
-          "El método join() une una lista de cadenas con un separador. Por ejemplo, \"-\".join(codigos) coloca un guion entre los elementos. El separador es quien llama al método, no la lista."
-        ],
-        "example": "entrada = \"  Python desde cero  \"\nlimpia = entrada.strip().lower()\npalabras = limpia.split()\nprint(palabras)",
-        "exampleOutput": "['python', 'desde', 'cero']",
-        "walkthrough": [
-          "strip() elimina los espacios exteriores.",
-          "lower() normaliza el texto y split() divide por espacios."
-        ],
-        "commonMistakes": [
-          "Esperar que strip() elimine espacios entre palabras.",
-          "Llamar join() sobre una lista en vez de sobre el separador de texto."
-        ],
-        "exercise": {
-          "id": "b3-e3",
-          "title": "Limpiar un nombre",
-          "statement": "Convierte el texto \"  MARIA LOPEZ  \" a minúsculas y elimina los espacios de los extremos. Imprime el resultado.",
-          "starterCode": "nombre = \"  MARIA LOPEZ  \"\n",
-          "solution": "nombre = \"  MARIA LOPEZ  \"\nprint(nombre.strip().lower())",
-          "tests": [
-            {
-              "input": [],
-              "expected": "maria lopez"
-            }
-          ],
-          "hints": [
-            "strip() elimina espacios exteriores.",
-            "lower() cambia letras a minúsculas."
-          ],
-          "difficulty": "facil",
-          "xp": 10,
-          "length": 5
-        },
-        "questions": [
-          {
-            "prompt": "¿Qué devuelve split() cuando se aplica a una cadena?",
-            "options": [
-              "Una lista de partes de la cadena",
-              "Un número entero",
-              "La misma cadena sin espacios",
-              "Un valor booleano"
-            ],
-            "answer": 0,
-            "explanation": "split() divide la cadena y devuelve una lista con los fragmentos."
-          }
-        ],
-        "assessment": false,
-        "estimatedMinutes": 14
-      },
-      {
-        "id": "b3-l4",
-        "section": "3.4",
-        "title": "Recorrer colecciones y acumular resultados",
-        "objectives": [
-          "Recorrer cada elemento con for.",
-          "Acumular una suma o un contador.",
-          "Usar sum(), min(), max() y len() cuando corresponda."
-        ],
-        "explanation": [
-          "Un bucle for puede recorrer directamente los elementos de una lista. En cada repetición, la variable de control representa el valor actual, por lo que normalmente no necesitas gestionar índices manuales.",
-          "Un acumulador guarda un resultado parcial y se actualiza en cada vuelta. Para sumar precios, se inicia total en 0 y se agrega cada precio; para contar elementos que cumplen una condición, se incrementa un contador.",
-          "Python incluye funciones útiles como sum(), min(), max() y len(). Aprende a reconocer cuándo una función integrada expresa mejor la intención que escribir un bucle manual; en otros casos, el bucle permite añadir filtros o cálculos propios."
-        ],
-        "example": "precios = [1200, 800, 1500]\ntotal = 0\nfor precio in precios:\n    total += precio\nprint(total)\nprint(len(precios))",
-        "exampleOutput": "3500\n3",
-        "walkthrough": [
-          "total empieza en cero y recibe cada precio una sola vez.",
-          "len(precios) devuelve el número de productos de la lista."
-        ],
-        "commonMistakes": [
-          "Olvidar inicializar el acumulador antes del bucle.",
-          "Reiniciar total dentro del bucle, lo que impediría acumular todos los valores."
-        ],
-        "exercise": {
-          "id": "b3-e4",
-          "title": "Sumar calificaciones",
-          "statement": "Dada la lista notas = [80, 95, 70, 85], calcula e imprime la suma de todas las notas recorriendo la lista con for.",
-          "starterCode": "notas = [80, 95, 70, 85]\ntotal = 0\n",
-          "solution": "notas = [80, 95, 70, 85]\ntotal = 0\nfor nota in notas:\n    total += nota\nprint(total)",
-          "tests": [
-            {
-              "input": [],
-              "expected": "330"
-            }
-          ],
-          "hints": [
-            "Inicializa total en cero.",
-            "Suma cada nota dentro del for."
-          ],
-          "difficulty": "facil",
-          "xp": 15,
-          "length": 5
-        },
-        "questions": [
-          {
-            "prompt": "¿Qué función integrada devuelve cuántos elementos contiene una lista?",
-            "options": [
-              "sum()",
-              "max()",
-              "type()",
-              "len()"
-            ],
-            "answer": 3,
-            "explanation": "len() devuelve la cantidad de elementos de una secuencia o colección."
-          }
-        ],
-        "assessment": false,
-        "estimatedMinutes": 15
-      },
-      {
-        "id": "b3-l5",
-        "section": "3.5",
-        "title": "Diccionarios: relacionar claves y valores",
-        "objectives": [
-          "Crear un diccionario con llaves.",
-          "Consultar un valor mediante su clave.",
-          "Añadir o actualizar pares clave-valor."
-        ],
-        "explanation": [
-          "Un diccionario organiza información mediante parejas clave: valor. Es apropiado cuando un dato tiene atributos identificables, como nombre, correo y edad, en vez de depender solamente de posiciones numéricas.",
-          "Las claves deben ser únicas y normalmente se usan cadenas. Para consultar un valor escribimos registro[\"nombre\"]. También podemos usar get() cuando queremos un valor alternativo si una clave no existe.",
-          "Para añadir o actualizar un dato se asigna a una clave: registro[\"ciudad\"] = \"San José\". El mismo código crea la clave si no existía o reemplaza su valor si ya estaba presente."
-        ],
-        "example": "persona = {\"nombre\": \"Sofía\", \"edad\": 22}\npersona[\"ciudad\"] = \"San José\"\nprint(persona[\"nombre\"])\nprint(persona[\"ciudad\"])",
-        "exampleOutput": "Sofía\nSan José",
-        "walkthrough": [
-          "El diccionario comienza con dos claves.",
-          "La asignación de ciudad añade un nuevo par; la consulta devuelve su valor."
-        ],
-        "commonMistakes": [
-          "Confundir la clave con el valor: se consulta usando la clave.",
-          "Asumir que una clave inexistente devuelve None al usar corchetes; en ese caso se produce KeyError."
-        ],
-        "exercise": {
-          "id": "b3-e5",
-          "title": "Ficha de producto",
-          "statement": "Crea un diccionario producto con las claves nombre y precio. Guarda \"Mouse\" y 6500, agrega la clave disponible con el valor True e imprime el precio.",
-          "starterCode": "producto = {}\n",
-          "solution": "producto = {\"nombre\": \"Mouse\", \"precio\": 6500}\nproducto[\"disponible\"] = True\nprint(producto[\"precio\"])",
-          "tests": [
-            {
-              "input": [],
-              "expected": "6500"
-            }
-          ],
-          "hints": [
-            "Las claves son cadenas entre comillas.",
-            "La asignación a disponible agrega un tercer dato."
-          ],
-          "difficulty": "facil",
-          "xp": 15,
-          "length": 5
-        },
-        "questions": [
-          {
-            "prompt": "¿Qué estructura de Python permite consultar un dato mediante una clave descriptiva?",
-            "options": [
-              "Un diccionario",
-              "Una tupla",
-              "Un rango",
-              "Un comentario"
-            ],
-            "answer": 0,
-            "explanation": "Un diccionario relaciona claves con valores y permite buscar por la clave."
-          }
-        ],
-        "assessment": false,
-        "estimatedMinutes": 15
-      },
-      {
-        "id": "b3-l6",
-        "section": "3.6",
-        "title": "Tuplas, conjuntos y pertenencia",
-        "objectives": [
-          "Reconocer tuplas y conjuntos por su sintaxis y propósito.",
-          "Consultar si un valor está en una colección con in.",
-          "Eliminar duplicados mediante set() cuando el orden no es la prioridad."
-        ],
-        "explanation": [
-          "Una tupla agrupa valores en un orden fijo y no se modifica después de crearla. Se escribe normalmente entre paréntesis y resulta útil para representar un conjunto pequeño de datos relacionados, como coordenadas (x, y).",
-          "Un conjunto (set) almacena valores únicos. Al convertir una lista a set(), los duplicados desaparecen; no debes depender del orden de impresión de un conjunto.",
-          "El operador in comprueba pertenencia y devuelve True o False. Puedes usarlo con listas, cadenas, tuplas, conjuntos y diccionarios; en un diccionario, comprueba las claves."
-        ],
-        "example": "coordenada = (10, 20)\ncolores = {\"azul\", \"rojo\", \"azul\"}\nprint(coordenada[0])\nprint(len(colores))\nprint(\"rojo\" in colores)",
-        "exampleOutput": "10\n2\nTrue",
-        "walkthrough": [
-          "La tupla conserva la coordenada x en la posición 0.",
-          "El conjunto elimina el color repetido y la operación in comprueba pertenencia."
-        ],
-        "commonMistakes": [
-          "Intentar modificar una tupla después de crearla.",
-          "Confiar en el orden de los elementos de un conjunto."
-        ],
-        "exercise": {
-          "id": "b3-e6",
-          "title": "Detectar ingredientes repetidos",
-          "statement": "Convierte la lista ingredientes = [\"arroz\", \"sal\", \"arroz\", \"aceite\"] en un conjunto y muestra cuántos ingredientes distintos hay.",
-          "starterCode": "ingredientes = [\"arroz\", \"sal\", \"arroz\", \"aceite\"]\n",
-          "solution": "ingredientes = [\"arroz\", \"sal\", \"arroz\", \"aceite\"]\nunicos = set(ingredientes)\nprint(len(unicos))",
-          "tests": [
-            {
-              "input": [],
-              "expected": "3"
-            }
-          ],
-          "hints": [
-            "set() mantiene solo valores únicos.",
-            "Usa len() para contar el conjunto."
-          ],
-          "difficulty": "medio",
-          "xp": 15,
-          "length": 5
-        },
-        "questions": [
-          {
-            "prompt": "¿Cuál es una propiedad de los conjuntos (set)?",
-            "options": [
-              "Sus elementos son únicos y no se garantiza su orden",
-              "Permiten elementos duplicados en orden fijo",
-              "Solo almacenan texto",
-              "Se accede a cada elemento mediante índices"
-            ],
-            "answer": 0,
-            "explanation": "Un set elimina duplicados y no ofrece acceso por índice como una lista."
-          }
-        ],
-        "assessment": false,
-        "estimatedMinutes": 15
-      },
-      {
-        "id": "b3-l7",
-        "section": "3.7",
-        "title": "Proyecto guiado: inventario sencillo",
-        "objectives": [
-          "Representar productos mediante diccionarios.",
-          "Agrupar varios productos en una lista.",
-          "Recorrer registros y calcular un total."
-        ],
-        "explanation": [
-          "Un inventario pequeño puede modelarse como una lista de diccionarios. Cada diccionario representa un producto y guarda sus propiedades; la lista permite agregar nuevos productos y recorrerlos en orden.",
-          "Para calcular el valor de inventario, cada registro aporta precio multiplicado por cantidad. El total se acumula mientras recorremos la lista. Este patrón aparece en tiendas, bibliotecas, listas de asistencia y muchas aplicaciones cotidianas.",
-          "Un buen programa separa datos y operaciones: primero se define la estructura, después se recorre y se calcula. Antes de añadir un menú interactivo, comprueba que las operaciones básicas producen resultados correctos con datos pequeños."
-        ],
-        "example": "inventario = [\n    {\"nombre\": \"Cuaderno\", \"precio\": 900, \"cantidad\": 4},\n    {\"nombre\": \"Lapiz\", \"precio\": 200, \"cantidad\": 10}\n]\nvalor = 0\nfor producto in inventario:\n    valor += producto[\"precio\"] * producto[\"cantidad\"]\nprint(valor)",
-        "exampleOutput": "5600",
-        "walkthrough": [
-          "La lista contiene dos diccionarios, uno por producto.",
-          "En cada vuelta se multiplica precio por cantidad y se suma al acumulador valor."
-        ],
-        "commonMistakes": [
-          "Usar un índice de lista para consultar un diccionario, o viceversa.",
-          "Calcular solo el precio unitario y olvidar multiplicarlo por la cantidad."
-        ],
-        "exercise": {
-          "id": "b3-e7",
-          "title": "Valorar existencias",
-          "statement": "Con los dos productos del ejemplo, calcula cuántas unidades hay en total. No sumes precios: suma las cantidades.",
-          "starterCode": "inventario = [\n    {\"nombre\": \"Cuaderno\", \"cantidad\": 4},\n    {\"nombre\": \"Lapiz\", \"cantidad\": 10}\n]\nunidades = 0\n",
-          "solution": "inventario = [\n    {\"nombre\": \"Cuaderno\", \"cantidad\": 4},\n    {\"nombre\": \"Lapiz\", \"cantidad\": 10}\n]\nunidades = 0\nfor producto in inventario:\n    unidades += producto[\"cantidad\"]\nprint(unidades)",
-          "tests": [
-            {
-              "input": [],
-              "expected": "14"
-            }
-          ],
-          "hints": [
-            "Recorre la lista de diccionarios.",
-            "Suma el valor asociado a la clave cantidad."
+            "Compara la edad con 18.",
+            "and exige que ambas condiciones sean verdaderas."
           ],
           "difficulty": "medio",
           "xp": 20,
@@ -1160,101 +862,407 @@ export const courseModules: CourseModule[] = [
         },
         "questions": [
           {
-            "prompt": "¿Cómo se representa mejor una colección de varios productos, cada uno con nombre, precio y cantidad?",
+            "prompt": "¿Qué diferencia principal existe entre and y &?",
             "options": [
-              "Una lista de diccionarios",
-              "Una cadena con todos los datos mezclados",
-              "Una única tupla sin nombres de campos",
-              "Un conjunto de precios únicamente"
+              "and combina condiciones booleanas; & opera bit a bit sobre enteros",
+              "Son siempre el mismo operador",
+              "and suma bits y & compara cadenas",
+              "& solo sirve para repetir bucles"
             ],
             "answer": 0,
-            "explanation": "Una lista de diccionarios conserva el orden de los productos y agrupa las propiedades de cada registro."
+            "explanation": "and se utiliza para condiciones; & combina bits de valores enteros."
           }
         ],
         "assessment": false,
-        "estimatedMinutes": 20
+        "estimatedMinutes": 45
+      },
+      {
+        "id": "b3-l3",
+        "section": "3.3",
+        "title": "Decisiones con if, elif y else",
+        "objectives": [
+          "Construir condiciones con if.",
+          "Encadenar alternativas mediante elif.",
+          "Cubrir los demás casos con else y sangría correcta."
+        ],
+        "explanation": [
+          "if ejecuta un bloque cuando la condición es verdadera. La línea de control termina con dos puntos y el bloque se identifica por la sangría; si la condición es falsa, Python continúa con la siguiente parte de la estructura.",
+          "elif permite comprobar otra condición cuando las anteriores fueron falsas. Python ejecuta únicamente la primera rama que se cumple, por eso el orden es importante si las condiciones se solapan.",
+          "else cubre los casos que no cumplen ninguna condición anterior. Antes de escribir el código, prueba valores por debajo, iguales y por encima de cada límite para evitar dejar datos sin clasificar."
+        ],
+        "example": "nota = 84\nif nota >= 90:\n    print(\"Excelente\")\nelif nota >= 70:\n    print(\"Aprobado\")\nelse:\n    print(\"Debe reforzar\")",
+        "exampleOutput": "Aprobado",
+        "walkthrough": [
+          "La primera condición es falsa para 84.",
+          "La segunda condición es verdadera.",
+          "else no se ejecuta porque una rama ya fue seleccionada."
+        ],
+        "commonMistakes": [
+          "Poner primero una condición general que capture todos los valores.",
+          "Olvidar los dos puntos o la sangría."
+        ],
+        "exercise": {
+          "id": "b3-e3",
+          "title": "Clasificar un envío",
+          "statement": "Si peso es hasta 1 kg imprime Ligero; hasta 5 kg imprime Mediano; en otro caso Pesado.",
+          "starterCode": "peso = 3.2\n",
+          "solution": "peso = 3.2\nif peso <= 1:\n    print(\"Ligero\")\nelif peso <= 5:\n    print(\"Mediano\")\nelse:\n    print(\"Pesado\")",
+          "tests": [
+            {
+              "input": [],
+              "expected": "Mediano"
+            }
+          ],
+          "hints": [
+            "Comprueba primero el límite menor.",
+            "Usa elif para el segundo intervalo."
+          ],
+          "difficulty": "facil",
+          "xp": 20,
+          "length": 5
+        },
+        "questions": [
+          {
+            "prompt": "¿Qué sucede si dos condiciones de una cadena if/elif/else podrían ser verdaderas?",
+            "options": [
+              "Python ejecuta la primera condición verdadera y salta el resto",
+              "Se ejecutan todas las ramas",
+              "Python elige siempre la última",
+              "El programa produce error de sintaxis"
+            ],
+            "answer": 0,
+            "explanation": "La cadena se detiene en la primera condición verdadera y omite las siguientes."
+          }
+        ],
+        "assessment": false,
+        "estimatedMinutes": 45
+      },
+      {
+        "id": "b3-l4",
+        "section": "3.4",
+        "title": "Repetición condicional con while",
+        "objectives": [
+          "Explicar que while repite mientras la condición sea verdadera.",
+          "Actualizar la variable que controla el ciclo.",
+          "Reconocer y evitar ciclos infinitos."
+        ],
+        "explanation": [
+          "while ejecuta un bloque mientras su condición sea True. Resulta útil cuando el número de repeticiones depende de una situación, por ejemplo pedir un dato hasta que cumpla una regla.",
+          "Un ciclo necesita avanzar hacia su final. Si la condición depende de un contador, este debe actualizarse dentro del bloque; si no cambia, el programa puede repetir la misma operación indefinidamente.",
+          "Antes de utilizar while identifica el valor inicial, la condición para continuar y la instrucción que modifica los datos. Para depurar, comienza con pocos pasos y observa el cambio del contador."
+        ],
+        "example": "contador = 1\nwhile contador <= 3:\n    print(contador)\n    contador += 1",
+        "exampleOutput": "1\n2\n3",
+        "walkthrough": [
+          "El contador comienza en uno.",
+          "Se imprime y aumenta en cada vuelta.",
+          "Al llegar a cuatro, la condición es falsa."
+        ],
+        "commonMistakes": [
+          "Olvidar actualizar el contador.",
+          "Incrementar en la dirección incorrecta."
+        ],
+        "exercise": {
+          "id": "b3-e4",
+          "title": "Contar hasta cinco",
+          "statement": "Utiliza while para imprimir los números del 1 al 5, uno por línea.",
+          "starterCode": "contador = 1\n",
+          "solution": "contador = 1\nwhile contador <= 5:\n    print(contador)\n    contador += 1",
+          "tests": [
+            {
+              "input": [],
+              "expected": "1\n2\n3\n4\n5"
+            }
+          ],
+          "hints": [
+            "La condición debe incluir cinco.",
+            "Incrementa el contador en cada vuelta."
+          ],
+          "difficulty": "facil",
+          "xp": 20,
+          "length": 5
+        },
+        "questions": [
+          {
+            "prompt": "¿Cuándo termina un bucle while?",
+            "options": [
+              "Cuando print() muestra un número",
+              "Cuando el contador llega siempre a cero",
+              "Después de diez vueltas",
+              "Cuando su condición se vuelve falsa"
+            ],
+            "answer": 3,
+            "explanation": "while evalúa la condición antes de cada vuelta y termina cuando es falsa."
+          }
+        ],
+        "assessment": false,
+        "estimatedMinutes": 45
+      },
+      {
+        "id": "b3-l5",
+        "section": "3.5",
+        "title": "Recorridos con for, range(), break y continue",
+        "objectives": [
+          "Recorrer secuencias mediante for.",
+          "Interpretar inicio, límite y paso de range().",
+          "Diferenciar break de continue."
+        ],
+        "explanation": [
+          "for toma un elemento de una secuencia y ejecuta el bloque una vez por cada elemento. Es apropiado cuando se recorren listas o se conoce el rango de valores que se necesita procesar.",
+          "range(fin) genera desde cero hasta fin sin incluirlo; range(inicio, fin, paso) permite elegir comienzo e incremento. range(2, 11, 2) produce 2, 4, 6, 8 y 10.",
+          "break termina el ciclo más cercano y continue omite el resto de la vuelta actual para pasar a la siguiente. Utiliza cada instrucción cuando la regla del problema lo requiera, sin confundir sus efectos."
+        ],
+        "example": "for numero in range(1, 6):\n    if numero == 3:\n        continue\n    print(numero)",
+        "exampleOutput": "1\n2\n4\n5",
+        "walkthrough": [
+          "range(1, 6) genera del uno al cinco.",
+          "Cuando numero vale tres, continue omite print().",
+          "El bucle sigue con cuatro y cinco."
+        ],
+        "commonMistakes": [
+          "Esperar que range(5) incluya cinco.",
+          "Confundir continue con break."
+        ],
+        "exercise": {
+          "id": "b3-e5",
+          "title": "Imprimir números pares",
+          "statement": "Utiliza for y range() para mostrar los pares desde 2 hasta 10.",
+          "starterCode": "for numero in range(2, 11, 2):\n    # muestra el número\n    pass\n",
+          "solution": "for numero in range(2, 11, 2):\n    print(numero)",
+          "tests": [
+            {
+              "input": [],
+              "expected": "2\n4\n6\n8\n10"
+            }
+          ],
+          "hints": [
+            "Empieza en dos y usa paso dos.",
+            "Usa once como límite para incluir diez."
+          ],
+          "difficulty": "facil",
+          "xp": 20,
+          "length": 5
+        },
+        "questions": [
+          {
+            "prompt": "¿Qué valores genera range(1, 4)?",
+            "options": [
+              "1, 2, 3",
+              "0, 1, 2, 3",
+              "1, 2, 3, 4",
+              "2, 3, 4"
+            ],
+            "answer": 0,
+            "explanation": "range se detiene antes del límite final."
+          }
+        ],
+        "assessment": false,
+        "estimatedMinutes": 45
+      },
+      {
+        "id": "b3-l6",
+        "section": "3.6",
+        "title": "Listas: crear, consultar y recorrer",
+        "objectives": [
+          "Crear listas y consultar su longitud.",
+          "Acceder a elementos mediante índices y cortes.",
+          "Recorrer elementos con for."
+        ],
+        "explanation": [
+          "Una lista agrupa varios valores y conserva el orden. Se escribe entre corchetes y puede almacenar números, cadenas u otros tipos de datos; una variable de lista representa una colección completa.",
+          "Los índices empiezan en cero, los negativos cuentan desde el final y len() devuelve la cantidad de elementos. Un índice inexistente genera IndexError, por eso conviene comprobar la longitud cuando la posición depende de datos externos.",
+          "Un corte lista[inicio:fin] selecciona valores desde inicio hasta antes de fin. Para procesar todos los elementos suele bastar con for elemento in lista, sin administrar índices manualmente."
+        ],
+        "example": "notas = [80, 95, 70, 85]\nprint(notas[0])\nprint(notas[-1])\nprint(notas[1:3])\nprint(len(notas))",
+        "exampleOutput": "80\n85\n[95, 70]\n4",
+        "walkthrough": [
+          "El índice cero consulta el primer elemento.",
+          "El índice -1 consulta el último.",
+          "El corte [1:3] incluye las posiciones uno y dos."
+        ],
+        "commonMistakes": [
+          "Pensar que el primer índice es uno.",
+          "Esperar que el límite final de un corte se incluya."
+        ],
+        "exercise": {
+          "id": "b3-e6",
+          "title": "Consultar una lista",
+          "statement": "Crea tareas = [\"leer\", \"practicar\", \"repasar\"]. Imprime el segundo elemento y la cantidad de elementos.",
+          "starterCode": "# crea la lista\n",
+          "solution": "tareas = [\"leer\", \"practicar\", \"repasar\"]\nprint(tareas[1])\nprint(len(tareas))",
+          "tests": [
+            {
+              "input": [],
+              "expected": "practicar\n3"
+            }
+          ],
+          "hints": [
+            "El segundo elemento tiene índice uno.",
+            "Utiliza len() para contar."
+          ],
+          "difficulty": "facil",
+          "xp": 20,
+          "length": 5
+        },
+        "questions": [
+          {
+            "prompt": "¿Qué índice permite acceder al primer elemento de una lista?",
+            "options": [
+              "0",
+              "1",
+              "-1",
+              "len(lista)"
+            ],
+            "answer": 0,
+            "explanation": "Los índices de las listas comienzan en cero."
+          }
+        ],
+        "assessment": false,
+        "estimatedMinutes": 45
+      },
+      {
+        "id": "b3-l7",
+        "section": "3.7",
+        "title": "Modificar, ordenar y procesar listas",
+        "objectives": [
+          "Añadir y eliminar elementos mediante métodos.",
+          "Diferenciar sort() de sorted().",
+          "Explicar el algoritmo de ordenamiento por burbuja."
+        ],
+        "explanation": [
+          "append() añade elementos, remove() elimina la primera coincidencia y pop() elimina por posición y devuelve el valor. Antes de eliminar, comprueba que el elemento o índice exista para evitar excepciones.",
+          "sort() ordena la lista original; sorted(lista) crea una lista nueva ordenada. reverse=True permite ordenar en sentido descendente; el resultado puede utilizarse para presentar o procesar datos.",
+          "Bubble sort compara elementos vecinos y los intercambia cuando están en el orden incorrecto. Después de cada pasada, un elemento grande queda al final de la parte no ordenada; es útil para aprender bucles anidados, aunque no es eficiente con listas grandes."
+        ],
+        "example": "numeros = [5, 2, 4, 1]\nnumeros.append(3)\nordenados = sorted(numeros)\nprint(numeros)\nprint(ordenados)",
+        "exampleOutput": "[5, 2, 4, 1, 3]\n[1, 2, 3, 4, 5]",
+        "walkthrough": [
+          "append() modifica la lista original.",
+          "sorted() devuelve otra lista ordenada.",
+          "Las dos impresiones permiten comparar los resultados."
+        ],
+        "commonMistakes": [
+          "Creer que sorted() modifica la lista original.",
+          "Intercambiar valores sin conservar temporalmente uno de ellos."
+        ],
+        "exercise": {
+          "id": "b3-e7",
+          "title": "Ordenar con bubble sort",
+          "statement": "Completa el ordenamiento por burbuja para ordenar [5, 2, 4, 1] de menor a mayor.",
+          "starterCode": "numeros = [5, 2, 4, 1]\nfor pasada in range(len(numeros)):\n    for indice in range(len(numeros) - 1 - pasada):\n        # compara e intercambia vecinos\n        pass\n",
+          "solution": "numeros = [5, 2, 4, 1]\nfor pasada in range(len(numeros)):\n    for indice in range(len(numeros) - 1 - pasada):\n        if numeros[indice] > numeros[indice + 1]:\n            temporal = numeros[indice]\n            numeros[indice] = numeros[indice + 1]\n            numeros[indice + 1] = temporal\nprint(numeros)",
+          "tests": [
+            {
+              "input": [],
+              "expected": "[1, 2, 4, 5]"
+            }
+          ],
+          "hints": [
+            "Compara cada elemento con su vecino derecho.",
+            "Intercambia cuando el primero es mayor."
+          ],
+          "difficulty": "medio",
+          "xp": 20,
+          "length": 5
+        },
+        "questions": [
+          {
+            "prompt": "¿Qué método ordena una lista modificando el mismo objeto?",
+            "options": [
+              "sort()",
+              "sorted()",
+              "append()",
+              "remove()"
+            ],
+            "answer": 0,
+            "explanation": "sort() modifica la lista; sorted() devuelve una lista nueva."
+          }
+        ],
+        "assessment": false,
+        "estimatedMinutes": 45
       },
       {
         "id": "b3-l8",
         "section": "3.8",
-        "title": "Evaluación del módulo 3: colecciones y datos",
+        "title": "Evaluación del módulo 3: lógica, ciclos y listas",
         "objectives": [
-          "Elegir la colección adecuada para el tipo de información.",
-          "Procesar listas y diccionarios mediante recorridos.",
-          "Interpretar operaciones habituales de cadenas y colecciones."
+          "Combinar comparaciones y operadores lógicos.",
+          "Elegir estructuras de repetición adecuadas.",
+          "Procesar colecciones y comprender el ordenamiento."
         ],
         "explanation": [
-          "En este módulo aprendiste a seleccionar una estructura según la pregunta: lista si importa el orden y se modifica el conjunto; diccionario si cada dato tiene una clave; tupla para agrupar valores fijos; conjunto para mantener elementos únicos.",
-          "La evaluación combina acceso, modificación, recorrido y selección de estructuras. Cuando leas un ejercicio, identifica qué dato necesitas consultar y qué operación se aplicará sobre él.",
-          "El reto práctico integra una lista de registros y un acumulador. Comprueba cada paso con pocos elementos antes de trabajar con una colección más grande."
+          "Esta evaluación integra comparaciones, operadores lógicos, control de flujo y listas. Para responder, calcula valores y sigue el orden real de ejecución; no supongas que Python evalúa todas las ramas de un condicional.",
+          "Al trabajar con listas, identifica si necesitas consultar una posición, recorrer elementos, modificar contenido u ordenar. Si el problema requiere intercambiar vecinos, revisa los límites del recorrido y la condición de intercambio.",
+          "El reto combina una lista, un bucle y una condición. Ejecuta un caso pequeño, compara la salida con lo esperado y corrige primero los límites o condiciones antes de modificar otras partes del programa."
         ],
-        "example": "ventas = [1200, 800, 500]\nprint(sum(ventas))\nprint(800 in ventas)",
-        "exampleOutput": "2500\nTrue",
+        "example": "datos = [4, 1, 3]\nfor numero in datos:\n    if numero >= 3:\n        print(\"alto\")\n    else:\n        print(\"bajo\")",
+        "exampleOutput": "alto\nbajo\nalto",
         "walkthrough": [
-          "sum() agrega los valores numéricos de la lista.",
-          "in comprueba si 800 aparece en la colección."
+          "for recorre los elementos en orden.",
+          "La condición separa valores mayores o iguales a tres.",
+          "La salida conserva el orden de la lista."
         ],
         "commonMistakes": [
-          "Elegir un set cuando el orden de los datos sí importa.",
-          "Olvidar que los índices empiezan en cero o que las cadenas no se modifican en el sitio."
+          "No considerar que range() excluye el límite final.",
+          "Usar operadores bit a bit para una condición booleana simple."
         ],
         "exercise": {
           "id": "b3-e8",
-          "title": "Resumen de ventas",
-          "statement": "Calcula la suma y el promedio de ventas = [1000, 1500, 2000]. Imprime primero la suma y después el promedio.",
-          "starterCode": "ventas = [1000, 1500, 2000]\n",
-          "solution": "ventas = [1000, 1500, 2000]\ntotal = sum(ventas)\npromedio = total / len(ventas)\nprint(total)\nprint(promedio)",
+          "title": "Clasificar una lista",
+          "statement": "Recorre [2, 5, 1, 8]. Imprime Par para números pares e Impar para los demás.",
+          "starterCode": "datos = [2, 5, 1, 8]\n",
+          "solution": "datos = [2, 5, 1, 8]\nfor numero in datos:\n    if numero % 2 == 0:\n        print(\"Par\")\n    else:\n        print(\"Impar\")",
           "tests": [
             {
               "input": [],
-              "expected": "4500\n1500.0"
+              "expected": "Par\nImpar\nImpar\nPar"
             }
           ],
           "hints": [
-            "Usa sum() para calcular el total.",
-            "Divide el total entre len(ventas) para obtener el promedio."
+            "Recorre la lista con for.",
+            "Un número es par cuando el residuo al dividirlo entre dos es cero."
           ],
-          "difficulty": "medio",
-          "xp": 25,
+          "difficulty": "facil",
+          "xp": 20,
           "length": 5
         },
         "questions": [
           {
             "prompt": "Si datos = [\"a\", \"b\", \"c\"], ¿qué devuelve datos[1]?",
             "options": [
-              "Una lista vacía",
-              "El valor None",
               "\"a\"",
+              "\"c\"",
+              "\"1\"",
               "\"b\""
             ],
             "answer": 3,
-            "explanation": "El índice 1 es la segunda posición de la lista."
+            "explanation": "El índice uno representa el segundo elemento."
           },
           {
-            "prompt": "¿Qué hace diccionario.get(\"zona\", \"sin dato\") si la clave zona no existe?",
+            "prompt": "¿Qué hace continue dentro de un bucle?",
             "options": [
-              "Devuelve \"sin dato\"",
-              "Agrega zona automáticamente",
-              "Devuelve la lista completa",
-              "Lanza siempre IndexError"
+              "Salta el resto de la iteración actual y continúa con la siguiente",
+              "Termina el programa",
+              "Finaliza el bucle inmediatamente",
+              "Vuelve al inicio del archivo"
             ],
             "answer": 0,
-            "explanation": "get() devuelve el valor alternativo indicado cuando la clave no existe."
+            "explanation": "continue omite las instrucciones restantes de la vuelta y avanza a la siguiente."
           },
           {
-            "prompt": "¿Qué estructura elimina duplicados al convertir una lista?",
+            "prompt": "¿Qué operador bit a bit conserva los bits que son 1 en ambos operandos?",
             "options": [
-              "set()",
-              "str()",
-              "tuple()",
-              "dict()"
+              "&",
+              "|",
+              "^",
+              "~"
             ],
             "answer": 0,
-            "explanation": "set() crea un conjunto y conserva una sola aparición de cada valor."
+            "explanation": "El AND bit a bit conserva las posiciones que contienen un uno en ambos operandos."
           }
         ],
         "assessment": true,
-        "estimatedMinutes": 25
+        "estimatedMinutes": 45
       }
     ]
   },
