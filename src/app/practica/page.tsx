@@ -48,7 +48,7 @@ export default async function PracticaPage() {
           Laboratorio de Python
         </h1>
         <p className="mb-8 mt-4 max-w-2xl text-sm leading-7 text-[var(--theme-muted)]">
-          Escribe código, ejecuta tus pruebas y guarda el progreso de tus lecciones.
+          Escribe código Python, ejecuta tus pruebas y observa el resultado. El avance de cada lección se guarda desde su evaluación en la academia.
         </p>
 
         <PythonEditor
