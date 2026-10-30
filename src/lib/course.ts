@@ -21,7 +21,7 @@ export const courseModules: CourseModule[] = [
         "explanation": [
           "Programar comienza por entender una necesidad y definir el resultado correcto. Un algoritmo es una secuencia finita y ordenada de pasos que permite resolver esa tarea; cada paso debe ser claro y comprobable.",
           "Un algoritmo puede escribirse con palabras, diagramas o pseudocódigo antes de convertirse en Python. Un programa traduce esos pasos a instrucciones de un lenguaje que el intérprete puede ejecutar siguiendo un orden definido.",
-          "Para calcular el cambio de una compra, identifica precio y pago como entradas, realiza la resta como proceso y muestra el resultado como salida. En este primer ejemplo, precio, pago y cambio son nombres que ayudan a identificar los datos: se usan como demostración guiada, no como una explicación completa de las variables. La instrucción print() solo hace visible la salida; su uso formal como función se estudia más adelante. Separar estas etapas permite comprobar la lógica antes de escribir código."
+          "Para calcular el cambio de una compra, identifica precio y pago como entradas, realiza la resta como proceso y muestra el resultado como salida. En este primer ejemplo, precio, pago y cambio son nombres que ayudan a identificar los datos: se usan como demostración guiada, no como una explicación completa de las variables. La instrucción print() solo hace visible la salida; su uso formal como función se estudia en la lección 2.1. Separar estas etapas permite comprobar la lógica antes de escribir código."
         ],
         "example": "precio = 3200\npago = 5000\ncambio = pago - precio\nprint(cambio)",
         "exampleOutput": "1800",
