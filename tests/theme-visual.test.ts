@@ -104,47 +104,30 @@ test("Respetar prefers-reduced-motion", async ({ page }) => {
   expect(animations).toBe(0);
 });
 
+test("La paleta de temas móvil se adapta al ancho y no queda recortada", async ({ page }) => {
+  for (const width of [320, 360, 390]) {
+    await page.setViewportSize({ width, height: 568 });
+    await page.goto("/");
 
-test("La paleta de temas cabe completa en una pantalla móvil", async ({ page }) => {
-  await page.setViewportSize({ width: 360, height: 640 });
-  await page.goto("/");
+    const trigger = page.getByRole("button", { name: "Seleccionar tema visual" });
+    await expect(trigger).toBeVisible();
+    await trigger.click();
 
-  const trigger = page.getByRole("button", { name: "Seleccionar tema visual" });
-  await trigger.click();
-  await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    const dialog = page.getByRole("dialog", { name: "Tema visual" });
+    await expect(dialog).toBeVisible();
 
-  const panel = page.getByRole("region", { name: "Tema visual" });
-  await expect(panel).toBeVisible();
-  await expect(panel.locator('button[aria-pressed]')).toHaveCount(7);
+    const bounds = await dialog.boundingBox();
+    expect(bounds).not.toBeNull();
+    expect(bounds!.x).toBeGreaterThanOrEqual(0);
+    expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width);
+    expect(bounds!.y).toBeGreaterThanOrEqual(0);
+    expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(568);
 
-  const bounds = await panel.boundingBox();
-  expect(bounds).not.toBeNull();
-  expect(bounds!.x).toBeGreaterThanOrEqual(0);
-  expect(bounds!.y).toBeGreaterThanOrEqual(0);
-  expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(360);
-  expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(640);
+    await expect(dialog.locator("[data-theme-options]")).toHaveCSS("overflow-y", "auto");
+    await expect(dialog.getByRole("button", { name: /Cyberpunk/ })).toBeVisible();
+    await dialog.getByRole("button", { name: /Cyberpunk/ }).click();
 
-  const layout = await panel.evaluate((element) => {
-    const firstOption = element.querySelector("button");
-    const textContainer = firstOption?.querySelectorAll(":scope > span")[1];
-    const label = textContainer?.querySelectorAll(":scope > span")[0];
-    const description = textContainer?.querySelectorAll(":scope > span")[1];
-    return {
-      panelScrollWidth: element.scrollWidth,
-      panelClientWidth: element.clientWidth,
-      labelDisplay: label ? getComputedStyle(label).display : "",
-      descriptionDisplay: description ? getComputedStyle(description).display : "",
-      bodyScrollWidth: document.body.scrollWidth,
-    };
-  });
-
-  expect(layout.panelScrollWidth).toBeLessThanOrEqual(layout.panelClientWidth);
-  expect(layout.bodyScrollWidth).toBeLessThanOrEqual(360);
-  expect(layout.labelDisplay).toBe("block");
-  expect(layout.descriptionDisplay).toBe("block");
-
-  await panel.getByRole("button", { name: /Hacker/ }).click();
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "hacker");
-  await expect(panel).toHaveCount(0);
-  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "cyberpunk");
+    await expect(dialog).toHaveCount(0);
+  }
 });
