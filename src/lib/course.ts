@@ -206,43 +206,43 @@ export const courseModules: CourseModule[] = [
       {
         "id": "b1-l4",
         "section": "1.4",
-        "title": "Primer programa, salida y comentarios",
+        "title": "Primer contacto con un programa Python",
         "objectives": [
-          "Utilizar print() para mostrar texto y valores.",
-          "Escribir comentarios de una línea con #.",
-          "Reconocer errores sencillos de sintaxis."
+          "Reconocer que un programa es un conjunto ordenado de instrucciones.",
+          "Ejecutar un programa sencillo mediante el intérprete de Python.",
+          "Identificar la salida y el orden en que se ejecutan las instrucciones."
         ],
         "explanation": [
-          "print() muestra información en la consola. El texto debe escribirse entre comillas; los números pueden escribirse sin ellas. Python ejecuta las instrucciones en orden, normalmente de arriba hacia abajo.",
-          "Un comentario comienza con # y permite explicar una decisión o dejar una nota para quien lee el programa. Python ignora los comentarios durante la ejecución; una comilla sin cerrar o un paréntesis faltante puede producir un error de sintaxis.",
-          "Cuando aparezca un error, lee el mensaje, localiza la línea indicada y revisa nombres, comillas y paréntesis antes de modificar otras partes. Un comentario útil añade contexto y no repite literalmente el código."
+          "Un programa informático es un conjunto de instrucciones que una computadora puede ejecutar para realizar una tarea. El código fuente es el texto que escribe la persona programadora siguiendo las reglas de un lenguaje, en este caso Python.",
+          "El intérprete de Python lee el código y ejecuta sus instrucciones. Cuando una instrucción muestra un resultado, ese resultado aparece en la consola. En esta primera práctica solo comprobarás que el entorno puede ejecutar un programa; la sintaxis de print() se estudiará con detalle en el módulo 2.",
+          "Python ejecuta las instrucciones en orden, de arriba hacia abajo. Si encuentra una instrucción que no respeta la sintaxis, muestra un error y detiene esa ejecución. Aprender a observar el resultado y leer el mensaje de error es parte del trabajo de programar."
         ],
-        "example": "# Mensaje de bienvenida\nprint(\"Hola, Python\")\nprint(2026)",
-        "exampleOutput": "Hola, Python\n2026",
+        "example": "print(\"Hola, Python\")",
+        "exampleOutput": "Hola, Python",
         "walkthrough": [
-          "La primera línea es un comentario.",
-          "La primera llamada muestra texto.",
-          "La segunda llamada muestra un número."
+          "El editor contiene una instrucción escrita en Python.",
+          "Al ejecutar el código, el intérprete procesa esa instrucción.",
+          "La consola muestra el texto que produjo el programa."
         ],
         "commonMistakes": [
-          "Escribir texto literal sin comillas.",
-          "Cambiar mayúsculas en print() o dejar un paréntesis abierto."
+          "Confundir el código fuente con el resultado que aparece en la consola.",
+          "Cambiar el texto sin conservar las comillas que delimitan una cadena."
         ],
         "exercise": {
           "id": "b1-e4",
-          "title": "Presentación en tres líneas",
-          "statement": "Muestra Ana, Estoy aprendiendo Python y 2026, cada uno en una línea.",
-          "starterCode": "# completa el programa\n",
-          "solution": "print(\"Ana\")\nprint(\"Estoy aprendiendo Python\")\nprint(2026)",
+          "title": "Ejecuta tu primer mensaje",
+          "statement": "Modifica el mensaje para que el programa muestre Estoy listo para aprender Python.",
+          "starterCode": "print(\"Hola, Python\")",
+          "solution": "print(\"Estoy listo para aprender Python\")",
           "tests": [
             {
               "input": [],
-              "expected": "Ana\nEstoy aprendiendo Python\n2026"
+              "expected": "Estoy listo para aprender Python"
             }
           ],
           "hints": [
-            "Usa tres llamadas print().",
-            "El año puede mostrarse como número."
+            "Ejecuta primero el ejemplo para comprobar que el entorno responde.",
+            "Cambia únicamente el texto entre comillas y vuelve a ejecutar."
           ],
           "difficulty": "facil",
           "xp": 15,
@@ -250,19 +250,19 @@ export const courseModules: CourseModule[] = [
         },
         "questions": [
           {
-            "prompt": "¿Qué carácter inicia un comentario de una línea en Python?",
+            "prompt": "¿Qué describe mejor un programa informático?",
             "options": [
-              "//",
-              "--",
-              "**",
-              "#"
+              "Una parte física del computador",
+              "Un archivo que contiene únicamente imágenes",
+              "Una contraseña para iniciar sesión",
+              "Un conjunto de instrucciones que la computadora ejecuta"
             ],
             "answer": 3,
-            "explanation": "El símbolo # hace que Python ignore el resto de esa línea como comentario."
+            "explanation": "Un programa reúne instrucciones escritas en un lenguaje que el intérprete o el entorno de ejecución puede procesar."
           }
         ],
         "assessment": false,
-        "estimatedMinutes": 40
+        "estimatedMinutes": 25
       }
     ]
   },
@@ -519,27 +519,31 @@ export const courseModules: CourseModule[] = [
       {
         "id": "b2-l5",
         "section": "2.5",
-        "title": "Cadenas y salida formateada",
+        "title": "Cadenas, comentarios y salida formateada",
         "objectives": [
           "Combinar texto con variables y expresiones mediante f-strings.",
           "Limpiar y transformar cadenas con strip(), lower() y title().",
-          "Presentar números con formato y etiquetas comprensibles."
+          "Presentar números con formato y etiquetas comprensibles.",
+          "Documentar el propósito de una instrucción mediante comentarios breves con #."
         ],
         "explanation": [
           "Una cadena (str) representa texto y ofrece métodos para normalizarlo. strip() elimina espacios al principio y al final; lower() convierte las letras a minúsculas y title() pone en mayúscula inicial cada palabra. Las cadenas son inmutables: estos métodos devuelven un nuevo texto y no cambian la cadena original.",
           "Una f-string comienza con la letra f antes de las comillas. Dentro de llaves puedes insertar variables o expresiones, y la especificación :.2f permite mostrar dos decimales. Esta forma resulta más legible que concatenar manualmente texto y números.",
-          "La salida es la conversación del programa con quien lo utiliza. Antes de mostrar un dato, limpia espacios innecesarios, conserva el formato adecuado y añade una etiqueta con su significado. Así evitas nombres inconsistentes y resultados que no se entienden."
+          "La salida es la conversación del programa con quien lo utiliza. Antes de mostrar un dato, limpia espacios innecesarios, conserva el formato adecuado y añade una etiqueta con su significado. Así evitas nombres inconsistentes y resultados que no se entienden.",
+          "Un comentario comienza con # y sirve para explicar la intención de una parte del código. Python ignora ese texto al ejecutar el programa. Escribe comentarios breves que aporten contexto; no repitas palabra por palabra lo que la instrucción ya expresa."
         ],
         "example": "entrada = \"  ana perez  \"\nnombre = entrada.strip().title()\nprecio = 1250.5\nprint(nombre)\nprint(f\"Total: {precio:.2f} colones\")",
         "exampleOutput": "Ana Perez\nTotal: 1250.50 colones",
         "walkthrough": [
           "strip() elimina los espacios que rodean el nombre.",
           "title() devuelve una cadena con las palabras capitalizadas.",
-          "La f-string presenta el precio con dos decimales y una etiqueta."
+          "La f-string presenta el precio con dos decimales y una etiqueta.",
+          "Los comentarios explican la intención y no aparecen en la salida."
         ],
         "commonMistakes": [
           "Creer que strip() elimina los espacios que aparecen entre palabras.",
-          "Olvidar la f antes de las comillas o mezclar texto y números con +."
+          "Olvidar la f antes de las comillas o mezclar texto y números con +.",
+          "Escribir una nota sin el símbolo # y provocar un error de sintaxis."
         ],
         "exercise": {
           "id": "b2-e5",
