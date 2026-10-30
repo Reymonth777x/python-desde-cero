@@ -1,6 +1,7 @@
 'use client';
 
 import { useTheme, type ThemeName } from '@/app/theme-provider';
+import { useEffect, useId, useRef, useState } from 'react';
 
 const THEMES = [
   { id: 'sistema', label: 'Sistema', color: '#6b7280' },
@@ -10,56 +11,100 @@ const THEMES = [
   { id: 'cyberpunk', label: 'Cyberpunk', color: '#00ffff' },
   { id: 'hacker', label: 'Hacker', color: '#00ff41' },
   { id: 'rosa', label: 'Rosa', color: '#be185d' },
-];
+] as const;
 
 export default function ThemeSelectorNav() {
   const { theme, setTheme } = useTheme();
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelId = useId();
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const closeWhenOutside = (event: PointerEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsOpen(false);
+        triggerRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('pointerdown', closeWhenOutside);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('pointerdown', closeWhenOutside);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [isOpen]);
+
   return (
-    <div className="relative inline-block">
+    <div ref={containerRef} className={`relative inline-block ${isOpen ? 'z-[90]' : ''}`}>
       <button
+        ref={triggerRef}
         type="button"
-        className="flex items-center gap-2 px-2 py-1 text-xs font-semibold text-[var(--theme-muted)] hover:text-[var(--theme-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"
+        onClick={() => setIsOpen((open) => !open)}
+        className="flex min-h-10 items-center gap-2 rounded-md px-2 py-2 text-xs font-semibold text-[var(--theme-muted)] hover:bg-[var(--theme-surface)] hover:text-[var(--theme-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"
         aria-label="Seleccionar tema"
-        aria-haspopup="true"
+        aria-controls={panelId}
+        aria-expanded={isOpen}
       >
         <span
-          className="flex h-4 w-4 items-center justify-center rounded-full border border-current"
+          className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-current"
           style={{ color: THEMES.find((t) => t.id === theme)?.color }}
+          aria-hidden="true"
         >
           <span className="h-1.5 w-1.5 rounded-full bg-current" />
         </span>
+        <span>Tema</span>
+        <span aria-hidden="true" className="opacity-60">▾</span>
       </button>
-      <div
-        className="absolute right-0 mt-1 w-48 rounded-lg shadow-lg py-2 z-50"
-        style={{
-          backgroundColor: 'var(--theme-surface)',
-          borderColor: 'var(--theme-border)',
-          borderWidth: '1px',
-          borderStyle: 'solid',
-        }}
-      >
-        <p className="mx-3 mb-1 text-[10px] font-bold tracking-[0.2em] text-[var(--theme-muted)] uppercase">
-          Tema
-        </p>
-        <div className="space-y-0.5">
-          {THEMES.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setTheme(t.id as ThemeName)}
-              className={`flex w-full items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors ${theme === t.id ? 'bg-[var(--theme-accent)] text-[var(--theme-ink-inverse)]' : 'text-[var(--theme-ink)] hover:bg-[var(--theme-surface)] hover:text-[var(--theme-accent)]'}`}
-            >
-              <span
-                className="flex h-4 w-4 items-center justify-center rounded-full border border-current"
-                style={{ color: t.color }}
+      {isOpen && (
+        <div
+          id={panelId}
+          role="region"
+          aria-label="Tema visual"
+          className="absolute right-0 top-full z-50 mt-2 w-[min(13rem,calc(100vw-1.5rem))] rounded-xl border p-2 shadow-xl"
+          style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}
+        >
+          <p className="px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--theme-muted)]">
+            Tema visual
+          </p>
+          <div className="space-y-1">
+            {THEMES.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                onClick={() => {
+                  setTheme(option.id as ThemeName);
+                  setIsOpen(false);
+                }}
+                aria-pressed={theme === option.id}
+                className="flex min-h-10 w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--theme-focus-ring)]"
+                style={{
+                  backgroundColor: theme === option.id ? 'var(--theme-accent-light)' : 'transparent',
+                  color: 'var(--theme-ink)',
+                }}
               >
-                <span className="h-1.5 w-1.5 rounded-full bg-current" />
-              </span>
-              <span style={{ color: 'var(--theme-ink)' }}>{t.label}</span>
-            </button>
-          ))}
+                <span
+                  className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-current"
+                  style={{ color: option.color }}
+                  aria-hidden="true"
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                </span>
+                <span className="min-w-0 flex-1 break-words">{option.label}</span>
+                {theme === option.id && <span className="text-xs font-bold text-[var(--theme-accent)]" aria-label="Tema seleccionado">✓</span>}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
