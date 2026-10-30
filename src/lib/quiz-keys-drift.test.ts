@@ -56,7 +56,7 @@ describe('quiz answer-key drift detection', () => {
     expect(sql).toContain('SET correct_option_v2 = mapping.correct_option_v2');
     expect(sql).toContain('CREATE OR REPLACE FUNCTION public.submit_quiz_v2');
     expect(sql).not.toContain('SET correct_option = mapping.correct_option');
-    expect(finalAssessmentSql).toContain('ON CONFLICT (module_id, lesson_id, question_index) DO UPDATE');
+    expect(finalAssessmentSql).toMatch(/ON CONFLICT \(module_id, lesson_id, question_index\)\s+DO UPDATE SET/);
     expect(finalAssessmentSql).not.toContain('DELETE FROM private.quiz_answer_key');
     expect(actual).toHaveLength(expected.length);
     expect(actual).toEqual(expected);
