@@ -205,7 +205,7 @@ export const courseModules: CourseModule[] = [
       },
       {
         "id": "b1-l4",
-        "section": "1.4",
+        "section": "1.3 práctica",
         "title": "Primer contacto con un programa Python",
         "objectives": [
           "Reconocer que un programa es un conjunto ordenado de instrucciones.",
