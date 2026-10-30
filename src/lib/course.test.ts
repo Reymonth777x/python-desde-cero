@@ -87,6 +87,21 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(algoritmo.options[algoritmo.answer]).toBe('Una secuencia finita y ordenada de pasos para resolver un problema');
   });
 
+  it('mantiene el orden progresivo del módulo 3 antes de los ejercicios integradores y la evaluación', () => {
+    expect(courseModules[2].lessons.map((item) => item.id)).toEqual([
+      'b3-l1',
+      'b3-l3',
+      'b3-l4',
+      'b3-l5',
+      'b3-l2',
+      'b3-l6',
+      'b3-l7',
+      'b3-l9',
+      'b3-l8',
+    ]);
+    expect(lesson('module-1', 'b1-l4').section).toBe('1.3 práctica');
+  });
+
   it('incluye estructuras y herramientas necesarias para resolver problemas reales', () => {
     const lesson = (moduleId: string, lessonId: string) =>
       courseModules.find((courseModule) => courseModule.id === moduleId)!
