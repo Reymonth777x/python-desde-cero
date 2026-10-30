@@ -22,12 +22,17 @@ const EMPTY_RESULT: SubmitQuizResult = {
   completed: false,
 };
 
-function friendlyQuizError(message: string | undefined): string {
-  const m = message ?? '';
+function friendlyQuizError(code: string | undefined, message: string | undefined): string {
+  const m = (message ?? '').toLowerCase();
   if (m.includes('quiz_rate_limited')) return 'Hiciste demasiados intentos seguidos. Espera unos minutos y vuelve a intentarlo.';
-  if (m.includes('quiz_auth_required')) return 'Tu sesión expiró. Inicia sesión de nuevo.';
-  if (m.includes('quiz_invalid')) return 'Esta evaluación no está disponible en este momento. Avísanos si el problema continúa.';
-  return 'No se pudo guardar tu resultado. Inténtalo de nuevo.';
+  if (m.includes('quiz_auth_required') || code === 'PGRST301' || m.includes('jwt')) return 'Tu sesión expiró o ya no es válida. Vuelve a iniciar sesión.';
+  if (m.includes('quiz_invalid')) return 'La evaluación no coincide con la versión activa del curso. Actualiza la página y vuelve a intentarlo.';
+  if (code === 'PGRST202' || m.includes('could not find the function') || m.includes('schema cache')) return 'El guardado de evaluaciones no está sincronizado con la base de datos. La actualización debe revisarse antes de continuar.';
+  if (code === '42501' || m.includes('permission denied') || m.includes('row-level security')) return 'La base de datos rechazó el guardado por permisos. No se perdió tu respuesta; informa al equipo para revisar el acceso de esta cuenta.';
+  if (m.includes('network') || m.includes('fetch') || m.includes('timeout')) return 'Se perdió la conexión al guardar. Revisa tu internet y vuelve a comprobar las respuestas.';
+  return code
+    ? `No se pudo guardar tu resultado (referencia ${code}). Inténtalo de nuevo; si continúa, comparte solo esa referencia.`
+    : 'No se pudo guardar tu resultado. Inténtalo de nuevo.';
 }
 
 function parseAnswers(formData: FormData): number[] | null {
@@ -93,7 +98,7 @@ export async function submitQuiz(
       total,
       explanations: [],
       completed: false,
-      error: friendlyQuizError(rpcError.message),
+      error: friendlyQuizError(rpcError.code, rpcError.message),
     };
   }
 
