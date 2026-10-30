@@ -17,13 +17,19 @@ describe('sequential lesson access', () => {
     expect(canAccessLessonInSequence('module-1', 2, lessons, progress)).toBe(false);
   });
 
-  it('unlocks only the next lesson after completion', () => {
-    const progress: LessonProgressRecord[] = [
+  it('unlocks the next lesson only after every earlier lesson is completed', () => {
+    const firstCompleted: LessonProgressRecord[] = [
       { module_id: 'module-1', lesson_id: 'b1-l1', is_completed: true },
     ];
 
-    expect(canAccessLessonInSequence('module-1', 1, lessons, progress)).toBe(true);
-    expect(canAccessLessonInSequence('module-1', 2, lessons, progress)).toBe(false);
+    expect(canAccessLessonInSequence('module-1', 1, lessons, firstCompleted)).toBe(true);
+    expect(canAccessLessonInSequence('module-1', 2, lessons, firstCompleted)).toBe(false);
+
+    const firstTwoCompleted: LessonProgressRecord[] = [
+      ...firstCompleted,
+      { module_id: 'module-1', lesson_id: 'b1-l2', is_completed: true },
+    ];
+    expect(canAccessLessonInSequence('module-1', 2, lessons, firstTwoCompleted)).toBe(true);
   });
 
   it('does not treat completion in another module as a prerequisite', () => {
