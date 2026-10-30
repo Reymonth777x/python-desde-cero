@@ -1,5 +1,4 @@
 import PythonEditor from '@/components/PythonEditor';
-import LessonProgress from '@/components/LessonProgress';
 import { logout } from '@/app/login/actions';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
@@ -56,7 +55,6 @@ export default async function PracticaPage() {
           defaultCode={'precio = 1200\ncantidad = 3\ntotal = precio * cantidad\nprint(total)'}
           instructions="Edita el programa, pulsa Ejecutar y consulta la salida. Para probar input(), escribe una respuesta por línea en el campo de entrada antes de ejecutar. La ejecución tiene un límite de tiempo; si lo supera, el Worker se reinicia."
         />
-        <LessonProgress />
       </div>
     </main>
   );
