@@ -17,7 +17,10 @@ function createWorkerHarness({ withTurtle = false }: { withTurtle?: boolean } = 
   let stdin = () => null as string | null;
 
   const turtleCommandProxy = {
-    toJs: vi.fn(() => [
+    toJs: vi.fn((options: {
+      dict_converter: (entries: Iterable<[string, unknown]>) => unknown;
+      create_pyproxies: boolean;
+    }) => [
       { type: 'line', x1: 0, y1: 0, x2: 25, y2: 40, color: 'lime' },
     ]),
     destroy: vi.fn(),
@@ -132,10 +135,12 @@ describe('Python Web Worker', () => {
     });
 
     expect(harness.getCommands).toHaveBeenCalledOnce();
-    expect(harness.turtleCommandProxy.toJs).toHaveBeenCalledWith({
-      dict_converter: Object.fromEntries,
-      create_pyproxies: false,
-    });
+    const conversionOptions = harness.turtleCommandProxy.toJs.mock.calls[0]?.[0];
+    expect(conversionOptions?.create_pyproxies).toBe(false);
+    expect(typeof conversionOptions?.dict_converter).toBe('function');
+    expect(
+      (conversionOptions?.dict_converter([['type', 'line']]) as { type: string }).type,
+    ).toBe('line');
     expect(harness.turtleCommandProxy.destroy).toHaveBeenCalledOnce();
     expect(harness.posted.find((message) => message.id === 8)?.turtle_commands).toEqual([
       { type: 'line', x1: 0, y1: 0, x2: 25, y2: 40, color: 'lime' },
