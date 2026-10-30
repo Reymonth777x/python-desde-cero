@@ -30,7 +30,7 @@ Archivo canónico:
 `supabase/migrations/20261029051953_020_balance_quiz_answer_positions_v2.sql`
 
 La migración agregó `private.quiz_answer_key.correct_option_v2` y publicó `public.submit_quiz_v2(text,text,integer[])`. En el momento de aplicar la migración se configuraron 41 preguntas. La verificación remota de solo lectura del 30-10-2026 contra el catálogo vigente encontró:
-- 44 claves del catálogo actual repartidas en 34 lecciones; las 44 tienen `correct_option_v2` configurado.
+- 67 claves del catálogo actual repartidas en 37 lecciones; las 67 tienen `correct_option_v2` configurado.
 - 31 de las 44 usan un índice v2 distinto del índice histórico; el texto de la opción correcta se conservó al reordenar el catálogo.
 - Hay 43 claves históricas de IDs antiguos sin v2; no pertenecen al catálogo actual `bN-lN` y no deben confundirse con claves faltantes del curso vigente.
 - `anon` no puede ejecutar el RPC v2; `authenticated` sí.
@@ -46,7 +46,7 @@ Verificación remota adicional del 30-10-2026:
 - El historial `supabase_migrations.schema_migrations` contiene las tres versiones y nombres anteriores.
 - El RPC `private.submit_quiz_authoritative_v2` contiene la limpieza acotada al usuario autenticado.
 - El trigger de protección de invitaciones utilizadas está instalado.
-- El catálogo vigente tiene 44 claves en 34 lecciones; 44/44 tienen `correct_option_v2`. Hay 43 claves históricas de IDs antiguos sin v2, fuera del catálogo vigente.
+- El catálogo vigente tiene 67 claves en 37 lecciones; 67/67 tienen `correct_option_v2`. Hay 43 claves históricas de IDs antiguos sin v2, fuera del catálogo vigente.
 
 **Conflicto de PR #8:** su archivo `20261030050000_021_pe1_course_catalog_refresh.sql` reutiliza la versión `20261030050000` con contenido y propósito distintos. Esa versión ya está aplicada en remoto como `scope_quiz_attempt_cleanup_to_current_user`. No fusionar ni aplicar la migración de PR #8. Revisar sus cambios de código y rescatar únicamente los que no dupliquen ni contradigan la ruta canónica.
 ## Migraciones 024–026 — estado remoto verificado el 30-10-2026
