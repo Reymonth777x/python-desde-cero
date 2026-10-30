@@ -645,6 +645,72 @@ export const courseModules: CourseModule[] = [
         "estimatedMinutes": 40
       },
       {
+        "id": "b2-l8",
+        "section": "2.6 práctica",
+        "title": "Laboratorio integrador: crear un recibo interactivo",
+        "objectives": [
+          "Leer texto, precios y cantidades mediante input().",
+          "Convertir cada dato al tipo que necesita el cálculo.",
+          "Presentar un recibo con una salida formateada."
+        ],
+        "explanation": [
+          "Un programa interactivo recibe información de la persona que lo utiliza. input() siempre devuelve una cadena, por lo que debes decidir si el dato representa texto, una cantidad entera o un importe con decimales antes de procesarlo.",
+          "Para un recibo, el nombre del producto se puede limpiar con strip() y title(); el precio se convierte con float() y la cantidad con int(). Después se multiplica precio por cantidad. Separar lectura, conversión y cálculo facilita encontrar una entrada incorrecta.",
+          "Una f-string permite presentar el resultado con una etiqueta y dos decimales. Antes de entregar un programa, pruébalo con más de un producto, precios con y sin decimales y cantidades mayores que uno; los casos de prueba deben confirmar que el cálculo no depende de un único ejemplo."
+        ],
+        "example": "producto = input(\"Producto: \").strip().title()\nprecio = float(input(\"Precio: \"))\ncantidad = int(input(\"Cantidad: \"))\ntotal = precio * cantidad\nprint(f\"{producto}: {total:.2f} colones\")",
+        "exampleOutput": "Cuaderno: 2500.00 colones",
+        "walkthrough": [
+          "strip() elimina espacios que rodean el nombre y title() lo presenta de forma legible.",
+          "float() permite que el precio tenga decimales; int() convierte la cantidad a entero.",
+          "La f-string presenta el subtotal con dos posiciones decimales."
+        ],
+        "commonMistakes": [
+          "Olvidar que input() entrega texto aunque la persona escriba una cifra.",
+          "Convertir el precio con int() y perder los centavos."
+        ],
+        "exercise": {
+          "id": "b2-e8",
+          "title": "Emitir un recibo desde la entrada",
+          "statement": "Lee tres líneas: el nombre del producto, su precio decimal y su cantidad entera. Limpia el nombre, calcula el total y muestra el recibo con dos decimales. Prueba con Cuaderno, 1250 y 2.",
+          "starterCode": "producto = input()\nprecio = float(input())\ncantidad = int(input())\n",
+          "solution": "producto = input().strip().title()\nprecio = float(input())\ncantidad = int(input())\ntotal = precio * cantidad\nprint(f\"{producto}: {total:.2f} colones\")",
+          "tests": [
+            {
+              "input": [
+                "cuaderno",
+                "1250",
+                "2"
+              ],
+              "expected": "Cuaderno: 2500.00 colones"
+            }
+          ],
+          "hints": [
+            "Lee tres entradas en el orden indicado.",
+            "Limpia el nombre antes de mostrarlo.",
+            "Multiplica el precio por la cantidad y utiliza :.2f."
+          ],
+          "difficulty": "medio",
+          "xp": 25,
+          "length": 5
+        },
+        "questions": [
+          {
+            "prompt": "¿Por qué se convierte precio con float() y cantidad con int()?",
+            "options": [
+              "Porque input() ya devuelve números",
+              "Porque ambos datos deben conservarse como texto",
+              "Porque el precio puede tener decimales y la cantidad debe ser entera",
+              "Porque int() convierte cualquier palabra"
+            ],
+            "answer": 2,
+            "explanation": "float() permite representar importes con parte decimal; int() representa cantidades enteras."
+          }
+        ],
+        "assessment": false,
+        "estimatedMinutes": 55
+      },
+      {
         "id": "b2-l7",
         "section": "2.7",
         "title": "Evaluación del módulo 2: tipos, operadores y E/S",
@@ -750,73 +816,7 @@ export const courseModules: CourseModule[] = [
         "assessment": true,
         "estimatedMinutes": 50
       },
-      {
-        "id": "b2-l8",
-        "section": "2.8",
-        "title": "Laboratorio integrador: crear un recibo interactivo",
-        "objectives": [
-          "Leer texto, precios y cantidades mediante input().",
-          "Convertir cada dato al tipo que necesita el cálculo.",
-          "Presentar un recibo con una salida formateada."
-        ],
-        "explanation": [
-          "Un programa interactivo recibe información de la persona que lo utiliza. input() siempre devuelve una cadena, por lo que debes decidir si el dato representa texto, una cantidad entera o un importe con decimales antes de procesarlo.",
-          "Para un recibo, el nombre del producto se puede limpiar con strip() y title(); el precio se convierte con float() y la cantidad con int(). Después se multiplica precio por cantidad. Separar lectura, conversión y cálculo facilita encontrar una entrada incorrecta.",
-          "Una f-string permite presentar el resultado con una etiqueta y dos decimales. Antes de entregar un programa, pruébalo con más de un producto, precios con y sin decimales y cantidades mayores que uno; los casos de prueba deben confirmar que el cálculo no depende de un único ejemplo."
-        ],
-        "example": "producto = input(\"Producto: \").strip().title()\nprecio = float(input(\"Precio: \"))\ncantidad = int(input(\"Cantidad: \"))\ntotal = precio * cantidad\nprint(f\"{producto}: {total:.2f} colones\")",
-        "exampleOutput": "Cuaderno: 2500.00 colones",
-        "walkthrough": [
-          "strip() elimina espacios que rodean el nombre y title() lo presenta de forma legible.",
-          "float() permite que el precio tenga decimales; int() convierte la cantidad a entero.",
-          "La f-string presenta el subtotal con dos posiciones decimales."
-        ],
-        "commonMistakes": [
-          "Olvidar que input() entrega texto aunque la persona escriba una cifra.",
-          "Convertir el precio con int() y perder los centavos."
-        ],
-        "exercise": {
-          "id": "b2-e8",
-          "title": "Emitir un recibo desde la entrada",
-          "statement": "Lee tres líneas: el nombre del producto, su precio decimal y su cantidad entera. Limpia el nombre, calcula el total y muestra el recibo con dos decimales. Prueba con Cuaderno, 1250 y 2.",
-          "starterCode": "producto = input()\nprecio = float(input())\ncantidad = int(input())\n",
-          "solution": "producto = input().strip().title()\nprecio = float(input())\ncantidad = int(input())\ntotal = precio * cantidad\nprint(f\"{producto}: {total:.2f} colones\")",
-          "tests": [
-            {
-              "input": [
-                "cuaderno",
-                "1250",
-                "2"
-              ],
-              "expected": "Cuaderno: 2500.00 colones"
-            }
-          ],
-          "hints": [
-            "Lee tres entradas en el orden indicado.",
-            "Limpia el nombre antes de mostrarlo.",
-            "Multiplica el precio por la cantidad y utiliza :.2f."
-          ],
-          "difficulty": "medio",
-          "xp": 25,
-          "length": 5
-        },
-        "questions": [
-          {
-            "prompt": "¿Por qué se convierte precio con float() y cantidad con int()?",
-            "options": [
-              "Porque input() ya devuelve números",
-              "Porque ambos datos deben conservarse como texto",
-              "Porque el precio puede tener decimales y la cantidad debe ser entera",
-              "Porque int() convierte cualquier palabra"
-            ],
-            "answer": 2,
-            "explanation": "float() permite representar importes con parte decimal; int() representa cantidades enteras."
-          }
-        ],
-        "assessment": false,
-        "estimatedMinutes": 55
-      }
-    ]
+   ]
   },
   {
     "id": "module-3",
@@ -1262,7 +1262,7 @@ export const courseModules: CourseModule[] = [
       },
       {
         "id": "b3-l9",
-        "section": "3.8",
+        "section": "3.7 práctica",
         "title": "Laboratorio integrador: analizar una tabla de calificaciones",
         "objectives": [
           "Representar una tabla mediante una lista de listas.",
@@ -1324,7 +1324,7 @@ export const courseModules: CourseModule[] = [
       },
       {
         "id": "b3-l8",
-        "section": "3.9",
+        "section": "3.8",
         "title": "Evaluación del módulo 3: lógica, ciclos y listas",
         "objectives": [
           "Combinar comparaciones y operadores lógicos.",
@@ -1838,6 +1838,68 @@ export const courseModules: CourseModule[] = [
         "estimatedMinutes": 45
       },
       {
+        "id": "b4-l9",
+        "section": "4.7 práctica",
+        "title": "Laboratorio integrador: calcular un inventario con funciones",
+        "objectives": [
+          "Representar productos mediante una lista de diccionarios.",
+          "Crear una función con un parámetro predeterminado.",
+          "Recorrer los registros y acumular un total."
+        ],
+        "explanation": [
+          "Una aplicación puede guardar varios productos como una lista de diccionarios. Cada diccionario conserva las mismas claves, como nombre, precio y cantidad; esto permite recorrer los registros sin crear una variable diferente para cada producto.",
+          "Una función puede recibir un producto y un impuesto. Si el parámetro impuesto tiene un valor predeterminado, la llamada puede omitirlo y utilizar la tasa establecida. La función devuelve un resultado para que el programa principal pueda acumularlo.",
+          "El bucle recorre la lista, llama a la función para cada registro y suma los resultados. Separar el cálculo en una función facilita probarlo y reutilizarlo. Comprueba el total con una operación manual antes de presentar el informe."
+        ],
+        "example": "def valor_con_iva(producto, impuesto=0.13):\n    subtotal = producto[\"precio\"] * producto[\"cantidad\"]\n    return subtotal * (1 + impuesto)\n\nproductos = [\n    {\"nombre\": \"Cuaderno\", \"precio\": 900, \"cantidad\": 4},\n    {\"nombre\": \"Lapiz\", \"precio\": 200, \"cantidad\": 10}\n]\ntotal = 0\nfor producto in productos:\n    total += valor_con_iva(producto)\nprint(f\"Valor con impuesto: {total:.2f}\")",
+        "exampleOutput": "Valor con impuesto: 6328.00",
+        "walkthrough": [
+          "Cada diccionario contiene el nombre, precio y cantidad de un producto.",
+          "valor_con_iva() calcula el subtotal y aplica el 13% predeterminado.",
+          "El bucle suma el valor de cada registro y presenta el importe acumulado."
+        ],
+        "commonMistakes": [
+          "Olvidar que el parámetro impuesto ya tiene un valor predeterminado.",
+          "Sumar solo el precio unitario y omitir la cantidad disponible."
+        ],
+        "exercise": {
+          "id": "b4-e9",
+          "title": "Calcular el valor total con impuesto",
+          "statement": "Define valor_con_iva(producto, impuesto=0.13), que devuelva precio por cantidad más el 13%. Recorre los dos productos del ejemplo y muestra el total con dos decimales.",
+          "starterCode": "productos = [\n    {\"nombre\": \"Cuaderno\", \"precio\": 900, \"cantidad\": 4},\n    {\"nombre\": \"Lapiz\", \"precio\": 200, \"cantidad\": 10}\n]\n",
+          "solution": "def valor_con_iva(producto, impuesto=0.13):\n    subtotal = producto[\"precio\"] * producto[\"cantidad\"]\n    return subtotal * (1 + impuesto)\n\nproductos = [\n    {\"nombre\": \"Cuaderno\", \"precio\": 900, \"cantidad\": 4},\n    {\"nombre\": \"Lapiz\", \"precio\": 200, \"cantidad\": 10}\n]\ntotal = 0\nfor producto in productos:\n    total += valor_con_iva(producto)\nprint(f\"{total:.2f}\")",
+          "tests": [
+            {
+              "input": [],
+              "expected": "6328.00"
+            }
+          ],
+          "hints": [
+            "Define la función antes de recorrer los productos.",
+            "Multiplica precio por cantidad antes de aplicar el impuesto.",
+            "Suma el resultado de la función para cada producto."
+          ],
+          "difficulty": "medio",
+          "xp": 25,
+          "length": 5
+        },
+        "questions": [
+          {
+            "prompt": "¿Qué hace el parámetro impuesto=0.13 en valor_con_iva(producto, impuesto=0.13)?",
+            "options": [
+              "Permite omitir impuesto en la llamada y utilizar 0.13",
+              "Obliga a que cada llamada entregue un segundo argumento",
+              "Convierte el producto en un diccionario",
+              "Hace que la función se ejecute dos veces"
+            ],
+            "answer": 0,
+            "explanation": "Un parámetro predeterminado se utiliza cuando la llamada no entrega un valor para ese argumento."
+          }
+        ],
+        "assessment": false,
+        "estimatedMinutes": 65
+      },
+      {
         "id": "b4-l8",
         "section": "4.8",
         "title": "Evaluación del módulo 4: funciones y datos estructurados",
@@ -1920,69 +1982,7 @@ export const courseModules: CourseModule[] = [
         "assessment": true,
         "estimatedMinutes": 45
       },
-      {
-        "id": "b4-l9",
-        "section": "4.9",
-        "title": "Laboratorio integrador: calcular un inventario con funciones",
-        "objectives": [
-          "Representar productos mediante una lista de diccionarios.",
-          "Crear una función con un parámetro predeterminado.",
-          "Recorrer los registros y acumular un total."
-        ],
-        "explanation": [
-          "Una aplicación puede guardar varios productos como una lista de diccionarios. Cada diccionario conserva las mismas claves, como nombre, precio y cantidad; esto permite recorrer los registros sin crear una variable diferente para cada producto.",
-          "Una función puede recibir un producto y un impuesto. Si el parámetro impuesto tiene un valor predeterminado, la llamada puede omitirlo y utilizar la tasa establecida. La función devuelve un resultado para que el programa principal pueda acumularlo.",
-          "El bucle recorre la lista, llama a la función para cada registro y suma los resultados. Separar el cálculo en una función facilita probarlo y reutilizarlo. Comprueba el total con una operación manual antes de presentar el informe."
-        ],
-        "example": "def valor_con_iva(producto, impuesto=0.13):\n    subtotal = producto[\"precio\"] * producto[\"cantidad\"]\n    return subtotal * (1 + impuesto)\n\nproductos = [\n    {\"nombre\": \"Cuaderno\", \"precio\": 900, \"cantidad\": 4},\n    {\"nombre\": \"Lapiz\", \"precio\": 200, \"cantidad\": 10}\n]\ntotal = 0\nfor producto in productos:\n    total += valor_con_iva(producto)\nprint(f\"Valor con impuesto: {total:.2f}\")",
-        "exampleOutput": "Valor con impuesto: 6328.00",
-        "walkthrough": [
-          "Cada diccionario contiene el nombre, precio y cantidad de un producto.",
-          "valor_con_iva() calcula el subtotal y aplica el 13% predeterminado.",
-          "El bucle suma el valor de cada registro y presenta el importe acumulado."
-        ],
-        "commonMistakes": [
-          "Olvidar que el parámetro impuesto ya tiene un valor predeterminado.",
-          "Sumar solo el precio unitario y omitir la cantidad disponible."
-        ],
-        "exercise": {
-          "id": "b4-e9",
-          "title": "Calcular el valor total con impuesto",
-          "statement": "Define valor_con_iva(producto, impuesto=0.13), que devuelva precio por cantidad más el 13%. Recorre los dos productos del ejemplo y muestra el total con dos decimales.",
-          "starterCode": "productos = [\n    {\"nombre\": \"Cuaderno\", \"precio\": 900, \"cantidad\": 4},\n    {\"nombre\": \"Lapiz\", \"precio\": 200, \"cantidad\": 10}\n]\n",
-          "solution": "def valor_con_iva(producto, impuesto=0.13):\n    subtotal = producto[\"precio\"] * producto[\"cantidad\"]\n    return subtotal * (1 + impuesto)\n\nproductos = [\n    {\"nombre\": \"Cuaderno\", \"precio\": 900, \"cantidad\": 4},\n    {\"nombre\": \"Lapiz\", \"precio\": 200, \"cantidad\": 10}\n]\ntotal = 0\nfor producto in productos:\n    total += valor_con_iva(producto)\nprint(f\"{total:.2f}\")",
-          "tests": [
-            {
-              "input": [],
-              "expected": "6328.00"
-            }
-          ],
-          "hints": [
-            "Define la función antes de recorrer los productos.",
-            "Multiplica precio por cantidad antes de aplicar el impuesto.",
-            "Suma el resultado de la función para cada producto."
-          ],
-          "difficulty": "medio",
-          "xp": 25,
-          "length": 5
-        },
-        "questions": [
-          {
-            "prompt": "¿Qué hace el parámetro impuesto=0.13 en valor_con_iva(producto, impuesto=0.13)?",
-            "options": [
-              "Permite omitir impuesto en la llamada y utilizar 0.13",
-              "Obliga a que cada llamada entregue un segundo argumento",
-              "Convierte el producto en un diccionario",
-              "Hace que la función se ejecute dos veces"
-            ],
-            "answer": 0,
-            "explanation": "Un parámetro predeterminado se utiliza cuando la llamada no entrega un valor para ese argumento."
-          }
-        ],
-        "assessment": false,
-        "estimatedMinutes": 65
-      }
-    ]
+   ]
   },
   {
     "id": "module-5",
