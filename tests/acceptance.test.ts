@@ -139,6 +139,24 @@ test.describe('Rutas de autenticación', () => {
     await expect(page.locator('h1')).toBeVisible();
   });
 
+  test('separa las credenciales al cambiar entre Entrar y Crear cuenta', async ({ page }) => {
+    await page.goto('/login');
+
+    await page.locator('#login-email').fill('admin-prueba@example.test');
+    await page.locator('#login-password').fill('UnaClaveTemporal123!');
+    await page.getByRole('button', { name: 'Crear cuenta', exact: true }).click();
+
+    await expect(page.locator('#signup-email')).toHaveValue('');
+    await expect(page.locator('#signup-password')).toHaveValue('');
+
+    await page.locator('#signup-email').fill('estudiante-prueba@example.test');
+    await page.locator('#signup-password').fill('OtraClaveTemporal123!');
+    await page.getByRole('button', { name: 'Entrar', exact: true }).click();
+
+    await expect(page.locator('#login-email')).toHaveValue('');
+    await expect(page.locator('#login-password')).toHaveValue('');
+  });
+
   test('carga forgot-password', async ({ page }) => {
     await page.goto('/login/forgot-password');
     await expect(page.locator('h1')).toContainText('Recuperar contraseña');

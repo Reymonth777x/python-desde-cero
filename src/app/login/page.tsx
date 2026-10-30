@@ -1,5 +1,7 @@
 import LoginForm from './LoginForm';
 import { safeNext } from '@/lib/safe-next';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 
 type SearchParams = {
   error?: string | string[];
@@ -33,6 +35,12 @@ function firstParam(value?: string | string[]) {
 
 export default async function LoginPage({ searchParams }: Props) {
   const params = await searchParams;
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (!authError && user) {
+    redirect(safeNext(firstParam(params.next), '/academia'));
+  }
+
   const errorCode = firstParam(params.error);
   const messageCode = firstParam(params.message);
   const error = errorCode

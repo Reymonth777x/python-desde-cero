@@ -134,7 +134,8 @@ print("Área del cuadrado (lado 4):", area_cuadrado(4))`,
   },
 ];
 
-const TOTAL_LESSONS = courseModules.reduce(
+const CORE_MODULES = courseModules.filter((module) => !module.optional);
+const TOTAL_LESSONS = CORE_MODULES.reduce(
   (total, module) => total + module.lessons.length,
   0,
 );
@@ -151,7 +152,7 @@ function HeroIllustration() {
             <span className="h-2 w-2 rounded-full bg-[var(--theme-error)]" />
             <span className="h-2 w-2 rounded-full bg-[var(--theme-warning)]" />
             <span className="h-2 w-2 rounded-full bg-[var(--theme-success)]" />
-            <span className="ml-2 font-mono text-[11px] text-[var(--theme-muted)]">arbol_fractal.py</span>
+            <span className="ml-2 font-mono text-[11px] text-[var(--theme-muted)]">cuadrado.py</span>
           </div>
           <span className="font-mono text-[10px] tracking-[0.15em] text-[var(--theme-accent)]">PYTHON / 01</span>
         </div>
@@ -159,10 +160,10 @@ function HeroIllustration() {
         <div className="grid grid-cols-[1fr_0.92fr]">
           <div className="min-w-0 bg-[var(--theme-code-bg)] p-4 sm:p-5">
             <p className="font-mono text-[10px] tracking-[0.16em] text-[var(--theme-muted)]">UNA IDEA SE CONVIERTE EN CÓDIGO</p>
-            <pre className="mt-4 overflow-hidden whitespace-pre-wrap break-words font-mono text-[11px] leading-[1.9] text-[var(--theme-ink)] sm:text-xs"><code><span className="text-[var(--theme-muted)]">01 </span><span className="text-[var(--theme-accent)]">def</span> rama(n):{"\n"}<span className="text-[var(--theme-muted)]">02 </span>    <span className="text-[var(--theme-accent)]">if</span> n &lt; 10:{"\n"}<span className="text-[var(--theme-muted)]">03 </span>        <span className="text-[var(--theme-warning)]">return</span>{"\n"}<span className="text-[var(--theme-muted)]">04 </span>    t.forward(n){"\n"}<span className="text-[var(--theme-muted)]">05 </span>    rama(n * 0.78){"\n"}<span className="text-[var(--theme-muted)]">06 </span>    t.left(25)</code></pre>
+            <pre className="mt-4 overflow-hidden whitespace-pre-wrap break-words font-mono text-[11px] leading-[1.9] text-[var(--theme-ink)] sm:text-xs"><code><span className="text-[var(--theme-muted)]">01 </span><span className="text-[var(--theme-accent)]">import</span> turtle <span className="text-[var(--theme-accent)]">as</span> t{"\n"}<span className="text-[var(--theme-muted)]">02 </span><span className="text-[var(--theme-accent)]">for</span> lado <span className="text-[var(--theme-accent)]">in</span> range(4):{"\n"}<span className="text-[var(--theme-muted)]">03 </span>    t.forward(80){"\n"}<span className="text-[var(--theme-muted)]">04 </span>    t.right(90)</code></pre>
             <div className="mt-6 border-t border-[var(--theme-border)]/60 pt-3">
               <span className="font-mono text-[10px] text-[var(--theme-muted)]">IDEA CLAVE</span>
-              <p className="mt-1 text-xs leading-5 text-[var(--theme-ink)]">Una función puede resolver un problema llamándose a sí misma.</p>
+              <p className="mt-1 text-xs leading-5 text-[var(--theme-ink)]">Un bucle permite repetir cuatro instrucciones sin copiarlas.</p>
             </div>
           </div>
 
@@ -174,30 +175,17 @@ function HeroIllustration() {
               aria-label="Ilustración de un árbol fractal de ramas verdes"
             >
               <g fill="none" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M130 280 L130 215 L130 155 L130 103" stroke="#edf2e8" strokeWidth="7" />
-                <path d="M130 215 L94 175 L69 130 L49 100" stroke="#edf2e8" strokeWidth="5" />
-                <path d="M130 215 L166 175 L191 130 L211 100" stroke="#edf2e8" strokeWidth="5" />
-                <path d="M130 155 L104 125 L91 91 L86 66" stroke="#c5e6b3" strokeWidth="4" />
-                <path d="M130 155 L156 125 L169 91 L174 66" stroke="#c5e6b3" strokeWidth="4" />
-                <path d="M69 130 L41 116 L26 91" stroke="#91c77d" strokeWidth="3" />
-                <path d="M69 130 L84 103 L79 78" stroke="#91c77d" strokeWidth="3" />
-                <path d="M191 130 L219 116 L234 91" stroke="#91c77d" strokeWidth="3" />
-                <path d="M191 130 L176 103 L181 78" stroke="#91c77d" strokeWidth="3" />
-                <path d="M91 91 L71 78 L64 53" stroke="#91c77d" strokeWidth="2.5" />
-                <path d="M169 91 L189 78 L196 53" stroke="#91c77d" strokeWidth="2.5" />
+                <rect x="50" y="70" width="160" height="160" stroke="#edf2e8" strokeWidth="7" />
+                <path d="M130 70 V230 M50 150 H210" stroke="#c5e6b3" strokeWidth="1.5" strokeDasharray="4 7" opacity="0.65" />
               </g>
               <g fill="#a7d58f">
-                <circle cx="49" cy="100" r="5" />
-                <circle cx="211" cy="100" r="5" />
-                <circle cx="86" cy="66" r="5" />
-                <circle cx="174" cy="66" r="5" />
-                <circle cx="26" cy="91" r="4" />
-                <circle cx="234" cy="91" r="4" />
-                <circle cx="64" cy="53" r="4" />
-                <circle cx="196" cy="53" r="4" />
+                <circle cx="50" cy="70" r="6" />
+                <circle cx="210" cy="70" r="6" />
+                <circle cx="210" cy="230" r="6" />
+                <circle cx="50" cy="230" r="6" />
               </g>
               <path d="M25 281 H235" stroke="#496653" strokeWidth="1" />
-              <text x="130" y="294" fill="#9fb8a4" textAnchor="middle" fontSize="8" letterSpacing="2">RECURSIVIDAD</text>
+              <text x="130" y="294" fill="#9fb8a4" textAnchor="middle" fontSize="8" letterSpacing="2">BUCLE / 4 VUELTAS</text>
             </svg>
             <span className="absolute left-3 top-3 font-mono text-[9px] tracking-[0.16em] text-[#a7d58f]">SALIDA GRÁFICA</span>
             <span className="absolute bottom-3 right-3 font-mono text-[9px] text-[#9fb8a4]">TURTLE / SVG</span>
@@ -217,7 +205,12 @@ function HeroIllustration() {
 }
 
 export default function Home() {
-  const [selectedExample, setSelectedExample] = useState<Example>(EXAMPLES[0]);
+  const beginnerFirstExamples = [...EXAMPLES].sort(
+    (left, right) => Number(left.level !== 'Principiante') - Number(right.level !== 'Principiante'),
+  );
+  const [selectedExample, setSelectedExample] = useState<Example>(
+    () => EXAMPLES.find((example) => example.id === 'contador-ascendente') ?? EXAMPLES[0],
+  );
 
   return (
     <main className="min-h-screen overflow-hidden bg-[var(--theme-bg)] text-[var(--theme-ink)]">
@@ -271,8 +264,8 @@ export default function Home() {
 
             <div className="mt-12 grid max-w-xl grid-cols-3 border-t border-[var(--theme-border)] pt-5">
               <div className="pr-3">
-                <p className="font-mono text-2xl font-semibold tracking-tight text-[var(--theme-ink)]">05</p>
-                <p className="mt-1 text-[10px] leading-4 text-[var(--theme-muted)] sm:text-xs">módulos de aprendizaje</p>
+                <p className="font-mono text-2xl font-semibold tracking-tight text-[var(--theme-ink)]">{CORE_MODULES.length.toString().padStart(2, "0")}</p>
+                <p className="mt-1 text-[10px] leading-4 text-[var(--theme-muted)] sm:text-xs">módulos principales</p>
               </div>
               <div className="border-l border-[var(--theme-border)] px-3 sm:px-5">
                 <p className="font-mono text-2xl font-semibold tracking-tight text-[var(--theme-ink)]">{TOTAL_LESSONS.toString().padStart(2, '0')}</p>
@@ -296,11 +289,11 @@ export default function Home() {
             <div className="max-w-2xl">
               <p className="text-[10px] font-bold tracking-[0.22em] text-[var(--theme-accent)] sm:text-xs">01 / EL RECORRIDO</p>
               <h2 className="mt-4 text-3xl font-semibold leading-tight tracking-[-0.04em] sm:text-4xl">
-                Cinco módulos. Una idea a la vez.
+                Cuatro módulos principales. Un proyecto para consolidar.
               </h2>
             </div>
             <p className="max-w-md text-sm leading-7 text-[var(--theme-muted)] sm:text-base">
-              El contenido avanza por etapas. Cada lección suma una herramienta y cada evaluación comprueba lo que ya sabes hacer.
+              El recorrido base sigue los cuatro módulos principales de Python Essentials 1. Al completarlo, puedes continuar con un proyecto aplicado opcional.
             </p>
           </div>
 
@@ -310,14 +303,17 @@ export default function Home() {
                 key={module.id}
                 className="group flex min-h-[220px] flex-col border-b border-[var(--theme-border)] p-5 last:border-b-0 sm:odd:border-r sm:even:border-r-0 xl:border-b-0 xl:border-r xl:last:border-r-0"
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs text-[var(--theme-accent)]">0{index + 1}</span>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="font-mono text-xs text-[var(--theme-accent)]">{module.optional ? 'EX' : `0${index + 1}`}</span>
+                  {module.optional && (
+                    <span className="border border-[var(--theme-accent)]/40 px-2 py-1 text-[9px] font-bold tracking-[0.14em] text-[var(--theme-accent)]">EXTENSIÓN OPCIONAL</span>
+                  )}
                   <span className="h-2 w-2 rounded-full border border-[var(--theme-border-dark)] transition-colors group-hover:bg-[var(--theme-accent)]" />
                 </div>
                 <h3 className="mt-8 text-lg font-semibold leading-snug tracking-tight">{module.title}</h3>
                 <p className="mt-3 text-xs leading-6 text-[var(--theme-muted)]">{module.summary}</p>
                 <p className="mt-auto border-t border-[var(--theme-border)]/60 pt-3 font-mono text-[10px] tracking-[0.12em] text-[var(--theme-muted)]">
-                  {module.lessons.length.toString().padStart(2, '0')} LECCIONES
+                  {module.lessons.length.toString().padStart(2, '0')} {module.optional ? 'ACTIVIDADES' : 'LECCIONES DEL NÚCLEO'}
                 </p>
               </article>
             ))}
@@ -349,7 +345,7 @@ export default function Home() {
                 <span className="font-mono text-[10px] text-[var(--theme-muted)]">06 / 06</span>
               </div>
               <div className="divide-y divide-[var(--theme-border)]">
-                {EXAMPLES.map((example, index) => (
+                {beginnerFirstExamples.map((example, index) => (
                   <button
                     key={example.id}
                     type="button"
@@ -398,8 +394,6 @@ export default function Home() {
             </div>
           </div>
           <nav aria-label="Enlaces del pie de página" className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-[var(--theme-muted)]">
-            <Link href="/academia" className="inline-flex min-h-10 items-center underline underline-offset-4 hover:text-[var(--theme-ink)]">Academia</Link>
-            <Link href="/login" className="inline-flex min-h-10 items-center underline underline-offset-4 hover:text-[var(--theme-ink)]">Acceso de estudiantes</Link>
             <Link href="/practica" className="inline-flex min-h-10 items-center underline underline-offset-4 hover:text-[var(--theme-ink)]">Laboratorio completo</Link>
           </nav>
         </div>

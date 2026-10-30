@@ -117,15 +117,15 @@ export default function LoginForm({ error, message, next = '' }: Props) {
                 <input type="hidden" name="next" value={next} />
                 <div>
                   <label htmlFor="full-name" className="text-sm font-semibold">Nombre completo</label>
-                  <input id="full-name" name="full_name" type="text" autoComplete="off" maxLength={100} value={signupName} onChange={(event) => setSignupName(event.target.value)} required className={inputStyle} />
+                  <input id="full-name" name="full_name" type="text" autoComplete="section-signup name" maxLength={100} value={signupName} onChange={(event) => setSignupName(event.target.value)} required className={inputStyle} />
                 </div>
                 <div>
                   <label htmlFor="signup-email" className="text-sm font-semibold">Correo electrónico</label>
-                  <input id="signup-email" name="email" type="email" autoComplete="off" value={signupEmail} onChange={(event) => setSignupEmail(event.target.value)} required className={inputStyle} />
+                  <input id="signup-email" name="email" type="email" autoComplete="section-signup email" value={signupEmail} onChange={(event) => setSignupEmail(event.target.value)} required className={inputStyle} />
                 </div>
                 <div>
                   <label htmlFor="signup-password" className="text-sm font-semibold">Contraseña</label>
-                  <input id="signup-password" name="password" type="password" autoComplete="new-password" minLength={8} value={signupPassword} onChange={(event) => setSignupPassword(event.target.value)} required className={inputStyle} />
+                  <input id="signup-password" name="password" type="password" autoComplete="section-signup new-password" minLength={8} value={signupPassword} onChange={(event) => setSignupPassword(event.target.value)} required className={inputStyle} />
                   <p className="mt-2 text-xs text-[var(--theme-muted)]">Mínimo 8 caracteres.</p>
                 </div>
                 <div>
@@ -155,11 +155,11 @@ export default function LoginForm({ error, message, next = '' }: Props) {
                 <input type="hidden" name="next" value={next} />
                 <div>
                   <label htmlFor="login-email" className="text-sm font-semibold">Correo electrónico</label>
-                  <input id="login-email" name="email" type="email" autoComplete="username" value={loginEmail} onChange={(event) => setLoginEmail(event.target.value)} required className={inputStyle} />
+                  <input id="login-email" name="email" type="email" autoComplete="section-login username" value={loginEmail} onChange={(event) => setLoginEmail(event.target.value)} required className={inputStyle} />
                 </div>
                 <div>
                   <label htmlFor="login-password" className="text-sm font-semibold">Contraseña</label>
-                  <input id="login-password" name="password" type="password" autoComplete="current-password" value={loginPassword} onChange={(event) => setLoginPassword(event.target.value)} required className={inputStyle} />
+                  <input id="login-password" name="password" type="password" autoComplete="section-login current-password" value={loginPassword} onChange={(event) => setLoginPassword(event.target.value)} required className={inputStyle} />
                 </div>
                 {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
                   <TurnstileWidget siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} />
