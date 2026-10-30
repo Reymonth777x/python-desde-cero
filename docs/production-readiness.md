@@ -48,7 +48,7 @@ Se compararon las 67 tuplas actuales de `questions.answer` con `private.quiz_ans
 
 El historial remoto de producción registra 22 migraciones. Las versiones locales 001–003 y 016–017, además de varios timestamps 024–027, difieren del historial remoto. La rama preview `main` del proyecto de producción tiene `MIGRATIONS_FAILED` (la base preview indica `ACTIVE_HEALTHY`), y no es el proyecto DEV separado. No ejecutar `db push`, `migration repair`, `db reset`, ni resetear/rebasar/borrar esa rama sin investigar el drift y preparar backup/rollback.
 
-Producción y DEV usan PostgreSQL 17.11.0.003 y `pgcrypto` 1.3. El Advisor de seguridad de producción reporta Leaked Password Protection desactivado; dos índices de invitaciones muestran uso no observado (INFO). No cambiar índices sin medir.
+Producción y DEV usan PostgreSQL 17.11.0.003 y `pgcrypto` 1.3. El Advisor de seguridad de producción reporta Leaked Password Protection desactivado. La organización está en plan Free y la documentación oficial de Supabase indica que la función requiere Pro o superior; no está disponible para activar en el plan actual. Mantener los requisitos básicos de contraseña y reevaluar si se decide actualizar. Dos índices de invitaciones muestran uso no observado (INFO); no cambiarlos sin medir.
 
 ## Bloqueos antes del lanzamiento educativo
 
@@ -63,7 +63,8 @@ Producción y DEV usan PostgreSQL 17.11.0.003 y `pgcrypto` 1.3. El Advisor de se
 - `/login` incluye el widget Turnstile en HTML; eso no demuestra que el desafío interactivo se complete ni que Supabase Auth valide el token/Secret key.
 - Probar con buzón controlado registro, confirmación, login, logout y recuperación/cambio de contraseña en el dominio final.
 - Probar con dos cuentas de estudiante aislamiento de datos, guardado/restauración de progreso, notas y prerrequisitos del calificador.
-- Activar Leaked Password Protection en Auth de producción; verificar SMTP, SPF, DKIM, DMARC, plantillas y URLs de redirección.
+- Leaked Password Protection no se puede habilitar en el plan Free; requiere Pro o superior. No considerarla una acción inmediata sin decisión de actualización.
+- Los logs de producción registraron dos respuestas `over_email_send_rate_limit` (429). La configuración del proveedor SMTP no pudo verificarse por herramientas de solo lectura. Confirmar el proveedor en Auth → SMTP; si se usa el SMTP integrado por defecto, configurar SMTP propio y después verificar SPF, DKIM, DMARC, plantillas y URLs de redirección.
 
 ### P1 — Dispositivo y laboratorio
 
