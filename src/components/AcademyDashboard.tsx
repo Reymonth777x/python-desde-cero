@@ -173,7 +173,7 @@ export default function AcademyDashboard({
         {/* Progress summary */}
         {progressUnavailable ? (
           <p role="alert" className="mt-6 border-l-4 border-[var(--theme-error)] bg-[var(--theme-surface)] px-4 py-3 text-sm leading-6 text-[var(--theme-error)]">
-            No se pudo consultar el progreso guardado. Puedes estudiar; la aplicación mostrará un error si no logra guardar una evaluación.
+            No se pudo consultar tu progreso. Por seguridad, solo estará disponible la primera lección hasta que se recupere la conexión y podamos comprobar tus avances.
           </p>
         ) : (
           <section aria-label="Progreso general" className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
@@ -252,13 +252,15 @@ export default function AcademyDashboard({
                     );
 
                     if (!lessonUnlocked) {
-                      const lockDescription = !unlocked
-                        ? prevAssessment
-                          ? `Completa la evaluación del módulo ${prevModule.number} para desbloquear este módulo.`
-                          : 'Completa el módulo anterior para desbloquear este módulo.'
-                        : lessonIndex > 0
-                          ? `Completa «${courseModule.lessons[lessonIndex - 1].title}» para desbloquear esta lección.`
-                          : 'El progreso no está disponible; actualiza la página para comprobar el siguiente paso.';
+                      const lockDescription = progressUnavailable
+                        ? 'No se pudo consultar el progreso. Actualiza la página cuando se recupere la conexión.'
+                        : !unlocked
+                          ? prevAssessment
+                            ? `Completa la evaluación del módulo ${prevModule.number} para desbloquear este módulo.`
+                            : 'Completa el módulo anterior para desbloquear este módulo.'
+                          : lessonIndex > 0
+                            ? `Completa «${courseModule.lessons[lessonIndex - 1].title}» para desbloquear esta lección.`
+                            : 'Esta lección estará disponible cuando podamos comprobar tu progreso.';
 
                       return (
                         <li key={`${courseModule.id}-${lesson.id}`}>
