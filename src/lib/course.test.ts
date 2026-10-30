@@ -194,8 +194,8 @@ describe('ruta de aprendizaje Python desde cero', () => {
 
     expect(lesson.objectives.join(' ')).toContain('AND (&), OR (|) y XOR (^)');
     expect(lesson.explanation.join(' ')).toContain('0101 & 0011 = 0001');
-    expect(lesson.explanation.join(' ')).toContain('0101 | 0011 = 0111');
-    expect(lesson.explanation.join(' ')).toContain('0101 ^ 0011 = 0110');
+    expect(lesson.explanation.join(' ')).toContain('el resultado es 0111 (7)');
+    expect(lesson.explanation.join(' ')).toContain('el resultado es 0110 (6)');
     expect(lesson.explanation.join(' ')).toContain('5 << 1');
     expect(lesson.explanation.join(' ')).toContain('5 >> 1');
     expect(lesson.exampleOutput).toBe('True\\nFalse\\n1\\n7\\n6\\n10\\n2\\n-6');
