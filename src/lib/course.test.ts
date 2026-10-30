@@ -242,7 +242,7 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(lesson.exercise.solution).toContain('int(precio_texto)');
     expect(lesson.exercise.solution).toContain('float(factor_texto)');
     expect(lesson.exercise.solution).toContain('str(subtotal)');
-    expect(lesson.exercise.tests[0].expected).toBe('3750.0\\nSubtotal: 3750.0');
+    expect(lesson.exercise.tests[0].expected).toBe('3750.0\nSubtotal: 3750.0');
   });
 
 });
