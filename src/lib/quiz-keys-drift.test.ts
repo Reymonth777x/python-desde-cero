@@ -66,7 +66,7 @@ describe('quiz answer-key drift detection', () => {
     expect(sql).not.toContain('SET correct_option = mapping.correct_option');
     expect(finalAssessmentSql).toMatch(/ON CONFLICT \(module_id, lesson_id, question_index\)\s+DO UPDATE SET/);
     expect(finalAssessmentSql).not.toContain('DELETE FROM private.quiz_answer_key');
-    expect(helloWorldSql).toContain("'module-2', 'b2-l9', 0, 1, 4, 1");
+    expect(helloWorldSql).toMatch(/\(\s*'module-2',\s*'b2-l9',\s*0,\s*1,\s*4,\s*1\s*\)/);
     expect(helloWorldSql).not.toContain('DELETE FROM private.quiz_answer_key');
     expect(actual).toHaveLength(expected.length);
     expect(actual).toEqual(expected);
