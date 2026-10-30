@@ -9,9 +9,12 @@ type State =
   | { status: 'loading' }
   | { status: 'guest' }
   | { status: 'error' }
-  | { status: 'member'; completed: number; total: number };
+  | { status: 'member'; completed: number; total: number; extensionCompleted: number; extensionTotal: number };
 
-const TOTAL_LESSONS = courseModules.reduce((sum, courseModule) => sum + courseModule.lessons.length, 0);
+const CORE_MODULES = courseModules.filter((courseModule) => !courseModule.optional);
+const EXTENSION_MODULES = courseModules.filter((courseModule) => courseModule.optional);
+const TOTAL_LESSONS = CORE_MODULES.reduce((sum, courseModule) => sum + courseModule.lessons.length, 0);
+const TOTAL_EXTENSION_LESSONS = EXTENSION_MODULES.reduce((sum, courseModule) => sum + courseModule.lessons.length, 0);
 
 export default function HomeProgressSummary() {
   const supabase = useMemo(() => createClient(), []);
@@ -23,7 +26,7 @@ export default function HomeProgressSummary() {
     async function loadProgress(userId: string) {
       const { data, error } = await supabase
         .from('progress')
-        .select('is_completed')
+        .select('module_id, is_completed')
         .eq('user_id', userId);
 
       if (!active) return;
@@ -32,8 +35,18 @@ export default function HomeProgressSummary() {
         return;
       }
 
-      const completed = (data ?? []).filter((row) => row.is_completed === true).length;
-      setState({ status: 'member', completed, total: TOTAL_LESSONS });
+      const completedRows = (data ?? []).filter((row) => row.is_completed === true);
+      const coreIds = new Set(CORE_MODULES.map((courseModule) => courseModule.id));
+      const extensionIds = new Set(EXTENSION_MODULES.map((courseModule) => courseModule.id));
+      const completed = completedRows.filter((row) => coreIds.has(row.module_id)).length;
+      const extensionCompleted = completedRows.filter((row) => extensionIds.has(row.module_id)).length;
+      setState({
+        status: 'member',
+        completed,
+        total: TOTAL_LESSONS,
+        extensionCompleted,
+        extensionTotal: TOTAL_EXTENSION_LESSONS,
+      });
     }
 
     supabase.auth.getUser().then(({ data, error }) => {
@@ -83,6 +96,11 @@ export default function HomeProgressSummary() {
       <div className="mt-3 h-2 w-full bg-[var(--theme-bg-secondary)]" role="progressbar" aria-label="Progreso del curso" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent}>
         <div className="h-full bg-[var(--theme-accent)] transition-[width]" style={{ width: `${percent}%` }} />
       </div>
+      {state.extensionTotal > 0 && (
+        <p className="mt-3 text-xs text-[var(--theme-muted)]">
+          Extensión práctica opcional: {state.extensionCompleted}/{state.extensionTotal} actividades
+        </p>
+      )}
       <Link href="/academia" className="mt-3 inline-flex min-h-10 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">Continuar aprendiendo</Link>
     </section>
   );

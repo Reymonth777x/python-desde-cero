@@ -46,14 +46,23 @@ export default function AcademyDashboard({
         row.is_completed,
     );
 
-  const completedCount = courseModules.reduce(
+  const coreModules = courseModules.filter((courseModule) => !courseModule.optional);
+  const extensionModules = courseModules.filter((courseModule) => courseModule.optional);
+  const completedCount = coreModules.reduce(
     (total, courseModule) =>
-      total +
-      courseModule.lessons.filter((lesson) => completed(courseModule.id, lesson.id))
-        .length,
+      total + courseModule.lessons.filter((lesson) => completed(courseModule.id, lesson.id)).length,
     0,
   );
-  const lessonCount = courseModules.reduce(
+  const lessonCount = coreModules.reduce(
+    (total, courseModule) => total + courseModule.lessons.length,
+    0,
+  );
+  const extensionCompletedCount = extensionModules.reduce(
+    (total, courseModule) =>
+      total + courseModule.lessons.filter((lesson) => completed(courseModule.id, lesson.id)).length,
+    0,
+  );
+  const extensionLessonCount = extensionModules.reduce(
     (total, courseModule) => total + courseModule.lessons.length,
     0,
   );
@@ -140,8 +149,13 @@ export default function AcademyDashboard({
         ) : (
           <section aria-label="Progreso general" className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
             <BookOpenCheck aria-hidden="true" className="text-[var(--theme-accent)]" size={18} />
-            <span className="font-semibold">{completedCount} de {lessonCount} actividades completadas</span>
+            <span className="font-semibold">{completedCount} de {lessonCount} lecciones del curso principal</span>
             <span className="text-[var(--theme-muted)]">({completionPercent}%)</span>
+            {extensionLessonCount > 0 && (
+              <span className="w-full text-xs text-[var(--theme-muted)]">
+                Extensión práctica opcional: {extensionCompletedCount} de {extensionLessonCount} actividades
+              </span>
+            )}
             <div className="h-2 w-full bg-[var(--theme-bg-secondary)] sm:max-w-sm" role="progressbar" aria-label="Porcentaje completado" aria-valuemin={0} aria-valuemax={100} aria-valuenow={completionPercent}>
               <div className="h-full bg-[var(--theme-accent)] transition-[width]" style={{ width: `${completionPercent}%` }} />
             </div>

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { courseModules, gradeQuiz } from './course';
 
 describe('ruta de aprendizaje Python desde cero', () => {
-  it('incluye los cinco módulos progresivos del curso', () => {
+  it('incluye cuatro módulos principales y una extensión opcional', () => {
     expect(courseModules.map((courseModule) => courseModule.id)).toEqual([
       'module-1',
       'module-2',
@@ -10,7 +10,15 @@ describe('ruta de aprendizaje Python desde cero', () => {
       'module-4',
       'module-5',
     ]);
-    expect(courseModules.map((courseModule) => courseModule.lessons.length)).toEqual([
+    expect(courseModules.slice(0, 4).map((courseModule) => courseModule.title)).toEqual([
+      'Introducción a Python y a la programación',
+      'Tipos de datos, variables, operadores y entrada/salida',
+      'Valores booleanos, control de flujo, ciclos y listas',
+      'Funciones, tuplas, diccionarios y excepciones',
+    ]);
+    expect(courseModules[4].optional).toBe(true);
+    expect(courseModules[4].title).toContain('extensión práctica');
+    expect(courseModules.slice(0, 4).map((courseModule) => courseModule.lessons.length)).toEqual([
       4, 7, 8, 8, 4,
     ]);
   });
@@ -44,6 +52,7 @@ describe('ruta de aprendizaje Python desde cero', () => {
     const exerciseIds = lessons.map((lesson) => lesson.exercise.id);
 
     expect(lessons).toHaveLength(31);
+    expect(courseModules.filter((courseModule) => !courseModule.optional).flatMap((courseModule) => courseModule.lessons)).toHaveLength(27);
     expect(new Set(exerciseIds).size).toBe(lessons.length);
     expect(new Set(prompts).size).toBe(prompts.length);
 
@@ -64,14 +73,14 @@ describe('ruta de aprendizaje Python desde cero', () => {
         .lessons.find((lesson) => lesson.id === lessonId)!
         .questions.find((question) => question.prompt === prompt)!;
 
-    const modulo = findQuestion('module-1', 'b1-l3', '¿Qué valor devuelve 17 % 5?');
+    const modulo = findQuestion('module-2', 'b2-l3', '¿Qué devuelve 17 % 5?');
     expect(modulo.options[modulo.answer]).toBe('2');
 
-    const rango = findQuestion('module-2', 'b2-l7', '¿Qué imprime range(1, 4) al recorrerlo con print?');
+    const rango = findQuestion('module-3', 'b3-l5', '¿Qué valores genera range(1, 4)?');
     expect(rango.options[rango.answer]).toBe('1, 2, 3');
 
-    const algoritmo = findQuestion('module-1', 'b1-l1', '¿Qué representa un algoritmo?');
-    expect(algoritmo.options[algoritmo.answer]).toBe('Una secuencia ordenada de pasos para resolver una tarea');
+    const algoritmo = findQuestion('module-1', 'b1-l1', '¿Qué describe mejor un algoritmo?');
+    expect(algoritmo.options[algoritmo.answer]).toBe('Una secuencia finita y ordenada de pasos para resolver un problema');
   });
 
   it('califica todas las respuestas y exige al menos 75 por ciento', () => {
