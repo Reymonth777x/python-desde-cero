@@ -281,7 +281,7 @@ export default function PythonEditor({
 
         <div className="space-y-2 md:hidden">
           <p className="text-xs font-semibold text-[var(--theme-muted)]">Atajos para escribir en la pantalla táctil</p>
-          <div aria-label="Teclas de Python para pantalla táctil" className="grid grid-cols-7 gap-2">
+          <div aria-label="Teclas de Python para pantalla táctil" className="grid grid-cols-4 gap-2">
             {[
               { label: '()', accessible: 'Insertar paréntesis', text: '()', cursor: 1 },
               { label: '""', accessible: 'Insertar comillas', text: '""', cursor: 1 },
