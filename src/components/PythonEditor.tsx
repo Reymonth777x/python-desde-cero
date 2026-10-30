@@ -406,13 +406,12 @@ export default function PythonEditor({
       {usesTurtle && (
       <div
         id="practice-panel-turtle"
-        role="tabpanel"
-        aria-labelledby="practice-tab-turtle"
+        aria-labelledby="python-turtle-title"
         data-testid="python-turtle-output"
         className="mt-6 space-y-3"
       >
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-sm font-semibold text-[var(--theme-ink)]">Gráficos de Turtle</h2>
+          <h2 id="python-turtle-title" className="text-sm font-semibold text-[var(--theme-ink)]">Gráficos de Turtle</h2>
           <span className="text-xs text-[var(--theme-muted)]">{turtleCommands.length > 0 ? `${turtleCommands.length} trazo(s) dibujado(s)` : 'Ejecuta código con Turtle para ver el dibujo'}</span>
         </div>
         <div className="flex flex-col items-center justify-center min-h-[200px] max-h-[600px] overflow-auto border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] rounded-lg">
