@@ -132,6 +132,7 @@ Consulta de solo lectura posterior al despliegue del 30-10-2026:
 - En los cuatro módulos obligatorios hay 62 claves; las otras 5 pertenecen a la extensión opcional. No se detectaron filas con `correct_option_v2 IS NULL` en ese conjunto.
 - La tabla de producción contiene 110 filas: 67 claves v2 del catálogo actual y 43 filas heredadas con identificadores antiguos lesson-*, donde correct_option_v2 es NULL. Esas 43 filas no coinciden con ninguna de las 67 tuplas actuales (module_id, lesson_id, question_index); no son faltantes del catálogo vigente. DEV contiene solo las 67 filas actuales. Mantener las históricas hasta aprobar una reconciliación; no borrarlas ni reescribirlas como parte de este trabajo.
 - Comparación de índices actuales: producción registra 29/67 valores v2 distintos de correct_option y 38/67 iguales; DEV registra 67/67 iguales. El calificador utiliza correct_option_v2. No reescribir v2 desde correct_option.
+- Se compararon las 67 posiciones actuales de questions.answer en el catálogo (SHA `b14b334a9700d5191ae106266925ed8cf208d2b0`) con correct_option_v2: producción y DEV tienen 67/67 presentes, cero filas faltantes, cero valores nulos y cero índices distintos.
 - Producción confirma `public.submit_quiz_v2` como SECURITY INVOKER, sin permiso EXECUTE para `anon` y con permiso para `authenticated`. La función privada autoritativa es SECURITY DEFINER, valida `auth.uid()` y conserva el cálculo del lado servidor.
 - El trigger `invitations_prevent_used_deletion` está habilitado sobre `public.invitations`.
 
