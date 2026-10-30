@@ -212,6 +212,39 @@ describe('ruta de aprendizaje Python desde cero', () => {
     ]);
   });
 
+  it('presenta listas y codigo de b3-l6 con saltos de linea reales', () => {
+    const lesson = courseModules
+      .find((courseModule) => courseModule.id === 'module-3')!
+      .lessons.find((item) => item.id === 'b3-l6')!;
+    const literalBackslashN = String.fromCharCode(92) + 'n';
+
+    expect(lesson.example).not.toContain(literalBackslashN);
+    expect(lesson.example.split(String.fromCharCode(10))).toHaveLength(6);
+    expect(lesson.exampleOutput.split(String.fromCharCode(10))).toEqual([
+      '18',
+      '19',
+      '3',
+      '18',
+      '21',
+      '19',
+    ]);
+    expect(lesson.exercise.starterCode).not.toContain(literalBackslashN);
+    expect(lesson.exercise.solution).not.toContain(literalBackslashN);
+    expect(lesson.exercise.solution.split(String.fromCharCode(10))).toEqual([
+      'datos = input()',
+      'numeros = datos.split()',
+      'total = 0',
+      'for texto in numeros:',
+      '    total += int(texto)',
+      'print(total)',
+    ]);
+    expect(lesson.exercise.tests).toEqual([
+      { input: ['10 20 30'], expected: '60' },
+      { input: ['5'], expected: '5' },
+      { input: ['-2 7'], expected: '5' },
+    ]);
+  });
+
   it('separa operadores logicos y practica AND, OR y XOR bit a bit', () => {
     const lesson = courseModules
       .find((courseModule) => courseModule.id === 'module-3')!
