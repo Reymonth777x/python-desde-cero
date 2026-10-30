@@ -3,11 +3,13 @@
 ## Estado comprobado el 30 de octubre de 2026
 
 - La variable pública `NEXT_PUBLIC_TURNSTILE_SITE_KEY` está disponible en GitHub Actions y el workflow la inyecta durante el build de Vinext.
-- El workflow de publicación **41048515179** finalizó correctamente para la versión de contenido `2940723e3a37a6556770169d0ae692e6bab2d943`.
-- El log confirma que Cloudflare publicó el Worker, que el dominio está conectado al servicio `python-desdecero`, que el HTML de `/login` contiene `data-testid="turnstile-widget"`, que `/muestra` y el sitemap responden, y que `www` devuelve HTTP 308 al apex.
+- El workflow de publicación **41049961984** finalizó correctamente para el HEAD `71fa854381f0507f6b0b16b8a6fbf2a0c2efaa15`.
+- El log confirma que Cloudflare publicó el Worker, que el dominio está conectado al servicio `python-desdecero`, que el HTML de `/login` contiene `data-testid="turnstile-widget"`, que `/muestra` y el sitemap responden, y que `www` devuelve HTTP 308 al apex. La verificación externa leyó la explicación de la lección 1.1 y confirmó que www termina en el dominio canónico.
 - Esto confirma que el componente y la Sitekey pública llegaron al build/HTML. No demuestra que el script cliente haya cargado, que un usuario haya completado el desafío ni que Supabase Auth haya validado un token.
 - La Secret key privada de Turnstile y el estado de CAPTCHA protection no se pueden leer mediante la inspección del repositorio ni el estado básico del proyecto Supabase. Su configuración en Supabase Auth sigue pendiente de confirmación.
 - Tampoco se completó una prueba real de correo, registro o restablecimiento; estos puntos siguen abiertos.
+
+- La guarda anti-despliegue obsoleto (PR #54) compara el HEAD actual de master antes de compilar y de nuevo inmediatamente antes de publicar, para evitar que un workflow atrasado revierta producción.
 
 ## Separación de llaves
 
