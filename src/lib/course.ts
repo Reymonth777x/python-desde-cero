@@ -1,5 +1,5 @@
 import 'server-only';
-import type { CourseExercise, CourseLesson, CourseModule, QuizQuestion } from './course-types';
+import type { CourseLesson, CourseModule, QuizQuestion } from './course-types';
 export type { CourseExercise, CourseLesson, CourseModule, QuizQuestion } from './course-types';
 
 export const courseModules: CourseModule[] = [
