@@ -85,6 +85,53 @@ describe('acciones de invitaciones', () => {
     expect(insert).not.toHaveBeenCalled();
   });
 
+  it('guarda el vencimiento como UTC ya convertido en el navegador', async () => {
+    const profileQuery = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: { is_admin: true }, error: null }),
+    };
+    const insert = vi.fn().mockResolvedValue({ error: null });
+    vi.mocked(createClient).mockResolvedValue(
+      adminClient((table) => table === 'profiles' ? profileQuery : { insert }),
+    );
+
+    const formData = new FormData();
+    formData.set('code', 'EQUIPO-OCT-26');
+    formData.set('expires_at_local', '2026-10-31T12:00');
+    formData.set('expires_at', '2026-10-31T18:00:00.000Z');
+
+    const result = await createInvitation(formData);
+
+    expect(result).toEqual({ error: null });
+    expect(insert).toHaveBeenCalledWith(expect.objectContaining({
+      code: 'EQUIPO-OCT-26',
+      expires_at: '2026-10-31T18:00:00.000Z',
+    }));
+  });
+
+  it('rechaza una fecha local sin conversión UTC en vez de usar siete días', async () => {
+    const profileQuery = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: { is_admin: true }, error: null }),
+    };
+    const insert = vi.fn();
+    vi.mocked(createClient).mockResolvedValue(
+      adminClient((table) => table === 'profiles' ? profileQuery : { insert }),
+    );
+
+    const formData = new FormData();
+    formData.set('code', 'EQUIPO-OCT-26');
+    formData.set('expires_at_local', '2026-10-31T12:00');
+    formData.set('expires_at', '');
+
+    const result = await createInvitation(formData);
+
+    expect(result.error).toContain('hora local no es válida');
+    expect(insert).not.toHaveBeenCalled();
+  });
+
   it('elimina una invitación que todavía no se ha utilizado', async () => {
     const profileQuery = {
       select: vi.fn().mockReturnThis(),

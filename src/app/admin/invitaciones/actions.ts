@@ -68,6 +68,7 @@ export async function createInvitation(formData: FormData) {
 
   const submittedCode = String(formData.get('code') ?? '').trim();
   const code = submittedCode ? normalizeInvitationCode(submittedCode) : generateInvitationCode();
+  const rawLocalExpiresAt = String(formData.get('expires_at_local') ?? '').trim();
   const rawExpiresAt = String(formData.get('expires_at') ?? '').trim();
 
   if (!code) {
@@ -89,9 +90,18 @@ export async function createInvitation(formData: FormData) {
     expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
   };
 
+  if (rawLocalExpiresAt && !rawExpiresAt) {
+    return { error: 'La fecha y hora local no es válida. Selecciona una hora existente en tu dispositivo.' };
+  }
+
   if (rawExpiresAt) {
     const expires = new Date(rawExpiresAt);
-    if (Number.isNaN(expires.getTime()) || expires.getTime() <= Date.now()) {
+    if (
+      !rawExpiresAt.endsWith('Z') ||
+      Number.isNaN(expires.getTime()) ||
+      expires.toISOString() !== rawExpiresAt ||
+      expires.getTime() <= Date.now()
+    ) {
       return { error: 'La fecha de expiración debe ser una fecha futura válida.' };
     }
     insertData.expires_at = expires.toISOString();
