@@ -57,7 +57,7 @@ function Get-SupabaseLocalEnv {
 
     if (-not $apiUrl -or -not $publishableKey) {
         $names = ($values.Keys | Sort-Object) -join ', '
-        throw "Supabase no devolvió API_URL y PUBLISHABLE_KEY/ANON_KEY. Variables detectadas: $names"
+        throw "Supabase no devolvio API_URL y PUBLISHABLE_KEY/ANON_KEY. Variables detectadas: $names"
     }
 
     return @{
@@ -68,17 +68,17 @@ function Get-SupabaseLocalEnv {
 }
 
 if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
-    throw 'Docker CLI no está instalado. Abre Docker Desktop o instala Docker Desktop.'
+    throw 'Docker CLI no esta instalado. Abre Docker Desktop o instala Docker Desktop.'
 }
 
 Write-Host 'Comprobando Docker Desktop...' -ForegroundColor Cyan
 & docker info *> $null
 if ($LASTEXITCODE -ne 0) {
-    throw 'Docker no responde. Abre Docker Desktop, espera a que indique que está en ejecución y vuelve a ejecutar este script.'
+    throw 'Docker no responde. Abre Docker Desktop, espera a que indique que esta en ejecucion y vuelve a ejecutar este script.'
 }
 
 if (-not (Get-Command supabase -ErrorAction SilentlyContinue)) {
-    throw 'No se encontró Supabase CLI. Comprueba la instalación con: supabase --version'
+    throw 'No se encontro Supabase CLI. Comprueba la instalacion con: supabase --version'
 }
 
 Write-Host 'Iniciando Supabase local. No se enlaza ni se modifica el proyecto remoto...' -ForegroundColor Cyan
@@ -93,14 +93,14 @@ finally {
 }
 
 # No mostrar la salida de "supabase start": algunas versiones de la CLI imprimen
-# claves locales en una tabla. Así evitamos filtrarlas y no dependemos de caracteres
+# claves locales en una tabla. Asi evitamos filtrarlas y no dependemos de caracteres
 # Unicode de los bordes de esa tabla para interpretar el resultado.
 if ($startExitCode -eq 0) {
-    Write-Host 'Supabase local está iniciado.' -ForegroundColor Green
+    Write-Host 'Supabase local esta iniciado.' -ForegroundColor Green
 }
 
 if ($startExitCode -ne 0) {
-    throw 'Supabase local no pudo iniciar. Confirma que Docker Desktop esté en ejecución y vuelve a probar. La salida de Supabase se oculta para no mostrar claves locales; no ejecutes db push ni db reset contra el proyecto remoto.'
+    throw 'Supabase local no pudo iniciar. Confirma que Docker Desktop este en ejecucion y vuelve a probar. La salida de Supabase se oculta para no mostrar claves locales; no ejecutes db push ni db reset contra el proyecto remoto.'
 }
 
 $local = Get-SupabaseLocalEnv
@@ -116,11 +116,11 @@ $envLines = @(
 
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText($developmentEnvPath, ($envLines -join [Environment]::NewLine) + [Environment]::NewLine, $utf8NoBom)
-Write-Host 'Configuración de desarrollo creada para Supabase local (sin mostrar claves).' -ForegroundColor Green
+Write-Host 'Configuracion de desarrollo creada para Supabase local (sin mostrar claves).' -ForegroundColor Green
 
 if (-not $SkipSeed) {
     if (-not $local.ServiceRoleKey) {
-        throw 'Supabase no devolvió SERVICE_ROLE_KEY/SECRET_KEY; no se crearon usuarios. Comprueba supabase status --output env.'
+        throw 'Supabase no devolvio SERVICE_ROLE_KEY/SECRET_KEY; no se crearon usuarios. Comprueba supabase status --output env.'
     }
 
     $previousUrl = $env:SUPABASE_URL
@@ -150,12 +150,12 @@ if (-not $SkipSeed) {
         }
     }
 } else {
-    Write-Host 'Se omitió la creación de cuentas (-SkipSeed).' -ForegroundColor Yellow
+    Write-Host 'Se omitio la creacion de cuentas (-SkipSeed).' -ForegroundColor Yellow
 }
 
 $portInUse = Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue
 if ($portInUse) {
-    throw 'El puerto 3000 ya está ocupado. Detén el servidor anterior con Ctrl+C y vuelve a ejecutar este script.'
+    throw 'El puerto 3000 ya esta ocupado. Deten el servidor anterior con Ctrl+C y vuelve a ejecutar este script.'
 }
 
 Write-Host ''
@@ -164,9 +164,9 @@ Write-Host '  App:     http://localhost:3000'
 Write-Host '  Studio:  http://localhost:54323'
 Write-Host '  Usuarios: .local/dev-users.credentials.json'
 Write-Host ''
-Write-Host 'Pulsa Ctrl+C para detener Next.js. Supabase seguirá activo en Docker.' -ForegroundColor DarkGray
+Write-Host 'Pulsa Ctrl+C para detener Next.js. Supabase seguira activo en Docker.' -ForegroundColor DarkGray
 
 & npm run dev
 if ($LASTEXITCODE -ne 0) {
-    throw 'El servidor de Next.js terminó con error.'
+    throw 'El servidor de Next.js termino con error.'
 }
