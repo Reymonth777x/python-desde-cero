@@ -52,29 +52,39 @@ The application follows Next.js App Router conventions:
 - npm (dependencies are locked in `package-lock.json`)
 - A Supabase project with Auth and PostgreSQL enabled
 
-## Setup
+## Local setup (Windows + Docker)
 
-1. Clone the repository and install dependencies:
+Use Node.js 24, npm, Docker Desktop and the Supabase CLI. The repository already contains `supabase/config.toml` and the canonical migrations in `supabase/migrations/`.
 
-```bash
+1. Install dependencies once:
+
+```powershell
 npm ci
 ```
 
-2. Create a `.env.local` file in the project root with the following variables (values are **never** committed to Git):
+2. Open Docker Desktop and wait until its engine is running.
 
-```
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-supabase-publishable-key
-NEXT_PUBLIC_SITE_URL=https://your-site-domain.com
-```
+3. From the project root, run the local launcher:
 
-3. Start the development server:
-
-```bash
-npm run dev
+```powershell
+.\scripts\start-local.ps1
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+The launcher starts the Supabase stack in Docker, reads the local API URL and publishable key from `supabase status --output env`, writes an ignored `.env.development.local` for Next.js, creates three test accounts, and starts the app at [http://localhost:3000](http://localhost:3000). It does not run `supabase link`, `db push`, or `db reset`, and it does not connect the app to production.
+
+Open Supabase Studio at [http://localhost:54323](http://localhost:54323). The API and database ports are read from the CLI output; do not confuse the API port (commonly 54321) with the database port (commonly 54322).
+
+Test account passwords are stored only in `.local/dev-users.credentials.json`, which is ignored by Git. The seed creates two students for ownership/IDOR tests and one admin with `profiles.is_admin = true`. The current profile schema does not define a teacher role, so the seed does not pretend to create one.
+
+To start the app without resetting the local test passwords:
+
+```powershell
+.\scripts\start-local.ps1 -SkipSeed
+```
+
+To stop Next.js, press `Ctrl+C`. To stop the local Supabase containers when finished, run `supabase stop`; this preserves their data volumes.
+
+For a hosted Supabase development project instead of Docker, copy `.env.example` to `.env.local` and use that project's own URL and publishable key. Never put a service-role/secret key in a `NEXT_PUBLIC_` variable or commit it.
 
 ## Contributing as a team
 
