@@ -36,17 +36,17 @@ El módulo 2 ahora sigue la secuencia: 2.1 primer programa “Hello, World!”, 
 | Laboratorios integradores | 3, ubicados al cierre de los módulos 2, 3 y 4 |
 | Preguntas registradas | 67 esperadas en el catálogo; DEV verificado con 67 claves v2. Producción tiene 44 claves v2 del catálogo anterior |
 | Extensión adicional | 4 unidades opcionales en module-5 |
-| Proyecto aplicado | Proyecto obligatorio b4-l10; cinco pruebas automáticas |
+| Proyecto aplicado | Proyecto obligatorio b4-l10; seis pruebas automáticas |
 | Evaluación final global | b4-l11 implementado en código; 12 preguntas |
 
 El módulo 5 está marcado explícitamente como opcional. Ahora se concentra en persistencia con archivos de texto; no sustituye el proyecto obligatorio ni el examen final.
 
 ### Medición inicial de calidad didáctica
 
-- El núcleo ahora contiene 33 unidades: 27 lecciones/laboratorios, cuatro evaluaciones de módulo, un proyecto final obligatorio y un examen global. El proyecto suma cinco casos de prueba; no se debe confundir el total de unidades con el objetivo de 30 laboratorios oficiales.
+- El núcleo ahora contiene 33 unidades: 27 lecciones/laboratorios, cuatro evaluaciones de módulo, un proyecto final obligatorio y un examen global. El proyecto suma seis casos de prueba; no se debe confundir el total de unidades con el objetivo de 30 laboratorios oficiales.
 - En la auditoría inicial, 29 de las 30 prácticas tenían un solo caso automático; la práctica b3-l6 se amplió a tres entradas (varios valores, un solo valor y valores negativos).
 - El catálogo principal contiene 40 preguntas conceptuales: la mayoría de las lecciones regulares solo tiene una pregunta.
-- Las evaluaciones de módulo tienen 6, 5, 3 y 3 preguntas. El examen global suma 12 preguntas; el proyecto final incluye cinco casos automáticos.
+- Las evaluaciones de módulo tienen 6, 5, 3 y 3 preguntas. El examen global suma 12 preguntas; el proyecto final incluye seis casos automáticos.
 - Esto no alcanza todavía el estándar de calidad definido abajo. Las prácticas restantes necesitan casos límite adecuados a cada objetivo y las evaluaciones requieren más preguntas de lectura, razonamiento y depuración.
 
 En el módulo 3 se corrigió la progresión: comparaciones y decisiones → while → for → operadores lógicos y bit a bit → listas simples → modificación/ordenamiento → aplicación avanzada con listas anidadas → evaluación. La primera lección de listas trabaja listas unidimensionales; las listas anidadas aparecen después de practicar índices y recorridos, antes de la evaluación del módulo.
@@ -116,7 +116,7 @@ Antes de publicar o considerar terminada una lección, debe cumplir lo siguiente
 
 ### Proyecto final obligatorio implementado en la rama
 
-b4-l10 requiere construir un gestor de inventario de consola que lea varios registros, guarde productos en un diccionario, acumule cantidades cuando se repite un nombre, valide nombres y cantidades y maneje ValueError. Incluye cinco casos automáticos: un producto, varios productos con acumulación de un producto repetido, nombre vacío, cantidad cero y cantidad no numérica. Las prácticas b2-l6 (entrada de cantidad) y b2-l8 (recibo) tienen cuatro casos cada una, incluidos cero, cantidades distintas, precios decimales y limpieza de espacios en nombres. El estudiante debe ejecutar las pruebas locales y aprobar cinco preguntas conceptuales con al menos 75%.
+b4-l10 requiere construir un gestor de inventario de consola que lea varios registros, guarde productos en un diccionario, acumule cantidades cuando se repite un nombre, valide nombres y cantidades y maneje ValueError. Incluye seis casos automáticos: un producto, varios productos con acumulación de un producto repetido, nombre vacío, cantidad cero, cantidad negativa y cantidad no numérica. Las prácticas b2-l6 (entrada de cantidad) y b2-l8 (recibo) tienen cuatro casos cada una, incluidos cero, cantidades distintas, precios decimales y limpieza de espacios en nombres. El estudiante debe ejecutar las pruebas locales y aprobar cinco preguntas conceptuales con al menos 75%.
 
 **Limitación deliberada:** la comparación de salidas se ejecuta en el navegador mediante el Worker de Python; no constituye una certificación ni una atestación inviolable del código ejecutado. La nota de las preguntas sí se calcula en el servidor a partir de claves privadas. Las migraciones 024 y 025 están aplicadas en DEV; en producción siguen pendientes.
 
@@ -139,7 +139,7 @@ No marcar el curso como terminado hasta verificar:
 - [x] Proyecto obligatorio y examen global incluidos en el código; claves 024 verificadas en DEV.
 - [ ] Las lecciones avanzadas tienen prerequisitos y ejemplos progresivos.
 - [x] No hay claves desincronizadas en DEV: 67 claves v2 para 67 preguntas del catálogo.
-- [ ] Completar la matriz de pruebas de los ejercicios regulares con casos límite; el proyecto final ejecuta cinco casos en el Worker del estudiante.
+- [ ] Completar la matriz de pruebas de los ejercicios regulares con casos límite; el proyecto final ejecuta seis casos en el Worker del estudiante.
 - [ ] Las evaluaciones se guardan, recuperan y aíslan por usuario.
 - [ ] La extensión opcional no altera el porcentaje ni el certificado de finalización PE1.
 - [ ] Revisión pedagógica completa en español antes de traducir el catálogo al inglés.
@@ -155,7 +155,7 @@ El contenido de esta plataforma debe ser original y didácticamente equivalente 
 ## Cambios preparados en la rama de finalización
 
 - b1-l4 se convierte en evaluación formal del módulo 1 con seis preguntas.
-- b4-l10 contiene el proyecto obligatorio de inventario y cinco casos de prueba locales.
+- b4-l10 contiene el proyecto obligatorio de inventario y seis casos de prueba locales.
 - b4-l11 contiene el examen global de 12 preguntas y requiere haber completado el proyecto.
 - b2-l9 introduce “Hello, World!” como sección 2.1 de M2, antes de tipos y literales.
 - El módulo 5 permanece opcional y pasa a tratar persistencia con archivos.
