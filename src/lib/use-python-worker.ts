@@ -81,7 +81,7 @@ export function usePythonWorker({ onStatusChange, onOutput }: UsePythonWorkerOpt
         if (workerRef.current === worker) workerRef.current = null;
         executionTimeoutRef.current = null;
         setWorkerState('error');
-        setError('Tiempo máximo superado. El proceso se detuvo para proteger el navegador.');
+        setError('Tiempo de ejecución agotado: el proceso se detuvo para proteger el navegador.');
         pendingExecutionRef.current = null;
         setIsRunning(false);
         onStatusChange?.('error');
