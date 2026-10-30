@@ -1205,9 +1205,9 @@ export const courseModules: CourseModule[] = [
           "starterCode": "limite = int(input())\nfor numero in range(1, limite + 1):\n    # termina el ciclo cuando numero llegue a 7\n    # omite los números pares\n    pass\n",
           "solution": "limite = int(input())\nfor numero in range(1, limite + 1):\n    if numero == 7:\n        break\n    if numero % 2 == 0:\n        continue\n    print(numero)",
           "tests": [
+            {"input":["1"],"expected":"1"},
             {"input":["-1"],"expected":""},
             {"input":["0"],"expected":""},
-            {"input":["1"],"expected":"1"},
             {"input":["6"],"expected":"1\n3\n5"},
             {"input":["10"],"expected":"1\n3\n5"},
           ],
