@@ -110,14 +110,14 @@ for i in range(360):
     concepts: ['bucles', 'variables', 'imprimir'],
     code: `for i in range(1, 11):
     print(i)`,
-    description: 'Imprime los n?meros del 1 al 10 usando un bucle for.',
+    description: 'Imprime los números del 1 al 10 usando un bucle for.',
   },
   {
         id: 'calculo-areas',
-    title: 'C?lculo de ?reas',
-    subtitle: 'Funciones y par?metros',
+    title: 'Cálculo de áreas',
+    subtitle: 'Funciones y parámetros',
     level: 'Principiante',
-    concepts: ['funciones', 'par?metros', 'operadores'],
+    concepts: ['funciones', 'parámetros', 'operadores'],
     code: `def area_circulo(radio):
     import math
     return math.pi * radio ** 2
@@ -125,9 +125,9 @@ for i in range(360):
 def area_cuadrado(lado):
     return lado ** 2
 
-print("?rea del c?rculo (radio 5):", area_circulo(5))
-print("?rea del cuadrado (lado 4):", area_cuadrado(4))`,
-    description: 'Define funciones para calcular ?reas y las ejecuta con valores de ejemplo.',
+print("Área del círculo (radio 5):", area_circulo(5))
+print("Área del cuadrado (lado 4):", area_cuadrado(4))`,
+    description: 'Define funciones para calcular áreas y las ejecuta con valores de ejemplo.',
   },
 ];
 
