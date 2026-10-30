@@ -269,168 +269,171 @@ export const courseModules: CourseModule[] = [
   {
     "id": "module-2",
     "number": "2",
-    "title": "Decisiones y repetición",
-    "summary": "Compara datos, construye condiciones, controla alternativas y automatiza tareas repetitivas con while y for.",
+    "title": "Tipos de datos, variables, operadores y entrada/salida",
+    "summary": "Representa datos, utiliza variables, construye expresiones, convierte valores y trabaja con entrada y salida.",
     "lessons": [
       {
         "id": "b2-l1",
         "section": "2.1",
-        "title": "Valores booleanos y comparaciones",
+        "title": "Tipos de datos y literales",
         "objectives": [
-          "Identificar True y False como valores booleanos.",
-          "Usar ==, !=, >, <, >= y <= para comparar.",
-          "Leer el resultado booleano de una expresión."
+          "Reconocer int, float, str y bool.",
+          "Diferenciar texto de valores numéricos.",
+          "Consultar el tipo de un valor mediante type()."
         ],
         "explanation": [
-          "El tipo bool solo tiene dos valores: True y False. Una comparación produce uno de esos valores, por lo que puede utilizarse directamente para decidir qué instrucciones ejecutar.",
-          "El operador == pregunta si dos valores son iguales; != pregunta si son distintos. Los operadores >, <, >= y <= comparan magnitudes. No confundas == con =: uno compara y el otro asigna.",
-          "Las comparaciones deben hacerse entre valores compatibles. Por ejemplo, compara una edad convertida a int con otro entero, no con el texto \"18\". Las comparaciones también pueden combinarse con and, or y not, que se practicarán cuando construyamos condiciones."
+          "Un literal es un valor escrito directamente en el código. int representa enteros, float números con parte decimal, str texto y bool valores de verdad. Cada tipo ofrece operaciones y comportamientos diferentes.",
+          "Las comillas hacen que un valor sea texto: \"25\" es una cadena mientras que 25 es un entero. True y False son los dos valores booleanos de Python y sirven para representar condiciones que pueden cumplirse o no.",
+          "type() permite consultar el tipo de un valor. Es una herramienta útil cuando recibes información de otra fuente y todavía no sabes si llega como texto, entero o decimal."
         ],
-        "example": "edad = 20\nes_mayor = edad >= 18\nprint(es_mayor)\nprint(edad != 18)",
-        "exampleOutput": "True\nTrue",
+        "example": "edad = 25\nprecio = 19.95\nnombre = \"Luis\"\nactivo = True\nprint(type(edad).__name__)\nprint(type(precio).__name__)\nprint(type(nombre).__name__)\nprint(type(activo).__name__)",
+        "exampleOutput": "int\nfloat\nstr\nbool",
         "walkthrough": [
-          "edad >= 18 pregunta si la edad es al menos 18.",
-          "El resultado de cada comparación es un booleano que print() puede mostrar."
+          "edad es un entero y precio un decimal.",
+          "nombre es una cadena.",
+          "activo es booleano."
         ],
         "commonMistakes": [
-          "Escribir = en lugar de == dentro de una comparación.",
-          "Comparar un número con texto sin convertir previamente la entrada."
+          "Confundir \"25\" con 25.",
+          "Escribir true o false en minúsculas."
         ],
         "exercise": {
           "id": "b2-e1",
-          "title": "Comparar una temperatura",
-          "statement": "Guarda temperatura = 29 y muestra True si es mayor o igual que 25; muestra el booleano directamente.",
-          "starterCode": "temperatura = 29\n",
-          "solution": "temperatura = 29\nprint(temperatura >= 25)",
+          "title": "Reconocer cuatro tipos",
+          "statement": "Crea cantidad 8, precio 2.5, nombre Marta y estado True. Imprime el tipo de cada variable.",
+          "starterCode": "cantidad = 8\nprecio = 2.5\nnombre = \"Marta\"\nestado = True\n",
+          "solution": "cantidad = 8\nprecio = 2.5\nnombre = \"Marta\"\nestado = True\nprint(type(cantidad).__name__)\nprint(type(precio).__name__)\nprint(type(nombre).__name__)\nprint(type(estado).__name__)",
           "tests": [
             {
               "input": [],
-              "expected": "True"
+              "expected": "int\nfloat\nstr\nbool"
             }
           ],
           "hints": [
-            "Usa >= para incluir también el límite.",
-            "No conviertas el resultado a texto: imprime la comparación."
+            "Usa type(variable).__name__.",
+            "Imprime un tipo por línea."
           ],
           "difficulty": "facil",
-          "xp": 10,
+          "xp": 15,
           "length": 5
         },
         "questions": [
           {
-            "prompt": "¿Qué operador comprueba que dos valores no sean iguales?",
+            "prompt": "¿Qué tipo representa el valor 3.75?",
             "options": [
-              "=",
-              "==",
-              "!=",
-              "<="
+              "int",
+              "str",
+              "float",
+              "bool"
             ],
             "answer": 2,
-            "explanation": "!= devuelve True cuando los dos valores son diferentes."
+            "explanation": "Un número con parte decimal se representa normalmente mediante float."
           }
         ],
         "assessment": false,
-        "estimatedMinutes": 12
+        "estimatedMinutes": 40
       },
       {
         "id": "b2-l2",
         "section": "2.2",
-        "title": "Tomar decisiones con if y else",
+        "title": "Variables y nombres claros",
         "objectives": [
-          "Construir una condición con if.",
-          "Añadir else para cubrir el caso contrario.",
-          "Respetar los dos puntos y la sangría del bloque."
+          "Crear variables mediante asignación.",
+          "Elegir identificadores válidos y descriptivos.",
+          "Actualizar una variable con su valor anterior."
         ],
         "explanation": [
-          "if permite ejecutar un bloque solamente cuando una condición es verdadera. La condición se escribe después de if y termina con dos puntos (:); las instrucciones que pertenecen al bloque llevan sangría.",
-          "else define el bloque alternativo cuando la condición del if es falsa. Un if puede existir sin else, pero cuando la tarea exige cubrir ambos casos, else hace explícito el resultado contrario.",
-          "La sangría en Python no es decoración: define qué instrucciones pertenecen a cada bloque. Mantén el mismo nivel de espacios dentro de un bloque y evita mezclar tabuladores y espacios."
+          "Una variable es un nombre asociado a un valor durante la ejecución. El signo igual realiza una asignación: Python evalúa el lado derecho y guarda el resultado en el nombre izquierdo.",
+          "Un identificador puede contener letras, números y guion bajo, pero no empezar con un número ni contener espacios. Nombres como precio_unitario y cantidad permiten entender mejor el programa.",
+          "Una variable puede cambiar: puntos = puntos + 5 calcula un nuevo valor y lo asigna de nuevo. puntos += 5 expresa la misma actualización de forma abreviada y se usa en contadores y acumuladores."
         ],
-        "example": "saldo = 1200\nif saldo >= 1000:\n    print(\"Compra autorizada\")\nelse:\n    print(\"Saldo insuficiente\")",
-        "exampleOutput": "Compra autorizada",
+        "example": "puntos = 10\npuntos += 5\nproducto = \"Cuaderno\"\nprint(producto)\nprint(puntos)",
+        "exampleOutput": "Cuaderno\n15",
         "walkthrough": [
-          "Python evalúa saldo >= 1000.",
-          "Como la condición es verdadera, ejecuta el primer bloque y omite else."
+          "puntos comienza en diez y aumenta cinco.",
+          "producto conserva el texto.",
+          "La última línea muestra el valor actualizado."
         ],
         "commonMistakes": [
-          "Olvidar los dos puntos después de la condición.",
-          "No indentar las instrucciones del bloque o indentar de forma inconsistente."
+          "Usar espacios en nombres de variables.",
+          "Confundir =, que asigna, con ==, que compara."
         ],
         "exercise": {
           "id": "b2-e2",
-          "title": "Clasificar una edad",
-          "statement": "Si edad es al menos 18, imprime Adulto; en caso contrario, imprime Menor de edad.",
-          "starterCode": "edad = 16\n",
-          "solution": "edad = 16\nif edad >= 18:\n    print(\"Adulto\")\nelse:\n    print(\"Menor de edad\")",
+          "title": "Actualizar una cantidad",
+          "statement": "Crea stock = 12, suma cinco unidades con += e imprime el valor final.",
+          "starterCode": "stock = 12\n",
+          "solution": "stock = 12\nstock += 5\nprint(stock)",
           "tests": [
             {
               "input": [],
-              "expected": "Menor de edad"
+              "expected": "17"
             }
           ],
           "hints": [
-            "La condición debe comparar edad con 18.",
-            "El bloque else resuelve el caso contrario."
+            "Usa += para actualizar la variable.",
+            "Imprime después de asignar."
           ],
           "difficulty": "facil",
-          "xp": 10,
+          "xp": 15,
           "length": 5
         },
         "questions": [
           {
-            "prompt": "¿Cuándo se ejecuta el bloque else asociado a un if?",
+            "prompt": "¿Qué hace total = total + 3?",
             "options": [
-              "Siempre después de if",
-              "Cuando la condición de if es falsa",
-              "Cuando la condición de if es verdadera",
-              "Solo si hay un bucle"
+              "Compara total con 3",
+              "Calcula el valor anterior más 3 y lo asigna nuevamente a total",
+              "Crea una cadena llamada total",
+              "Elimina total"
             ],
             "answer": 1,
-            "explanation": "else se ejecuta si ninguna condición anterior de esa estructura se cumplió."
+            "explanation": "Python evalúa el lado derecho y asigna el nuevo resultado a total."
           }
         ],
         "assessment": false,
-        "estimatedMinutes": 12
+        "estimatedMinutes": 40
       },
       {
         "id": "b2-l3",
         "section": "2.3",
-        "title": "Elegir entre varias opciones con elif",
+        "title": "Operadores aritméticos",
         "objectives": [
-          "Construir una cadena if/elif/else.",
-          "Ordenar condiciones desde la más específica o restrictiva.",
-          "Evitar rangos que se solapen o dejen casos sin tratar."
+          "Aplicar suma, resta, multiplicación y división.",
+          "Diferenciar /, // y %.",
+          "Utilizar ** para calcular potencias."
         ],
         "explanation": [
-          "elif significa \"si no, si...\" y permite comprobar otra condición cuando las anteriores fueron falsas. Python revisa la cadena en orden y ejecuta únicamente el primer bloque cuya condición resulte verdadera.",
-          "El orden de las condiciones cambia el resultado. Si primero compruebas nota >= 60, una nota de 95 entra ahí y nunca llega a la condición nota >= 90. Coloca primero el rango más alto cuando las categorías son acumulativas.",
-          "else puede cerrar la estructura para cubrir los casos restantes. Antes de escribir código, define los rangos con claridad y prueba mentalmente los valores del límite, justo por debajo y justo por encima."
+          "Los operadores +, -, *, / y ** permiten sumar, restar, multiplicar, dividir y elevar a una potencia. Por ejemplo, 3 ** 2 produce nueve.",
+          "/ realiza división real; // devuelve el cociente entero y % devuelve el residuo. Al dividir 17 entre 5, el cociente entero es tres y sobran dos unidades.",
+          "// calcula cuántas cajas completas se pueden formar y % permite conocer unidades restantes. Elige el operador según necesites división decimal, cociente entero o residuo."
         ],
-        "example": "nota = 84\nif nota >= 90:\n    print(\"Excelente\")\nelif nota >= 70:\n    print(\"Aprobado\")\nelse:\n    print(\"Debe reforzar\")",
-        "exampleOutput": "Aprobado",
+        "example": "print(8 + 4)\nprint(8 / 4)\nprint(17 // 5)\nprint(17 % 5)\nprint(2 ** 3)",
+        "exampleOutput": "12\n2.0\n3\n2\n8",
         "walkthrough": [
-          "La condición nota >= 90 es falsa.",
-          "La segunda condición nota >= 70 es verdadera; por eso se ejecuta Aprobado y se omite else."
+          "La suma produce doce.",
+          "17 // 5 devuelve tres.",
+          "17 % 5 devuelve dos."
         ],
         "commonMistakes": [
-          "Ordenar primero una condición general que captura todos los casos.",
-          "Dejar sin definir qué debe pasar exactamente en los valores límite."
+          "Pensar que / y // son iguales.",
+          "Confundir cociente y residuo."
         ],
         "exercise": {
           "id": "b2-e3",
-          "title": "Categorizar un envío",
-          "statement": "Si peso es hasta 1 kg imprime Ligero; si es hasta 5 kg imprime Mediano; para valores mayores imprime Pesado.",
-          "starterCode": "peso = 3.2\n",
-          "solution": "peso = 3.2\nif peso <= 1:\n    print(\"Ligero\")\nelif peso <= 5:\n    print(\"Mediano\")\nelse:\n    print(\"Pesado\")",
+          "title": "Calcular cajas y sobrantes",
+          "statement": "Hay 23 cuadernos y cada caja guarda cinco. Imprime las cajas completas y las unidades sobrantes.",
+          "starterCode": "cuadernos = 23\npor_caja = 5\n",
+          "solution": "cuadernos = 23\npor_caja = 5\nprint(cuadernos // por_caja)\nprint(cuadernos % por_caja)",
           "tests": [
             {
               "input": [],
-              "expected": "Mediano"
+              "expected": "4\n3"
             }
           ],
           "hints": [
-            "Comprueba primero el límite menor.",
-            "elif solo se evalúa cuando el if anterior fue falso."
+            "Usa // para las cajas completas.",
+            "Usa % para los sobrantes."
           ],
           "difficulty": "facil",
           "xp": 15,
@@ -438,59 +441,60 @@ export const courseModules: CourseModule[] = [
         },
         "questions": [
           {
-            "prompt": "En una cadena if/elif/else, ¿qué sucede si dos condiciones podrían ser verdaderas?",
+            "prompt": "¿Qué devuelve 17 % 5?",
             "options": [
-              "Python ejecuta la primera condición verdadera y salta el resto",
-              "Se ejecutan ambas",
-              "Python elige la última",
-              "El programa siempre falla"
+              "2",
+              "3",
+              "5",
+              "3.4"
             ],
             "answer": 0,
-            "explanation": "La cadena se detiene en el primer bloque cuya condición sea verdadera."
+            "explanation": "El operador % devuelve el residuo; al dividir 17 entre 5 sobran dos."
           }
         ],
         "assessment": false,
-        "estimatedMinutes": 14
+        "estimatedMinutes": 40
       },
       {
         "id": "b2-l4",
         "section": "2.4",
-        "title": "Repetir acciones con while",
+        "title": "Prioridad y conversión de expresiones",
         "objectives": [
-          "Explicar que while repite mientras la condición sea verdadera.",
-          "Actualizar la variable de control dentro del bucle.",
-          "Evitar bucles infinitos con una condición de salida."
+          "Aplicar la prioridad de operadores.",
+          "Agrupar operaciones mediante paréntesis.",
+          "Convertir valores con int(), float() y str()."
         ],
         "explanation": [
-          "while ejecuta un bloque repetidamente mientras su condición sea True. Es útil cuando el número de repeticiones depende de una condición, por ejemplo seguir solicitando un dato hasta que sea válido.",
-          "Un bucle necesita una forma de avanzar. En un contador, actualizamos el valor dentro del bloque; si nunca cambia la condición de salida, el ciclo puede repetirse indefinidamente.",
-          "Antes de ejecutar un while, identifica el valor inicial, la condición para continuar y la instrucción que acerca al programa a terminar. Esas tres decisiones evitan muchos errores."
+          "Python evalúa primero los paréntesis, luego potencias, multiplicaciones y divisiones, y después sumas y restas. Los paréntesis permiten expresar el orden deseado con claridad.",
+          "int() convierte una cadena numérica a entero; float() permite números decimales y str() transforma un valor en texto. int(\"doce\") falla porque la cadena no representa un entero válido.",
+          "Antes de combinar datos, identifica el tipo y la operación que necesitas. Utiliza números para calcular y cadenas para construir mensajes; las conversiones deben tener un propósito."
         ],
-        "example": "contador = 1\nwhile contador <= 3:\n    print(contador)\n    contador += 1",
-        "exampleOutput": "1\n2\n3",
+        "example": "subtotal = 3 * (1200 + 300)\nprecio_texto = \"4500\"\nprecio = int(precio_texto)\nprint(subtotal)\nprint(precio + 500)",
+        "exampleOutput": "4500\n5000",
         "walkthrough": [
-          "contador comienza en 1.",
-          "Después de cada impresión aumenta en uno; al llegar a 4, la condición resulta falsa y el bucle termina."
+          "Los paréntesis calculan primero 1200 + 300.",
+          "int() convierte el texto en entero.",
+          "El nuevo entero puede sumarse con 500."
         ],
         "commonMistakes": [
-          "Olvidar incrementar o modificar el contador.",
-          "Usar una condición que nunca puede volverse falsa."
+          "Sumar un entero y una cadena sin convertir.",
+          "Suponer que int() convierte palabras."
         ],
         "exercise": {
           "id": "b2-e4",
-          "title": "Contar intentos",
-          "statement": "Usa while para imprimir los números del 1 al 5, uno por línea.",
-          "starterCode": "contador = 1\n",
-          "solution": "contador = 1\nwhile contador <= 5:\n    print(contador)\n    contador += 1",
+          "title": "Convertir un subtotal",
+          "statement": "Convierte \"1250\" a entero, multiplícalo por tres e imprime el subtotal.",
+          "starterCode": "precio_texto = \"1250\"\n",
+          "solution": "precio_texto = \"1250\"\nprecio = int(precio_texto)\nsubtotal = precio * 3\nprint(subtotal)",
           "tests": [
             {
               "input": [],
-              "expected": "1\n2\n3\n4\n5"
+              "expected": "3750"
             }
           ],
           "hints": [
-            "La condición debe permitir llegar hasta 5.",
-            "Incrementa el contador en cada vuelta."
+            "Utiliza int().",
+            "Multiplica el valor convertido por tres."
           ],
           "difficulty": "facil",
           "xp": 15,
@@ -498,59 +502,60 @@ export const courseModules: CourseModule[] = [
         },
         "questions": [
           {
-            "prompt": "¿Qué hace que un bucle while termine en un programa correcto?",
+            "prompt": "¿Qué función convierte la cadena \"12\" en el entero 12?",
             "options": [
-              "Que la variable sea de tipo texto",
-              "Que la condición llegue a ser falsa",
-              "Que se use print() al final",
-              "Que siempre tenga exactamente diez vueltas"
+              "str()",
+              "int()",
+              "type()",
+              "bool()"
             ],
             "answer": 1,
-            "explanation": "while deja de repetir cuando su condición ya no es verdadera."
+            "explanation": "int() convierte una cadena que representa un entero en un valor int."
           }
         ],
         "assessment": false,
-        "estimatedMinutes": 15
+        "estimatedMinutes": 40
       },
       {
         "id": "b2-l5",
         "section": "2.5",
-        "title": "Recorrer secuencias con for y range",
+        "title": "Cadenas y salida formateada",
         "objectives": [
-          "Usar for para recorrer elementos de una secuencia.",
-          "Comprender que range(n) empieza en 0 y termina antes de n.",
-          "Definir inicio, límite y paso con range()."
+          "Combinar cadenas con variables.",
+          "Utilizar f-strings para insertar valores.",
+          "Presentar cantidades con etiquetas claras."
         ],
         "explanation": [
-          "for recorre los elementos de una secuencia y ejecuta su bloque una vez por cada elemento. Es apropiado cuando queremos procesar una lista o repetir una acción un número conocido de veces.",
-          "range(fin) genera números desde 0 hasta fin - 1. range(inicio, fin) empieza en el valor indicado y se detiene antes de fin. También podemos usar range(inicio, fin, paso) para avanzar en intervalos.",
-          "El nombre de la variable de control representa el elemento actual. Dentro del bloque podemos usarlo para calcular o mostrar resultados; al terminar el recorrido, el bucle for finaliza automáticamente."
+          "Una cadena (str) representa texto. Métodos como lower(), upper() y strip() permiten normalizarlo; las cadenas son inmutables y sus métodos devuelven nuevos valores.",
+          "Una f-string comienza con la letra f antes de las comillas. Dentro de llaves puedes insertar variables o expresiones; la especificación :.2f permite mostrar dos decimales.",
+          "Una salida útil indica qué representa cada dato. Mostrar Total: 25000 colones aporta contexto y reduce confusiones cuando el programa presenta varios resultados."
         ],
-        "example": "for numero in range(2, 11, 2):\n    print(numero)",
-        "exampleOutput": "2\n4\n6\n8\n10",
+        "example": "producto = \"Teclado\"\nprecio = 12500\ncantidad = 2\ntotal = precio * cantidad\nprint(f\"Producto: {producto}\")\nprint(f\"Total: {total} colones\")",
+        "exampleOutput": "Producto: Teclado\nTotal: 25000 colones",
         "walkthrough": [
-          "range(2, 11, 2) comienza en 2, avanza de 2 en 2 y se detiene antes de 11.",
-          "Cada valor generado se asigna a numero antes de ejecutar print()."
+          "La f-string inserta el nombre.",
+          "La multiplicación calcula el importe.",
+          "Las etiquetas explican los valores."
         ],
         "commonMistakes": [
-          "Esperar que range(5) incluya el 5; genera 0, 1, 2, 3 y 4.",
-          "Olvidar que el límite final no se incluye."
+          "Olvidar la f antes de las comillas.",
+          "Concatenar texto y números sin convertir."
         ],
         "exercise": {
           "id": "b2-e5",
-          "title": "Tabla de multiplicar",
-          "statement": "Utiliza for y range para imprimir la tabla del 7, desde 7 hasta 70, un resultado por línea.",
-          "starterCode": "for numero in range(1, 11):\n    # calcula el producto\n    pass\n",
-          "solution": "for numero in range(1, 11):\n    print(7 * numero)",
+          "title": "Crear un recibo",
+          "statement": "Calcula cuatro productos a 750 colones y muestra Total: 3000 colones con una f-string.",
+          "starterCode": "precio = 750\ncantidad = 4\n",
+          "solution": "precio = 750\ncantidad = 4\ntotal = precio * cantidad\nprint(f\"Total: {total} colones\")",
           "tests": [
             {
               "input": [],
-              "expected": "7\n14\n21\n28\n35\n42\n49\n56\n63\n70"
+              "expected": "Total: 3000 colones"
             }
           ],
           "hints": [
-            "range(1, 11) genera diez valores.",
-            "Multiplica cada valor por 7."
+            "Calcula el total.",
+            "Inserta la variable entre llaves."
           ],
           "difficulty": "facil",
           "xp": 15,
@@ -558,183 +563,188 @@ export const courseModules: CourseModule[] = [
         },
         "questions": [
           {
-            "prompt": "¿Qué números produce range(3, 7)?",
+            "prompt": "¿Qué permite hacer una f-string?",
             "options": [
-              "3, 4, 5, 7",
-              "3, 4, 5, 6, 7",
-              "3, 4, 5, 6",
-              "2, 3, 4, 5"
+              "Ejecutar archivos externos",
+              "Crear una función sin def",
+              "Insertar variables y expresiones dentro de una cadena",
+              "Repetir un bloque"
             ],
             "answer": 2,
-            "explanation": "El rango comienza en 3 y termina antes de 7: incluye 3, 4, 5 y 6."
+            "explanation": "Una f-string evalúa las expresiones entre llaves y las inserta en el texto."
           }
         ],
         "assessment": false,
-        "estimatedMinutes": 15
+        "estimatedMinutes": 40
       },
       {
         "id": "b2-l6",
         "section": "2.6",
-        "title": "Controlar un bucle con break y continue",
+        "title": "Entrada de datos con input()",
         "objectives": [
-          "Explicar la diferencia entre break y continue.",
-          "Usar break para salir de un bucle antes de terminar el recorrido.",
-          "Usar continue para saltar una iteración."
+          "Leer información mediante input().",
+          "Recordar que input() devuelve una cadena.",
+          "Convertir la entrada antes de calcular."
         ],
         "explanation": [
-          "break termina inmediatamente el bucle más cercano que lo contiene. Se usa cuando ya encontramos lo que buscábamos o cuando una condición indica que no debemos seguir.",
-          "continue no termina todo el bucle: omite el resto del bloque de la vuelta actual y pasa a la siguiente iteración. Conviene usarlo cuando algunos elementos deben ignorarse y otros deben procesarse.",
-          "Estos controles deben responder a una regla clara. Si un bucle se vuelve difícil de seguir por muchos break y continue, suele ser mejor dividir la tarea o expresar la condición de forma más directa."
+          "input() permite que una persona escriba un dato durante la ejecución. La función puede mostrar una pregunta, espera la respuesta y devuelve lo escrito como cadena, incluso si se introduce una cifra.",
+          "Para calcular, convierte el texto con int() o float(). Separa preguntar, leer, convertir, procesar y presentar para poder comprobar cada etapa.",
+          "El laboratorio simula la entrada de consola mediante un campo de texto. Introduce una línea por cada llamada a input(); si el dato no representa un número, la conversión puede generar un error que estudiarás después."
         ],
-        "example": "for numero in range(1, 6):\n    if numero == 3:\n        continue\n    print(numero)",
-        "exampleOutput": "1\n2\n4\n5",
+        "example": "cantidad = int(input(\"Cantidad: \"))\nprecio = 1500\ntotal = cantidad * precio\nprint(f\"Total: {total}\")",
+        "exampleOutput": "Entrada: 3\nSalida: Total: 4500",
         "walkthrough": [
-          "Cuando numero vale 3, continue omite print(numero).",
-          "Las demás iteraciones se procesan con normalidad."
+          "input() recoge el texto.",
+          "int() convierte a entero.",
+          "El programa multiplica y presenta el total."
         ],
         "commonMistakes": [
-          "Confundir continue con break: uno salta una vuelta y el otro termina el bucle.",
-          "Colocar break en una posición que termina el bucle antes de procesar los datos necesarios."
+          "No convertir input() antes de calcular.",
+          "No suministrar una línea por cada llamada a input()."
         ],
         "exercise": {
           "id": "b2-e6",
-          "title": "Detener una búsqueda",
-          "statement": "Recorre los números del 1 al 10 y detén el bucle cuando encuentres el 6. Imprime cada número antes de detenerte.",
-          "starterCode": "for numero in range(1, 11):\n    # completa la condición de salida\n    pass\n",
-          "solution": "for numero in range(1, 11):\n    print(numero)\n    if numero == 6:\n        break",
+          "title": "Calcular un precio desde la entrada",
+          "statement": "Lee cantidad con input(), multiplícala por 1500 e imprime el total. Prueba con 3.",
+          "starterCode": "cantidad = int(input())\n",
+          "solution": "cantidad = int(input())\nprecio = 1500\nprint(cantidad * precio)",
           "tests": [
             {
-              "input": [],
-              "expected": "1\n2\n3\n4\n5\n6"
+              "input": [
+                "3"
+              ],
+              "expected": "4500"
             }
           ],
           "hints": [
-            "Usa break cuando numero sea igual a 6.",
-            "Imprime antes de break para incluir el 6 en la salida."
+            "Utiliza input().",
+            "Convierte el dato con int()."
           ],
-          "difficulty": "medio",
-          "xp": 20,
+          "difficulty": "facil",
+          "xp": 15,
           "length": 5
         },
         "questions": [
           {
-            "prompt": "¿Qué sucede después de ejecutar continue dentro de un bucle?",
+            "prompt": "¿Qué tipo devuelve input() inicialmente?",
             "options": [
-              "Termina el programa completo",
-              "Sale del bucle para siempre",
-              "Reinicia el programa desde la primera línea",
-              "Pasa directamente a la siguiente iteración"
+              "int",
+              "float",
+              "bool",
+              "str"
             ],
             "answer": 3,
-            "explanation": "continue salta las instrucciones restantes de esa vuelta y sigue con la iteración siguiente."
+            "explanation": "input() devuelve una cadena; la conversión numérica debe realizarse explícitamente."
           }
         ],
         "assessment": false,
-        "estimatedMinutes": 15
+        "estimatedMinutes": 40
       },
       {
         "id": "b2-l7",
         "section": "2.7",
-        "title": "Evaluación del módulo 2: decisiones y bucles",
+        "title": "Evaluación del módulo 2: tipos, operadores y E/S",
         "objectives": [
-          "Combinar comparaciones y decisiones en un mismo programa.",
-          "Elegir entre while y for según el problema.",
-          "Predecir el resultado de una secuencia de condiciones."
+          "Elegir tipos adecuados.",
+          "Resolver expresiones y conversiones.",
+          "Combinar entrada, cálculo y salida."
         ],
         "explanation": [
-          "Esta evaluación reúne los conceptos del módulo: comparaciones booleanas, condicionales y bucles. No se trata de memorizar palabras clave, sino de leer el problema, identificar su condición y elegir una estructura que lo resuelva con claridad.",
-          "Antes de responder, sigue el orden exacto de ejecución. En una cadena if/elif/else solo entra el primer bloque verdadero; en un bucle, revisa cuándo se actualiza la condición y qué valores genera range().",
-          "En la práctica final deberás combinar una condición con un recorrido. Si cometes un error, vuelve al ejemplo del tema correspondiente, ejecuta una versión pequeña y después intenta de nuevo."
+          "Esta evaluación integra tipos básicos, variables, asignación, operadores y conversión. Antes de responder, identifica si cada dato es texto, número o booleano y elige una operación compatible.",
+          "Cuando aparecen varios operadores, sigue el orden de evaluación y utiliza paréntesis para mostrar la intención. Si una expresión contiene input(), recuerda que el dato inicial es texto y puede necesitar conversión.",
+          "El reto combina cantidad, precio e impuesto. Calcula el subtotal, aplica el porcentaje y presenta el total con una etiqueta; la salida debe ser comprensible y producir el resultado esperado."
         ],
-        "example": "for numero in range(1, 6):\n    if numero % 2 == 0:\n        print(\"par\")\n    else:\n        print(\"impar\")",
-        "exampleOutput": "impar\npar\nimpar\npar\nimpar",
+        "example": "cantidad = 2\nprecio = 2500\nsubtotal = cantidad * precio\nimpuesto = subtotal * 0.13\ntotal = subtotal + impuesto\nprint(f\"{total:.2f}\")",
+        "exampleOutput": "5650.00",
         "walkthrough": [
-          "for recorre cinco enteros.",
-          "% obtiene el residuo de la división entre 2: residuo cero significa par."
+          "Calcula subtotal con cantidad por precio.",
+          "Calcula el 13% del subtotal.",
+          "Suma y presenta dos decimales."
         ],
         "commonMistakes": [
-          "Elegir una respuesta sin simular el orden de ejecución.",
-          "Olvidar que range() excluye el límite final."
+          "Aplicar el impuesto a una sola unidad.",
+          "Mostrar un número sin indicar su significado."
         ],
         "exercise": {
           "id": "b2-e7",
-          "title": "Clasificador de números",
-          "statement": "Recorre del 1 al 8. Imprime Par para los múltiplos de 2 e Impar para los demás.",
-          "starterCode": "for numero in range(1, 9):\n    # decide qué mensaje mostrar\n    pass\n",
-          "solution": "for numero in range(1, 9):\n    if numero % 2 == 0:\n        print(\"Par\")\n    else:\n        print(\"Impar\")",
+          "title": "Calcular una compra con impuesto",
+          "statement": "Con dos productos de 2500 colones, calcula subtotal, impuesto del 13% y total. Muestra dos decimales.",
+          "starterCode": "cantidad = 2\nprecio = 2500\n",
+          "solution": "cantidad = 2\nprecio = 2500\nsubtotal = cantidad * precio\nimpuesto = subtotal * 0.13\ntotal = subtotal + impuesto\nprint(f\"{total:.2f}\")",
           "tests": [
             {
               "input": [],
-              "expected": "Impar\nPar\nImpar\nPar\nImpar\nPar\nImpar\nPar"
+              "expected": "5650.00"
             }
           ],
           "hints": [
-            "Usa for para recorrer los ocho números.",
-            "El operador % 2 permite comprobar si el residuo es cero."
+            "Calcula subtotal.",
+            "Multiplica por 0.13.",
+            "Suma el impuesto."
           ],
-          "difficulty": "medio",
-          "xp": 25,
+          "difficulty": "facil",
+          "xp": 15,
           "length": 5
         },
         "questions": [
           {
-            "prompt": "¿Qué valor booleano produce 8 != 8?",
+            "prompt": "¿Qué tipo produce 5 / 2?",
             "options": [
-              "True",
-              "False",
-              "8",
-              "Error"
+              "int",
+              "float",
+              "str",
+              "bool"
             ],
             "answer": 1,
-            "explanation": "Los dos valores son iguales; por tanto, la condición de desigualdad es falsa."
+            "explanation": "La división / devuelve un valor decimal, 2.5 en este caso."
           },
           {
-            "prompt": "¿Qué bloque se ejecuta si x es 4 en if x > 5 / elif x == 4 / else?",
+            "prompt": "¿Qué valor guarda x después de x = 4 y x += 2?",
             "options": [
-              "elif",
-              "if",
-              "else",
-              "ninguno"
+              "6",
+              "4",
+              "42",
+              "2"
             ],
             "answer": 0,
-            "explanation": "La comparación del elif es la primera verdadera después del if falso."
+            "explanation": "La segunda instrucción suma dos al valor anterior."
           },
           {
-            "prompt": "¿Qué imprime range(1, 4) al recorrerlo con print?",
+            "prompt": "¿Qué función convierte una cadena numérica en decimal?",
             "options": [
-              "0, 1, 2, 3",
-              "1, 2, 3",
-              "1, 2, 3, 4",
-              "2, 3, 4"
+              "int()",
+              "float()",
+              "str()",
+              "type()"
             ],
             "answer": 1,
-            "explanation": "range(1, 4) genera 1, 2 y 3."
+            "explanation": "float() convierte una cadena numérica válida en decimal."
           },
           {
-            "prompt": "¿Qué instrucción termina inmediatamente el bucle actual?",
+            "prompt": "¿Qué devuelve 17 // 5?",
             "options": [
-              "continue",
-              "pass",
-              "break",
-              "return siempre"
+              "2",
+              "3.4",
+              "3",
+              "4"
             ],
             "answer": 2,
-            "explanation": "break detiene el bucle que lo contiene más cerca."
+            "explanation": "La división entera devuelve el cociente sin parte decimal."
           },
           {
-            "prompt": "¿Qué debe cambiar dentro de un while con contador para que pueda terminar?",
+            "prompt": "¿Qué devuelve input() antes de convertir la respuesta?",
             "options": [
-              "La condición nunca debe cambiar",
-              "Hay que cambiar el nombre",
-              "Debe ejecutarse print() dos veces",
-              "La condición debe cambiar hasta ser falsa"
+              "int",
+              "float",
+              "bool",
+              "str"
             ],
             "answer": 3,
-            "explanation": "Un bucle while termina cuando la condición se vuelve falsa; normalmente se actualiza su variable de control."
+            "explanation": "input() entrega texto y se debe convertir para hacer cálculos."
           }
         ],
         "assessment": true,
-        "estimatedMinutes": 25
+        "estimatedMinutes": 50
       }
     ]
   },
