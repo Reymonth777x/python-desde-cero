@@ -155,6 +155,7 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
           NEXT_PUBLIC_SITE_URL: https://python-desdecero.com
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY || secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
 
       - name: Normalizar y validar Account ID sin exponerlo
         shell: bash
@@ -177,6 +178,7 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
           NEXT_PUBLIC_SITE_URL: https://python-desdecero.com
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY || secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
 
       - name: Verificar dominio personalizado conectado al Worker
         shell: bash
