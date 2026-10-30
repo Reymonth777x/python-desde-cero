@@ -48,6 +48,8 @@ Todavía faltan pruebas integrales con cuentas reales de Auth, desafío Turnstil
 
 La tabla de producción conserva 43 filas antiguas con IDs del esquema previo lesson-* y correct_option_v2 NULL. No coinciden con ninguna de las 67 tuplas actuales del catálogo. Se mantienen sin cambios hasta una reconciliación explícita; no deben confundirse con claves faltantes.
 
+En las 67 filas actuales, 29 valores v2 en producción difieren del campo histórico correct_option y 38 coinciden; en DEV coinciden 67/67. El campo v2 es la referencia del calificador; no sobrescribirlo con el valor legacy.
+
 El historial remoto de producción registra 22 migraciones. Las versiones locales 001–003, 016–017 y algunas variantes posteriores no coinciden con el historial remoto. Las migraciones 024–027 están aplicadas tanto en producción como en DEV, pero con timestamps diferentes. No ejecutar db push, migration repair ni db reset hasta reconciliar los archivos e historiales y preparar respaldo/rollback.
 
 La rama preview main del proyecto de producción tiene status = MIGRATIONS_FAILED y with_data = false; su preview_project_status aparece ACTIVE_HEALTHY. No es el proyecto DEV separado. Investigar el drift antes de resetear, rebasar, fusionar o eliminar esa rama.
