@@ -229,6 +229,24 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(result.score).toBe(100);
   });
 
+  it('guía bubble sort con una pasada manual antes del ejercicio completo', () => {
+    const lesson = courseModules
+      .find((courseModule) => courseModule.id === 'module-3')!
+      .lessons.find((item) => item.id === 'b3-l7')!;
+    const explanation = lesson.explanation.join(' ');
+    const onePass = lesson.example.split('# Una pasada de bubble sort\n')[1] ?? '';
+
+    expect(explanation).toContain('una sola pasada');
+    expect(explanation).toContain('range(len(numeros) - 1 - pasada)');
+    expect(onePass).toContain('for indice in range(len(numeros) - 1):');
+    expect(onePass).toContain('if numeros[indice] > numeros[indice + 1]:');
+    expect(onePass).not.toContain('.sort()');
+    expect(onePass).not.toContain('sorted(');
+    expect(lesson.exampleOutput).toContain('[2, 4, 5]');
+    expect(lesson.exercise.starterCode).toContain('for pasada in range(len(numeros) - 1):');
+    expect(lesson.exercise.hints).toHaveLength(4);
+  });
+
   it('presenta variables antes de usarlas y practica int, float y str en 2.3.1', () => {
     const lesson = courseModules
       .find((courseModule) => courseModule.id === 'module-2')!
@@ -243,6 +261,4 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(lesson.exercise.solution).toContain('float(factor_texto)');
     expect(lesson.exercise.solution).toContain('str(subtotal)');
     expect(lesson.exercise.tests[0].expected).toBe('3750.0\nSubtotal: 3750.0');
-  });
-
 });
