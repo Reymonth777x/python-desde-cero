@@ -64,7 +64,7 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
     .single();
 
   if (!profile?.is_admin) {
-    redirect('/estudiante');
+    redirect('/academia');
   }
 
   const { invitations, error: listError } = await listInvitations();
