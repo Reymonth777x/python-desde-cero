@@ -1190,34 +1190,38 @@ export const courseModules: CourseModule[] = [
           "range(fin) genera desde cero hasta fin sin incluirlo; range(inicio, fin, paso) permite elegir comienzo e incremento. range(2, 11, 2) produce 2, 4, 6, 8 y 10.",
           "break termina el ciclo más cercano y continue omite el resto de la vuelta actual para pasar a la siguiente. Utiliza cada instrucción cuando la regla del problema lo requiera, sin confundir sus efectos."
         ],
-        "example": "for numero in range(1, 6):\n    if numero == 3:\n        continue\n    print(numero)",
+        "example": "for numero in range(1, 8):\n    if numero == 3:\n        continue\n    if numero == 6:\n        break\n    print(numero)",
         "exampleOutput": "1\n2\n4\n5",
         "walkthrough": [
-          "range(1, 6) genera del uno al cinco.",
-          "Cuando numero vale tres, continue omite print().",
-          "El bucle sigue con cuatro y cinco."
+          "range(1, 8) genera los números del uno al siete; el límite ocho no se incluye.",
+          "Cuando numero vale tres, continue omite solo esa vuelta y el bucle sigue con cuatro.",
+          "Cuando numero vale seis, break termina el bucle completo; seis y siete no llegan a print().",
         ],
         "commonMistakes": [
-          "Esperar que range(5) incluya cinco.",
-          "Confundir continue con break."
+          "Esperar que range(5) incluya cinco; el límite final queda fuera.",
+          "Usar break cuando solo quieres saltar una vuelta: break termina el ciclo completo.",
+          "Usar continue cuando necesitas terminar el ciclo: continue solo omite la vuelta actual.",
         ],
         "exercise": {
           "id": "b3-e5",
-          "title": "Imprimir números pares",
-          "statement": "Utiliza for y range() para mostrar los pares desde 2 hasta 10.",
-          "starterCode": "for numero in range(2, 11, 2):\n    # muestra el número\n    pass\n",
-          "solution": "for numero in range(2, 11, 2):\n    print(numero)",
+          "title": "Omitir pares y detener el recorrido",
+          "statement": "Lee un límite entero y recorre desde 1 hasta ese límite. Usa continue para omitir los números pares y break para detener el ciclo cuando llegues a 7. Imprime cada número impar anterior a 7.",
+          "starterCode": "limite = int(input())\nfor numero in range(1, limite + 1):\n    # termina el ciclo cuando numero llegue a 7\n    # omite los números pares\n    pass\n",
+          "solution": "limite = int(input())\nfor numero in range(1, limite + 1):\n    if numero == 7:\n        break\n    if numero % 2 == 0:\n        continue\n    print(numero)",
           "tests": [
-            {
-              "input": [],
-              "expected": "2\n4\n6\n8\n10"
-            }
+            {"input":["1"],"expected":"1"},
+            {"input":["-1"],"expected":""},
+            {"input":["0"],"expected":""},
+            {"input":["6"],"expected":"1\n3\n5"},
+            {"input":["10"],"expected":"1\n3\n5"},
           ],
           "hints": [
-            "Empieza en dos y usa paso dos.",
-            "Usa once como límite para incluir diez."
+            "Convierte el límite de input() a entero y recorre con range(1, limite + 1).",
+            "Comprueba numero == 7 y usa break antes de imprimir.",
+            "Comprueba numero % 2 == 0 y usa continue para saltar los pares.",
+            "Coloca print(numero) después de las dos condiciones.",
           ],
-          "difficulty": "facil",
+          "difficulty": "medio",
           "xp": 20,
           "length": 5
         },
