@@ -52,6 +52,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Prepare the isolated Python runner assets
+        run: npm run prepare:python-runner
+
+      - name: Validate the isolated runner Worker configuration
+        run: npx --yes wrangler@4.148.0 deploy --config wrangler.runner.jsonc --dry-run
+
       - name: Verify every course exercise solution with isolated Python runs
         run: python3 scripts/verify-course-exercises.py
 
