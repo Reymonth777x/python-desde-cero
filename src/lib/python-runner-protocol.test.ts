@@ -11,6 +11,27 @@ describe('origen del ejecutor Python', () => {
     ).toBe('https://python-desdecero-runner.account.workers.dev');
   });
 
+  it('rechaza subdominios anidados y labels inválidos aunque usen workers.dev', () => {
+    expect(
+      resolvePythonRunnerOrigin(
+        'https://python-desdecero-runner.account.extra.workers.dev',
+        'https://python-desdecero.com',
+      ),
+    ).toBeNull();
+    expect(
+      resolvePythonRunnerOrigin(
+        'https://python-desdecero-runner..workers.dev',
+        'https://python-desdecero.com',
+      ),
+    ).toBeNull();
+    expect(
+      resolvePythonRunnerOrigin(
+        'https://python-desdecero-runner.account_name.workers.dev',
+        'https://python-desdecero.com',
+      ),
+    ).toBeNull();
+  });
+
   it('rechaza otros Workers de workers.dev que no sean el runner dedicado', () => {
     expect(
       resolvePythonRunnerOrigin(
