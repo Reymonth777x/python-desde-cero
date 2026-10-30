@@ -214,7 +214,7 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(lesson.exercise.solution).toContain('edad >= 18 and tiene_entrada');
     expect(lesson.exercise.tests).toEqual([
       { input: [], expected: ['True', '1', '7', '6'].join(String.fromCharCode(10)) },
-      { input: [], expected: 'True\\n1\\n7\\n6' },
+    ]);
     expect(lesson.exercise.hints).toHaveLength(4);
     expect(lesson.commonMistakes.join(' ')).toContain('no son equivalentes');
   });
