@@ -78,7 +78,7 @@ test.describe('Ejemplos de portada', () => {
       '    t.forward(100)',
       '    t.right(90)',
       'turtle.done()',
-    ].join('\\n'));
+    ].join('\n'));
 
     const ejecutar = lab.getByRole('button', { name: 'Ejecutar', exact: true });
     await ejecutar.click();
