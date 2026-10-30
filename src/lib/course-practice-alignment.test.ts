@@ -53,4 +53,35 @@ describe('course practice alignment', () => {
       },
     ]);
   });
+
+  it('cubre los límites de las ramas if/elif/else en b3-l3', () => {
+    const { exercise } = getExercise('b3-l3');
+
+    expect(exercise.starterCode).toContain('peso = float(input())');
+    expect(exercise.solution).toContain('if peso <= 1:');
+    expect(exercise.solution).toContain('elif peso <= 5:');
+    expect(exercise.solution).toContain('else:');
+    expect(exercise.tests).toEqual([
+      { input: ['0.5'], expected: 'Ligero' },
+      { input: ['1'], expected: 'Ligero' },
+      { input: ['1.1'], expected: 'Mediano' },
+      { input: ['5'], expected: 'Mediano' },
+      { input: ['5.1'], expected: 'Pesado' },
+    ]);
+  });
+
+  it('comprueba los límites del bucle while, incluso si debe ejecutar cero veces', () => {
+    const { exercise } = getExercise('b3-l4');
+
+    expect(exercise.starterCode).toContain('limite = int(input())');
+    expect(exercise.solution).toContain('while contador <= limite:');
+    expect(exercise.solution).toContain('contador += 1');
+    expect(exercise.tests).toEqual([
+      { input: ['-2'], expected: '' },
+      { input: ['0'], expected: '' },
+      { input: ['1'], expected: '1' },
+      { input: ['5'], expected: '1\\n2\\n3\\n4\\n5' },
+    ]);
+  });
+
 });
