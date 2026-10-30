@@ -103,6 +103,17 @@ export default function PythonEditor({
   }, [applyEditorTheme]);
 
   const needsInput = /\binput\s*\(/.test(code);
+  const usesTurtle = /\b(?:import\s+turtle|from\s+turtle\s+import)\b/.test(code);
+  const mobilePanels: Array<{ id: 'instructions' | 'editor' | 'output' | 'turtle'; label: string }> = [
+    { id: 'instructions', label: 'Guía' },
+    { id: 'editor', label: 'Código' },
+    { id: 'output', label: 'Resultado' },
+    ...(usesTurtle ? [{ id: 'turtle' as const, label: 'Gráficos' }] : []),
+  ];
+
+  useEffect(() => {
+    if (!usesTurtle && mobilePanel === 'turtle') setMobilePanel('editor');
+  }, [usesTurtle, mobilePanel]);
 
   const runCode = useCallback(() => {
     if (isRunning) return;

@@ -6,7 +6,8 @@ import { courseModules } from '@/lib/course';
 import { createClient } from '@/lib/supabase/client';
 
 type State =
-  | { status: 'loading' | 'guest' }
+  | { status: 'loading' }
+  | { status: 'guest' }
   | { status: 'error' }
   | { status: 'member'; completed: number; total: number };
 
