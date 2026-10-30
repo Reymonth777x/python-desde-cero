@@ -1271,20 +1271,21 @@ export const courseModules: CourseModule[] = [
         "exercise": {
           "id": "b3-e2",
           "title": "Combinar condiciones y calcular bits",
-          "statement": "Crea edad = 22, tiene_entrada = True, permisos = 5 y solicitud = 3. Muestra primero si la persona puede entrar usando and. Después calcula permisos & solicitud, permisos | solicitud y permisos ^ solicitud, cada uno en una línea distinta.",
-          "starterCode": "edad = 22\ntiene_entrada = True\npermisos = 5\nsolicitud = 3\n\n# Comprueba la condición con and.\n\n# Calcula AND (&), OR (|) y XOR (^) entre los enteros.\n",
-          "solution": "edad = 22\ntiene_entrada = True\npermisos = 5\nsolicitud = 3\nprint(edad >= 18 and tiene_entrada)\nprint(permisos & solicitud)\nprint(permisos | solicitud)\nprint(permisos ^ solicitud)",
+          "statement": "Crea edad = 22, tiene_entrada = True, permisos = 5 y solicitud = 3. Muestra si la persona puede entrar con and. Después calcula permisos & solicitud, permisos | solicitud y permisos ^ solicitud. También calcula permisos << 1 y permisos >> 1 para desplazar los bits una posición a la izquierda y otra a la derecha. Muestra cada resultado en una línea distinta.",
+          "starterCode": "edad = 22\ntiene_entrada = True\npermisos = 5\nsolicitud = 3\n\n# Comprueba la condición con and.\n\n# Calcula AND (&), OR (|), XOR (^) y los dos desplazamientos.\n",
+          "solution": "edad = 22\ntiene_entrada = True\npermisos = 5\nsolicitud = 3\nprint(edad >= 18 and tiene_entrada)\nprint(permisos & solicitud)\nprint(permisos | solicitud)\nprint(permisos ^ solicitud)\nprint(permisos << 1)\nprint(permisos >> 1)",
           "tests": [
             {
               "input": [],
-              "expected": "True\n1\n7\n6"
+              "expected": "True\n1\n7\n6\n10\n2"
             }
           ],
           "hints": [
             "La condición lógica se escribe edad >= 18 and tiene_entrada.",
             "Usa permisos & solicitud para conservar los bits que están activos en ambos enteros.",
             "Usa permisos | solicitud para combinar las posiciones activas.",
-            "Usa permisos ^ solicitud para conservar las posiciones donde los bits son distintos."
+            "Usa permisos ^ solicitud para conservar las posiciones donde los bits son distintos.",
+            "Usa permisos << 1 para desplazar una posición a la izquierda y permisos >> 1 para hacerlo a la derecha."
           ],
           "difficulty": "medio",
           "xp": 20,
@@ -2002,22 +2003,41 @@ export const courseModules: CourseModule[] = [
         "exercise": {
           "id": "b4-e7",
           "title": "Manejar una clave inexistente",
-          "statement": "Intenta consultar la clave edad en el diccionario persona = {\"nombre\": \"Ana\"}. Si falta la clave, captura KeyError e imprime Dato no encontrado.",
-          "starterCode": "persona = {\"nombre\": \"Ana\"}\n",
-          "solution": "persona = {\"nombre\": \"Ana\"}\ntry:\n    print(persona[\"edad\"])\nexcept KeyError:\n    print(\"Dato no encontrado\")",
+          "statement": "Lee un nombre y una edad. Si la edad está vacía, deja esa clave fuera del diccionario persona. Convierte la edad a entero: captura KeyError si falta la clave y ValueError si el texto no es numérico. Usa else para mostrar una edad válida y finally para mostrar Validación finalizada.",
+          "starterCode": "nombre = input().strip()\nedad_texto = input().strip()\npersona = {\"nombre\": nombre}\nif edad_texto:\n    persona[\"edad\"] = edad_texto\n\n# Controla la consulta y conversión de la edad.\n",
+          "solution": "nombre = input().strip()\nedad_texto = input().strip()\npersona = {\"nombre\": nombre}\nif edad_texto:\n    persona[\"edad\"] = edad_texto\ntry:\n    edad = int(persona[\"edad\"])\nexcept KeyError:\n    print(\"Falta el campo edad\")\nexcept ValueError:\n    print(\"La edad debe ser numérica\")\nelse:\n    print(f\"Edad: {edad}\")\nfinally:\n    print(\"Validación finalizada\")",
           "tests": [
             {
-              "input": [],
-              "expected": "Dato no encontrado"
+              "input": [
+                "Ana",
+                "20"
+              ],
+              "expected": "Edad: 20\nValidación finalizada"
+            },
+            {
+              "input": [
+                "Ana",
+                "veinte"
+              ],
+              "expected": "La edad debe ser numérica\nValidación finalizada"
+            },
+            {
+              "input": [
+                "Ana",
+                ""
+              ],
+              "expected": "Falta el campo edad\nValidación finalizada"
             }
           ],
           "hints": [
-            "La consulta persona[\"edad\"] puede generar KeyError.",
-            "Coloca la consulta dentro de try y captura KeyError."
+            "Lee dos líneas y agrega la clave edad solo si la segunda no está vacía.",
+            "Coloca int(persona[\"edad\"]) dentro del bloque try.",
+            "Captura KeyError si falta la clave y ValueError si el texto no representa un entero.",
+            "Usa else para mostrar la edad convertida cuando no hubo errores y finally para mostrar siempre Validación finalizada."
           ],
           "difficulty": "medio",
           "xp": 20,
-          "length": 5
+          "length": 10
         },
         "questions": [
           {

@@ -236,11 +236,13 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(lesson.exercise.statement).toContain('permisos & solicitud');
     expect(lesson.exercise.statement).toContain('permisos | solicitud');
     expect(lesson.exercise.statement).toContain('permisos ^ solicitud');
+    expect(lesson.exercise.statement).toContain('permisos << 1');
+    expect(lesson.exercise.statement).toContain('permisos >> 1');
     expect(lesson.exercise.solution).toContain('edad >= 18 and tiene_entrada');
     expect(lesson.exercise.tests).toEqual([
-      { input: [], expected: ['True', '1', '7', '6'].join(String.fromCharCode(10)) },
+      { input: [], expected: ['True', '1', '7', '6', '10', '2'].join(String.fromCharCode(10)) },
     ]);
-    expect(lesson.exercise.hints).toHaveLength(4);
+    expect(lesson.exercise.hints).toHaveLength(5);
     expect(lesson.commonMistakes.join(' ')).toContain('no son equivalentes');
   });
 
