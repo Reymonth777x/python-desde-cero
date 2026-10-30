@@ -398,7 +398,8 @@ export default function PythonEditor({
                       {cmd.text}
                     </text>
                   );
-                if (cmd.type === "bgcolor") {
+                }
+                if (cmd.type === 'bgcolor') {
                   return (
                     <rect
                       key={`turtle-bgcolor-${idx}`}
@@ -406,10 +407,9 @@ export default function PythonEditor({
                       y="-250"
                       width="500"
                       height="500"
-                      fill={cmd.color ?? "white"}
+                      fill={cmd.color ?? 'white'}
                     />
                   );
-                }
                 }
                 return null;
               })}
