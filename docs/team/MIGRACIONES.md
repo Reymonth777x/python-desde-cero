@@ -46,6 +46,16 @@ Verificación remota adicional del 30-10-2026:
 - El catálogo vigente tiene 44 claves en 34 lecciones; 44/44 tienen `correct_option_v2`. Hay 43 claves históricas de IDs antiguos sin v2, fuera del catálogo vigente.
 
 **Conflicto de PR #8:** su archivo `20261030050000_021_pe1_course_catalog_refresh.sql` reutiliza la versión `20261030050000` con contenido y propósito distintos. Esa versión ya está aplicada en remoto como `scope_quiz_attempt_cleanup_to_current_user`. No fusionar ni aplicar la migración de PR #8. Revisar sus cambios de código y rescatar únicamente los que no dupliquen ni contradigan la ruta canónica.
+## Migración 024 — preparada en rama, no aplicada
+
+Archivo: `supabase/migrations/20261030064000_024_add_required_pe1_assessments_and_project.sql`.
+
+- Actualiza la clave existente de `module-1/b1-l4` y añade las cinco preguntas restantes de la evaluación formal de M1.
+- Añade cinco claves para `module-4/b4-l10` (proyecto obligatorio) y doce para `module-4/b4-l11` (examen final global).
+- Son 23 filas de claves: una fila existente actualizada y 22 añadidas. La migración no elimina claves históricas, intentos ni progreso.
+- El catálogo espera 66 claves activas tras aplicar la migración. La comprobación remota más reciente todavía observa 44; por tanto, 024 no está aplicada.
+- No fusionar ni desplegar el nuevo catálogo antes de probar la migración en una instancia de desarrollo y coordinar su aplicación. No ejecutar `db push`, `migration repair` ni `db reset` en producción para forzar la sincronización.
+
 ## Otras migraciones
 
 - 018: revoca escritura directa de estudiantes en `progress` y concede DELETE de invitaciones sujeto a RLS; aparece en remoto.
