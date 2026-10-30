@@ -24,16 +24,11 @@ const THEMES: ThemeOption[] = [
 export default function ThemeSelector() {
   const { theme, setTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
-  const [portalReady, setPortalReady] = useState(false);
   const id = useId();
   const selectorRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const desktopPanelRef = useRef<HTMLDivElement>(null);
   const mobilePanelRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    setPortalReady(true);
-  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -185,7 +180,7 @@ export default function ThemeSelector() {
         </div>
       )}
 
-      {isOpen && portalReady && createPortal(
+      {isOpen && createPortal(
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-3 py-4 md:hidden"
           onPointerDown={(event) => {
