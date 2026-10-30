@@ -22,9 +22,13 @@ describe('ruta de aprendizaje Python desde cero', () => {
       4, 8, 9, 9,
     ]);
     expect(courseModules[4].lessons).toHaveLength(4);
-    expect(courseModules[1].lessons.at(-1)?.id).toBe('b2-l8');
+    expect(courseModules[1].lessons.at(-1)?.id).toBe('b2-l7');
     expect(courseModules[2].lessons.at(-1)?.id).toBe('b3-l8');
-    expect(courseModules[3].lessons.at(-1)?.id).toBe('b4-l9');
+    expect(courseModules[3].lessons.at(-1)?.id).toBe('b4-l8');
+    expect(courseModules[1].lessons.at(-1)?.assessment).toBe(true);
+    expect(courseModules[2].lessons.at(-1)?.assessment).toBe(true);
+    expect(courseModules[3].lessons.at(-1)?.assessment).toBe(true);
+    expect(courseModules[0].lessons.at(-1)?.assessment).toBe(false);
   });
 
   it('asigna preguntas y ejemplos a cada actividad y mantiene ids únicos por módulo', () => {
