@@ -106,22 +106,7 @@ if ($startExitCode -ne 0) {
     throw 'Supabase local no pudo iniciar. Confirma que Docker Desktop este en ejecucion y vuelve a probar. La salida de Supabase se oculta para no mostrar claves locales; no ejecutes db push ni db reset contra el proyecto remoto.'
 }
 
-Write-Host 'Aplicando migraciones pendientes SOLO a la base local...' -ForegroundColor Cyan
-$previousErrorActionPreference = $ErrorActionPreference
-try {
-    $ErrorActionPreference = 'Continue'
-    $migrationOutput = & npx --yes "supabase@$SupabaseCliVersion" migration up --local 2>&1
-    $migrationExitCode = $LASTEXITCODE
-}
-finally {
-    $ErrorActionPreference = $previousErrorActionPreference
-}
-if ($migrationExitCode -ne 0) {
-    throw 'No se pudieron aplicar las migraciones pendientes a Supabase local. No se modifico el proyecto remoto. Revisa la salida de supabase migration up --local.'
-}
-Write-Host 'Migraciones locales aplicadas.' -ForegroundColor Green
-
-$local = Get-SupabaseLocalEnv
+Write-Host 'No se aplican migraciones automáticamente: el historial local/remoto está pendiente de reconciliación.' -ForegroundColor Yellow`n`n$local = Get-SupabaseLocalEnv
 $developmentEnvPath = Join-Path $projectRoot '.env.development.local'
 
 $envLines = @(
