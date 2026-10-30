@@ -271,7 +271,13 @@ export default function LessonStudy({
                 <Link href={previousHref} className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4"><ArrowLeft aria-hidden="true" size={16} /> Lección anterior</Link>
               ) : <span />}
               {nextHref ? (
-                <Link href={nextHref} className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">Siguiente lección <ArrowRight aria-hidden="true" size={16} /></Link>
+                completed ? (
+                  <Link href={nextHref} className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">Siguiente lección <ArrowRight aria-hidden="true" size={16} /></Link>
+                ) : (
+                  <span className="inline-flex min-h-11 items-center text-right text-xs text-[var(--theme-muted)]" aria-disabled="true">
+                    Aprueba esta lección para desbloquear la siguiente.
+                  </span>
+                )
               ) : <Link href="/academia" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">Volver a la ruta <ArrowRight aria-hidden="true" size={16} /></Link>}
             </nav>
           </article>
