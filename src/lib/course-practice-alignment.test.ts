@@ -80,7 +80,7 @@ describe('course practice alignment', () => {
       { input: ['-2'], expected: '' },
       { input: ['0'], expected: '' },
       { input: ['1'], expected: '1' },
-      { input: ['5'], expected: '1\\n2\\n3\\n4\\n5' },
+      { input: ['5'], expected: ['1', '2', '3', '4', '5'].join(String.fromCharCode(10)) },
     ]);
   });
 
