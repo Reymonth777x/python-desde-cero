@@ -82,8 +82,30 @@ if (-not (Get-Command supabase -ErrorAction SilentlyContinue)) {
 }
 
 Write-Host 'Iniciando Supabase local. No se enlaza ni se modifica el proyecto remoto...' -ForegroundColor Cyan
-& supabase start
-if ($LASTEXITCODE -ne 0) {
+$previousErrorActionPreference = $ErrorActionPreference
+try {
+    $ErrorActionPreference = 'Continue'
+    $startOutput = & supabase start 2>&1
+    $startExitCode = $LASTEXITCODE
+}
+finally {
+    $ErrorActionPreference = $previousErrorActionPreference
+}
+
+$secretsHidden = $false
+foreach ($line in $startOutput) {
+    $text = [string]$line
+    if ($text -match '^\s*│\s*(?:Publishable|Secret|Access Key|Secret Key|Region)\s*│') {
+        if (-not $secretsHidden) {
+            Write-Host '  [Claves locales ocultas por seguridad]' -ForegroundColor DarkGray
+            $secretsHidden = $true
+        }
+        continue
+    }
+    Write-Host $text
+}
+
+if ($startExitCode -ne 0) {
     throw 'Supabase local no pudo iniciar. Revisa el mensaje anterior y no ejecutes db push ni db reset contra el proyecto remoto.'
 }
 
