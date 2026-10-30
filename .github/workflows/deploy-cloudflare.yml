@@ -169,4 +169,13 @@ jobs:
           curl --fail --silent --show-error --location --retry 5 --retry-delay 3 --retry-all-errors \
             https://python-desdecero.com/ -o /tmp/python-desde-cero-home.html
           grep -qi "Python desde cero" /tmp/python-desde-cero-home.html
-          echo "La página pública respondió y contiene el título esperado."
+          grep -qi "Cuatro módulos principales" /tmp/python-desde-cero-home.html
+
+          curl --fail --silent --show-error --location --retry 5 --retry-delay 3 --retry-all-errors \
+            https://python-desdecero.com/sitemap.xml -o /tmp/python-desde-cero-sitemap.xml
+          grep -q "https://python-desdecero.com/" /tmp/python-desde-cero-sitemap.xml
+
+          curl --fail --silent --show-error --location --retry 5 --retry-delay 3 --retry-all-errors \
+            https://python-desdecero.com/robots.txt -o /tmp/python-desde-cero-robots.txt
+          grep -qi "Sitemap: https://python-desdecero.com/sitemap.xml" /tmp/python-desde-cero-robots.txt
+          echo "Portada de cuatro módulos, sitemap y robots verificados en el dominio personalizado."
