@@ -419,6 +419,7 @@ export default function PythonEditor({
                 if (cmd.type === 'cursor') {
                   return (
                     <g
+                      data-turtle-cursor="true"
                       key={`turtle-cursor-${idx}`}
                       transform={`translate(${cmd.x ?? 0} ${-(cmd.y ?? 0)}) rotate(${-(cmd.heading ?? 0)})`}
                     >

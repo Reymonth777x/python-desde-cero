@@ -454,8 +454,13 @@ def get_commands():
 
 
 def clear_commands():
-    global _commands
+    """Start a fresh drawing and release references to previous turtle instances."""
+    global _commands, _turtles, _current, _screen, _screen_bgcolor
     _commands = _TurtleCommandBuffer()
+    _turtles = {}
+    _current = None
+    _screen = None
+    _screen_bgcolor = "white"
 
 
 def mainloop():
@@ -466,9 +471,7 @@ def exitonclick():
     pass
 
 
-def clear_commands():
-    global _commands
-    _commands = _TurtleCommandBuffer()
+
 
 # Registrar el módulo para que "import turtle as t" funcione
 sys.modules["turtle"] = sys.modules[__name__]

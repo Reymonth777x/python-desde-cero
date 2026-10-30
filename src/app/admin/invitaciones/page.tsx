@@ -9,6 +9,8 @@ type InvitationRow = {
   code: string;
   is_used: boolean;
   used_by: string | null;
+  used_by_name: string | null;
+  used_by_email: string | null;
   expires_at: string | null;
   is_expired: boolean;
   created_at: string;
@@ -21,11 +23,13 @@ const FEEDBACK: Record<string, { ok: boolean; text: string }> = {
   invalid: { ok: false, text: 'Revisa los datos: el código y la fecha no son válidos.' },
   duplicate: { ok: false, text: 'Ya existe una invitación con ese código.' },
   failed: { ok: false, text: 'La operación no se pudo completar. Inténtalo de nuevo.' },
+  used: { ok: false, text: 'El código ya fue utilizado. Se conserva para mantener el historial de la invitación.' },
 };
 
 function feedbackCode(error: string | null | undefined, success: string) {
   if (!error) return success;
   if (error.includes('Ya existe')) return 'duplicate';
+  if (error.includes('se conserva como historial')) return 'used';
   if (error.includes('inválid') || error.includes('requerido') || error.includes('caracteres: letras') || error.includes('futura')) return 'invalid';
   return 'failed';
 }
@@ -158,6 +162,7 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
                   <tr className='bg-[var(--theme-bg-secondary)]'>
                     <th className='border border-[var(--theme-border)] px-3 py-2 text-left text-xs font-semibold text-[var(--theme-muted)]'>Código</th>
                     <th className='border border-[var(--theme-border)] px-3 py-2 text-left text-xs font-semibold text-[var(--theme-muted)]'>Estado</th>
+                    <th className='border border-[var(--theme-border)] px-3 py-2 text-left text-xs font-semibold text-[var(--theme-muted)]'>Utilizada por</th>
                     <th className='border border-[var(--theme-border)] px-3 py-2 text-left text-xs font-semibold text-[var(--theme-muted)]'>Creada</th>
                     <th className='border border-[var(--theme-border)] px-3 py-2 text-left text-xs font-semibold text-[var(--theme-muted)]'>Expira</th>
                     <th className='border border-[var(--theme-border)] px-3 py-2 text-left text-xs font-semibold text-[var(--theme-muted)]'>Acciones</th>
@@ -175,6 +180,11 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
                         ) : (
                           <span className='text-[var(--theme-accent)]'>Activa</span>
                         )}
+                      </td>
+                      <td className='border border-[var(--theme-border)] px-3 py-2 text-sm text-[var(--theme-muted)]'>
+                        {inv.is_used
+                          ? <span>{inv.used_by_name || 'Cuenta vinculada'}{inv.used_by_email ? <span className='block text-xs'>{inv.used_by_email}</span> : null}</span>
+                          : 'Sin usar'}
                       </td>
                       <td className='border border-[var(--theme-border)] px-3 py-2 text-sm text-[var(--theme-muted)]'>
                         {new Date(inv.created_at).toLocaleDateString()}

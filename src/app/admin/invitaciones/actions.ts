@@ -30,11 +30,26 @@ export async function listInvitations() {
     .order('created_at', { ascending: false });
 
   if (error) return { invitations: [], error: 'No se pudieron cargar las invitaciones.' };
+
+  const usedUserIds = [...new Set((invitations ?? [])
+    .map((invitation) => invitation.used_by)
+    .filter((id): id is string => Boolean(id)))];
+
+  const { data: profiles, error: profileError } = usedUserIds.length > 0
+    ? await supabase.from('profiles').select('id, email, full_name').in('id', usedUserIds)
+    : { data: [], error: null };
+
+  const profilesById = new Map((profileError ? [] : profiles ?? []).map((profile) => [profile.id, profile]));
   const now = Date.now();
-  const withExpiryStatus = (invitations ?? []).map((invitation) => ({
-    ...invitation,
-    is_expired: Boolean(invitation.expires_at && new Date(invitation.expires_at).getTime() < now),
-  }));
+  const withExpiryStatus = (invitations ?? []).map((invitation) => {
+    const usedProfile = invitation.used_by ? profilesById.get(invitation.used_by) : null;
+    return {
+      ...invitation,
+      used_by_name: usedProfile?.full_name ?? null,
+      used_by_email: usedProfile?.email ?? null,
+      is_expired: Boolean(invitation.expires_at && new Date(invitation.expires_at).getTime() < now),
+    };
+  });
   return { invitations: withExpiryStatus, error: null };
 }
 
@@ -107,7 +122,23 @@ export async function deleteInvitation(id: string) {
   if (!profile?.is_admin) redirect('/academia');
   if (!/^[0-9a-f-]{36}$/i.test(id)) return { error: 'Identificador de invitación inválido.' };
 
-  const { error } = await supabase.from('invitations').delete().eq('id', id);
-  if (error) return { error: 'No se pudo eliminar la invitación.' };
+  const { data: invitation, error: lookupError } = await supabase
+    .from('invitations')
+    .select('is_used')
+    .eq('id', id)
+    .maybeSingle();
+
+  if (lookupError || !invitation) return { error: 'No se encontró la invitación.' };
+  if (invitation.is_used) return { error: 'Una invitación utilizada se conserva como historial y no se elimina.' };
+
+  const { data: deleted, error } = await supabase
+    .from('invitations')
+    .delete()
+    .eq('id', id)
+    .eq('is_used', false)
+    .select('id')
+    .maybeSingle();
+
+  if (error || !deleted) return { error: 'No se pudo eliminar la invitación. Puede que ya haya sido utilizada.' };
   return { error: null };
 }

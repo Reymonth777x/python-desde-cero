@@ -86,6 +86,12 @@ test.describe('Ejemplos de portada', () => {
     const canvas = lab.getByRole('img', { name: 'Resultado gráfico de Turtle' });
     await expect(canvas).toBeVisible({ timeout: 90_000 });
     await expect(canvas.locator('line')).toHaveCount(4);
+    await expect(canvas.locator('g[data-turtle-cursor="true"]')).toHaveCount(1);
+    await expect(ejecutar).toBeEnabled({ timeout: 90_000 });
+
+    await ejecutar.click();
+    await expect(canvas.locator('line')).toHaveCount(4);
+    await expect(canvas.locator('g[data-turtle-cursor="true"]')).toHaveCount(1);
     await expect(ejecutar).toBeEnabled({ timeout: 90_000 });
   });
 

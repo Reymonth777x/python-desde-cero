@@ -208,6 +208,7 @@ export default function PortadaLab({
                   if (command.type === 'cursor') {
                     return (
                       <g
+                        data-turtle-cursor="true"
                         key={`turtle-cursor-${index}`}
                         transform={`translate(${command.x ?? 0} ${-(command.y ?? 0)}) rotate(${-(command.heading ?? 0)})`}
                       >
