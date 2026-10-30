@@ -1,4 +1,4 @@
-import { Fragment, type ReactElement } from 'react';
+import { Children, Fragment, type ReactElement, type ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/lib/supabase/server', () => ({ createClient: vi.fn() }));
@@ -29,7 +29,7 @@ describe('HomeAccountLinks', () => {
     const element = (await HomeAccountLinks()) as ReactElement;
     expect(element.type).toBe(Fragment);
 
-    const children = (element.props as { children: ReactElement[] }).children;
+    const children = Children.toArray((element.props as { children: ReactNode }).children) as ReactElement[];
     expect((children[0].props as { href: string }).href).toBe('/#progreso');
     expect(children[1].type).toBe('form');
     expect((children[1].props as { action?: unknown }).action).toBeDefined();
