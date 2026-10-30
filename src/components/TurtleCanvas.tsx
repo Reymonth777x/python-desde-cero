@@ -1,20 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-
-type TurtleCommand = {
-  type: 'line' | 'fill' | 'dot' | 'write' | 'bgcolor';
-  x?: number;
-  y?: number;
-  x1?: number;
-  y1?: number;
-  x2?: number;
-  y2?: number;
-  color?: string;
-  size?: number;
-  points?: Array<[number, number]>;
-  text?: string;
-};
+import { getTurtlePose, getTurtleViewBox, type TurtleCommand } from '@/lib/turtle-rendering';
 
 type TurtleCanvasProps = {
   commands: TurtleCommand[];
@@ -23,8 +10,7 @@ type TurtleCanvasProps = {
 };
 
 const DEFAULT_WIDTH = 600;
-const DEFAULT_HEIGHT = 500;
-const VIEW_SIZE = 500;
+const DEFAULT_HEIGHT = 338;
 export default function TurtleCanvas({
   commands,
   width = DEFAULT_WIDTH,
@@ -118,25 +104,14 @@ export default function TurtleCanvas({
   }, [isPlaying, stepDuration]);
 
   const visibleCommands = commands.slice(0, currentStep);
-  const turtleState = visibleCommands.reduce(
-    (position, command) => {
-      if (
-        command.type !== 'line' ||
-        command.x1 === undefined ||
-        command.y1 === undefined ||
-        command.x2 === undefined ||
-        command.y2 === undefined
-      ) {
-        return position;
-      }
-      return {
-        x: command.x2,
-        y: command.y2,
-        heading: -Math.atan2(command.y2 - command.y1, command.x2 - command.x1) * (180 / Math.PI),
-      };
-    },
-    { x: 0, y: 0, heading: 0 },
-  );
+  const turtlePose = getTurtlePose(visibleCommands);
+  const hasTurtleCursor = commands.some((command) => command.type === 'cursor');
+  const viewBox = getTurtleViewBox(commands, width, height);
+  const gridStep = 50;
+  const firstGridX = Math.floor(viewBox.left / gridStep) * gridStep;
+  const firstGridY = Math.floor(viewBox.top / gridStep) * gridStep;
+  const gridColumns = Math.ceil((viewBox.left + viewBox.width - firstGridX) / gridStep) + 1;
+  const gridRows = Math.ceil((viewBox.top + viewBox.height - firstGridY) / gridStep) + 1;
 
   const bgColorCmd = [...visibleCommands].reverse().find((c) => c.type === 'bgcolor');
   const bgColor = bgColorCmd?.color || 'var(--theme-bg)';
@@ -149,25 +124,24 @@ export default function TurtleCanvas({
         borderColor: 'var(--theme-code-border)',
       }}
     >
-      <div className="relative w-full h-full border border-[#theme-code-border]">
+      <div className="relative w-full h-full border border-[var(--theme-code-border)]">
         <svg
           width="100%"
           height="100%"
-          viewBox={'-' + (VIEW_SIZE / 2) + ' -' + (VIEW_SIZE / 2) + ' ' + VIEW_SIZE + ' ' + VIEW_SIZE}
+          viewBox={viewBox.viewBox}
           preserveAspectRatio="xMidYMid meet"
           className="w-full h-full"
           style={{ backgroundColor: bgColor }}
         >
           {showGrid && (
             <g stroke="var(--theme-border)" strokeOpacity="0.3" strokeWidth="1">
-              {[...Array(11)].map((_, i) => {
-                const pos = -250 + i * 50;
-                return (
-                  <g key={"grid-" + i}>
-                    <line x1={pos} y1={-250} x2={pos} y2={250} />
-                    <line x1={-250} y1={pos} x2={250} y2={pos} />
-                  </g>
-                );
+              {Array.from({ length: gridColumns }, (_, i) => {
+                const pos = firstGridX + i * gridStep;
+                return <line key={"grid-x-" + i} x1={pos} y1={viewBox.top} x2={pos} y2={viewBox.top + viewBox.height} />;
+              })}
+              {Array.from({ length: gridRows }, (_, i) => {
+                const pos = firstGridY + i * gridStep;
+                return <line key={"grid-y-" + i} x1={viewBox.left} y1={pos} x2={viewBox.left + viewBox.width} y2={pos} />;
               })}
             </g>
           )}
@@ -226,40 +200,50 @@ export default function TurtleCanvas({
             }
             return null;
           })}
-          {showTurtle && visibleCommands.length > 0 && (
-            <g transform={"translate(" + turtleState.x + "," + -turtleState.y + ") rotate(" + turtleState.heading + ")"}>
-              <path
-                d="M-8,8 L8,8 L0,-12 Z"
-                fill="var(--theme-accent)"
-                stroke="var(--theme-accent-dark)"
-                strokeWidth="1"
-              />
-              <circle cx="0" cy="0" r="3" fill="var(--theme-ink-inverse)" />
+          {showTurtle && hasTurtleCursor && turtlePose && (
+            <g transform={"translate(" + turtlePose.x + "," + -turtlePose.y + ") rotate(" + turtlePose.heading + ")"}>
+              {turtlePose.shape === 'turtle' ? (
+                <g fill={turtlePose.color} stroke="var(--theme-code-bg)" strokeWidth="1">
+                  <ellipse cx="-1" cy="0" rx="9" ry="7" />
+                  <circle cx="11" cy="0" r="4" />
+                  <ellipse cx="-6" cy="-7" rx="3" ry="2.5" />
+                  <ellipse cx="4" cy="-7" rx="3" ry="2.5" />
+                  <ellipse cx="-6" cy="7" rx="3" ry="2.5" />
+                  <ellipse cx="4" cy="7" rx="3" ry="2.5" />
+                  <path d="M-10,0 L-15,-3 L-15,3 Z" />
+                </g>
+              ) : turtlePose.shape === 'square' ? (
+                <rect x="-7" y="-7" width="14" height="14" fill={turtlePose.color} stroke="var(--theme-code-bg)" strokeWidth="1" />
+              ) : turtlePose.shape === 'circle' ? (
+                <circle cx="0" cy="0" r="7" fill={turtlePose.color} stroke="var(--theme-code-bg)" strokeWidth="1" />
+              ) : (
+                <path d="M-8,-7 L10,0 L-8,7 Z" fill={turtlePose.color} stroke="var(--theme-code-bg)" strokeWidth="1" />
+              )}
             </g>
           )}
         </svg>
       </div>
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 px-3 py-2 bg-[#theme-surface] border border-[#theme-border] rounded-md">
-        <div className="flex items-center gap-2 text-xs text-[#theme-muted]">
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 px-3 py-2 bg-[var(--theme-surface)] border border-[var(--theme-border)] rounded-md">
+        <div className="flex items-center gap-2 text-xs text-[var(--theme-muted)]">
           <span>Velocidad:</span>
           <button
             type="button"
             onClick={() => setSpeedValue(0.5)}
-            className={"px-2 py-0.5 rounded text-xs transition-colors " + (speed === 0.5 ? "bg-[#theme-accent] text-[#theme-ink-inverse]" : "hover:bg-[#theme-bg-secondary]")}
+            className={"px-2 py-0.5 rounded text-xs transition-colors " + (speed === 0.5 ? "bg-[var(--theme-accent)] text-[var(--theme-ink-inverse)]" : "hover:bg-[var(--theme-bg-secondary)]")}
           >
             Lento
           </button>
           <button
             type="button"
             onClick={() => setSpeedValue(1)}
-            className={"px-2 py-0.5 rounded text-xs transition-colors " + (speed === 1 ? "bg-[#theme-accent] text-[#theme-ink-inverse]" : "hover:bg-[#theme-bg-secondary]")}
+            className={"px-2 py-0.5 rounded text-xs transition-colors " + (speed === 1 ? "bg-[var(--theme-accent)] text-[var(--theme-ink-inverse)]" : "hover:bg-[var(--theme-bg-secondary)]")}
           >
             Normal
           </button>
           <button
             type="button"
             onClick={() => setSpeedValue(2)}
-            className={"px-2 py-0.5 rounded text-xs transition-colors " + (speed === 2 ? "bg-[#theme-accent] text-[#theme-ink-inverse]" : "hover:bg-[#theme-bg-secondary]")}
+            className={"px-2 py-0.5 rounded text-xs transition-colors " + (speed === 2 ? "bg-[var(--theme-accent)] text-[var(--theme-ink-inverse)]" : "hover:bg-[var(--theme-bg-secondary)]")}
           >
             R\u00e1pido
           </button>
@@ -303,13 +287,13 @@ export default function TurtleCanvas({
           </button>
         </div>
 
-        <div className="flex items-center gap-2 text-xs text-[#theme-muted]">
+        <div className="flex items-center gap-2 text-xs text-[var(--theme-muted)]">
           <label className="flex items-center gap-1 cursor-pointer">
             <input
               type="checkbox"
               checked={showGrid}
               onChange={(e) => setShowGrid(e.target.checked)}
-              className="accent-[#theme-accent]"
+              className="accent-[var(--theme-accent)]"
             />
             Cuadr\u00edcula
           </label>
@@ -318,13 +302,13 @@ export default function TurtleCanvas({
               type="checkbox"
               checked={showTurtle}
               onChange={(e) => setShowTurtle(e.target.checked)}
-              className="accent-[#theme-accent]"
+              className="accent-[var(--theme-accent)]"
             />
             Tortuga
           </label>
         </div>
 
-        <div className="text-xs text-[#theme-muted]">
+        <div className="text-xs text-[var(--theme-muted)]">
           Paso {currentStep} de {commands.length}
         </div>
       </div>
