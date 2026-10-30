@@ -20,7 +20,7 @@ La página oficial de Cisco Networking Academy consultada el 30-10-2026 describe
 - Curso oficial y secciones: https://www.netacad.com/ja/courses/python-essentials-1?courseLang=en-US
 - Catálogo Cisco 2024 en español: https://www.netacad.com/sites/default/files/course-catalog-es.pdf
 
-La rama de finalización incorpora una evaluación formal de M1, el proyecto final como requisito y un examen global de 12 preguntas. El código contiene 33 unidades principales (incluye evaluaciones, proyecto y examen) y cuatro unidades de extensión opcional. Las migraciones 024, 025 y 026 ya se probaron en Supabase DEV: 67 claves, todas con respuesta v2. La 026 deja el RPC público como SECURITY INVOKER y reserva SECURITY DEFINER para la implementación privada. En producción ya se aplicó 026; las migraciones de contenido 024 y 025 siguen pendientes y deben aplicarse coordinadas con el nuevo catálogo.
+La rama de finalización incorpora una evaluación formal de M1, el proyecto final como requisito y un examen global de 12 preguntas. El código contiene 33 unidades principales (incluye evaluaciones, proyecto y examen) y cuatro unidades de extensión opcional. Las migraciones 024, 025 y 026 ya se probaron en Supabase DEV: 67 claves, todas con respuesta v2. La 026 deja el RPC público como SECURITY INVOKER y reserva SECURITY DEFINER para la implementación privada. En producción ya se aplicó 026; las migraciones de contenido 024 y 025 siguen pendientes y deben aplicarse coordinadas con el nuevo catálogo. El índice público de navegación coincide con las 37 unidades del contenido del servidor en ID, sección y título; una prueba protege el orden de M2.
 
 El módulo 3 ahora sigue la secuencia oficial de prerequisitos: decisiones → ciclos → lógica/bit a bit → listas → ordenamiento → operaciones y aplicaciones avanzadas con listas → evaluación. La práctica con listas anidadas aparece después de dominar listas simples.
 
@@ -126,7 +126,7 @@ b4-l10 requiere construir un gestor de inventario de consola que lea varios regi
 - Combina tipos, operadores, entrada/salida, condiciones, ciclos, listas, bubble sort, funciones y excepciones.
 - No introduce archivos, POO ni paquetes externos como requisito de PE1.
 - Umbral de aprobación: 75%.
-- Las claves privadas del examen se añaden mediante la migración 024 y se verificaron en DEV; producción sigue pendiente.
+- Las claves privadas del examen se añadieron mediante la migración 024 y se verificaron en DEV; producción sigue pendiente de 024/025.
 
 
 ## Puerta de calidad antes de publicar
