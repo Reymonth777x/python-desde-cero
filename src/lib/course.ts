@@ -1145,9 +1145,9 @@ export const courseModules: CourseModule[] = [
           "starterCode": "limite = int(input())\ncontador = 1\n",
           "solution": "limite = int(input())\ncontador = 1\nwhile contador <= limite:\n    print(contador)\n    contador += 1",
           "tests": [
+            {"input":["1"],"expected":"1"},
             {"input":["-2"],"expected":""},
             {"input":["0"],"expected":""},
-            {"input":["1"],"expected":"1"},
             {"input":["5"],"expected":"1\n2\n3\n4\n5"},
           ],
           "hints": [
