@@ -111,9 +111,7 @@ export default function PythonEditor({
     ...(usesTurtle ? [{ id: 'turtle' as const, label: 'Gráficos' }] : []),
   ];
 
-  useEffect(() => {
-    if (!usesTurtle && mobilePanel === 'turtle') setMobilePanel('editor');
-  }, [usesTurtle, mobilePanel]);
+  const activeMobilePanel = activeMobilePanel === 'turtle' && !usesTurtle ? 'editor' : mobilePanel;
 
   const runCode = useCallback(() => {
     if (isRunning) return;
@@ -148,12 +146,12 @@ export default function PythonEditor({
             role="tab"
             id={`practice-tab-${panel}`}
             aria-controls={`practice-panel-${panel}`}
-            aria-selected={mobilePanel === panel}
+            aria-selected={activeMobilePanel === panel}
             onClick={() => {
               setMobilePanel(panel);
               if (panel === 'editor') setEditorRequested(true);
             }}
-            className={`min-h-12 border-b-2 px-2 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] ${mobilePanel === panel ? 'border-[var(--theme-accent)] text-[var(--theme-accent)]' : 'border-transparent text-[var(--theme-muted)]'}`}
+            className={`min-h-12 border-b-2 px-2 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] ${activeMobilePanel === panel ? 'border-[var(--theme-accent)] text-[var(--theme-accent)]' : 'border-transparent text-[var(--theme-muted)]'}`}
           >
             {label}
           </button>
@@ -171,7 +169,7 @@ export default function PythonEditor({
         id="practice-panel-instructions"
         role="tabpanel"
         aria-labelledby="practice-tab-instructions"
-        className={`${mobilePanel === 'instructions' ? 'block' : 'hidden'} md:hidden`}
+        className={`${activeMobilePanel === 'instructions' ? 'block' : 'hidden'} md:hidden`}
       >
         <section className="border-l-2 border-[var(--theme-border-dark)] bg-[var(--theme-bg-secondary)] p-4 sm:p-5">
           <h2 className="font-serif text-xl">Guía de práctica</h2>
@@ -193,7 +191,7 @@ export default function PythonEditor({
         id="practice-panel-editor"
         role="tabpanel"
         aria-labelledby="practice-tab-editor"
-        className={`${mobilePanel === 'editor' ? 'block' : 'hidden'} space-y-4 md:block`}
+        className={`${activeMobilePanel === 'editor' ? 'block' : 'hidden'} space-y-4 md:block`}
       >
         {(editorRequested || desktopLayout) && (
           <>
@@ -287,7 +285,7 @@ export default function PythonEditor({
         id="practice-panel-output"
         role="tabpanel"
         aria-labelledby="practice-tab-output"
-        className={`${mobilePanel === 'output' ? 'block' : 'hidden'} mt-4 md:block`}
+        className={`${activeMobilePanel === 'output' ? 'block' : 'hidden'} mt-4 md:block`}
       >
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-semibold text-[var(--theme-ink)]">Salida del programa</h2>
@@ -336,7 +334,7 @@ export default function PythonEditor({
         id="practice-panel-turtle"
         role="tabpanel"
         aria-labelledby="practice-tab-turtle"
-        className={`${mobilePanel === 'turtle' ? 'block' : 'hidden'} mt-4 md:block`}
+        className={`${activeMobilePanel === 'turtle' ? 'block' : 'hidden'} mt-4 md:block`}
       >
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-semibold text-[var(--theme-ink)]">Gráficos de Turtle</h2>
