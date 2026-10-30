@@ -50,9 +50,9 @@ Verificación remota adicional del 30-10-2026:
 
 Archivo: `supabase/migrations/20261030064000_024_add_required_pe1_assessments_and_project.sql`.
 
-- Actualiza la clave existente de `module-1/b1-l4` y añade las cinco preguntas restantes de la evaluación formal de M1.
+- Actualiza las claves existentes de `module-1/b1-l4` y `module-5/b5-l4`; añade las cinco preguntas restantes de la evaluación formal de M1.
 - Añade cinco claves para `module-4/b4-l10` (proyecto obligatorio) y doce para `module-4/b4-l11` (examen final global).
-- Son 23 filas de claves: una fila existente actualizada y 22 añadidas. La migración no elimina claves históricas, intentos ni progreso.
+- Son 24 filas de claves: una fila existente actualizada y 22 añadidas. La migración no elimina claves históricas, intentos ni progreso.
 - El catálogo espera 66 claves activas tras aplicar la migración. La comprobación remota más reciente todavía observa 44; por tanto, 024 no está aplicada.
 - No fusionar ni desplegar el nuevo catálogo antes de probar la migración en una instancia de desarrollo y coordinar su aplicación. No ejecutar `db push`, `migration repair` ni `db reset` en producción para forzar la sincronización.
 
