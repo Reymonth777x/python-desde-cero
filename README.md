@@ -54,7 +54,7 @@ The application follows Next.js App Router conventions:
 
 ## Local setup (Windows + Docker)
 
-Use Node.js 24, npm and Docker Desktop. The local launcher downloads and runs a pinned Supabase CLI 2.121.0 through npx on first use; a global CLI installation is not required. The repository already contains `supabase/config.toml` and the canonical migrations in `supabase/migrations/`.
+Use Node.js 24, npm and Docker Desktop. The local launcher downloads and runs a pinned Supabase CLI 2.121.0 through npx on first use; a global CLI installation is not required. It starts the local stack and seeds local test users, but deliberately does not run migration up, db reset, db push or supabase link: the repository and remote migration histories must be reconciled before applying migrations.
 
 1. Install dependencies once:
 
