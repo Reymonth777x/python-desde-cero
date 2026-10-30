@@ -7,10 +7,9 @@ El workflow de producción:
 - exige una sitekey real antes de publicar;
 - acepta una variable de GitHub Actions llamada `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (preferida) o un secreto heredado con ese nombre;
 - inyecta la llave durante la compilación de Vinext y en el comando de despliegue;
-- rechaza las llaves de prueba oficiales;
-- si se despliega, comprueba la portada y que `/login` contiene el widget.
+- rechaza las llaves de prueba oficiales.
 
-La comprobación de `/login` se está reforzando en la rama `chore/verify-turnstile-on-live-login`, porque la validación anterior solo comprobaba la portada. No se debe considerar completo un despliegue si el widget no aparece en la ruta de autenticación.
+El PR `#27`, en la rama `chore/verify-turnstile-on-live-login`, añade una comprobación HTTP posterior al despliegue para validar que la portada está actualizada y que el HTML de `/login` contiene el widget. La validación anterior solo comprobaba la portada. No se debe considerar completo un despliegue si el widget no aparece en la ruta de autenticación.
 
 Si la sitekey no está configurada, el paso de comprobación omite el despliegue y deja la versión de producción intacta.
 
