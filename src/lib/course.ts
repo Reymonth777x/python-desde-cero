@@ -252,7 +252,7 @@ export const courseModules: CourseModule[] = [
         },
         "questions": [
           {
-            "prompt": "¿Qué describe mejor un algoritmo?",
+            "prompt": "¿Qué condición permite reconocer un algoritmo bien definido?",
             "options": [
               "Un programa ya ejecutado",
               "Una secuencia finita y ordenada de pasos para resolver un problema",
