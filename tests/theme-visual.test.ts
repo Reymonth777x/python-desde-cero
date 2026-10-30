@@ -10,6 +10,8 @@ test.describe("Temas visuales — cada página × cada tema", () => {
         await page.addInitScript((selectedTheme) => {
           localStorage.setItem("python-desde-cero-theme", selectedTheme);
         }, theme);
+        // Theme/layout tests do not depend on the external Turnstile network.
+        await page.route("https://challenges.cloudflare.com/**", (request) => request.abort());
         await page.goto(route);
         await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
 
@@ -151,22 +153,58 @@ test("Las páginas principales no generan desplazamiento horizontal en móvil", 
 });
 
 
-test("El formulario de acceso, registro y recuperación incluye Turnstile cuando está configurado", async ({ page }) => {
+test("Turnstile entrega el token a acceso, registro y recuperación", async ({ page }) => {
   const testSiteKey = "1x00000000000000000000AA";
 
+  await page.addInitScript(() => {
+    const testWindow = window as Window & {
+      __turnstileOptions?: Record<string, unknown>;
+      __turnstileResetCount?: number;
+    };
+    window.turnstile = {
+      render: (_container, options) => {
+        testWindow.__turnstileOptions = options;
+        return 1;
+      },
+      remove: () => undefined,
+      reset: () => {
+        testWindow.__turnstileResetCount = (testWindow.__turnstileResetCount ?? 0) + 1;
+      },
+    };
+  });
+
+  const getAction = () => page.evaluate(() => {
+    const testWindow = window as Window & { __turnstileOptions?: Record<string, unknown> };
+    return testWindow.__turnstileOptions?.action;
+  });
+  const submitToken = (token: string) => page.evaluate((value) => {
+    const testWindow = window as Window & { __turnstileOptions?: Record<string, unknown> };
+    const callback = testWindow.__turnstileOptions?.callback;
+    if (typeof callback !== "function") return false;
+    (callback as (token: string) => void)(value);
+    return true;
+  }, token);
+  const widget = page.getByTestId("turnstile-widget");
+
   await page.goto("/login");
-  const loginWidget = page.getByTestId("turnstile-widget");
-  await expect(loginWidget).toBeVisible();
-  await expect(loginWidget).toHaveAttribute("data-sitekey", testSiteKey);
+  await expect(widget).toBeVisible();
+  await expect(widget).toHaveAttribute("data-sitekey", testSiteKey);
+  await expect.poll(getAction).toBe("login");
   await expect(page.locator('input[name="captchaToken"]')).toHaveCount(1);
+  expect(await submitToken("login-test-token")).toBe(true);
+  await expect(page.locator('input[name="captchaToken"]')).toHaveValue("login-test-token");
 
   await page.getByRole("button", { name: "Crear cuenta" }).click();
-  const signupWidget = page.getByTestId("turnstile-widget");
-  await expect(signupWidget).toBeVisible();
-  await expect(signupWidget).toHaveAttribute("data-sitekey", testSiteKey);
+  await expect(widget).toBeVisible();
+  await expect(widget).toHaveAttribute("data-sitekey", testSiteKey);
+  await expect.poll(getAction).toBe("signup");
+  expect(await submitToken("signup-test-token")).toBe(true);
+  await expect(page.locator('input[name="captchaToken"]')).toHaveValue("signup-test-token");
 
   await page.goto("/login/forgot-password");
-  const resetWidget = page.getByTestId("turnstile-widget");
-  await expect(resetWidget).toBeVisible();
-  await expect(resetWidget).toHaveAttribute("data-sitekey", testSiteKey);
+  await expect(widget).toBeVisible();
+  await expect(widget).toHaveAttribute("data-sitekey", testSiteKey);
+  await expect.poll(getAction).toBe("password-reset");
+  expect(await submitToken("reset-test-token")).toBe(true);
+  await expect(page.locator('input[name="captchaToken"]')).toHaveValue("reset-test-token");
 });
