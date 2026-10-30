@@ -1,8 +1,10 @@
-# Informe final — QA y entrega
+# Informe histórico — QA y entrega
+
+> **Documento de archivo, no readiness actual.** Este informe describe una etapa anterior del repositorio. No debe usarse para declarar que producción está completa ni para afirmar que las funciones enumeradas siguen publicadas. Consulta `docs/team/ESTADO.md` para la situación operativa vigente.
 
 ## Resumen ejecutivo
 
-La plataforma "Python desde cero" está completa y funcional. Todos los hitos H0 a H9 han sido implementados y verificados. El proyecto pasa TypeScript, pruebas unitarias (22/22) y build de producción sin errores.
+Este documento conserva resultados de una revisión histórica. Sus conteos, hitos y comprobaciones pertenecen a ese snapshot y no describen necesariamente el código ni la infraestructura actuales.
 
 ## Estado de hitos
 
@@ -15,7 +17,7 @@ La plataforma "Python desde cero" está completa y funcional. Todos los hitos H0
 | H4. Backend y cuentas | ✅ Completado | Migraciones 014-017, paneles estudiante/docente/admin |
 | H5. Seguridad | ✅ Completado | Middleware protegido, plantillas de correo, RLS |
 | H6. Contenido | ✅ Completado | 5 bloques, 31 lecciones, 100+ ejercicios, quizzes |
-| H7. Juego de cocina | ✅ Completado | Motor Python determinista, API en español, 6 niveles |
+| H7. Juego de cocina | Prototipo retirado | No hay juego de cocina publicado; no es una función activa del producto |
 | H8. Portada y UX | ✅ Completado | Navigation, ThemeSelectorNav, i18n estructura |
 | H9. Despliegue | ✅ Documentado | despliegue.md, CI/CD workflow |
 
