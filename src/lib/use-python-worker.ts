@@ -25,6 +25,9 @@ type UsePythonWorkerOptions = {
 const MAX_EXECUTION_TIME_MS = 15000;
 const INITIALIZATION_TIMEOUT_MS = 60000;
 const MAX_CODE_LENGTH = 50000;
+const MAX_OUTPUT_LENGTH = 20000;
+const OUTPUT_TRUNCATION_NOTICE = '\n[Salida limitada para proteger el navegador.]';
+const MAX_OUTPUT_WITH_NOTICE_LENGTH = MAX_OUTPUT_LENGTH + OUTPUT_TRUNCATION_NOTICE.length;
 const MAX_INPUT_LINES = 20;
 const MAX_INPUT_LINE_LENGTH = 1000;
 
@@ -205,7 +208,7 @@ export function usePythonWorker({
     setIsRunning(false);
 
     const nextOutput = typeof message.output === 'string'
-      ? message.output.slice(0, 20000)
+      ? message.output.slice(0, MAX_OUTPUT_WITH_NOTICE_LENGTH)
       : '';
     const nextError = typeof message.error === 'string'
       ? message.error.slice(0, 2000)
