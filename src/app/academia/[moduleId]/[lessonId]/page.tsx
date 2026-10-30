@@ -80,13 +80,17 @@ export default async function LessonPage({ params }: Props) {
     .eq('user_id', user.id)
     .eq('module_id', courseModule.id);
 
+  const progressForModule = (moduleProgress ?? []).map((row) => ({
+    ...row,
+    module_id: courseModule.id,
+  }));
   const currentProgress = moduleProgress?.find((row) => row.lesson_id === lesson.id);
   const currentLessonCompleted = currentProgress?.is_completed === true;
   const canOpenBySequence = canAccessLessonInSequence(
     courseModule.id,
     lessonIndex,
     courseModule.lessons,
-    moduleProgress ?? [],
+    progressForModule,
     Boolean(progressError),
   );
 
@@ -94,7 +98,7 @@ export default async function LessonPage({ params }: Props) {
     const firstIncompleteIndex = findFirstIncompleteLessonIndex(
       courseModule.id,
       courseModule.lessons.slice(0, lessonIndex),
-      moduleProgress ?? [],
+      progressForModule,
       Boolean(progressError),
     );
     const fallbackIndex = firstIncompleteIndex >= 0 ? firstIncompleteIndex : 0;
