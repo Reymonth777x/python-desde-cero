@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useTheme } from '@/app/theme-provider';
+import ThemeSelector from './ThemeSelector';
 import ThemeSelectorNav from './ThemeSelectorNav';
 
 const NAV_LINKS = [
@@ -17,7 +17,6 @@ const NAV_LINKS = [
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
-  const { theme } = useTheme();
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -63,6 +62,9 @@ export default function Navigation() {
               {NAV_LINKS.map((l) => (
                 <Link key={l.href} href={l.href} onClick={() => setIsOpen(false)} className={`block px-3 py-2 rounded-md text-base ${pathname === l.href ? 'bg-[var(--theme-accent)] text-[var(--theme-ink-inverse)]' : 'text-[var(--theme-ink)] hover:bg-[var(--theme-surface)] hover:text-[var(--theme-accent)]'}`} aria-current={pathname === l.href ? 'page' : undefined}>{l.label}</Link>
               ))}
+              <div className="mt-3 border-t border-[var(--theme-border)] px-3 pt-3">
+                <ThemeSelector />
+              </div>
             </div>
           </div>
         )}
