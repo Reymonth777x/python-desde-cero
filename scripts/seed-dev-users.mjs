@@ -107,6 +107,7 @@ async function main() {
     if (existing) {
       const { data, error } = await supabase.auth.admin.updateUserById(existing.id, {
         password,
+        email_confirm: true,
         user_metadata: { full_name: user.fullName },
       });
 
