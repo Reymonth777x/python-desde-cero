@@ -1269,8 +1269,8 @@ export const courseModules: CourseModule[] = [
   {
     "id": "module-4",
     "number": "4",
-    "title": "Funciones y programas fiables",
-    "summary": "Divide programas en funciones, utiliza parámetros y return, maneja errores y aprovecha módulos de Python.",
+    "title": "Funciones, tuplas, diccionarios y excepciones",
+    "summary": "Crea funciones reutilizables, organiza registros y colecciones y controla errores para construir programas fiables.",
     "lessons": [
       {
         "id": "b4-l1",
@@ -1515,31 +1515,154 @@ export const courseModules: CourseModule[] = [
       {
         "id": "b4-l5",
         "section": "4.5",
-        "title": "Manejar errores de entrada con try y except",
+        "title": "Tuplas: agrupar valores inmutables",
         "objectives": [
-          "Reconocer que una conversión puede fallar.",
-          "Capturar ValueError mediante try/except.",
-          "Dar un mensaje comprensible cuando la entrada no es válida."
+          "Crear tuplas y consultar elementos por índice.",
+          "Explicar la inmutabilidad de una tupla.",
+          "Desempaquetar una tupla en variables."
         ],
         "explanation": [
-          "Los errores de ejecución aparecen mientras el programa trabaja. Por ejemplo, int(\"hola\") produce ValueError porque el texto no representa un entero válido.",
-          "try contiene instrucciones que podrían producir una excepción. Si ocurre la excepción indicada en except, Python ejecuta ese bloque en vez de terminar con el error sin tratar.",
-          "Captura el tipo de error que realmente esperas. Un except demasiado general puede ocultar problemas de programación; para una conversión numérica, ValueError suele ser la excepción apropiada."
+          "Una tupla agrupa valores en un orden fijo y suele escribirse entre paréntesis, por ejemplo coordenada = (10, 20). Sus índices comienzan en cero, igual que los de una lista, por lo que puedes consultar cada elemento mediante su posición.",
+          "La característica fundamental es que una tupla es inmutable: no permite reemplazar, agregar o eliminar directamente sus elementos después de crearla. Resulta útil para agrupar datos relacionados que deben mantenerse estables, como coordenadas o medidas.",
+          "El desempaquetado asigna cada elemento a una variable según su posición: x, y = coordenada. La cantidad de nombres debe coincidir con la cantidad de valores, salvo que se utilice una técnica de desempaquetado extendido."
         ],
-        "example": "texto = \"veinte\"\ntry:\n    edad = int(texto)\n    print(edad)\nexcept ValueError:\n    print(\"Escribe un número entero\")",
-        "exampleOutput": "Escribe un número entero",
+        "example": "coordenada = (10, 20)\nx, y = coordenada\nprint(x)\nprint(y)",
+        "exampleOutput": "10\n20",
         "walkthrough": [
-          "Python intenta convertir texto a entero.",
-          "La conversión falla y el bloque except ValueError muestra un mensaje alternativo."
+          "La tupla guarda dos valores ordenados.",
+          "El primer valor se asigna a x.",
+          "El segundo valor se asigna a y."
         ],
         "commonMistakes": [
-          "Usar try/except para esconder cualquier error sin entenderlo.",
-          "Poner el código que no puede fallar dentro de try innecesariamente."
+          "Intentar cambiar un elemento de la tupla.",
+          "Desempaquetar variables en un orden distinto al de los valores."
         ],
         "exercise": {
           "id": "b4-e5",
-          "title": "Validar una conversión",
-          "statement": "Intenta convertir el texto \"12a\" a entero. Si se produce ValueError, imprime Entrada inválida.",
+          "title": "Desempaquetar una coordenada",
+          "statement": "Crea punto = (12, 7), desempaquétalo en x e y e imprime ambos valores.",
+          "starterCode": "punto = (12, 7)\n",
+          "solution": "punto = (12, 7)\nx, y = punto\nprint(x)\nprint(y)",
+          "tests": [
+            {
+              "input": [],
+              "expected": "12\n7"
+            }
+          ],
+          "hints": [
+            "Declara x e y en el mismo orden de la tupla.",
+            "Imprime primero x y después y."
+          ],
+          "difficulty": "medio",
+          "xp": 20,
+          "length": 5
+        },
+        "questions": [
+          {
+            "prompt": "¿Qué característica distingue a una tupla de una lista?",
+            "options": [
+              "Solo almacena enteros",
+              "No conserva el orden",
+              "Una tupla no permite modificar sus elementos después de crearla",
+              "Siempre tiene dos elementos"
+            ],
+            "answer": 2,
+            "explanation": "Las tuplas son secuencias ordenadas e inmutables."
+          }
+        ],
+        "assessment": false,
+        "estimatedMinutes": 45
+      },
+      {
+        "id": "b4-l6",
+        "section": "4.6",
+        "title": "Diccionarios: claves, valores y registros",
+        "objectives": [
+          "Crear diccionarios con claves y valores.",
+          "Consultar y actualizar valores mediante claves.",
+          "Utilizar get() cuando una clave puede faltar."
+        ],
+        "explanation": [
+          "Un diccionario relaciona claves con valores y resulta útil cuando los datos tienen atributos identificables, como nombre, precio y cantidad. Se escribe entre llaves y utiliza dos puntos para separar cada clave de su valor.",
+          "Para consultar se puede escribir registro[\"nombre\"]. Si la clave no existe, se produce KeyError; get(\"nombre\", \"sin dato\") permite indicar un valor alternativo. Una asignación agrega una clave nueva o actualiza su valor.",
+          "keys(), values() e items() permiten recorrer claves, valores o parejas completas. Una lista de diccionarios representa varios registros con estructura similar, como productos, estudiantes o calificaciones."
+        ],
+        "example": "producto = {\"nombre\": \"Mouse\", \"precio\": 6500}\nproducto[\"disponible\"] = True\nprint(producto[\"nombre\"])\nprint(producto.get(\"stock\", 0))",
+        "exampleOutput": "Mouse\n0",
+        "walkthrough": [
+          "El diccionario contiene nombre y precio.",
+          "La asignación agrega la clave disponible.",
+          "get() devuelve cero porque stock todavía no existe."
+        ],
+        "commonMistakes": [
+          "Consultar un dato mediante su contenido en vez de su clave.",
+          "Creer que los corchetes devuelven un valor alternativo cuando falta una clave."
+        ],
+        "exercise": {
+          "id": "b4-e6",
+          "title": "Actualizar un registro",
+          "statement": "Crea un diccionario con nombre Teclado y precio 12500, agrega disponible = True e imprime el precio.",
+          "starterCode": "producto = {}\n",
+          "solution": "producto = {\"nombre\": \"Teclado\", \"precio\": 12500}\nproducto[\"disponible\"] = True\nprint(producto[\"precio\"])",
+          "tests": [
+            {
+              "input": [],
+              "expected": "12500"
+            }
+          ],
+          "hints": [
+            "Escribe las claves como cadenas.",
+            "Asigna el nuevo valor mediante su clave."
+          ],
+          "difficulty": "medio",
+          "xp": 20,
+          "length": 5
+        },
+        "questions": [
+          {
+            "prompt": "¿Qué estructura permite consultar un valor mediante una clave descriptiva?",
+            "options": [
+              "Una tupla",
+              "Un rango",
+              "Una cadena",
+              "Un diccionario"
+            ],
+            "answer": 3,
+            "explanation": "Los diccionarios relacionan claves con valores y permiten consultar por la clave."
+          }
+        ],
+        "assessment": false,
+        "estimatedMinutes": 45
+      },
+      {
+        "id": "b4-l7",
+        "section": "4.7",
+        "title": "Excepciones y manejo de errores",
+        "objectives": [
+          "Distinguir errores de sintaxis de excepciones durante la ejecución.",
+          "Manejar ValueError con try/except.",
+          "Presentar mensajes que ayuden a corregir una entrada."
+        ],
+        "explanation": [
+          "Una excepción interrumpe el flujo normal de ejecución, por ejemplo al convertir texto no numérico a entero o consultar una clave inexistente. Python identifica el tipo de excepción y presenta una traza para ayudar a localizar la operación que falló.",
+          "try contiene instrucciones que podrían fallar y except captura un tipo específico para ejecutar una respuesta alternativa. int(\"hola\") genera ValueError porque la cadena no representa un entero válido.",
+          "Conviene capturar los errores que esperas manejar. Un except demasiado general puede ocultar defectos reales; el mensaje debe indicar qué dato se esperaba y cómo corregirlo."
+        ],
+        "example": "texto = \"veinte\"\ntry:\n    edad = int(texto)\n    print(edad)\nexcept ValueError:\n    print(\"Escribe una edad con números\")",
+        "exampleOutput": "Escribe una edad con números",
+        "walkthrough": [
+          "int(texto) intenta realizar la conversión.",
+          "La conversión genera ValueError.",
+          "except presenta el mensaje alternativo."
+        ],
+        "commonMistakes": [
+          "Capturar todos los errores sin distinguirlos.",
+          "Usar excepciones para esconder errores de lógica."
+        ],
+        "exercise": {
+          "id": "b4-e7",
+          "title": "Manejar una conversión inválida",
+          "statement": "Intenta convertir \"12a\" a entero. Si ocurre ValueError, imprime Entrada invalida.",
           "starterCode": "",
           "solution": "try:\n    numero = int(\"12a\")\n    print(numero)\nexcept ValueError:\n    print(\"Entrada invalida\")",
           "tests": [
@@ -1549,8 +1672,8 @@ export const courseModules: CourseModule[] = [
             }
           ],
           "hints": [
-            "La conversión int() es la instrucción que puede fallar.",
-            "Captura específicamente ValueError."
+            "int() puede generar ValueError.",
+            "Captura específicamente esa excepción."
           ],
           "difficulty": "medio",
           "xp": 20,
@@ -1558,209 +1681,90 @@ export const courseModules: CourseModule[] = [
         },
         "questions": [
           {
-            "prompt": "¿Qué excepción se produce normalmente al intentar int(\"hola\")?",
+            "prompt": "¿Qué excepción ocurre normalmente al ejecutar int(\"hola\")?",
             "options": [
               "IndexError",
               "KeyError",
-              "ValueError",
-              "FileNotFoundError"
-            ],
-            "answer": 2,
-            "explanation": "ValueError indica que el tipo es correcto para la operación, pero el contenido no representa un entero válido."
-          }
-        ],
-        "assessment": false,
-        "estimatedMinutes": 17
-      },
-      {
-        "id": "b4-l6",
-        "section": "4.6",
-        "title": "Importar y utilizar módulos",
-        "objectives": [
-          "Explicar qué aporta un módulo.",
-          "Importar el módulo math y llamar a una de sus funciones.",
-          "Reconocer que la biblioteca estándar ofrece herramientas ya disponibles."
-        ],
-        "explanation": [
-          "Un módulo es un archivo o conjunto de código que ofrece funciones, clases y valores reutilizables. import permite acceder a ese conjunto sin copiar su implementación dentro del programa.",
-          "La biblioteca estándar de Python incluye módulos para tareas habituales. math contiene operaciones matemáticas; datetime trabaja con fechas y horas; random permite generar valores pseudoaleatorios.",
-          "Al escribir import math, utilizamos la función como math.sqrt(25). El prefijo indica de qué módulo procede y ayuda a evitar confusiones entre nombres."
-        ],
-        "example": "import math\nradio = 3\narea = math.pi * radio ** 2\nprint(round(area, 2))\nprint(math.sqrt(81))",
-        "exampleOutput": "28.27\n9.0",
-        "walkthrough": [
-          "math.pi proporciona una aproximación de pi.",
-          "sqrt() calcula la raíz cuadrada y round() limita los decimales mostrados."
-        ],
-        "commonMistakes": [
-          "Olvidar el prefijo del módulo cuando se importó con import math.",
-          "Confundir la función sqrt() con una variable propia llamada math."
-        ],
-        "exercise": {
-          "id": "b4-e6",
-          "title": "Calcular una raíz",
-          "statement": "Importa math, calcula la raíz cuadrada de 144 usando math.sqrt() e imprime el resultado.",
-          "starterCode": "# importa el módulo\n",
-          "solution": "import math\nprint(math.sqrt(144))",
-          "tests": [
-            {
-              "input": [],
-              "expected": "12.0"
-            }
-          ],
-          "hints": [
-            "Escribe import math al inicio.",
-            "Llama a math.sqrt() con el número 144."
-          ],
-          "difficulty": "medio",
-          "xp": 15,
-          "length": 5
-        },
-        "questions": [
-          {
-            "prompt": "Después de escribir import math, ¿cómo se llama a la raíz cuadrada de 49?",
-            "options": [
-              "sqrt(49) sin prefijo siempre",
-              "import.sqrt(49)",
-              "math = sqrt(49)",
-              "math.sqrt(49)"
+              "FileNotFoundError",
+              "ValueError"
             ],
             "answer": 3,
-            "explanation": "Con import math se accede a la función mediante math.sqrt()."
+            "explanation": "ValueError aparece cuando el contenido no es válido para la conversión."
           }
         ],
         "assessment": false,
-        "estimatedMinutes": 15
-      },
-      {
-        "id": "b4-l7",
-        "section": "4.7",
-        "title": "Organizar una solución con varias funciones",
-        "objectives": [
-          "Dividir un problema en tareas pequeñas.",
-          "Asignar una responsabilidad clara a cada función.",
-          "Conectar funciones mediante parámetros y valores devueltos."
-        ],
-        "explanation": [
-          "Un programa crece mejor cuando se separan responsabilidades. Una función puede calcular un subtotal, otra aplicar un impuesto y otra presentar el resultado; cada parte se entiende y comprueba de forma independiente.",
-          "Al diseñar la solución, primero identifica entradas, procesos y salidas. Después asigna una función a cada tarea y decide qué datos necesita y qué resultado debe devolver.",
-          "Las funciones no deben duplicar trabajo ni depender de variables globales. Una buena estructura hace más sencillo corregir errores y ampliar el programa cuando aparecen requisitos nuevos."
-        ],
-        "example": "def subtotal(precio, cantidad):\n    return precio * cantidad\n\ndef con_impuesto(monto):\n    return monto * 1.13\n\nbase = subtotal(1000, 2)\nprint(con_impuesto(base))",
-        "exampleOutput": "2260.0",
-        "walkthrough": [
-          "subtotal calcula el costo base y devuelve un número.",
-          "con_impuesto recibe ese resultado y calcula el total con 13% de impuesto."
-        ],
-        "commonMistakes": [
-          "Crear una función enorme que mezcla entrada, cálculo, almacenamiento y salida.",
-          "Hacer que una función dependa de variables globales que podrían pasarse como parámetros."
-        ],
-        "exercise": {
-          "id": "b4-e7",
-          "title": "Separar cálculo y presentación",
-          "statement": "Define una función calcular_promedio(a, b, c) que devuelva el promedio. Luego imprime el promedio de 80, 90 y 100.",
-          "starterCode": "",
-          "solution": "def calcular_promedio(a, b, c):\n    return (a + b + c) / 3\n\nprint(calcular_promedio(80, 90, 100))",
-          "tests": [
-            {
-              "input": [],
-              "expected": "90.0"
-            }
-          ],
-          "hints": [
-            "Agrupa el cálculo en una función.",
-            "Devuelve la operación y muestra el resultado en la llamada."
-          ],
-          "difficulty": "medio",
-          "xp": 20,
-          "length": 5
-        },
-        "questions": [
-          {
-            "prompt": "¿Qué ventaja aporta separar un programa en funciones pequeñas?",
-            "options": [
-              "Obliga a repetir cada cálculo",
-              "Impide usar parámetros",
-              "Hace imposible probar partes",
-              "Permite aislar responsabilidades y reutilizar tareas"
-            ],
-            "answer": 3,
-            "explanation": "Las funciones pequeñas se pueden entender, reutilizar y probar por separado."
-          }
-        ],
-        "assessment": false,
-        "estimatedMinutes": 18
+        "estimatedMinutes": 45
       },
       {
         "id": "b4-l8",
         "section": "4.8",
-        "title": "Evaluación del módulo 4: funciones y errores",
+        "title": "Evaluación del módulo 4: funciones y datos estructurados",
         "objectives": [
-          "Definir y llamar funciones con parámetros.",
-          "Elegir entre print() y return según el objetivo.",
-          "Usar excepciones específicas para entradas no válidas."
+          "Diseñar funciones con parámetros y return.",
+          "Seleccionar listas, tuplas y diccionarios según los datos.",
+          "Manejar excepciones y validar resultados."
         ],
         "explanation": [
-          "La evaluación final del módulo combina diseño de funciones, parámetros, valores de retorno, alcance y manejo de excepciones. Concéntrate en qué datos recibe cada función y qué resultado entrega.",
-          "En los ejercicios, distingue las instrucciones que muestran algo de las que calculan un resultado reutilizable. Comprueba también que una conversión problemática tenga un manejo de error que no oculte otros fallos.",
-          "Para el reto práctico, construye primero la función de cálculo y prueba varios argumentos. Después conecta la función a la parte que muestra o valida los datos."
+          "Esta evaluación integra funciones, parámetros, return, alcance, tuplas, diccionarios y excepciones. Una solución puede utilizar una función para calcular, un diccionario para representar un registro y una tupla para agrupar valores relacionados.",
+          "Al leer un problema, identifica qué datos recibe la función, qué nombres están disponibles en cada ámbito y qué resultado devuelve. Cuando una clave falta o una conversión falla, reconoce la excepción correspondiente.",
+          "El reto calcula el valor de un producto mediante un diccionario y una función. Revisa los argumentos y compara el resultado con una operación manual; una solución de calidad es legible, comprobable y fácil de modificar."
         ],
-        "example": "def doble(numero):\n    return numero * 2\n\nprint(doble(6))",
-        "exampleOutput": "12",
+        "example": "def total_producto(precio, cantidad):\n    return precio * cantidad\n\nproducto = {\"precio\": 900, \"cantidad\": 4}\nprint(total_producto(producto[\"precio\"], producto[\"cantidad\"]))",
+        "exampleOutput": "3600",
         "walkthrough": [
-          "La función recibe el número como parámetro.",
-          "return devuelve el valor que print() muestra."
+          "La función recibe precio y cantidad.",
+          "El diccionario conserva los datos.",
+          "return devuelve el producto."
         ],
         "commonMistakes": [
-          "Confundir parámetro con argumento.",
-          "Asumir que except captura errores si el código problemático no está dentro del try."
+          "Consultar una clave que no existe.",
+          "Imprimir dentro de una función cuando se requiere devolver un resultado."
         ],
         "exercise": {
           "id": "b4-e8",
-          "title": "Integrar función y validación",
-          "statement": "Define una función es_positivo(numero) que devuelva True si el número es mayor que cero. Imprime el resultado para -3.",
+          "title": "Procesar un producto",
+          "statement": "Define total_producto(precio, cantidad). Guarda precio 900 y cantidad 4 en un diccionario e imprime el total.",
           "starterCode": "",
-          "solution": "def es_positivo(numero):\n    return numero > 0\n\nprint(es_positivo(-3))",
+          "solution": "def total_producto(precio, cantidad):\n    return precio * cantidad\n\nproducto = {\"precio\": 900, \"cantidad\": 4}\nprint(total_producto(producto[\"precio\"], producto[\"cantidad\"]))",
           "tests": [
             {
               "input": [],
-              "expected": "False"
+              "expected": "3600"
             }
           ],
           "hints": [
-            "La comparación devuelve un booleano.",
-            "Devuelve la comparación desde la función."
+            "Define la función antes de llamarla.",
+            "Pasa los valores del diccionario como argumentos."
           ],
           "difficulty": "medio",
-          "xp": 25,
+          "xp": 20,
           "length": 5
         },
         "questions": [
           {
-            "prompt": "¿Cuál es la diferencia entre parámetro y argumento?",
+            "prompt": "¿Qué diferencia hay entre parámetro y argumento?",
             "options": [
-              "Son palabras intercambiables en una misma línea",
+              "El parámetro siempre es texto",
               "El parámetro aparece en la definición y el argumento se entrega al llamar la función",
-              "El argumento solo se utiliza dentro de return",
-              "El parámetro siempre debe ser un texto"
+              "El argumento se escribe en def",
+              "Significan lo mismo"
             ],
             "answer": 1,
-            "explanation": "El parámetro es el nombre en la definición; el argumento es el valor que se pasa al llamar."
+            "explanation": "El parámetro es el nombre declarado; el argumento es el valor enviado."
           },
           {
-            "prompt": "¿Qué sucede cuando una función ejecuta return 25?",
+            "prompt": "¿Qué devuelve return 25?",
             "options": [
-              "Muestra 25 automáticamente en pantalla",
+              "Lo muestra automáticamente",
               "Repite la función",
-              "Devuelve el valor 25 a quien la llamó",
-              "Cierra el intérprete de Python"
+              "El valor 25 a quien llamó a la función",
+              "Cierra el intérprete"
             ],
             "answer": 2,
-            "explanation": "return entrega el valor de regreso; para mostrarlo se puede envolver la llamada en print()."
+            "explanation": "return entrega el valor, pero no lo imprime automáticamente."
           },
           {
-            "prompt": "¿Qué bloque maneja una conversión que produce ValueError?",
+            "prompt": "¿Qué bloque captura ValueError?",
             "options": [
               "else ValueError",
               "finally ValueError",
@@ -1768,11 +1772,11 @@ export const courseModules: CourseModule[] = [
               "except ValueError"
             ],
             "answer": 3,
-            "explanation": "La excepción se captura mediante un bloque except del tipo adecuado."
+            "explanation": "Las excepciones se capturan con except y el tipo correspondiente."
           }
         ],
         "assessment": true,
-        "estimatedMinutes": 25
+        "estimatedMinutes": 45
       }
     ]
   },
