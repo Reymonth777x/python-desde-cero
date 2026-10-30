@@ -6,7 +6,7 @@ import {
   findCourseModule,
 } from '@/lib/course';
 import { toClientLesson } from '@/lib/server-quiz/public-lesson';
-import { canAccessLessonInSequence, findFirstIncompleteLessonIndex } from '@/lib/lesson-access';
+import { canAccessLessonInSequence, canAccessModule, findFirstIncompleteLessonIndex } from '@/lib/lesson-access';
 import { createClient } from '@/lib/supabase/server';
 
 type Props = {
@@ -41,9 +41,18 @@ export default async function LessonPage({ params }: Props) {
     redirect(`/login?next=${encodeURIComponent(`/academia/${moduleId}/${lessonId}`)}`);
   }
 
+  const { data: moduleProgress, error: progressError } = await supabase
+    .from('progress')
+    .select('lesson_id, is_completed, best_score')
+    .eq('user_id', user.id)
+    .eq('module_id', courseModule.id);
+
+  const hasExistingModuleProgress = !progressError && (moduleProgress?.length ?? 0) > 0;
+
   if (moduleIndex > 0) {
     const prevModule = courseModules[moduleIndex - 1];
     const assessmentLesson = [...prevModule.lessons].reverse().find((item) => item.finalAssessment || item.assessment);
+    let hasPreviousAssessment = !assessmentLesson;
 
     if (assessmentLesson) {
       const { data: gate, error: gateError } = await supabase
@@ -54,7 +63,11 @@ export default async function LessonPage({ params }: Props) {
         .eq('lesson_id', assessmentLesson.id)
         .maybeSingle();
 
-      if (gateError || gate?.is_completed !== true) redirect('/academia');
+      hasPreviousAssessment = !gateError && gate?.is_completed === true;
+    }
+
+    if (!canAccessModule(moduleIndex, hasPreviousAssessment, hasExistingModuleProgress)) {
+      redirect('/academia');
     }
   }
 
@@ -73,12 +86,6 @@ export default async function LessonPage({ params }: Props) {
       redirect(`/academia/${courseModule.id}/${requiredCurrentLessonId}`);
     }
   }
-
-  const { data: moduleProgress, error: progressError } = await supabase
-    .from('progress')
-    .select('lesson_id, is_completed, best_score')
-    .eq('user_id', user.id)
-    .eq('module_id', courseModule.id);
 
   const progressForModule = (moduleProgress ?? []).map((row) => ({
     ...row,
