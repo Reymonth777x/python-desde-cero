@@ -45,6 +45,7 @@
 - La comprobación HTTP confirma que el widget se renderiza; no demuestra que una persona completó el desafío ni que Supabase Auth validó la Secret key privada.
 - La configuración CAPTCHA dentro de Supabase Auth no se puede leer mediante las herramientas disponibles. La validación real debe completarse con un correo controlado en el dominio publicado.
 - El historial de CI no sustituye una prueba integral de registro, confirmación por correo, login, logout y recuperación de contraseña con cuentas reales.
+- La organización Supabase está en plan Free. El Advisor de producción reporta `auth_leaked_password_protection` desactivado; Supabase documenta que esta función requiere Pro o superior. No se puede habilitar mediante SQL y no debe figurar como una corrección disponible en el plan actual. DEV no presenta avisos de seguridad.
 
 ## Riesgos de repositorio y gobierno
 
