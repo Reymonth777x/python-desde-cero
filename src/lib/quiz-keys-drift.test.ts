@@ -56,6 +56,10 @@ describe('quiz answer-key drift detection', () => {
       new URL('../../supabase/migrations/20261030072000_025_add_module_2_hello_world_quiz.sql', import.meta.url),
       'utf8',
     );
+    const rpcSecuritySql = readFileSync(
+      new URL('../../supabase/migrations/20261030074000_026_harden_quiz_rpc_invoker.sql', import.meta.url),
+      'utf8',
+    );
     const actual = [
       ...previousKeys,
       ...keysFromPracticeMigration(finalAssessmentSql),
@@ -68,6 +72,10 @@ describe('quiz answer-key drift detection', () => {
     expect(finalAssessmentSql).not.toContain('DELETE FROM private.quiz_answer_key');
     expect(helloWorldSql).toMatch(/\(\s*'module-2',\s*'b2-l9',\s*0,\s*1,\s*4,\s*1\s*\)/);
     expect(helloWorldSql).not.toContain('DELETE FROM private.quiz_answer_key');
+    expect(rpcSecuritySql).toMatch(/ALTER FUNCTION public\.submit_quiz_v2\(text, text, integer\[\]\) SECURITY INVOKER/);
+    expect(rpcSecuritySql).toMatch(/GRANT EXECUTE ON FUNCTION private\.submit_quiz_authoritative_v2[\s\S]*?TO authenticated/);
+    expect(rpcSecuritySql).toMatch(/REVOKE EXECUTE ON FUNCTION private\.submit_quiz_authoritative_v2[\s\S]*?FROM PUBLIC, anon/);
+    expect(rpcSecuritySql).not.toMatch(/GRANT (SELECT|INSERT|UPDATE|DELETE) ON/);
     expect(actual).toHaveLength(expected.length);
     expect(actual).toEqual(expected);
   });
