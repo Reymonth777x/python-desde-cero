@@ -10,6 +10,8 @@ describe('Flujo móvil del laboratorio', () => {
     expect(source).toContain('data-testid="python-run"');
     expect(source).toContain('data-testid="python-output"');
     expect(source).not.toContain('role="tablist"');
+    expect(source).not.toContain('role="tabpanel"');
+    expect(source).not.toContain('practice-tab-turtle');
     expect(source).not.toContain('activeMobilePanel');
     expect(source).not.toContain('editorRequested');
   });
