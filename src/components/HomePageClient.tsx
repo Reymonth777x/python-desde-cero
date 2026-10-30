@@ -143,65 +143,42 @@ function HeroIllustration() {
     <div className="relative mx-auto w-full max-w-[580px]">
       <div className="absolute -left-3 top-12 hidden h-28 w-28 border border-[var(--theme-border)]/60 sm:block" aria-hidden="true" />
       <div className="absolute -bottom-4 -right-3 hidden h-24 w-24 rounded-full border border-[var(--theme-accent)]/50 sm:block" aria-hidden="true" />
-
       <div className="relative overflow-hidden border border-[var(--theme-border)] bg-[var(--theme-surface)] shadow-[12px_14px_0_var(--theme-shadow)]">
         <div className="flex items-center justify-between border-b border-[var(--theme-border)] px-4 py-3">
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-[var(--theme-error)]" />
             <span className="h-2 w-2 rounded-full bg-[var(--theme-warning)]" />
             <span className="h-2 w-2 rounded-full bg-[var(--theme-success)]" />
-            <span className="ml-2 font-mono text-[11px] text-[var(--theme-muted)]">cuadrado.py</span>
+            <span className="ml-2 font-mono text-[11px] text-[var(--theme-muted)]">cambio.py</span>
           </div>
-          <span className="font-mono text-[10px] tracking-[0.15em] text-[var(--theme-accent)]">PYTHON / 01</span>
+          <span className="font-mono text-[10px] tracking-[0.15em] text-[var(--theme-accent)]">PRIMERA LECCIÓN</span>
         </div>
-
-        <div className="grid grid-cols-[1fr_0.92fr]">
+        <div className="grid sm:grid-cols-[1.15fr_0.85fr]">
           <div className="min-w-0 bg-[var(--theme-code-bg)] p-4 sm:p-5">
-            <p className="font-mono text-[10px] tracking-[0.16em] text-[var(--theme-muted)]">UNA IDEA SE CONVIERTE EN CÓDIGO</p>
-            <pre className="mt-4 overflow-hidden whitespace-pre-wrap break-words font-mono text-[11px] leading-[1.9] text-[var(--theme-ink)] sm:text-xs"><code><span className="text-[var(--theme-muted)]">01 </span><span className="text-[var(--theme-accent)]">import</span> turtle <span className="text-[var(--theme-accent)]">as</span> t{"\n"}<span className="text-[var(--theme-muted)]">02 </span><span className="text-[var(--theme-accent)]">for</span> lado <span className="text-[var(--theme-accent)]">in</span> range(4):{"\n"}<span className="text-[var(--theme-muted)]">03 </span>    t.forward(80){"\n"}<span className="text-[var(--theme-muted)]">04 </span>    t.right(90)</code></pre>
-            <div className="mt-6 border-t border-[var(--theme-border)]/60 pt-3">
-              <span className="font-mono text-[10px] text-[var(--theme-muted)]">IDEA CLAVE</span>
-              <p className="mt-1 text-xs leading-5 text-[var(--theme-ink)]">Un bucle permite repetir cuatro instrucciones sin copiarlas.</p>
+            <p className="font-mono text-[10px] tracking-[0.16em] text-[var(--theme-muted)]">ENTRADA Y CÁLCULO</p>
+            <pre className="mt-4 overflow-x-auto font-mono text-xs leading-[2] text-[var(--theme-ink)] sm:text-sm"><code><span className="text-[var(--theme-muted)]">01 </span>precio = 3200{"\n"}<span className="text-[var(--theme-muted)]">02 </span>pago = 5000{"\n"}<span className="text-[var(--theme-muted)]">03 </span>cambio = pago - precio{"\n"}<span className="text-[var(--theme-muted)]">04 </span><span className="text-[var(--theme-accent)]">print</span>(cambio)</code></pre>
+            <div className="mt-5 border-t border-[var(--theme-border)]/60 pt-3">
+              <span className="font-mono text-[10px] text-[var(--theme-muted)]">QUÉ ESTÁ PASANDO</span>
+              <p className="mt-1 text-xs leading-5 text-[var(--theme-ink)]">Python guarda dos cantidades, resta el precio al pago y muestra el resultado.</p>
             </div>
           </div>
-
-          <div className="relative flex min-h-[260px] items-center justify-center overflow-hidden bg-[#101b16] p-2 sm:min-h-[310px] sm:p-4">
-            <svg
-              viewBox="0 0 260 300"
-              className="h-full w-full"
-              role="img"
-              aria-label="Ilustración de un árbol fractal de ramas verdes"
-            >
-              <g fill="none" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="50" y="70" width="160" height="160" stroke="#edf2e8" strokeWidth="7" />
-                <path d="M130 70 V230 M50 150 H210" stroke="#c5e6b3" strokeWidth="1.5" strokeDasharray="4 7" opacity="0.65" />
-              </g>
-              <g fill="#a7d58f">
-                <circle cx="50" cy="70" r="6" />
-                <circle cx="210" cy="70" r="6" />
-                <circle cx="210" cy="230" r="6" />
-                <circle cx="50" cy="230" r="6" />
-              </g>
-              <path d="M25 281 H235" stroke="#496653" strokeWidth="1" />
-              <text x="130" y="294" fill="#9fb8a4" textAnchor="middle" fontSize="8" letterSpacing="2">BUCLE / 4 VUELTAS</text>
-            </svg>
-            <span className="absolute left-3 top-3 font-mono text-[9px] tracking-[0.16em] text-[#a7d58f]">SALIDA GRÁFICA</span>
-            <span className="absolute bottom-3 right-3 font-mono text-[9px] text-[#9fb8a4]">TURTLE / SVG</span>
+          <div className="flex min-h-[220px] flex-col justify-center border-t border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] p-5 sm:min-h-[300px] sm:border-l sm:border-t-0 sm:p-6">
+            <span className="font-mono text-[10px] tracking-[0.16em] text-[var(--theme-muted)]">SALIDA DEL PROGRAMA</span>
+            <p className="mt-4 font-serif text-5xl tracking-tight text-[var(--theme-accent)]">1800</p>
+            <p className="mt-3 max-w-[15rem] text-sm leading-6 text-[var(--theme-ink)]">Ese es el cambio que debe devolver la tienda.</p>
+            <div className="mt-6 border-t border-[var(--theme-border)] pt-3">
+              <span className="font-mono text-[9px] tracking-[0.12em] text-[var(--theme-muted)]">ENTRADA · PROCESO · SALIDA</span>
+            </div>
           </div>
         </div>
-
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--theme-border)] px-4 py-3">
-          <span className="text-xs text-[var(--theme-muted)]">Del concepto al resultado, en el navegador.</span>
-          <span className="flex items-center gap-2 font-mono text-[10px] text-[var(--theme-accent)]">
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--theme-success)]" />
-            PYODIDE / WEB WORKER
-          </span>
+          <span className="text-xs text-[var(--theme-muted)]">Un primer programa que resuelve un problema concreto.</span>
+          <span className="font-mono text-[10px] text-[var(--theme-accent)]">PYTHON EN EL NAVEGADOR</span>
         </div>
       </div>
     </div>
   );
 }
-
 type HomePageClientProps = {
   accountLinks: ReactNode;
   progressSummary: ReactNode;
