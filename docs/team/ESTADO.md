@@ -6,9 +6,10 @@
 
 - Repositorio: `Reymonth777x/python-desde-cero`, rama de producción: `master`.
 - PR #37 (muestra pública ejecutable y sitemap) y PR #38 (andamiaje didáctico de Bubble Sort) están integrados en `master`.
-- La última publicación comprobada es el workflow **41046973667**, commit `994a579b7c1750a55de6f2302668bafdea8725cf`. El Worker se publicó y los pasos posteriores confirmaron el dominio personalizado y el marcador Turnstile en el HTML de `/login`.
-- La ruta pública `/muestra` responde y el sitemap publicado incluye esa URL (cinco entradas). La petición a `www.python-desdecero.com` termina en el apex; el PR #43 añade una prueba de CI que exige HTTP 308 explícito para esta redirección.
-- PR #43 contiene cambios adicionales de portada, rutas y retirada del prototipo de cocina; hasta que se integre y publique, esos cambios siguen siendo solo una propuesta.
+- La última versión de contenido verificada en producción es el workflow **41048515179**, SHA `2940723e3a37a6556770169d0ae692e6bab2d943` (PR #43 integrado). Cloudflare publicó el Worker y verificó el dominio personalizado y la versión nueva.
+- La portada pública muestra ahora el ejemplo `cambio.py` de la primera lección (precio 3200, pago 5000, salida 1800), con una acción principal hacia la muestra. La ruta `/muestra` responde con la lección real, y el sitemap contiene cinco URLs.
+- El mismo post-deploy verificó el HTML de `/login` con el marcador Turnstile y la redirección HTTP 308 de `www.python-desdecero.com` al dominio principal.
+- El PR #54 añade una protección adicional contra ejecuciones `workflow_run` obsoletas; permanece como mejora de despliegue separada hasta integrarse.
 
 ## Experiencia del alumno
 
@@ -22,7 +23,7 @@
 ## Turnstile y autenticación
 
 - GitHub Actions tiene una Sitekey pública válida disponible para el build de producción.
-- El despliegue 41046973667 comprobó que el HTML de `/login` contiene `data-testid="turnstile-widget"`.
+- El despliegue 41048515179 comprobó que el HTML de `/login` contiene `data-testid="turnstile-widget"`.
 - Eso confirma el renderizado del widget en el HTML, **no** que el desafío interactivo se haya completado ni que Supabase Auth esté validando su Secret key.
 - Registro, confirmación de correo, login y recuperación con una cuenta y un buzón reales siguen pendientes de prueba integral. No afirmar que Auth está cerrado hasta probarlos.
 
@@ -40,7 +41,7 @@
 2. Probar, con un correo de prueba controlado, registro, confirmación, login, logout y recuperación/cambio de contraseña en el dominio final.
 3. Completar la primera lección y su evaluación con un estudiante autenticado; confirmar persistencia de resultado y progreso al recargar.
 4. Activar la protección contra contraseñas filtradas en Supabase Auth.
-5. Integrar PR #43 solo con CI verde, publicar su nuevo HEAD y verificar las nuevas aserciones de dominio, sitemap, muestra pública, Turnstile y `www` 308. Un job `deploy` omitido no es una publicación.
+5. Integrar PR #54 cuando sus checks estén verdes; su protección compara el SHA del CI concluido con el HEAD de `master` para impedir despliegues atrasados. Verificar el post-deploy del nuevo HEAD y comprobar que el Worker sirve la misma versión.
 
 ## Regla de cambios de datos
 
