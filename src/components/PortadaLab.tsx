@@ -4,7 +4,9 @@ import { useState, useCallback } from 'react';
 import { usePythonWorker } from '@/lib/use-python-worker';
 
 type TurtleCommand = {
-  type: 'line' | 'fill' | 'dot' | 'write' | 'bgcolor';
+  type: 'line' | 'fill' | 'dot' | 'write' | 'bgcolor' | 'cursor';
+  heading?: number;
+  shape?: string;
   x?: number;
   y?: number;
   x1?: number;
@@ -201,6 +203,28 @@ export default function PortadaLab({
                         height="500"
                         fill={command.color ?? 'black'}
                       />
+                    );
+                  }
+                  if (command.type === 'cursor') {
+                    return (
+                      <g
+                        key={`turtle-cursor-${index}`}
+                        transform={`translate(${command.x ?? 0} ${-(command.y ?? 0)}) rotate(${-(command.heading ?? 0)})`}
+                      >
+                        {command.shape === 'turtle' ? (
+                          <>
+                            <ellipse cx="0" cy="0" rx="8" ry="5.5" fill={command.color ?? 'lime'} stroke="#17251d" strokeWidth="1" />
+                            <circle cx="10" cy="0" r="3.5" fill="#76a85d" stroke="#17251d" strokeWidth="0.8" />
+                            <circle cx="-5" cy="-6" r="2.7" fill="#76a85d" />
+                            <circle cx="4" cy="-6" r="2.7" fill="#76a85d" />
+                            <circle cx="-5" cy="6" r="2.7" fill="#76a85d" />
+                            <circle cx="4" cy="6" r="2.7" fill="#76a85d" />
+                            <path d="M-9 0 L-13 0" stroke="#17251d" strokeWidth="2" strokeLinecap="round" />
+                          </>
+                        ) : (
+                          <path d="M12 0 L-8 -6 L-5 0 L-8 6 Z" fill={command.color ?? 'white'} stroke="#17251d" strokeWidth="1" />
+                        )}
+                      </g>
                     );
                   }
                   return null;

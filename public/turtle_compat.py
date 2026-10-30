@@ -57,6 +57,7 @@ class Turtle:
         self._shape = "classic"
         self.is_filling = False
         self.fill_points = []
+        _turtles[id(self)] = self
 
     def forward(self, distance):
         rad = _radians(self._heading)
@@ -437,7 +438,19 @@ def bgcolor(color=None):
 
 
 def get_commands():
-    return list(_commands)
+    commands = list(_commands)
+    # Turtle dibuja el cursor al terminar cada ejecución, no solo las líneas.
+    for current in _turtles.values():
+        if current.is_visible:
+            commands.append({
+                "type": "cursor",
+                "x": current.x,
+                "y": current.y,
+                "heading": current._heading,
+                "color": current.pen_color,
+                "shape": current._shape,
+            })
+    return commands
 
 
 def clear_commands():

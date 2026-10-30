@@ -11,7 +11,9 @@ type WorkerResponse = {
 };
 
 type TurtleCommand = {
-  type: 'line' | 'fill' | 'dot' | 'write' | 'bgcolor';
+  type: 'line' | 'fill' | 'dot' | 'write' | 'bgcolor' | 'cursor';
+  heading?: number;
+  shape?: string;
   x?: number;
   y?: number;
   x1?: number;

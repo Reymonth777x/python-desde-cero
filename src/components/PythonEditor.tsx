@@ -130,12 +130,7 @@ export default function PythonEditor({
   return (
     <section className="w-full" aria-label="Espacio de práctica de Python">
       <div role="tablist" aria-label="Paneles del laboratorio" className="mb-4 grid grid-cols-4 border-b border-[var(--theme-border)] md:hidden">
-        {([
-          ['instructions', 'Guía'],
-          ['editor', 'Código'],
-          ['output', 'Resultado'],
-          ['turtle', 'Gráficos'],
-        ] as const).map(([panel, label]) => (
+        {mobilePanels.map(({ id: panel, label }) => (
           <button
             key={panel}
             type="button"
@@ -157,7 +152,7 @@ export default function PythonEditor({
       {workerState !== 'ready' && (
         <p role="status" aria-live="polite" className="mb-4 flex min-h-11 items-center gap-2 text-sm text-[var(--theme-muted)]">
           {workerState === 'loading' && <span aria-hidden="true" className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--theme-border)] border-t-[var(--theme-accent)] motion-reduce:animate-none" />}
-          {workerState === 'idle' ? 'Python se prepara al abrir el editor o iniciar la primera ejecución.' : workerState === 'loading' ? 'Preparando Python en este dispositivo. La primera carga puede tardar.' : 'El ejecutor necesita atención. Consulta el resultado para ver opciones.'}
+          {workerState === 'idle' ? 'Python se cargará al ejecutar tu primer programa; todavía no se ha iniciado.' : workerState === 'loading' ? 'Preparando Python en este dispositivo. La primera carga puede tardar.' : 'El ejecutor necesita atención. Consulta el resultado para ver opciones.'}
         </p>
       )}
 
@@ -292,7 +287,7 @@ export default function PythonEditor({
           aria-atomic="true"
           className="max-h-[42svh] min-h-28 overflow-auto whitespace-pre-wrap break-words border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] p-4 font-mono text-sm leading-6 text-[var(--theme-ink)] sm:max-h-64"
         >
-          {error ? `Error de ejecución:\n${error}` : output || (workerState === 'ready' ? '> Entorno listo. Ejecuta código para consultar el resultado.' : '> Preparando el entorno Python en el navegador...')}
+          {error ? `Error de ejecución:\n${error}` : output || (workerState === 'ready' ? '> Entorno listo. Ejecuta código para consultar el resultado.' : workerState === 'idle' ? '> Pulsa Ejecutar para cargar Python por primera vez.' : '> Cargando Python en este dispositivo...')}
         </pre>
         <button
           type="button"
@@ -325,6 +320,7 @@ export default function PythonEditor({
         )}
       </div>
 
+      {usesTurtle && (
       <div
         id="practice-panel-turtle"
         role="tabpanel"
@@ -411,12 +407,35 @@ export default function PythonEditor({
                     />
                   );
                 }
+                if (cmd.type === 'cursor') {
+                  return (
+                    <g
+                      key={`turtle-cursor-${idx}`}
+                      transform={`translate(${cmd.x ?? 0} ${-(cmd.y ?? 0)}) rotate(${-(cmd.heading ?? 0)})`}
+                    >
+                      {cmd.shape === 'turtle' ? (
+                        <>
+                          <ellipse cx="0" cy="0" rx="8" ry="5.5" fill={cmd.color ?? 'blue'} stroke="#17251d" strokeWidth="1" />
+                          <circle cx="10" cy="0" r="3.5" fill="#76a85d" stroke="#17251d" strokeWidth="0.8" />
+                          <circle cx="-5" cy="-6" r="2.7" fill="#76a85d" />
+                          <circle cx="4" cy="-6" r="2.7" fill="#76a85d" />
+                          <circle cx="-5" cy="6" r="2.7" fill="#76a85d" />
+                          <circle cx="4" cy="6" r="2.7" fill="#76a85d" />
+                          <path d="M-9 0 L-13 0" stroke="#17251d" strokeWidth="2" strokeLinecap="round" />
+                        </>
+                      ) : (
+                        <path d="M12 0 L-8 -6 L-5 0 L-8 6 Z" fill={cmd.color ?? 'blue'} stroke="#17251d" strokeWidth="1" />
+                      )}
+                    </g>
+                  );
+                }
                 return null;
               })}
             </svg>
           )}
         </div>
       </div>
+      )}
     </section>
   );
 }

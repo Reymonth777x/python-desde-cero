@@ -8,6 +8,7 @@ import { logout } from '@/app/login/actions';
 import { createClient } from '@/lib/supabase/client';
 import type { CourseExercise, CourseLesson, QuizQuestion } from '@/lib/course';
 import { submitQuiz, type SubmitQuizResult } from '@/lib/server-quiz/submit-quiz.action';
+import PythonEditor from '@/components/PythonEditor';
 
 type ClientSafeQuizQuestion = Omit<QuizQuestion, 'answer' | 'explanation'>;
 type ClientSafeExercise = Omit<CourseExercise, 'solution'>;
@@ -198,13 +199,45 @@ export default function LessonStudy({
                   <span className="text-xs text-[var(--theme-muted)]">Código didáctico original</span>
                 </div>
                 <pre className="overflow-x-auto p-4 font-mono text-sm leading-7 text-[var(--theme-accent-dark)] sm:p-5"><code>{lesson.example}</code></pre>
+                <div className="border-t border-[var(--theme-border)] px-4 py-4 sm:px-5">
+                  <h3 className="text-xs font-bold tracking-[0.12em] text-[var(--theme-muted)]">SALIDA ESPERADA</h3>
+                  <pre className="mt-2 overflow-x-auto whitespace-pre-wrap rounded bg-[var(--theme-bg-secondary)] p-3 font-mono text-sm leading-6 text-[var(--theme-ink)]">{lesson.exampleOutput}</pre>
+                  <h3 className="mt-4 text-xs font-bold tracking-[0.12em] text-[var(--theme-muted)]">CÓMO FUNCIONA</h3>
+                  <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm leading-6 text-[var(--theme-muted)]">
+                    {lesson.walkthrough.map((step) => <li key={step}>{step}</li>)}
+                  </ol>
+                  <h3 className="mt-4 text-xs font-bold tracking-[0.12em] text-[var(--theme-muted)]">ERRORES FRECUENTES</h3>
+                  <ul className="mt-2 list-disc space-y-2 pl-5 text-sm leading-6 text-[var(--theme-muted)]">
+                    {lesson.commonMistakes.map((mistake) => <li key={mistake}>{mistake}</li>)}
+                  </ul>
+                </div>
               </div>
             </section>
 
-            <section aria-labelledby="exercise-title" className="border-l-2 border-[var(--theme-border-dark)] bg-[var(--theme-bg-secondary)] p-5 sm:p-6">
-              <h2 id="exercise-title" className="font-serif text-xl">Práctica sugerida</h2>
-              <p className="mt-3 text-sm leading-7 text-[var(--theme-muted)]">{lesson.exercise?.statement ?? ''}</p>
-              <Link href="/practica" className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">Abrir el laboratorio</Link>
+            <section aria-labelledby="exercise-title" className="space-y-4">
+              <div className="border-l-2 border-[var(--theme-border-dark)] bg-[var(--theme-bg-secondary)] p-5 sm:p-6">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <h2 id="exercise-title" className="font-serif text-xl">{lesson.exercise.title}</h2>
+                  <span className="text-xs font-semibold text-[var(--theme-muted)]">Nivel {lesson.exercise.difficulty} · {lesson.exercise.xp} XP · {lesson.estimatedMinutes} min</span>
+                </div>
+                <p className="mt-3 text-sm leading-7 text-[var(--theme-muted)]">{lesson.exercise.statement}</p>
+                <h3 className="mt-4 text-xs font-bold tracking-[0.12em] text-[var(--theme-muted)]">PISTA</h3>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-[var(--theme-muted)]">
+                  {lesson.exercise.hints.map((hint) => <li key={hint}>{hint}</li>)}
+                </ul>
+                {lesson.exercise.tests[0]?.expected && (
+                  <div className="mt-4">
+                    <h3 className="text-xs font-bold tracking-[0.12em] text-[var(--theme-muted)]">RESULTADO QUE DEBES OBTENER</h3>
+                    <pre className="mt-2 overflow-x-auto whitespace-pre-wrap rounded bg-[var(--theme-surface)] p-3 font-mono text-sm leading-6">{lesson.exercise.tests[0].expected}</pre>
+                    <p className="mt-2 text-xs leading-5 text-[var(--theme-muted)]">Compara tu salida con este resultado. La comprobación del curso se registra por separado al aprobar las preguntas de conocimiento.</p>
+                  </div>
+                )}
+              </div>
+              <PythonEditor
+                defaultCode={lesson.exercise.starterCode || lesson.example}
+                instructions={lesson.exercise.statement}
+              />
+              <Link href="/practica" className="inline-flex min-h-11 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">Abrir el laboratorio completo</Link>
             </section>
 
             <section aria-labelledby="quiz-title">
