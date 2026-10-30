@@ -20,7 +20,7 @@ La página oficial de Cisco Networking Academy consultada el 30-10-2026 describe
 - Curso oficial y secciones: https://www.netacad.com/ja/courses/python-essentials-1?courseLang=en-US
 - Catálogo Cisco 2024 en español: https://www.netacad.com/sites/default/files/course-catalog-es.pdf
 
-La rama de finalización incorpora una evaluación formal de M1, el proyecto final como requisito y un examen global de 12 preguntas. El código contiene 33 unidades principales (incluye evaluaciones, proyecto y examen) y cuatro unidades de extensión opcional. Las migraciones 024, 025 y 026 ya se probaron en Supabase DEV: 67 claves, todas con respuesta v2. La 026 deja el RPC público como SECURITY INVOKER y reserva SECURITY DEFINER para la implementación privada. En producción ya se aplicó 026; las migraciones de contenido 024 y 025 siguen pendientes y deben aplicarse coordinadas con el nuevo catálogo. El índice público de navegación coincide con las 37 unidades del contenido del servidor en ID, sección y título; una prueba protege el orden de M2.
+La rama de finalización incorpora una evaluación formal de M1, el proyecto final como requisito y un examen global de 12 preguntas. El código contiene 33 unidades principales (incluye evaluaciones, proyecto y examen) y cuatro unidades de extensión opcional. Las migraciones 024, 025 y 026 ya se probaron en Supabase DEV: 67 claves, todas con respuesta v2. La 026 deja el RPC público como SECURITY INVOKER y reserva SECURITY DEFINER para la implementación privada. En producción se aplicaron 024 y 025 (versiones 20261030081610 y 20261030081612); 026 ya estaba aplicada (20261030073610). DEV conserva sus propias versiones remotas. Ambos entornos tienen 67 claves activas v2. El índice público de navegación coincide con las 37 unidades del contenido del servidor en ID, sección y título; una prueba protege el orden de M2.
 
 El módulo 3 ahora sigue la secuencia oficial de prerequisitos: decisiones → ciclos → lógica/bit a bit → listas → ordenamiento → operaciones y aplicaciones avanzadas con listas → evaluación. La práctica con listas anidadas aparece después de dominar listas simples.
 
@@ -118,7 +118,7 @@ Antes de publicar o considerar terminada una lección, debe cumplir lo siguiente
 
 b4-l10 requiere construir un gestor de inventario de consola que lea varios registros, guarde productos en un diccionario, acumule cantidades cuando se repite un nombre, valide nombres y cantidades y maneje ValueError. Incluye seis casos automáticos: un producto, varios productos con acumulación de un producto repetido, nombre vacío, cantidad cero, cantidad negativa y cantidad no numérica. Las prácticas b2-l6 (entrada de cantidad) y b2-l8 (recibo) tienen cuatro casos cada una, incluidos cero, cantidades distintas, precios decimales y limpieza de espacios en nombres. El estudiante debe ejecutar las pruebas locales y aprobar cinco preguntas conceptuales con al menos 75%.
 
-**Limitación deliberada:** la comparación de salidas se ejecuta en el navegador mediante el Worker de Python; no constituye una certificación ni una atestación inviolable del código ejecutado. La nota de las preguntas sí se calcula en el servidor a partir de claves privadas. Las migraciones 024, 025 y 026 están aplicadas en DEV; en producción ya está aplicada 026 y siguen pendientes 024/025.
+**Limitación deliberada:** la comparación de salidas se ejecuta en el navegador mediante el Worker de Python; no constituye una certificación ni una atestación inviolable del código ejecutado. La nota de las preguntas sí se calcula en el servidor a partir de claves privadas. Las migraciones 024, 025 y 026 están aplicadas en DEV y producción; ambos entornos tienen 67 claves v2 activas.
 
 ### Examen final PE1 implementado en la rama
 
@@ -126,7 +126,7 @@ b4-l10 requiere construir un gestor de inventario de consola que lea varios regi
 - Combina tipos, operadores, entrada/salida, condiciones, ciclos, listas, bubble sort, funciones y excepciones.
 - No introduce archivos, POO ni paquetes externos como requisito de PE1.
 - Umbral de aprobación: 75%.
-- Las claves privadas del examen se añadieron mediante la migración 024 y se verificaron en DEV; producción sigue pendiente de 024/025.
+- Las claves privadas del examen se añadieron mediante la migración 024 y se verificaron en DEV; producción ya tiene aplicadas 024 y 025.
 
 
 ## Puerta de calidad antes de publicar
@@ -162,17 +162,17 @@ El contenido de esta plataforma debe ser original y didácticamente equivalente 
 - La migración 024 agrega/actualiza 24 claves privadas sin borrar filas ni modificar intentos o progreso.
 - La migración 025 agrega la clave privada de la nueva pregunta b2-l9 sin tocar intentos ni progreso.
 - La migración 026 convierte el RPC público submit_quiz_v2 a SECURITY INVOKER y concede EXECUTE de la implementación privada solo a authenticated; no abre lectura de claves ni escritura directa en tablas.
-- **Estado antes de publicar el catálogo:** DEV tiene 67 claves v2 y cero avisos de seguridad del asesor. Producción conserva 44 claves v2 del catálogo anterior; 026 ya endureció el RPC público a SECURITY INVOKER, y solo 024/025 están pendientes de sincronizar con el nuevo código.
+- **Estado antes de publicar el catálogo:** DEV y producción tienen 67/67 claves activas v2. La migración 026 dejó el RPC público como SECURITY INVOKER, anon no puede ejecutarlo y authenticated sí. Las tres migraciones están aplicadas en ambos entornos.
 - **Calidad pendiente:** ampliar las prácticas regulares con casos límite, depuración y retroalimentación más específica.
 
 ## Integración y estado real de la rama
 
-La evaluación de M1, el proyecto, el examen global y la lección Hello, World! están escritos en el catálogo de la rama. La migración 024 añade/actualiza claves para las nuevas evaluaciones y el proyecto; la 025 añade la clave de b2-l9; y la 026 corrige los permisos del RPC. DEV quedó con 67 claves v2 y el asesor de seguridad no informa alertas. Producción aún tiene 44 claves v2 y no se modificaron las claves, los intentos ni el progreso; la migración 026 ya dejó el envoltorio público como SECURITY INVOKER.
+La evaluación de M1, el proyecto, el examen global y la lección Hello, World! están escritos en el catálogo de la rama. La migración 024 añade/actualiza claves para las nuevas evaluaciones y el proyecto; la 025 añade la clave de b2-l9; y la 026 corrige los permisos del RPC. DEV quedó con 67 claves v2 y el asesor de seguridad no informa alertas. Producción tiene 67 claves v2 y no se modificaron los intentos ni el progreso. La migración 026 dejó el envoltorio público como SECURITY INVOKER.
 
 No fusionar ni desplegar el cambio de catálogo hasta:
 1. Confirmar que el CI completo pasa después de los cambios de M2 y que sus credenciales de prueba apuntan solo a DEV.
-2. Desplegar el código actualizado y aplicar 024/025 en producción de forma coordinada; 026 ya está aplicada.
-3. Verificar las 67 claves v2, el envoltorio público SECURITY INVOKER y los permisos del RPC en producción después de aplicar 024/025.
+2. Desplegar el código actualizado; 024, 025 y 026 ya están aplicadas y verificadas en producción.
+3. Tras el despliegue, volver a verificar las 67 claves v2, el envoltorio público SECURITY INVOKER y los permisos del RPC en producción.
 4. En Auth > Password Security, habilitar la protección contra contraseñas filtradas cuando el plan lo permita; la opción es Pro o superior.
 5. Realizar una prueba real de guardar una evaluación con una cuenta de prueba autenticada; DEV aún no tiene usuarios de prueba, por lo que no se ha confirmado el guardado E2E.
 
