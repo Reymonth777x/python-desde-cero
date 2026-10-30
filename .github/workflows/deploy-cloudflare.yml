@@ -35,8 +35,8 @@ jobs:
           if [[ "$GITHUB_EVENT_NAME" == "workflow_run" ]]; then
             if [[ "$WORKFLOW_HEAD_BRANCH" != "master" || "$WORKFLOW_CONCLUSION" != "success" ]]; then
               echo "configured=false" >> "$GITHUB_OUTPUT"
-              echo "::error::No se publica: el CI de master no terminó correctamente. Revisa la ejecución de CI y vuelve a publicar tras un resultado exitoso."
-              exit 1
+              echo "::notice::Despliegue omitido de forma segura: solo se publica master después de un CI exitoso (rama: ${WORKFLOW_HEAD_BRANCH:-desconocida}; resultado: ${WORKFLOW_CONCLUSION:-sin estado})."
+              exit 0
             fi
           elif [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
             if [[ "$GITHUB_REF_NAME" != "master" ]]; then
