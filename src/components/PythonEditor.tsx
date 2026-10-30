@@ -416,7 +416,6 @@ export default function PythonEditor({
             </svg>
           )}
         </div>
-button>
       </div>
     </section>
   );
