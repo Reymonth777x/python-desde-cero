@@ -1078,18 +1078,20 @@ export const courseModules: CourseModule[] = [
         "exercise": {
           "id": "b3-e3",
           "title": "Clasificar un envío",
-          "statement": "Si peso es hasta 1 kg imprime Ligero; hasta 5 kg imprime Mediano; en otro caso Pesado.",
-          "starterCode": "peso = 3.2\n",
-          "solution": "peso = 3.2\nif peso <= 1:\n    print(\"Ligero\")\nelif peso <= 5:\n    print(\"Mediano\")\nelse:\n    print(\"Pesado\")",
+          "statement": "Lee el peso de un envío en kilogramos. Imprime Ligero si pesa hasta 1 kg, Mediano si pesa más de 1 kg y hasta 5 kg, y Pesado si supera 5 kg.",
+          "starterCode": "peso = float(input())\n",
+          "solution": "peso = float(input())\nif peso <= 1:\n    print(\"Ligero\")\nelif peso <= 5:\n    print(\"Mediano\")\nelse:\n    print(\"Pesado\")",
           "tests": [
-            {
-              "input": [],
-              "expected": "Mediano"
-            }
+            {"input":["0.5"],"expected":"Ligero"},
+            {"input":["1"],"expected":"Ligero"},
+            {"input":["1.1"],"expected":"Mediano"},
+            {"input":["5"],"expected":"Mediano"},
+            {"input":["5.1"],"expected":"Pesado"},
           ],
           "hints": [
-            "Comprueba primero el límite menor.",
-            "Usa elif para el segundo intervalo."
+            "Usa float(input()) para leer un peso que también puede tener decimales.",
+            "Comprueba primero peso <= 1 y después peso <= 5.",
+            "else cubre los pesos mayores que cinco.",
           ],
           "difficulty": "facil",
           "xp": 20,
@@ -1139,18 +1141,20 @@ export const courseModules: CourseModule[] = [
         "exercise": {
           "id": "b3-e4",
           "title": "Contar hasta cinco",
-          "statement": "Utiliza while para imprimir los números del 1 al 5, uno por línea.",
-          "starterCode": "contador = 1\n",
-          "solution": "contador = 1\nwhile contador <= 5:\n    print(contador)\n    contador += 1",
+          "statement": "Lee un límite entero. Utiliza while para imprimir los números desde 1 hasta ese límite, uno por línea. Si el límite es menor que 1, no se imprime ningún número.",
+          "starterCode": "limite = int(input())\ncontador = 1\n",
+          "solution": "limite = int(input())\ncontador = 1\nwhile contador <= limite:\n    print(contador)\n    contador += 1",
           "tests": [
-            {
-              "input": [],
-              "expected": "1\n2\n3\n4\n5"
-            }
+            {"input":["-2"],"expected":""},
+            {"input":["0"],"expected":""},
+            {"input":["1"],"expected":"1"},
+            {"input":["5"],"expected":"1\n2\n3\n4\n5"},
           ],
           "hints": [
-            "La condición debe incluir cinco.",
-            "Incrementa el contador en cada vuelta."
+            "Usa int(input()) para convertir el límite escrito en un entero.",
+            "Inicia contador en uno y repite mientras contador <= limite.",
+            "Aumenta contador dentro del ciclo para que cada vuelta avance hacia el final.",
+            "Cuando el límite es cero o negativo, la condición ya es falsa y el ciclo no se ejecuta.",
           ],
           "difficulty": "facil",
           "xp": 20,
