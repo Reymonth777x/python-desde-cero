@@ -111,7 +111,7 @@ export default function PythonEditor({
     ...(usesTurtle ? [{ id: 'turtle' as const, label: 'Gráficos' }] : []),
   ];
 
-  const activeMobilePanel = activeMobilePanel === 'turtle' && !usesTurtle ? 'editor' : mobilePanel;
+  const activeMobilePanel = mobilePanel === 'turtle' && !usesTurtle ? 'editor' : mobilePanel;
 
   const runCode = useCallback(() => {
     if (isRunning) return;
