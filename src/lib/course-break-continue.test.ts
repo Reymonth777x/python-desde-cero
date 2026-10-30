@@ -23,9 +23,9 @@ describe('práctica de for, break y continue', () => {
     expect(exercise.solution).toContain('if numero % 2 == 0:');
     expect(exercise.solution).toContain('continue');
     expect(exercise.tests).toEqual([
+      { input: ['1'], expected: '1' },
       { input: ['-1'], expected: '' },
       { input: ['0'], expected: '' },
-      { input: ['1'], expected: '1' },
       { input: ['6'], expected: ['1', '3', '5'].join(String.fromCharCode(10)) },
       { input: ['10'], expected: ['1', '3', '5'].join(String.fromCharCode(10)) },
     ]);
