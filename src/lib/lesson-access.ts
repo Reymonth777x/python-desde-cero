@@ -16,6 +16,23 @@ export type LessonReference = {
  * Completed lessons remain revisitable; callers should check the current
  * lesson's completion separately before redirecting.
  */
+export function findFirstIncompleteLessonIndex(
+  moduleId: string,
+  lessons: LessonReference[],
+  progressRows: LessonProgressRecord[],
+  progressUnavailable = false,
+): number {
+  return lessons.findIndex((lesson) =>
+    progressUnavailable ||
+    !progressRows.some(
+      (row) =>
+        row.module_id === moduleId &&
+        row.lesson_id === lesson.id &&
+        row.is_completed,
+    ),
+  );
+}
+
 export function canAccessLessonInSequence(
   moduleId: string,
   lessonIndex: number,
@@ -35,12 +52,9 @@ export function canAccessLessonInSequence(
     return true;
   }
 
-  return lessons.slice(0, lessonIndex).every((previousLesson) =>
-    progressRows.some(
-      (row) =>
-        row.module_id === moduleId &&
-        row.lesson_id === previousLesson.id &&
-        row.is_completed,
-    ),
-  );
+  return findFirstIncompleteLessonIndex(
+    moduleId,
+    lessons.slice(0, lessonIndex),
+    progressRows,
+  ) === -1;
 }
