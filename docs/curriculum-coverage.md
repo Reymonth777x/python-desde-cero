@@ -43,11 +43,11 @@ En el módulo 3 se corrigió la progresión: comparaciones → decisiones → wh
 
 ### 1. Módulo 1: falta el cierre evaluativo
 
-El módulo 1 termina con b1-l4, actualmente titulado “Primer programa, salida y comentarios”. Esa unidad contiene conceptos que corresponden mejor al módulo 2 y no funciona como evaluación formal del módulo 1.
+El módulo 1 termina con b1-l4, ahora titulado “Primer contacto con un programa Python”. La unidad es una vista previa breve para comprobar que el intérprete ejecuta un programa; no es una evaluación formal del módulo 1.
 
 **Corrección requerida:**
 - Cerrar el módulo 1 con una evaluación de fundamentos: algoritmo, programa, código fuente, intérprete, lenguaje Python, IDE e instalación/ejecución.
-- Trasladar la introducción a print(), “Hello, World!” y comentarios al módulo 2.
+- Mantener print() en b1-l4 solo como demostración de ejecución, sin enseñar su sintaxis en profundidad. La explicación formal de salida, cadenas y comentarios está en el módulo 2.
 - No declarar PE1 completo hasta que exista la evaluación del módulo 1 y se guarde el resultado correctamente.
 
 ### 2. Módulo 2: secuencia y límites de conceptos
