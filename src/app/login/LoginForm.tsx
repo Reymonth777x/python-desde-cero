@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect, useState, type ReactNode } from 'react';
+import { useActionState, useState, type ReactNode } from 'react';
 import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
 import { TurnstileWidget } from '@/components/TurnstileWidget';
@@ -32,40 +32,28 @@ const inputStyle =
 export default function LoginForm({ error, message, next = '' }: Props) {
   const [isSignup, setIsSignup] = useState(false);
   const [loginState, loginAction] = useActionState(login, {} as LoginActionState);
-  const [captchaAttempt, setCaptchaAttempt] = useState(0);
-  const [loginActionError, setLoginActionError] = useState('');
   const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
   const [signupName, setSignupName] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [invitationCode, setInvitationCode] = useState('');
 
-  useEffect(() => {
-    if (!loginState.error) return;
-    const messages: Record<NonNullable<LoginActionState['error']>, string> = {
-      missing: 'Completa tu correo y contraseña.',
-      captcha: 'La verificación no se completó. Vuelve a marcar el control de seguridad; conservamos tu correo.',
-      login: 'No se pudo iniciar sesión. Comprueba tu correo y contraseña.',
-    };
-    setLoginActionError(messages[loginState.error]);
-    setLoginPassword('');
-    // A submitted Turnstile token is single-use, even when credentials are rejected.
-    setCaptchaAttempt((attempt) => attempt + 1);
-  }, [loginState]);
-
+  const loginErrorMessages: Record<NonNullable<LoginActionState['error']>, string> = {
+    missing: 'Completa tu correo y contraseña.',
+    captcha: 'La verificación no se completó. Vuelve a marcar el control de seguridad; conservamos tu correo.',
+    login: 'No se pudo iniciar sesión. Comprueba tu correo y contraseña.',
+  };
+  const loginActionError = loginState.error ? loginErrorMessages[loginState.error] : '';
   function showLogin() {
     setSignupName('');
     setSignupEmail('');
     setSignupPassword('');
     setInvitationCode('');
     setIsSignup(false);
-    setLoginActionError('');
   }
 
   function showSignup() {
     setLoginEmail('');
-    setLoginPassword('');
     setIsSignup(true);
   }
   const active = 'border-[var(--theme-accent)] text-[var(--theme-accent)]';
@@ -176,10 +164,10 @@ export default function LoginForm({ error, message, next = '' }: Props) {
                 </div>
                 <div>
                   <label htmlFor="login-password" className="text-sm font-semibold">Contraseña</label>
-                  <input id="login-password" name="password" type="password" autoComplete="section-login current-password" value={loginPassword} onChange={(event) => setLoginPassword(event.target.value)} required className={inputStyle} />
+                  <input key={loginState.attempt ?? 0} id="login-password" name="password" type="password" autoComplete="section-login current-password" required className={inputStyle} />
                 </div>
                 {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-                  <TurnstileWidget key={captchaAttempt} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} action="login" />
+                  <TurnstileWidget key={loginState.attempt ?? 0} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} action="login" />
                 )}
                 {loginActionError && (
                   <p role="alert" aria-live="polite" className="border-l-4 border-[var(--theme-error)] bg-[var(--theme-surface)] px-4 py-3 text-sm leading-6 text-[var(--theme-ink)]">
