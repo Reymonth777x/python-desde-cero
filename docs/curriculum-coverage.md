@@ -126,7 +126,7 @@ b4-l10 requiere construir un gestor de inventario de consola que lea varios regi
 - Combina tipos, operadores, entrada/salida, condiciones, ciclos, listas, bubble sort, funciones y excepciones.
 - No introduce archivos, POO ni paquetes externos como requisito de PE1.
 - Umbral de aprobación: 75%.
-- Las claves privadas del examen se añadieron mediante la migración 024 y se verificaron en DEV; producción ya tiene aplicadas 024 y 025.
+- Las claves privadas del examen/proyecto están aplicadas y verificadas en ambos entornos mediante 024 y 025; 026/027 endurecen el RPC y la progresión del curso.
 
 
 ## Puerta de calidad antes de publicar
@@ -134,9 +134,9 @@ b4-l10 requiere construir un gestor de inventario de consola que lea varios regi
 No marcar el curso como terminado hasta verificar:
 
 - [x] Cuatro módulos PE1 y sus contenidos en el orden revisado; M2 incorpora Hello, World! en 2.1 y respeta la progresión de prerequisitos.
-- [x] Evaluación formal incluida en el código para los cuatro módulos (M1–M4); claves 024 verificadas en DEV.
+- [x] Evaluación formal incluida en el código para los cuatro módulos (M1–M4); 67 claves v2 verificadas en DEV y producción.
 - [ ] Treinta prácticas diferenciadas, sin copiar el mismo enunciado cambiando solo nombres o números.
-- [x] Proyecto obligatorio y examen global incluidos en el código; claves 024 verificadas en DEV.
+- [x] Proyecto obligatorio y examen global incluidos en el código; sus claves v2 y prerrequisitos están verificados en DEV y producción.
 - [ ] Las lecciones avanzadas tienen prerequisitos y ejemplos progresivos.
 - [x] No hay claves desincronizadas en DEV: 67 claves v2 para 67 preguntas del catálogo.
 - [ ] Completar la matriz de pruebas de los ejercicios regulares con casos límite; el proyecto final ejecuta seis casos en el Worker del estudiante.
@@ -168,7 +168,7 @@ El contenido de esta plataforma debe ser original y didácticamente equivalente 
 
 ## Integración y estado real de la rama
 
-La evaluación de M1, el proyecto, el examen global y la lección Hello, World! están escritos en el catálogo de la rama. La migración 024 añade/actualiza claves para las nuevas evaluaciones y el proyecto; la 025 añade la clave de b2-l9; y la 026 corrige los permisos del RPC. DEV quedó con 67 claves v2 y el asesor de seguridad no informa alertas. Producción tiene 67 claves v2 y no se modificaron los intentos ni el progreso. La migración 026 dejó el envoltorio público como SECURITY INVOKER. La 027 eliminó la respuesta de aciertos por pregunta y reforzó los prerrequisitos en el calificador privado.
+La evaluación de M1, el proyecto, el examen global y la lección Hello, World! están escritos en el catálogo de la rama. La migración 024 añade/actualiza claves para las nuevas evaluaciones y el proyecto; la 025 añade la clave de b2-l9; la 026 endurece los permisos del RPC; y la 027 elimina `answerCorrect` y aplica los prerrequisitos en el calificador privado. DEV quedó con 67 claves v2 y el asesor de seguridad no informa alertas. Producción tiene 67 claves v2 y no se modificaron los intentos ni el progreso. La migración 026 dejó el envoltorio público como SECURITY INVOKER. La 027 eliminó la respuesta de aciertos por pregunta y reforzó los prerrequisitos en el calificador privado.
 
 No fusionar ni desplegar el cambio de catálogo hasta:
 1. Confirmar que el CI completo pasa después de los cambios de M2 y que sus credenciales de prueba apuntan solo a DEV.
