@@ -9,6 +9,29 @@ export type LessonReference = {
 };
 
 /**
+ * A module is unlocked for new students only after the previous module's
+ * assessment is complete. Students with persisted progress in the target
+ * module keep access when a later course update adds a new module gate.
+ *
+ * The caller must only pass progress loaded for the authenticated user.
+ */
+export function canAccessModule(
+  moduleIndex: number,
+  hasPreviousAssessment: boolean,
+  hasExistingModuleProgress: boolean,
+): boolean {
+  if (!Number.isInteger(moduleIndex) || moduleIndex < 0) {
+    return false;
+  }
+
+  if (moduleIndex === 0) {
+    return true;
+  }
+
+  return hasPreviousAssessment || hasExistingModuleProgress;
+}
+
+/**
  * A lesson can be opened when it is the first in its module or when every
  * earlier lesson in that module has been completed. If progress could not be
  * loaded, fail closed and leave only the first lesson available.
