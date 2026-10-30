@@ -1,3 +1,5 @@
+> **INFORME HISTÓRICO — ARCHIVO.** Esta revisión corresponde a una rama y una arquitectura anteriores. Sus hallazgos y resultados no describen el producto desplegado actualmente; consultar `docs/team/ESTADO.md`.
+
 # Informe de revisión hostil — rama `fix/cierre-reparacion` (fase-3-plataforma)
 
 ## Evidencias reproducidas (comando | exit | resumen | archivo)
