@@ -1,10 +1,9 @@
 # Preparación para producción — 30 de octubre de 2026
 
-**Último release funcional de la aplicación:** `e758f9cf9da1aa647429669b112b7128ca9b126d`  
-**CI:** [41076396982](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41076396982) — success  
-**Despliegue:** [41076898388](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41076898388) — success, job `deploy` ejecutado  
-**Actualización documental posterior:** PR #67 en `10cc1b7`; CI [41092034385](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41092034385) y deploy [41092591412](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41092591412) — success; no cambia el código de la aplicación.  
-**Alcance:** GitHub, dominio público, Cloudflare Workers y dos proyectos Supabase. Las consultas Supabase fueron de solo lectura; no se ejecutaron migraciones ni escrituras.
+**Última publicación comprobada:** `5013d517ed95ad0eb189a5e016dec9ce1faf69ef`  
+**CI:** [41105688936](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41105688936) — success  
+**Despliegue:** [41106258018](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41106258018) — success; jobs `check-credentials` y `deploy` completados  
+**Alcance:** GitHub, dominio público, Cloudflare Workers y dos proyectos Supabase. Se aplicó una migración DDL que reemplaza la función privada de evaluación para preservar acceso histórico; no ejecutó DML ni alteró filas de alumnos.
 
 ## Dictamen
 
@@ -30,7 +29,7 @@ El release `e758f9c` pasó CI completo y despliegue Cloudflare. El smoke test ex
 - Las fechas opcionales de invitación se interpretan según el reloj local del administrador, se convierten a un instante UTC en el navegador y se validan en el servidor; la tabla las muestra en hora local. La corrección no alteró el esquema.
 - Pendiente: revisión integral de las 33 unidades, ejemplos/salidas/casos límite y verificación autenticada de todas las pantallas educativas.
 
-## Supabase — solo lectura
+## Supabase — estado verificado
 
 | Comprobación | Producción | DEV |
 |---|---|---|
@@ -46,9 +45,9 @@ Se compararon las 67 tuplas actuales de `questions.answer` con `private.quiz_ans
 
 `public.submit_quiz_v2` es `SECURITY INVOKER`; `anon` no tiene EXECUTE y `authenticated` sí. El calificador autoritativo vive en el esquema privado como `SECURITY DEFINER`, valida `auth.uid()` y devuelve calificación agregada. La ruta antigua `public.submit_quiz` y `private.submit_quiz_authoritative` usaba `correct_option` legacy y devolvía `answerCorrect`; el 30-10-2026 se revocó `EXECUTE` sobre ambas para `PUBLIC`, `anon`, `authenticated` y `service_role`. El flujo v2 sigue habilitado. Migración: `20261030174256_revoke_legacy_quiz_rpc_execution.sql`; verificador: `scripts/sql/verify-legacy-quiz-rpc-closed.sql`. El trigger `invitations_prevent_used_deletion` conserva las invitaciones usadas.
 
-El historial remoto de producción registra 23 migraciones y DEV registra 9. La migración 028 (`revoke_legacy_quiz_rpc_execution`) está aplicada en ambos entornos con timestamps distintos. Las versiones locales 001–003 y 016–017, además de varios timestamps 024–027, siguen difiriendo del historial remoto. La rama preview `main` del proyecto de producción tiene `MIGRATIONS_FAILED` (la base preview indica `ACTIVE_HEALTHY`), y no es el proyecto DEV separado. No ejecutar `db push`, `migration repair`, `db reset`, ni resetear/rebasar/borrar esa rama sin investigar el drift y preparar backup/rollback.
+El historial remoto registra 24 migraciones en producción y 10 en DEV. La migración 028 `grandfather_existing_module_progress` está aplicada con versiones producción `20261030183117` y DEV `20261030183123`; la retirada del RPC heredado es una migración separada con versiones `20261030174256` y `20261030174245`. El archivo local 028 se alinea al timestamp de producción. Aún quedan nueve timestamps remotos sin archivo local coincidente (cinco versiones antiguas 011–015 y cuatro timestamps distintos para los cambios 024–027), además de archivos locales no aplicados. La rama preview `main` continúa con `MIGRATIONS_FAILED` (la base preview indica `ACTIVE_HEALTHY`). No ejecutar `db push`, `migration repair`, `db reset`, ni resetear/rebasar/borrar esa rama sin investigar el drift y preparar backup/rollback.
 
-Producción y DEV usan PostgreSQL 17.11.0.003 y `pgcrypto` 1.3. El Advisor de seguridad de producción reporta Leaked Password Protection desactivado. La organización está en plan Free y la documentación oficial de Supabase indica que la función requiere Pro o superior; no está disponible para activar en el plan actual. Mantener los requisitos básicos de contraseña y reevaluar si se decide actualizar. Dos índices de invitaciones muestran uso no observado (INFO); no cambiarlos sin medir.
+Producción y DEV usan PostgreSQL 17.11.0.003 y `pgcrypto` 1.3. La función privada de evaluación contiene ahora los tres criterios de acceso histórico (`existing_module_progress`, `existing_project_progress`, `existing_exam_progress`); la UI equivalente está en el PR #84, aún pendiente de CI. El Advisor de seguridad de producción reporta Leaked Password Protection desactivado. La organización está en plan Free y la documentación oficial de Supabase indica que la función requiere Pro o superior; no está disponible para activar en el plan actual. Mantener los requisitos básicos de contraseña y reevaluar si se decide actualizar. Dos índices de invitaciones muestran uso no observado (INFO); no cambiarlos sin medir.
 
 ## Bloqueos antes del lanzamiento educativo
 
@@ -73,7 +72,7 @@ Producción y DEV usan PostgreSQL 17.11.0.003 y `pgcrypto` 1.3. El Advisor de se
 
 ### P1 — Migraciones y recuperación
 
-- Reconciliar archivos de migración con los historiales PROD/DEV y diagnosticar la rama preview `main` fallida.
+- Reconciliar los nueve timestamps remotos de producción que aún no tienen archivo local equivalente y diagnosticar la rama preview `main` fallida. No reparar historial a ciegas.
 - Preparar y ensayar backup/restauración antes de cualquier cambio futuro de esquema.
 
 ### P2 — Legal y producto
