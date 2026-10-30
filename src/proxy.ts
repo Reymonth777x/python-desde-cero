@@ -1,3 +1,4 @@
+import { resolvePythonRunnerOrigin } from '@/lib/python-runner-protocol';
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
@@ -7,7 +8,7 @@ function matchesPrefix(pathname: string, prefix: string) {
   return pathname === prefix || pathname.startsWith(`${prefix}/`);
 }
 
-function createContentSecurityPolicy(nonce: string) {
+function createContentSecurityPolicy(nonce: string, appOrigin: string) {
   const connectSources = ["'self'"];
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
@@ -30,7 +31,7 @@ function createContentSecurityPolicy(nonce: string) {
     "font-src 'self'",
     `connect-src ${connectSources.join(' ')}`,
     "worker-src 'self' blob:",
-    "frame-src https://challenges.cloudflare.com",
+    `frame-src https://challenges.cloudflare.com ${resolvePythonRunnerOrigin(process.env.NEXT_PUBLIC_PYTHON_RUNNER_ORIGIN, appOrigin) ?? ''}`.trim(),
     "object-src 'none'",
     "base-uri 'self'",
     "frame-ancestors 'none'",
@@ -66,7 +67,7 @@ export async function proxy(request: NextRequest) {
   // Next.js needs this per-response nonce in the incoming request CSP so its
   // framework and inline flight scripts can be authorized without unsafe-inline.
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
-  const csp = createContentSecurityPolicy(nonce);
+  const csp = createContentSecurityPolicy(nonce, request.nextUrl.origin);
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-nonce', nonce);
   requestHeaders.set('Content-Security-Policy', csp);
