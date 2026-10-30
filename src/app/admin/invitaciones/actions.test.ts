@@ -85,6 +85,48 @@ describe('acciones de invitaciones', () => {
     expect(insert).not.toHaveBeenCalled();
   });
 
+  it('elimina una invitación que todavía no se ha utilizado', async () => {
+    const profileQuery = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: { is_admin: true }, error: null }),
+    };
+    const lookupQuery = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({ data: { is_used: false }, error: null }),
+    };
+    const deleteQuery = {
+      delete: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({
+        data: { id: '11111111-1111-4111-8111-111111111111' },
+        error: null,
+      }),
+    };
+    const from = vi.fn()
+      .mockReturnValueOnce(profileQuery)
+      .mockReturnValueOnce(lookupQuery)
+      .mockReturnValueOnce(deleteQuery);
+
+    vi.mocked(createClient).mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: { id: 'admin-1' } },
+          error: null,
+        }),
+      },
+      from,
+    } as unknown as Awaited<ReturnType<typeof createClient>>);
+
+    const result = await deleteInvitation('11111111-1111-4111-8111-111111111111');
+
+    expect(result).toEqual({ error: null });
+    expect(deleteQuery.delete).toHaveBeenCalledOnce();
+    expect(from).toHaveBeenCalledTimes(3);
+  });
+
   it('conserva una invitación utilizada y no ejecuta DELETE', async () => {
     const profileQuery = {
       select: vi.fn().mockReturnThis(),
@@ -96,7 +138,6 @@ describe('acciones de invitaciones', () => {
       eq: vi.fn().mockReturnThis(),
       maybeSingle: vi.fn().mockResolvedValue({ data: { is_used: true }, error: null }),
     };
-    const deleteQuery = { delete: vi.fn() };
     const from = vi.fn((table: string) => {
       if (table === 'profiles') return profileQuery;
       return lookupQuery;
@@ -114,6 +155,6 @@ describe('acciones de invitaciones', () => {
     const result = await deleteInvitation('11111111-1111-4111-8111-111111111111');
 
     expect(result.error).toContain('se conserva como historial');
-    expect(deleteQuery.delete).not.toHaveBeenCalled();
+    expect(from).toHaveBeenCalledTimes(2);
   });
 });
