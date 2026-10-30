@@ -699,8 +699,8 @@ export const courseModules: CourseModule[] = [
             "prompt": "¿Qué imprime range(1, 4) al recorrerlo con print?",
             "options": [
               "0, 1, 2, 3",
-              "1, 2, 3, 4",
               "1, 2, 3",
+              "1, 2, 3, 4",
               "2, 3, 4"
             ],
             "answer": 1,

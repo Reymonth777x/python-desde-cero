@@ -57,6 +57,23 @@ describe('ruta de aprendizaje Python desde cero', () => {
     }
   });
 
+  it('mantiene correctas las respuestas de los conceptos base y rangos', () => {
+    const findQuestion = (moduleId: string, lessonId: string, prompt: string) =>
+      courseModules
+        .find((courseModule) => courseModule.id === moduleId)!
+        .lessons.find((lesson) => lesson.id === lessonId)!
+        .questions.find((question) => question.prompt === prompt)!;
+
+    const modulo = findQuestion('module-1', 'b1-l3', '¿Qué valor devuelve 17 % 5?');
+    expect(modulo.options[modulo.answer]).toBe('2');
+
+    const rango = findQuestion('module-2', 'b2-l7', '¿Qué imprime range(1, 4) al recorrerlo con print?');
+    expect(rango.options[rango.answer]).toBe('1, 2, 3');
+
+    const algoritmo = findQuestion('module-1', 'b1-l1', '¿Qué representa un algoritmo?');
+    expect(algoritmo.options[algoritmo.answer]).toBe('Una secuencia ordenada de pasos para resolver una tarea');
+  });
+
   it('califica todas las respuestas y exige al menos 75 por ciento', () => {
     const questions = [
       { prompt: '1', options: ['a', 'b'], answer: 0, explanation: '' },
