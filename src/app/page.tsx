@@ -1,9 +1,10 @@
 'use client';
+
 import Link from 'next/link';
 import { useState } from 'react';
-import { useTheme } from '@/app/theme-provider';
 import ThemeSelector from '@/components/ThemeSelector';
 import PortadaLab from '@/components/PortadaLab';
+import { courseModules } from '@/lib/course';
 
 type Example = {
   id: string;
@@ -41,7 +42,7 @@ t.left(90); t.backward(150)
 rama(110)
 
 t.done()`,
-    description: 'Dibuja un árbol fractal recursivo con ramas principales y ramas más pequeñas en blanco y verde lima.',
+    description: 'Construye un árbol con una función que se llama a sí misma.',
   },
   {
     id: 'espiral-geometrica',
@@ -59,7 +60,7 @@ t.pencolor("cyan")
 for i in range(200):
     t.forward(i * 2)
     t.left(89)`,
-    description: 'Dibuja una espiral que crece progresivamente usando un bucle y un ángulo cercano a 90°.',
+    description: 'Observa cómo un bucle transforma una línea en una espiral.',
   },
   {
     id: 'arte-circulos',
@@ -77,7 +78,7 @@ for i in range(36):
     t.pencolor("magenta" if i % 2 == 0 else "cyan")
     t.circle(100)
     t.left(10)`,
-    description: 'Dibuja 36 círculos rotados progresivamente para crear un patrón floral.',
+    description: 'Combina repetición y ángulos para crear un patrón.',
   },
   {
     id: 'visualizacion-matematica',
@@ -100,20 +101,20 @@ for i in range(360):
     t.goto(x, y)
     t.pendown()
     t.dot(3)`,
-    description: 'Dibuja una espiral matemática usando funciones seno y coseno.',
+    description: 'Usa seno y coseno para dibujar una espiral matemática.',
   },
   {
-        id: 'contador-ascendente',
+    id: 'contador-ascendente',
     title: 'Contador ascendente',
     subtitle: 'Bucles simples',
     level: 'Principiante',
     concepts: ['bucles', 'variables', 'imprimir'],
     code: `for i in range(1, 11):
     print(i)`,
-    description: 'Imprime los números del 1 al 10 usando un bucle for.',
+    description: 'Ejecuta tu primer bucle y muestra diez resultados.',
   },
   {
-        id: 'calculo-areas',
+    id: 'calculo-areas',
     title: 'Cálculo de áreas',
     subtitle: 'Funciones y parámetros',
     level: 'Principiante',
@@ -127,179 +128,277 @@ def area_cuadrado(lado):
 
 print("Área del círculo (radio 5):", area_circulo(5))
 print("Área del cuadrado (lado 4):", area_cuadrado(4))`,
-    description: 'Define funciones para calcular áreas y las ejecuta con valores de ejemplo.',
+    description: 'Resuelve un problema real con dos funciones pequeñas.',
   },
 ];
 
+const TOTAL_LESSONS = courseModules.reduce(
+  (total, module) => total + module.lessons.length,
+  0,
+);
+
+function HeroIllustration() {
+  return (
+    <div className="relative mx-auto w-full max-w-[580px]">
+      <div className="absolute -left-3 top-12 hidden h-28 w-28 border border-[var(--theme-border)]/60 sm:block" aria-hidden="true" />
+      <div className="absolute -bottom-4 -right-3 hidden h-24 w-24 rounded-full border border-[var(--theme-accent)]/50 sm:block" aria-hidden="true" />
+
+      <div className="relative overflow-hidden border border-[var(--theme-border)] bg-[var(--theme-surface)] shadow-[12px_14px_0_var(--theme-shadow)]">
+        <div className="flex items-center justify-between border-b border-[var(--theme-border)] px-4 py-3">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-[var(--theme-error)]" />
+            <span className="h-2 w-2 rounded-full bg-[var(--theme-warning)]" />
+            <span className="h-2 w-2 rounded-full bg-[var(--theme-success)]" />
+            <span className="ml-2 font-mono text-[11px] text-[var(--theme-muted)]">arbol_fractal.py</span>
+          </div>
+          <span className="font-mono text-[10px] tracking-[0.15em] text-[var(--theme-accent)]">PYTHON / 01</span>
+        </div>
+
+        <div className="grid grid-cols-[1fr_0.92fr]">
+          <div className="min-w-0 bg-[var(--theme-code-bg)] p-4 sm:p-5">
+            <p className="font-mono text-[10px] tracking-[0.16em] text-[var(--theme-muted)]">UNA IDEA SE CONVIERTE EN CÓDIGO</p>
+            <pre className="mt-4 overflow-hidden whitespace-pre-wrap break-words font-mono text-[11px] leading-[1.9] text-[var(--theme-ink)] sm:text-xs"><code><span className="text-[var(--theme-muted)]">01 </span><span className="text-[var(--theme-accent)]">def</span> rama(n):{"\n"}<span className="text-[var(--theme-muted)]">02 </span>    <span className="text-[var(--theme-accent)]">if</span> n &lt; 10:{"\n"}<span className="text-[var(--theme-muted)]">03 </span>        <span className="text-[var(--theme-warning)]">return</span>{"\n"}<span className="text-[var(--theme-muted)]">04 </span>    t.forward(n){"\n"}<span className="text-[var(--theme-muted)]">05 </span>    rama(n * 0.78){"\n"}<span className="text-[var(--theme-muted)]">06 </span>    t.left(25)</code></pre>
+            <div className="mt-6 border-t border-[var(--theme-border)]/60 pt-3">
+              <span className="font-mono text-[10px] text-[var(--theme-muted)]">IDEA CLAVE</span>
+              <p className="mt-1 text-xs leading-5 text-[var(--theme-ink)]">Una función puede resolver un problema llamándose a sí misma.</p>
+            </div>
+          </div>
+
+          <div className="relative flex min-h-[260px] items-center justify-center overflow-hidden bg-[#101b16] p-2 sm:min-h-[310px] sm:p-4">
+            <svg
+              viewBox="0 0 260 300"
+              className="h-full w-full"
+              role="img"
+              aria-label="Ilustración de un árbol fractal de ramas verdes"
+            >
+              <g fill="none" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M130 280 L130 215 L130 155 L130 103" stroke="#edf2e8" strokeWidth="7" />
+                <path d="M130 215 L94 175 L69 130 L49 100" stroke="#edf2e8" strokeWidth="5" />
+                <path d="M130 215 L166 175 L191 130 L211 100" stroke="#edf2e8" strokeWidth="5" />
+                <path d="M130 155 L104 125 L91 91 L86 66" stroke="#c5e6b3" strokeWidth="4" />
+                <path d="M130 155 L156 125 L169 91 L174 66" stroke="#c5e6b3" strokeWidth="4" />
+                <path d="M69 130 L41 116 L26 91" stroke="#91c77d" strokeWidth="3" />
+                <path d="M69 130 L84 103 L79 78" stroke="#91c77d" strokeWidth="3" />
+                <path d="M191 130 L219 116 L234 91" stroke="#91c77d" strokeWidth="3" />
+                <path d="M191 130 L176 103 L181 78" stroke="#91c77d" strokeWidth="3" />
+                <path d="M91 91 L71 78 L64 53" stroke="#91c77d" strokeWidth="2.5" />
+                <path d="M169 91 L189 78 L196 53" stroke="#91c77d" strokeWidth="2.5" />
+              </g>
+              <g fill="#a7d58f">
+                <circle cx="49" cy="100" r="5" />
+                <circle cx="211" cy="100" r="5" />
+                <circle cx="86" cy="66" r="5" />
+                <circle cx="174" cy="66" r="5" />
+                <circle cx="26" cy="91" r="4" />
+                <circle cx="234" cy="91" r="4" />
+                <circle cx="64" cy="53" r="4" />
+                <circle cx="196" cy="53" r="4" />
+              </g>
+              <path d="M25 281 H235" stroke="#496653" strokeWidth="1" />
+              <text x="130" y="294" fill="#9fb8a4" textAnchor="middle" fontSize="8" letterSpacing="2">RECURSIVIDAD</text>
+            </svg>
+            <span className="absolute left-3 top-3 font-mono text-[9px] tracking-[0.16em] text-[#a7d58f]">SALIDA GRÁFICA</span>
+            <span className="absolute bottom-3 right-3 font-mono text-[9px] text-[#9fb8a4]">TURTLE / SVG</span>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--theme-border)] px-4 py-3">
+          <span className="text-xs text-[var(--theme-muted)]">Del concepto al resultado, en el navegador.</span>
+          <span className="flex items-center gap-2 font-mono text-[10px] text-[var(--theme-accent)]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[var(--theme-success)]" />
+            PYODIDE / WEB WORKER
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
-  const [selectedExample, setSelectedExample] = useState(EXAMPLES[0]);
-  useTheme();
+  const [selectedExample, setSelectedExample] = useState<Example>(EXAMPLES[0]);
 
   return (
-    <main className="min-h-screen bg-[var(--theme-bg)] text-[var(--theme-ink)]">
+    <main className="min-h-screen overflow-hidden bg-[var(--theme-bg)] text-[var(--theme-ink)]">
       <header className="border-b border-[var(--theme-border)]">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <Link href="/" className="flex min-h-11 items-center gap-3" aria-label="Python desde cero, inicio">
-            <span className="flex h-10 w-10 items-center justify-center bg-[var(--theme-accent)] font-serif text-xl text-[var(--theme-ink-inverse)]">
+        <div className="mx-auto flex min-h-[76px] max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-5 py-3">
+          <Link href="/" className="group flex min-h-11 items-center gap-3" aria-label="Python desde cero, inicio">
+            <span className="flex h-10 w-10 items-center justify-center border border-[var(--theme-accent)] bg-[var(--theme-accent)] font-mono text-lg font-bold text-[var(--theme-ink-inverse)] transition-transform group-hover:-rotate-3">
               Py
             </span>
-            <span>
-              <span className="block text-sm font-bold tracking-wide">PYTHON</span>
-              <span className="block text-xs tracking-[0.16em] text-[var(--theme-muted)]">DESDE CERO</span>
+            <span className="leading-tight">
+              <span className="block text-sm font-bold tracking-[0.12em]">PYTHON</span>
+              <span className="mt-1 block text-[10px] tracking-[0.25em] text-[var(--theme-muted)]">DESDE CERO</span>
             </span>
           </Link>
 
-          <nav aria-label="Navegación principal" className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-[var(--theme-muted)]">
-            <a href="#ruta" className="inline-flex min-h-11 items-center underline-offset-4 hover:underline">Ruta formativa</a>
-            <a href="#ejemplo" className="inline-flex min-h-11 items-center underline-offset-4 hover:underline">Ejemplo de Python</a>
-            <Link href="/academia" className="inline-flex min-h-11 items-center font-semibold text-[var(--theme-accent)] underline underline-offset-4">Academia</Link>
-            <Link href="/login" className="inline-flex min-h-11 items-center font-semibold text-[var(--theme-accent)] underline underline-offset-4">Iniciar sesión</Link>
-          </nav>
-
-          <ThemeSelector />
+          <div className="flex flex-wrap items-center gap-2 sm:gap-5">
+            <nav aria-label="Navegación principal" className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:gap-x-6 sm:text-sm">
+              <a href="#ruta" className="inline-flex min-h-10 items-center text-[var(--theme-muted)] underline-offset-4 hover:text-[var(--theme-ink)] hover:underline">La ruta</a>
+              <a href="#ejemplo" className="inline-flex min-h-10 items-center text-[var(--theme-muted)] underline-offset-4 hover:text-[var(--theme-ink)] hover:underline">Laboratorio</a>
+              <Link href="/academia" className="inline-flex min-h-10 items-center font-semibold text-[var(--theme-accent)] underline underline-offset-4">Academia</Link>
+              <Link href="/login" className="inline-flex min-h-10 items-center font-semibold text-[var(--theme-accent)] underline underline-offset-4">Iniciar sesión</Link>
+            </nav>
+            <ThemeSelector />
+          </div>
         </div>
       </header>
 
-      <section className="mx-auto grid max-w-7xl gap-10 px-5 py-14 sm:py-20 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-        <div>
-          <p className="text-xs font-bold tracking-[0.2em] text-[var(--theme-accent)]">PYTHON DESDE CERO / RUTA DE APRENDIZAJE</p>
-          <h1 className="mt-5 max-w-3xl font-serif text-4xl leading-tight sm:text-5xl lg:text-6xl">
-            Aprende Python, una idea clara a la vez.
-          </h1>
-          <p className="mt-6 max-w-2xl text-base leading-8 text-[var(--theme-muted)] sm:text-lg">
-            Una ruta pr&aacute;ctica para comprender los fundamentos, escribir tus primeros programas y avanzar con confianza.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <a href="#ruta" className="inline-flex min-h-12 items-center justify-center bg-[var(--theme-accent)] px-6 py-3 text-sm font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">
-              Explorar la ruta
-            </a>
-            <Link href="/academia" className="inline-flex min-h-12 items-center justify-center border border-[var(--theme-accent)] px-6 py-3 text-sm font-semibold text-[var(--theme-accent)] transition-colors hover:bg-[var(--theme-bg-secondary)]">
-              Entrar a la academia
+      <section className="relative isolate overflow-hidden border-b border-[var(--theme-border)]" style={{ backgroundImage: 'radial-gradient(circle at 82% 18%, var(--theme-accent-light) 0, transparent 34%)' }}>
+        <div className="mx-auto grid max-w-7xl items-center gap-14 px-5 py-16 sm:py-20 lg:min-h-[650px] lg:grid-cols-[0.94fr_1.06fr] lg:gap-12 lg:py-24">
+          <div className="relative z-10">
+            <p className="flex items-center gap-3 text-[10px] font-bold tracking-[0.22em] text-[var(--theme-accent)] sm:text-xs">
+              <span className="h-px w-8 bg-[var(--theme-accent)]" />
+              FORMACIÓN PRÁCTICA EN PYTHON
+            </p>
+            <h1 className="mt-7 max-w-2xl text-[clamp(3.1rem,6.2vw,5.5rem)] font-semibold leading-[0.98] tracking-[-0.065em]">
+              Aprende a programar.
+              <span className="mt-2 block font-normal text-[var(--theme-accent)]">Entiende lo que haces.</span>
+            </h1>
+            <p className="mt-7 max-w-xl text-base leading-8 text-[var(--theme-muted)] sm:text-lg">
+              Una ruta guiada para pasar de tus primeras instrucciones a resolver problemas con Python. Lee, modifica el código y ejecútalo en tu propio navegador.
+            </p>
+            <div className="mt-9 flex flex-wrap items-center gap-3">
+              <a href="#ruta" className="inline-flex min-h-12 items-center justify-center gap-3 bg-[var(--theme-accent)] px-5 py-3 text-sm font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">
+                Explorar la ruta <span aria-hidden="true">↗</span>
+              </a>
+              <a href="#ejemplo" className="inline-flex min-h-12 items-center justify-center border border-[var(--theme-border)] px-5 py-3 text-sm font-semibold text-[var(--theme-ink)] transition-colors hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">
+                Probar Python
+              </a>
+            </div>
+
+            <div className="mt-12 grid max-w-xl grid-cols-3 border-t border-[var(--theme-border)] pt-5">
+              <div className="pr-3">
+                <p className="font-mono text-2xl font-semibold tracking-tight text-[var(--theme-ink)]">05</p>
+                <p className="mt-1 text-[10px] leading-4 text-[var(--theme-muted)] sm:text-xs">módulos de aprendizaje</p>
+              </div>
+              <div className="border-l border-[var(--theme-border)] px-3 sm:px-5">
+                <p className="font-mono text-2xl font-semibold tracking-tight text-[var(--theme-ink)]">{TOTAL_LESSONS.toString().padStart(2, '0')}</p>
+                <p className="mt-1 text-[10px] leading-4 text-[var(--theme-muted)] sm:text-xs">lecciones guiadas</p>
+              </div>
+              <div className="border-l border-[var(--theme-border)] pl-3 sm:pl-5">
+                <p className="font-mono text-2xl font-semibold tracking-tight text-[var(--theme-ink)]">100%</p>
+                <p className="mt-1 text-[10px] leading-4 text-[var(--theme-muted)] sm:text-xs">Python en navegador</p>
+              </div>
+            </div>
+          </div>
+
+          <HeroIllustration />
+        </div>
+        <div aria-hidden="true" className="pointer-events-none absolute -bottom-28 -left-24 h-64 w-64 rounded-full border border-[var(--theme-border)]/40" />
+      </section>
+
+      <section id="ruta" className="scroll-mt-8 border-b border-[var(--theme-border)] bg-[var(--theme-bg-secondary)]">
+        <div className="mx-auto max-w-7xl px-5 py-16 sm:py-20">
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <div className="max-w-2xl">
+              <p className="text-[10px] font-bold tracking-[0.22em] text-[var(--theme-accent)] sm:text-xs">01 / EL RECORRIDO</p>
+              <h2 className="mt-4 text-3xl font-semibold leading-tight tracking-[-0.04em] sm:text-4xl">
+                Cinco módulos. Una idea a la vez.
+              </h2>
+            </div>
+            <p className="max-w-md text-sm leading-7 text-[var(--theme-muted)] sm:text-base">
+              El contenido avanza por etapas. Cada lección suma una herramienta y cada evaluación comprueba lo que ya sabes hacer.
+            </p>
+          </div>
+
+          <div className="mt-10 grid border-y border-[var(--theme-border)] sm:grid-cols-2 xl:grid-cols-5">
+            {courseModules.map((module, index) => (
+              <article
+                key={module.id}
+                className="group flex min-h-[220px] flex-col border-b border-[var(--theme-border)] p-5 last:border-b-0 sm:odd:border-r sm:even:border-r-0 xl:border-b-0 xl:border-r xl:last:border-r-0"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs text-[var(--theme-accent)]">0{index + 1}</span>
+                  <span className="h-2 w-2 rounded-full border border-[var(--theme-border-dark)] transition-colors group-hover:bg-[var(--theme-accent)]" />
+                </div>
+                <h3 className="mt-8 text-lg font-semibold leading-snug tracking-tight">{module.title}</h3>
+                <p className="mt-3 text-xs leading-6 text-[var(--theme-muted)]">{module.summary}</p>
+                <p className="mt-auto border-t border-[var(--theme-border)]/60 pt-3 font-mono text-[10px] tracking-[0.12em] text-[var(--theme-muted)]">
+                  {module.lessons.length.toString().padStart(2, '0')} LECCIONES
+                </p>
+              </article>
+            ))}
+          </div>
+
+          <div className="mt-7 flex flex-wrap items-center justify-between gap-4">
+            <p className="text-xs text-[var(--theme-muted)]">Contenido organizado para aprender con práctica, no de memoria.</p>
+            <Link href="/academia" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4 hover:text-[var(--theme-accent-dark)]">
+              Ver la academia <span aria-hidden="true">↗</span>
             </Link>
           </div>
         </div>
-
-        <aside className="border-l-2 border-[var(--theme-border-dark)] bg-[var(--theme-surface)]/70 p-6 sm:p-8">
-          <p className="text-xs font-bold tracking-[0.18em] text-[var(--theme-warning)]">APRENDER / PRACTICAR / AVANZAR</p>
-          <p className="mt-5 font-serif text-2xl leading-snug text-[var(--theme-ink)]">
-            De los primeros valores al pensamiento algor&iacute;tmico.
-          </p>
-          <p className="mt-4 text-sm leading-7 text-[var(--theme-muted)]">
-            Cada m&oacute;dulo suma una herramienta. El editor ejecutable y el guardado de avance est&aacute;n en el laboratorio.
-          </p>
-          <a href="#ejemplo" className="mt-6 inline-flex min-h-11 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">
-            Ver un ejemplo ilustrativo
-          </a>
-        </aside>
       </section>
 
-      <section id="ruta" className="border-y border-[var(--theme-border)] bg-[var(--theme-bg-secondary)]">
-        <div className="mx-auto max-w-7xl px-5 py-14 sm:py-16">
-          <div className="max-w-2xl">
-            <p className="text-xs font-bold tracking-[0.18em] text-[var(--theme-accent)]">RUTA FORMATIVA / M&Oacute;DULOS 01 Y 02</p>
-            <h2 className="mt-3 font-serif text-3xl sm:text-4xl">Una base s&oacute;lida, paso a paso.</h2>
-            <p className="mt-4 leading-7 text-[var(--theme-muted)]">
-              Empieza con datos y operaciones; despu&eacute;s, usa la l&oacute;gica para decidir y repetir acciones.
+      <section id="ejemplo" className="scroll-mt-8 mx-auto max-w-7xl px-5 py-16 sm:py-20">
+        <div className="grid gap-10 lg:grid-cols-[0.78fr_1.22fr] lg:gap-14">
+          <aside>
+            <p className="text-[10px] font-bold tracking-[0.22em] text-[var(--theme-accent)] sm:text-xs">02 / APRENDER HACIENDO</p>
+            <h2 className="mt-4 max-w-lg text-3xl font-semibold leading-tight tracking-[-0.04em] sm:text-4xl">
+              No solo leas código. Hazlo funcionar.
+            </h2>
+            <p className="mt-5 max-w-md text-sm leading-7 text-[var(--theme-muted)] sm:text-base">
+              Elige un ejemplo, cambia una instrucción y ejecútalo. Python corre en este dispositivo; no necesitas instalar un entorno de programación.
             </p>
-          </div>
 
-          <div className="mt-9 grid gap-5 md:grid-cols-2">
-            <article className="border-t-2 border-[var(--theme-accent)] bg-[var(--theme-bg)] p-6 sm:p-8">
-              <p className="text-xs font-bold tracking-[0.16em] text-[var(--theme-accent)]">M&Oacute;DULO 01 / FUNDAMENTOS</p>
-              <h3 className="mt-4 font-serif text-2xl">Variables y operadores</h3>
-              <p className="mt-3 text-sm leading-7 text-[var(--theme-muted)]">
-                Da nombre a los datos, guarda valores y combina operaciones para resolver problemas sencillos.
-              </p>
-              <ul className="mt-5 space-y-2 text-sm text-[var(--theme-ink)]">
-                <li>Variables, asignaci&oacute;n y tipos de datos</li>
-                <li>Operadores aritm&eacute;ticos y orden de operaciones</li>
-                <li>Mostrar resultados con <code className="font-mono text-[var(--theme-accent)]">print()</code></li>
-              </ul>
-            </article>
+            <div className="mt-8 border-t border-[var(--theme-border)]">
+              <div className="flex items-center justify-between py-3">
+                <span className="text-[10px] font-bold tracking-[0.18em] text-[var(--theme-muted)]">EJEMPLOS PARA PROBAR</span>
+                <span className="font-mono text-[10px] text-[var(--theme-muted)]">06 / 06</span>
+              </div>
+              <div className="divide-y divide-[var(--theme-border)]">
+                {EXAMPLES.map((example, index) => (
+                  <button
+                    key={example.id}
+                    type="button"
+                    aria-pressed={selectedExample.id === example.id}
+                    onClick={() => setSelectedExample(example)}
+                    className={`group flex min-h-[76px] w-full items-start gap-4 py-4 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--theme-focus-ring)] ${selectedExample.id === example.id ? 'text-[var(--theme-accent)]' : 'text-[var(--theme-ink)] hover:text-[var(--theme-accent)]'}`}
+                  >
+                    <span className="pt-0.5 font-mono text-[10px] text-[var(--theme-muted)]">0{index + 1}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                        <span className="font-semibold">{example.title}</span>
+                        <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-[var(--theme-muted)]">{example.level}</span>
+                      </span>
+                      <span className="mt-1 block text-xs leading-5 text-[var(--theme-muted)]">{example.description}</span>
+                      <span className="mt-2 flex flex-wrap gap-1.5">
+                        {example.concepts.map((concept) => (
+                          <span key={concept} className="border border-[var(--theme-border)] px-1.5 py-0.5 font-mono text-[9px] text-[var(--theme-muted)]">
+                            {concept}
+                          </span>
+                        ))}
+                      </span>
+                    </span>
+                    <span aria-hidden="true" className="pt-0.5 text-sm opacity-0 transition-opacity group-hover:opacity-100 group-aria-pressed:opacity-100">↗</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </aside>
 
-            <article className="border-t-2 border-[var(--theme-border-dark)] bg-[var(--theme-bg)] p-6 sm:p-8">
-              <p className="text-xs font-bold tracking-[0.16em] text-[var(--theme-warning)]">M&Oacute;DULO 02 / CONTROL DE FLUJO</p>
-              <h3 className="mt-4 font-serif text-2xl">Decisiones y ciclos</h3>
-              <p className="mt-3 text-sm leading-7 text-[var(--theme-muted)]">
-                Construye programas que responden a condiciones y repiten tareas de forma organizada.
-              </p>
-              <ul className="mt-5 space-y-2 text-sm text-[var(--theme-ink)]">
-                <li>Condiciones con <code className="font-mono text-[var(--theme-accent)]">if</code>, <code className="font-mono text-[var(--theme-accent)]">elif</code> y <code className="font-mono text-[var(--theme-accent)]">else</code></li>
-                <li>Repetici&oacute;n con ciclos <code className="font-mono text-[var(--theme-accent)]">for</code> y <code className="font-mono text-[var(--theme-accent)]">while</code></li>
-                <li>Dividir un problema en instrucciones peque&ntilde;as</li>
-              </ul>
-            </article>
+          <div className="min-w-0">
+            <PortadaLab key={selectedExample.id} defaultCode={selectedExample.code} />
+            <p className="mt-3 text-right text-[10px] leading-5 text-[var(--theme-muted)]">
+              Entorno educativo local en el navegador · Pyodide + Web Worker
+            </p>
           </div>
         </div>
       </section>
 
-      <section id="ejemplo" className="mx-auto max-w-7xl px-5 py-14 sm:py-16">
-        <div className="flex flex-col lg:flex-row gap-8">
-          <div className="lg:w-1/3 flex-shrink-0">
-            <p className="text-xs font-bold tracking-[0.18em] text-[var(--theme-accent)]">
-              LABORATORIO INTERACTIVO
-            </p>
-            <h2 className="mt-3 font-serif text-3xl sm:text-4xl">
-              Ejecuta código Python ahora
-            </h2>
-            <p className="mt-4 leading-7 text-[var(--theme-muted)]">
-              Cambia de ejemplo, edita el código y pulsa Ejecutar para ver el
-              resultado en tiempo real.
-            </p>
-            <div className="mt-6 space-y-3">
-              {EXAMPLES.map((example) => (
-                <button
-                  key={example.id}
-                  type="button"
-                  onClick={() => setSelectedExample(example)}
-                  className={`flex w-full items-start gap-3 px-4 py-3 rounded-lg border transition-colors text-left ${
-                    selectedExample.id === example.id
-                      ? 'border-[var(--theme-accent)] bg-[var(--theme-bg-secondary)] shadow-sm'
-                      : 'border-transparent hover:border-[var(--theme-border)] hover:bg-[var(--theme-bg)]'
-                  }`}
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-semibold text-[var(--theme-ink)]">
-                        {example.title}
-                      </span>
-                      <span className="text-[10px] font-bold text-[var(--theme-accent)] uppercase tracking-[0.2em]">
-                        {example.level}
-                      </span>
-                    </div>
-                    <p className="text-xs text-[var(--theme-muted)] mt-1">
-                      {example.description}
-                    </p>
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {example.concepts.map((c) => (
-                        <span key={c} className="text-[10px] px-1.5 py-0.5 bg-[var(--theme-accent-light)] text-[var(--theme-accent)] rounded">
-                          {c}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </button>
-              ))}
+      <footer className="border-t border-[var(--theme-border)] bg-[var(--theme-bg-secondary)]">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-7 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 items-center justify-center bg-[var(--theme-accent)] font-mono text-sm font-bold text-[var(--theme-ink-inverse)]">Py</span>
+            <div>
+              <p className="text-sm font-semibold">Python desde cero</p>
+              <p className="mt-0.5 text-[10px] text-[var(--theme-muted)]">Material educativo propio e independiente.</p>
             </div>
           </div>
-          <div className="lg:w-2/3">
-            <PortadaLab key={selectedExample.id} defaultCode={selectedExample.code} />
-          </div>
-        </div>
-      </section>
-
-      <footer className="border-t border-[var(--theme-border)]">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-6 text-sm text-[var(--theme-muted)] sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p>Python desde cero</p>
-            <p className="mt-1 max-w-xl text-xs leading-5">
-              Material educativo propio e independiente.
-            </p>
-          </div>
-          <div className="flex gap-5">
-            <Link href="/login" className="inline-flex min-h-11 items-center underline underline-offset-4">Acceso de estudiantes</Link>
-            <Link href="/practica" className="inline-flex min-h-11 items-center underline underline-offset-4">Laboratorio</Link>
-          </div>
+          <nav aria-label="Enlaces del pie de página" className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-[var(--theme-muted)]">
+            <Link href="/academia" className="inline-flex min-h-10 items-center underline underline-offset-4 hover:text-[var(--theme-ink)]">Academia</Link>
+            <Link href="/login" className="inline-flex min-h-10 items-center underline underline-offset-4 hover:text-[var(--theme-ink)]">Acceso de estudiantes</Link>
+            <Link href="/practica" className="inline-flex min-h-10 items-center underline underline-offset-4 hover:text-[var(--theme-ink)]">Laboratorio completo</Link>
+          </nav>
         </div>
       </footer>
     </main>
