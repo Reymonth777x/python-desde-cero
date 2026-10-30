@@ -23,7 +23,7 @@
 - El catálogo tiene 30 unidades principales y cuatro unidades opcionales de extensión.
 - El módulo 5 es opcional y está fuera del PE1; no se debe sumar al progreso ni presentarlo como módulo oficial.
 - Hay tres evaluaciones formales de módulo; falta la evaluación del módulo 1.
-- El contenido de primer programa/salida/comentarios está colocado en el módulo 1 y debe reubicarse o convertirse en un cierre evaluativo correcto.
+- b1-l4 ahora es una vista previa breve del intérprete, no una lección de comentarios ni una evaluación. La explicación formal de print(), cadenas y comentarios se trasladó al contenido de módulo 2; falta la evaluación formal de módulo 1.
 - Falta una evaluación global PE1.
 - El proyecto final está dentro de la extensión opcional; debe convertirse en un requisito de graduación PE1, sin exigir lectura de archivos como conocimiento central.
 - En la auditoría inicial, 29 de 30 prácticas principales tenían un único caso automático; b3-l6 ya tiene tres. Hace falta ampliar los demás casos de prueba con entradas límite y errores típicos.
