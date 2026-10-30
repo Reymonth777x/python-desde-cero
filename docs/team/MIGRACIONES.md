@@ -23,6 +23,10 @@ El historial de Supabase para el proyecto `nuqydanbbgqcofcftshk` incluye, entre 
 - `20261030081612` — `add_module_2_hello_world_quiz` (025; ya aplicada en producción)
 - `20261030084138` — `harden_quiz_result_and_enforce_prerequisites` (027; aplicada en DEV)
 - `20261030084308` — `harden_quiz_result_and_enforce_prerequisites` (027; aplicada en producción)
+- `20261030174245` — `revoke_legacy_quiz_rpc_execution` (DEV)
+- `20261030174256` — `revoke_legacy_quiz_rpc_execution` (producción)
+- `20261030183117` — `grandfather_existing_module_progress` (producción; archivo local 028)
+- `20261030183123` — `grandfather_existing_module_progress` (DEV; archivo local 028)
 
 La salida consultada del historial remoto empieza por la entrada timestamp 004; no asumir que las primeras migraciones locales 001-003 están registradas con el mismo historial de CLI. El esquema remoto existe. Antes de cualquier `db push`, comparar tablas, funciones, políticas y migraciones línea por línea.
 
@@ -149,7 +153,7 @@ La consulta de `list_branches` al proyecto `nuqydanbbgqcofcftshk` devuelve una r
 No resetear, rebasar, fusionar ni eliminar la rama preview como solución rápida. Primero identificar qué migración falla, comparar su historial con producción y valorar si la rama puede repararse sin perder datos de preview. Esta incidencia no justifica ejecutar operaciones de migración en la base principal.
 
 
-## 028 — Retirar el RPC de evaluación heredado (30-10-2026)
+## Cierre del RPC de evaluación heredado (30-10-2026)
 
 La auditoría encontró que producción conservaba `public.submit_quiz` y `private.submit_quiz_authoritative` con `EXECUTE` para `authenticated`. Esa ruta antigua usaba `correct_option` (índice histórico), devolvía el arreglo `answerCorrect` y no aplicaba los prerrequisitos añadidos al calificador v2. Como 29 de las 67 claves actuales tienen un índice distinto entre legacy y v2, un estudiante podía intentar el RPC heredado directamente en lugar de usar el flujo actual.
 
@@ -161,3 +165,11 @@ La auditoría encontró que producción conservaba `public.submit_quiz` y `priva
 - Verificador repetible: `scripts/sql/verify-legacy-quiz-rpc-closed.sql`.
 
 No volver a conceder `EXECUTE` a la ruta heredada. La aplicación usa `submit_quiz_v2` exclusivamente.
+
+## 028 — Conservar acceso histórico a módulos con progreso (30-10-2026)
+
+- Archivo canónico del repositorio: `supabase/migrations/20261030091000_028_grandfather_existing_module_progress.sql`.
+- El historial remoto registra la misma migración por nombre con versiones distintas al timestamp local: producción `20261030183117` y DEV `20261030183123`.
+- Las consultas de solo lectura sobre `private.submit_quiz_authoritative_v2` confirmaron en ambos entornos la excepción `existing_module_progress`, además de conservar las comprobaciones históricas del proyecto y examen (`existing_project_progress` y `existing_exam_progress`). No se crean calificaciones ni se completa progreso ficticio.
+- PR #84 quedó fusionado en `master` mediante el commit `04604585d899173439f73c8a9d1975451e771200`. Añade la misma conservación de acceso en el dashboard y en la ruta directa de lección, con pruebas unitarias; sus jobs `test-and-build` y `powershell-launcher` finalizaron correctamente en el workflow 41107541504.
+- Esta verificación no resuelve la deriva general de timestamps ni el estado `MIGRATIONS_FAILED` de la rama preview `main`. No ejecutar `db push`, `migration repair`, `db reset` ni operaciones sobre esa rama hasta completar una reconciliación y un plan de respaldo/rollback.
