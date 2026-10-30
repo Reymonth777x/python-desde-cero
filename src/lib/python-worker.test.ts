@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 type WorkerMessage = {
   id?: number;
-  status: 'ready' | 'init-error' | 'success' | 'error';
+  status: 'ready' | 'init-error' | 'success' | 'error' | 'stopped';
   output?: string;
   error?: string;
   turtle_commands?: Array<{ type: string; color?: string; x1?: number; y1?: number; x2?: number; y2?: number }>;
@@ -21,7 +21,6 @@ function createWorkerHarness({ withTurtle = false }: { withTurtle?: boolean } = 
       dict_converter: (entries: Iterable<[string, unknown]>) => unknown;
       create_pyproxies: boolean;
     }) => {
-      // Exercise the same dict converter passed by the worker.
       options.dict_converter([['type', 'line']]);
       return [
         { type: 'line', x1: 0, y1: 0, x2: 25, y2: 40, color: 'lime' },
@@ -32,7 +31,6 @@ function createWorkerHarness({ withTurtle = false }: { withTurtle?: boolean } = 
   const getCommands = vi.fn(() => turtleCommandProxy);
   const clearCommands = vi.fn();
   const globals = {
-    set: vi.fn(),
     get: vi.fn((name: string) => {
       if (name === 'get_commands') return getCommands;
       if (name === 'clear_commands') return clearCommands;
@@ -53,20 +51,29 @@ function createWorkerHarness({ withTurtle = false }: { withTurtle?: boolean } = 
     }),
     runPythonAsync: vi.fn(async (code: string) => {
       if (code === 'read-input') {
-        stdout(`Read: ${stdin()}\n`);
+        stdout('Read: ' + stdin() + '\n');
       } else if (code === 'raises') {
         stderr('warning before error\n');
         throw new Error('expected failure');
       } else if (code === 'large-output') {
         stdout('x'.repeat(25000));
+      } else if (code === 'draw-turtle') {
+        stdout('drawing\n');
       } else {
         stdout('ok\n');
       }
     }),
   };
 
+  const workerPort = {
+    onmessage: null as ((event: { data: Record<string, unknown> }) => void) | null,
+    onmessageerror: null as (() => void) | null,
+    postMessage: (message: WorkerMessage) => posted.push(message),
+    start: vi.fn(),
+    close: vi.fn(),
+  };
   const self = {
-    onmessage: null as ((event: { data: Record<string, unknown> }) => Promise<void>) | null,
+    onmessage: null as ((event: { data: Record<string, unknown>; ports?: unknown[] }) => void) | null,
     postMessage: (message: WorkerMessage) => posted.push(message),
   };
   const workerSource = readFileSync(
@@ -83,37 +90,51 @@ function createWorkerHarness({ withTurtle = false }: { withTurtle?: boolean } = 
           status: 200,
           text: async () => '# turtle compatibility test fixture',
         }))
-      : undefined,
+      : vi.fn(async () => ({ ok: false, status: 404, text: async () => '' })),
     loadPyodide: vi.fn(async () => pyodide),
-    setTimeout,
-    clearTimeout,
+    console: { warn: vi.fn() },
+    Object,
+    String,
+    Array,
+    Number,
+    Promise,
+    Error,
   });
 
-  return { self, posted, pyodide, turtleCommandProxy, getCommands };
+  async function connect() {
+    self.onmessage?.({ data: { type: 'connect' }, ports: [workerPort] });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  }
+
+  async function execute(message: Record<string, unknown>) {
+    workerPort.onmessage?.({ data: { type: 'execute', ...message } });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  }
+
+  return { self, posted, pyodide, turtleCommandProxy, getCommands, workerPort, connect, execute };
 }
 
-describe('Python Web Worker', () => {
-  it('espera a Pyodide y proporciona líneas de entrada a input()', async () => {
+describe('Python Web Worker aislado', () => {
+  it('conecta un MessagePort privado y entrega líneas a input()', async () => {
     const harness = createWorkerHarness();
-    await Promise.resolve();
+    await harness.connect();
     expect(harness.posted[0]?.status).toBe('ready');
+    expect(harness.workerPort.start).toHaveBeenCalledOnce();
 
-    await harness.self.onmessage?.({
-      data: { id: 4, code: 'read-input', input: ['Ada'] },
-    });
+    await harness.execute({ id: 4, code: 'read-input', input: ['Ada'] });
 
-    expect(harness.posted.at(-1)).toEqual({
+    expect(harness.posted.at(-1)).toMatchObject({
       id: 4,
       status: 'success',
       output: 'Read: Ada\n',
-      error: undefined,
     });
   });
 
-  it('conserva salida parcial en un error y limita la salida excesiva', async () => {
+  it('conserva salida parcial cuando hay error y limita salida excesiva', async () => {
     const harness = createWorkerHarness();
+    await harness.connect();
 
-    await harness.self.onmessage?.({ data: { id: 5, code: 'raises' } });
+    await harness.execute({ id: 5, code: 'raises', input: [] });
     expect(harness.posted.find((message) => message.id === 5)).toMatchObject({
       id: 5,
       status: 'error',
@@ -121,22 +142,18 @@ describe('Python Web Worker', () => {
       error: 'expected failure',
     });
 
-    await harness.self.onmessage?.({ data: { id: 6, code: 'large-output' } });
+    await harness.execute({ id: 6, code: 'large-output', input: [] });
     const cappedOutput = harness.posted.find((message) => message.id === 6)?.output ?? '';
     expect(cappedOutput.length).toBeLessThan(20100);
     expect(cappedOutput).toContain('Salida limitada');
   });
 
-  it('convierte y libera los comandos Turtle antes de enviarlos a React', async () => {
+  it('convierte y libera comandos Turtle antes de enviarlos al canal privado', async () => {
     const harness = createWorkerHarness({ withTurtle: true });
-
-    // La inicialización de Pyodide y la carga del módulo Turtle son asíncronas.
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await harness.connect();
     expect(harness.posted.some((message) => message.status === 'ready')).toBe(true);
 
-    await harness.self.onmessage?.({
-      data: { id: 8, code: 'draw-turtle', input: [] },
-    });
+    await harness.execute({ id: 8, code: 'draw-turtle', input: [] });
 
     expect(harness.getCommands).toHaveBeenCalledOnce();
     const conversionOptions = harness.turtleCommandProxy.toJs.mock.calls[0]?.[0];
@@ -151,9 +168,10 @@ describe('Python Web Worker', () => {
     ]);
   });
 
-  it('rechaza programas que superan el límite sin ejecutarlos', async () => {
+  it('rechaza programas demasiado grandes antes de invocar Pyodide', async () => {
     const harness = createWorkerHarness();
-    await harness.self.onmessage?.({ data: { id: 7, code: 'x'.repeat(50001) } });
+    await harness.connect();
+    await harness.execute({ id: 7, code: 'x'.repeat(50001), input: [] });
 
     expect(harness.posted.find((message) => message.id === 7)).toMatchObject({
       id: 7,
