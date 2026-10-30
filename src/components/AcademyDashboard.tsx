@@ -203,7 +203,7 @@ export default function AcademyDashboard({
           {courseCatalog.map((courseModule, moduleIndex) => {
             const unlocked = progressUnavailable
               ? moduleIndex === 0
-              : isModuleUnlocked(moduleIndex, progressRows);
+              : isModuleUnlocked(moduleIndex, courseModule.id, progressRows);
             const moduleCompleted = courseModule.lessons.filter((lesson) =>
               completed(courseModule.id, lesson.id),
             ).length;
