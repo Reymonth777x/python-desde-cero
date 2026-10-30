@@ -261,7 +261,7 @@ describe('ruta de aprendizaje Python desde cero', () => {
 
     const environment = lesson('b1-l3');
     expect(environment.explanation.join(' ')).toContain('prueba breve del entorno');
-    expect(environment.walkthrough[2]).toContain('no es una evaluación');
+    expect(environment.walkthrough[2]).toContain('no una evaluación');
     expect(environment.exercise.hints.join(' ')).toContain('no necesitas instalar Python');
   });
 
