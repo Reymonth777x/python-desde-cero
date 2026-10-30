@@ -84,6 +84,19 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(algoritmo.options[algoritmo.answer]).toBe('Una secuencia finita y ordenada de pasos para resolver un problema');
   });
 
+  it('incluye estructuras y herramientas necesarias para resolver problemas reales', () => {
+    const lesson = (moduleId: string, lessonId: string) =>
+      courseModules.find((courseModule) => courseModule.id === moduleId)!
+        .lessons.find((item) => item.id === lessonId)!;
+
+    expect(lesson('module-3', 'b3-l6').example).toContain('notas[0][1]');
+    expect(lesson('module-3', 'b3-l6').explanation.join(' ')).toContain('listas anidadas');
+    expect(lesson('module-4', 'b4-l2').example).toContain('cantidad=1');
+    expect(lesson('module-4', 'b4-l6').example).toContain('for producto in productos');
+    expect(lesson('module-4', 'b4-l7').explanation.join(' ')).toContain('IndexError');
+    expect(lesson('module-2', 'b2-l5').example).toContain('strip().title()');
+  });
+
   it('califica todas las respuestas y exige al menos 75 por ciento', () => {
     const questions = [
       { prompt: '1', options: ['a', 'b'], answer: 0, explanation: '' },

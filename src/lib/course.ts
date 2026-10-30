@@ -521,44 +521,44 @@ export const courseModules: CourseModule[] = [
         "section": "2.5",
         "title": "Cadenas y salida formateada",
         "objectives": [
-          "Combinar cadenas con variables.",
-          "Utilizar f-strings para insertar valores.",
-          "Presentar cantidades con etiquetas claras."
+          "Combinar texto con variables y expresiones mediante f-strings.",
+          "Limpiar y transformar cadenas con strip(), lower() y title().",
+          "Presentar números con formato y etiquetas comprensibles."
         ],
         "explanation": [
-          "Una cadena (str) representa texto. Métodos como lower(), upper() y strip() permiten normalizarlo; las cadenas son inmutables y sus métodos devuelven nuevos valores.",
-          "Una f-string comienza con la letra f antes de las comillas. Dentro de llaves puedes insertar variables o expresiones; la especificación :.2f permite mostrar dos decimales.",
-          "Una salida útil indica qué representa cada dato. Mostrar Total: 25000 colones aporta contexto y reduce confusiones cuando el programa presenta varios resultados."
+          "Una cadena (str) representa texto y ofrece métodos para normalizarlo. strip() elimina espacios al principio y al final; lower() convierte las letras a minúsculas y title() pone en mayúscula inicial cada palabra. Las cadenas son inmutables: estos métodos devuelven un nuevo texto y no cambian la cadena original.",
+          "Una f-string comienza con la letra f antes de las comillas. Dentro de llaves puedes insertar variables o expresiones, y la especificación :.2f permite mostrar dos decimales. Esta forma resulta más legible que concatenar manualmente texto y números.",
+          "La salida es la conversación del programa con quien lo utiliza. Antes de mostrar un dato, limpia espacios innecesarios, conserva el formato adecuado y añade una etiqueta con su significado. Así evitas nombres inconsistentes y resultados que no se entienden."
         ],
-        "example": "producto = \"Teclado\"\nprecio = 12500\ncantidad = 2\ntotal = precio * cantidad\nprint(f\"Producto: {producto}\")\nprint(f\"Total: {total} colones\")",
-        "exampleOutput": "Producto: Teclado\nTotal: 25000 colones",
+        "example": "entrada = \"  ana perez  \"\nnombre = entrada.strip().title()\nprecio = 1250.5\nprint(nombre)\nprint(f\"Total: {precio:.2f} colones\")",
+        "exampleOutput": "Ana Perez\nTotal: 1250.50 colones",
         "walkthrough": [
-          "La f-string inserta el nombre.",
-          "La multiplicación calcula el importe.",
-          "Las etiquetas explican los valores."
+          "strip() elimina los espacios que rodean el nombre.",
+          "title() devuelve una cadena con las palabras capitalizadas.",
+          "La f-string presenta el precio con dos decimales y una etiqueta."
         ],
         "commonMistakes": [
-          "Olvidar la f antes de las comillas.",
-          "Concatenar texto y números sin convertir."
+          "Creer que strip() elimina los espacios que aparecen entre palabras.",
+          "Olvidar la f antes de las comillas o mezclar texto y números con +."
         ],
         "exercise": {
           "id": "b2-e5",
-          "title": "Crear un recibo",
-          "statement": "Calcula cuatro productos a 750 colones y muestra Total: 3000 colones con una f-string.",
-          "starterCode": "precio = 750\ncantidad = 4\n",
-          "solution": "precio = 750\ncantidad = 4\ntotal = precio * cantidad\nprint(f\"Total: {total} colones\")",
+          "title": "Limpiar y presentar un nombre",
+          "statement": "Limpia el texto \"  python desde cero  \" con strip(), aplica title() y muestra el resultado en una f-string con la etiqueta Curso:.",
+          "starterCode": "texto = \"  python desde cero  \"\n",
+          "solution": "texto = \"  python desde cero  \"\nnombre = texto.strip().title()\nprint(f\"Curso: {nombre}\")",
           "tests": [
             {
               "input": [],
-              "expected": "Total: 3000 colones"
+              "expected": "Curso: Python Desde Cero"
             }
           ],
           "hints": [
-            "Calcula el total.",
-            "Inserta la variable entre llaves."
+            "Primero elimina los espacios que rodean el texto.",
+            "Aplica title() al resultado y úsalo dentro de una f-string."
           ],
           "difficulty": "facil",
-          "xp": 15,
+          "xp": 20,
           "length": 5
         },
         "questions": [
@@ -1064,43 +1064,43 @@ export const courseModules: CourseModule[] = [
         "section": "3.6",
         "title": "Listas: crear, consultar y recorrer",
         "objectives": [
-          "Crear listas y consultar su longitud.",
-          "Acceder a elementos mediante índices y cortes.",
-          "Recorrer elementos con for."
+          "Crear listas y consultar elementos mediante índices y cortes.",
+          "Representar tablas sencillas mediante listas anidadas.",
+          "Recorrer una colección de una y dos dimensiones."
         ],
         "explanation": [
-          "Una lista agrupa varios valores y conserva el orden. Se escribe entre corchetes y puede almacenar números, cadenas u otros tipos de datos; una variable de lista representa una colección completa.",
-          "Los índices empiezan en cero, los negativos cuentan desde el final y len() devuelve la cantidad de elementos. Un índice inexistente genera IndexError, por eso conviene comprobar la longitud cuando la posición depende de datos externos.",
-          "Un corte lista[inicio:fin] selecciona valores desde inicio hasta antes de fin. Para procesar todos los elementos suele bastar con for elemento in lista, sin administrar índices manualmente."
+          "Una lista agrupa varios valores y conserva el orden. Se escribe entre corchetes, permite añadir o quitar elementos y puede almacenar otros tipos de datos, incluidas más listas. len(lista) devuelve cuántos elementos contiene la lista exterior.",
+          "Los índices comienzan en cero y los negativos cuentan desde el final. En una lista anidada se utilizan dos índices: tabla[fila][columna]. Por ejemplo, notas[1][0] consulta el primer valor de la segunda fila. Esta estructura representa una tabla o matriz pequeña.",
+          "Un corte lista[inicio:fin] selecciona desde inicio hasta antes de fin. Para procesar una tabla se utilizan dos bucles: el exterior recorre cada fila y el interior recorre los valores de esa fila. Empieza con matrices pequeñas para no perder de vista qué índice estás consultando."
         ],
-        "example": "notas = [80, 95, 70, 85]\nprint(notas[0])\nprint(notas[-1])\nprint(notas[1:3])\nprint(len(notas))",
-        "exampleOutput": "80\n85\n[95, 70]\n4",
+        "example": "notas = [[80, 90], [75, 85]]\nprint(notas[0][1])\nprint(notas[1][0])\n\nfor fila in notas:\n    print(fila)",
+        "exampleOutput": "90\n75\n[80, 90]\n[75, 85]",
         "walkthrough": [
-          "El índice cero consulta el primer elemento.",
-          "El índice -1 consulta el último.",
-          "El corte [1:3] incluye las posiciones uno y dos."
+          "notas contiene dos listas; cada una representa una fila.",
+          "notas[0][1] accede a la segunda nota de la primera fila.",
+          "El bucle for recorre cada fila y la muestra completa."
         ],
         "commonMistakes": [
-          "Pensar que el primer índice es uno.",
-          "Esperar que el límite final de un corte se incluya."
+          "Olvidar que los índices empiezan en cero.",
+          "Intercambiar el índice de fila y el de columna en una lista anidada."
         ],
         "exercise": {
           "id": "b3-e6",
-          "title": "Consultar una lista",
-          "statement": "Crea tareas = [\"leer\", \"practicar\", \"repasar\"]. Imprime el segundo elemento y la cantidad de elementos.",
-          "starterCode": "# crea la lista\n",
-          "solution": "tareas = [\"leer\", \"practicar\", \"repasar\"]\nprint(tareas[1])\nprint(len(tareas))",
+          "title": "Sumar una tabla de calificaciones",
+          "statement": "Con la matriz [[80, 90], [75, 85]], utiliza dos bucles for para sumar todas las calificaciones e imprime el total.",
+          "starterCode": "notas = [[80, 90], [75, 85]]\ntotal = 0\n",
+          "solution": "notas = [[80, 90], [75, 85]]\ntotal = 0\nfor fila in notas:\n    for nota in fila:\n        total += nota\nprint(total)",
           "tests": [
             {
               "input": [],
-              "expected": "practicar\n3"
+              "expected": "330"
             }
           ],
           "hints": [
-            "El segundo elemento tiene índice uno.",
-            "Utiliza len() para contar."
+            "El primer for recorre cada fila.",
+            "El segundo for recorre las notas de la fila actual y las suma a total."
           ],
-          "difficulty": "facil",
+          "difficulty": "medio",
           "xp": 20,
           "length": 5
         },
@@ -1125,30 +1125,30 @@ export const courseModules: CourseModule[] = [
         "section": "3.7",
         "title": "Modificar, ordenar y procesar listas",
         "objectives": [
-          "Añadir y eliminar elementos mediante métodos.",
-          "Diferenciar sort() de sorted().",
-          "Explicar el algoritmo de ordenamiento por burbuja."
+          "Añadir, insertar y eliminar elementos mediante métodos de lista.",
+          "Diferenciar sort() de sorted() y explicar cuándo usar cada uno.",
+          "Comprender comparaciones e intercambios en bubble sort."
         ],
         "explanation": [
-          "append() añade elementos, remove() elimina la primera coincidencia y pop() elimina por posición y devuelve el valor. Antes de eliminar, comprueba que el elemento o índice exista para evitar excepciones.",
-          "sort() ordena la lista original; sorted(lista) crea una lista nueva ordenada. reverse=True permite ordenar en sentido descendente; el resultado puede utilizarse para presentar o procesar datos.",
-          "Bubble sort compara elementos vecinos y los intercambia cuando están en el orden incorrecto. Después de cada pasada, un elemento grande queda al final de la parte no ordenada; es útil para aprender bucles anidados, aunque no es eficiente con listas grandes."
+          "Las listas son mutables. append() añade al final, insert(posicion, valor) inserta en una posición, remove(valor) elimina la primera coincidencia y pop() elimina por índice y devuelve el elemento. Antes de eliminar o consultar, verifica que el elemento o índice exista.",
+          "sort() ordena la lista original y no devuelve una lista nueva; sorted(lista) crea otra secuencia ordenada sin modificar la fuente. Ambos pueden recibir reverse=True para invertir el orden. Elige sort() cuando quieras modificar la colección y sorted() cuando necesites conservarla.",
+          "Bubble sort es un algoritmo didáctico que compara elementos vecinos y los intercambia cuando están desordenados. En cada pasada, un valor grande termina al final de la parte pendiente. No es eficiente para colecciones grandes, pero enseña a coordinar bucles, índices y comparaciones."
         ],
-        "example": "numeros = [5, 2, 4, 1]\nnumeros.append(3)\nordenados = sorted(numeros)\nprint(numeros)\nprint(ordenados)",
-        "exampleOutput": "[5, 2, 4, 1, 3]\n[1, 2, 3, 4, 5]",
+        "example": "colores = [\"azul\", \"rojo\", \"verde\"]\ncolores.append(\"negro\")\ncolores.insert(1, \"blanco\")\nretirado = colores.pop()\ncolores.sort()\nprint(colores)\nprint(retirado)",
+        "exampleOutput": "['azul', 'blanco', 'rojo', 'verde']\nnegro",
         "walkthrough": [
-          "append() modifica la lista original.",
-          "sorted() devuelve otra lista ordenada.",
-          "Las dos impresiones permiten comparar los resultados."
+          "append() añade negro al final de la lista.",
+          "insert(1, ...) coloca blanco en la segunda posición.",
+          "pop() retira y devuelve el último valor; sort() ordena los restantes."
         ],
         "commonMistakes": [
-          "Creer que sorted() modifica la lista original.",
-          "Intercambiar valores sin conservar temporalmente uno de ellos."
+          "Esperar que sorted() modifique la lista original.",
+          "Confundir pop(), que devuelve un elemento, con remove(), que busca un valor."
         ],
         "exercise": {
           "id": "b3-e7",
           "title": "Ordenar con bubble sort",
-          "statement": "Completa el ordenamiento por burbuja para ordenar [5, 2, 4, 1] de menor a mayor.",
+          "statement": "Completa el ordenamiento por burbuja para ordenar [5, 2, 4, 1] de menor a mayor y muestra la lista final.",
           "starterCode": "numeros = [5, 2, 4, 1]\nfor pasada in range(len(numeros)):\n    for indice in range(len(numeros) - 1 - pasada):\n        # compara e intercambia vecinos\n        pass\n",
           "solution": "numeros = [5, 2, 4, 1]\nfor pasada in range(len(numeros)):\n    for indice in range(len(numeros) - 1 - pasada):\n        if numeros[indice] > numeros[indice + 1]:\n            temporal = numeros[indice]\n            numeros[indice] = numeros[indice + 1]\n            numeros[indice + 1] = temporal\nprint(numeros)",
           "tests": [
@@ -1159,7 +1159,7 @@ export const courseModules: CourseModule[] = [
           ],
           "hints": [
             "Compara cada elemento con su vecino derecho.",
-            "Intercambia cuando el primero es mayor."
+            "Intercambia cuando el primero sea mayor, conservando temporalmente uno de los valores."
           ],
           "difficulty": "medio",
           "xp": 20,
@@ -1337,43 +1337,44 @@ export const courseModules: CourseModule[] = [
         "section": "4.2",
         "title": "Parámetros y argumentos",
         "objectives": [
-          "Definir parámetros en la cabecera de una función.",
-          "Enviar argumentos al llamar una función.",
-          "Usar más de un parámetro y mantener el orden correcto."
+          "Distinguir parámetros de argumentos.",
+          "Usar argumentos posicionales y con nombre.",
+          "Definir parámetros con valores predeterminados."
         ],
         "explanation": [
-          "Un parámetro es un nombre que aparece en la definición y representa el dato que recibirá la función. Un argumento es el valor concreto que entregamos cuando la llamamos.",
-          "Los parámetros permiten reutilizar una función con distintos datos. Si la función calcula un subtotal, no debe tener un precio fijo escrito en su interior: recibe el precio y la cantidad como argumentos.",
-          "Los argumentos posicionales se asignan según el orden de los parámetros. Puedes mejorar la legibilidad usando argumentos con nombre, por ejemplo calcular_total(precio=100, cantidad=2)."
+          "Un parámetro es el nombre que aparece en la definición y representa el dato que recibirá la función. Un argumento es el valor concreto que entregamos al llamarla. Separar ambos conceptos permite escribir una solución reutilizable.",
+          "Los argumentos posicionales se asignan según el orden de los parámetros. También puedes indicar el nombre del parámetro, por ejemplo calcular_total(precio=100, cantidad=2); esta llamada resulta más clara cuando hay varios valores.",
+          "Un parámetro puede tener un valor predeterminado. En def calcular_total(precio, cantidad=1), cantidad vale uno cuando no se indica. Los parámetros obligatorios deben colocarse antes de los que tienen valor predeterminado, y una llamada puede sobrescribir ese valor."
         ],
-        "example": "def calcular_total(precio, cantidad):\n    total = precio * cantidad\n    print(total)\n\ncalcular_total(500, 3)",
-        "exampleOutput": "1500",
+        "example": "def calcular_total(precio, cantidad=1):\n    return precio * cantidad\n\nprint(calcular_total(2500))\nprint(calcular_total(precio=2500, cantidad=3))",
+        "exampleOutput": "2500\n7500",
         "walkthrough": [
-          "La definición indica que se necesitan dos valores.",
-          "La llamada entrega 500 a precio y 3 a cantidad."
+          "cantidad tiene el valor predeterminado uno.",
+          "La primera llamada solo entrega precio y utiliza ese valor.",
+          "La segunda llamada especifica cantidad=3 y calcula otro total."
         ],
         "commonMistakes": [
-          "Llamar una función con menos argumentos de los requeridos.",
-          "Cambiar el orden de los argumentos posicionales sin actualizar el significado de la función."
+          "Olvidar un argumento obligatorio al llamar una función.",
+          "Colocar un parámetro obligatorio después de uno con valor predeterminado."
         ],
         "exercise": {
           "id": "b4-e2",
-          "title": "Calcular el costo de entradas",
-          "statement": "Define calcular_entradas(precio, cantidad) para mostrar el costo total. Pruébala con precio 2500 y cantidad 2.",
+          "title": "Calcular entradas con cantidad predeterminada",
+          "statement": "Define calcular_entradas(precio, cantidad=1) para devolver el total. Muestra el costo de una entrada de 2500 y de tres entradas de 2500.",
           "starterCode": "# define calcular_entradas\n",
-          "solution": "def calcular_entradas(precio, cantidad):\n    print(precio * cantidad)\n\ncalcular_entradas(2500, 2)",
+          "solution": "def calcular_entradas(precio, cantidad=1):\n    return precio * cantidad\n\nprint(calcular_entradas(2500))\nprint(calcular_entradas(2500, 3))",
           "tests": [
             {
               "input": [],
-              "expected": "5000"
+              "expected": "2500\n7500"
             }
           ],
           "hints": [
-            "La función recibe precio y cantidad.",
-            "Multiplica los dos parámetros."
+            "Declara cantidad=1 en la cabecera de la función.",
+            "Utiliza return y llama la función una vez sin cantidad y otra vez con tres."
           ],
-          "difficulty": "facil",
-          "xp": 15,
+          "difficulty": "medio",
+          "xp": 20,
           "length": 5
         },
         "questions": [
@@ -1579,40 +1580,40 @@ export const courseModules: CourseModule[] = [
         "title": "Diccionarios: claves, valores y registros",
         "objectives": [
           "Crear diccionarios con claves y valores.",
-          "Consultar y actualizar valores mediante claves.",
-          "Utilizar get() cuando una clave puede faltar."
+          "Consultar y actualizar registros mediante claves.",
+          "Procesar una lista de diccionarios con un bucle."
         ],
         "explanation": [
-          "Un diccionario relaciona claves con valores y resulta útil cuando los datos tienen atributos identificables, como nombre, precio y cantidad. Se escribe entre llaves y utiliza dos puntos para separar cada clave de su valor.",
-          "Para consultar se puede escribir registro[\"nombre\"]. Si la clave no existe, se produce KeyError; get(\"nombre\", \"sin dato\") permite indicar un valor alternativo. Una asignación agrega una clave nueva o actualiza su valor.",
-          "keys(), values() e items() permiten recorrer claves, valores o parejas completas. Una lista de diccionarios representa varios registros con estructura similar, como productos, estudiantes o calificaciones."
+          "Un diccionario relaciona claves con valores y representa datos con atributos identificables, como nombre, precio y cantidad. Se escribe entre llaves; cada clave identifica un dato y las claves de un mismo diccionario son únicas.",
+          "Puedes consultar registro[\"nombre\"], actualizar un valor con registro[\"precio\"] = 700 o utilizar get(\"stock\", 0) cuando una clave podría faltar. Si accedes mediante corchetes a una clave inexistente, Python genera KeyError.",
+          "Una lista de diccionarios representa varios registros con la misma estructura. Un bucle for puede recorrer cada producto y calcular su importe usando precio por cantidad; esta combinación aparece en inventarios, listas de estudiantes y catálogos."
         ],
-        "example": "producto = {\"nombre\": \"Mouse\", \"precio\": 6500}\nproducto[\"disponible\"] = True\nprint(producto[\"nombre\"])\nprint(producto.get(\"stock\", 0))",
-        "exampleOutput": "Mouse\n0",
+        "example": "productos = [\n    {\"nombre\": \"Cuaderno\", \"precio\": 900, \"cantidad\": 4},\n    {\"nombre\": \"Lapiz\", \"precio\": 200, \"cantidad\": 10},\n    {\"nombre\": \"Mouse\", \"precio\": 6500, \"cantidad\": 1}\n]\ntotal = 0\nfor producto in productos:\n    subtotal = producto[\"precio\"] * producto[\"cantidad\"]\n    total += subtotal\n    print(f\"{producto['nombre']}: {subtotal}\")\nprint(f\"Inventario: {total}\")",
+        "exampleOutput": "Cuaderno: 3600\nLapiz: 2000\nMouse: 6500\nInventario: 12100",
         "walkthrough": [
-          "El diccionario contiene nombre y precio.",
-          "La asignación agrega la clave disponible.",
-          "get() devuelve cero porque stock todavía no existe."
+          "Cada diccionario representa un producto con las mismas tres claves.",
+          "for obtiene un registro por vuelta y calcula precio por cantidad.",
+          "El acumulador suma cada subtotal y presenta el valor completo."
         ],
         "commonMistakes": [
-          "Consultar un dato mediante su contenido en vez de su clave.",
-          "Creer que los corchetes devuelven un valor alternativo cuando falta una clave."
+          "Usar una clave distinta de la que existe en el registro.",
+          "Sumar solo el precio unitario y olvidar multiplicarlo por la cantidad."
         ],
         "exercise": {
           "id": "b4-e6",
-          "title": "Actualizar un registro",
-          "statement": "Crea un diccionario con nombre Teclado y precio 12500, agrega disponible = True e imprime el precio.",
-          "starterCode": "producto = {}\n",
-          "solution": "producto = {\"nombre\": \"Teclado\", \"precio\": 12500}\nproducto[\"disponible\"] = True\nprint(producto[\"precio\"])",
+          "title": "Calcular el valor de varios productos",
+          "statement": "Crea dos productos como diccionarios dentro de una lista: Cuaderno cuesta 900 y hay 4; Lápiz cuesta 200 y hay 10. Recorre la lista y muestra el valor total del inventario.",
+          "starterCode": "productos = [\n    {\"nombre\": \"Cuaderno\", \"precio\": 900, \"cantidad\": 4},\n    {\"nombre\": \"Lapiz\", \"precio\": 200, \"cantidad\": 10}\n]\ntotal = 0\n",
+          "solution": "productos = [\n    {\"nombre\": \"Cuaderno\", \"precio\": 900, \"cantidad\": 4},\n    {\"nombre\": \"Lapiz\", \"precio\": 200, \"cantidad\": 10}\n]\ntotal = 0\nfor producto in productos:\n    total += producto[\"precio\"] * producto[\"cantidad\"]\nprint(total)",
           "tests": [
             {
               "input": [],
-              "expected": "12500"
+              "expected": "5600"
             }
           ],
           "hints": [
-            "Escribe las claves como cadenas.",
-            "Asigna el nuevo valor mediante su clave."
+            "Recorre productos con for producto in productos.",
+            "Suma precio por cantidad en cada vuelta."
           ],
           "difficulty": "medio",
           "xp": 20,
@@ -1640,40 +1641,40 @@ export const courseModules: CourseModule[] = [
         "title": "Excepciones y manejo de errores",
         "objectives": [
           "Distinguir errores de sintaxis de excepciones durante la ejecución.",
-          "Manejar ValueError con try/except.",
-          "Presentar mensajes que ayuden a corregir una entrada."
+          "Manejar ValueError, KeyError e IndexError con bloques except específicos.",
+          "Utilizar else y finally para completar el control de errores."
         ],
         "explanation": [
-          "Una excepción interrumpe el flujo normal de ejecución, por ejemplo al convertir texto no numérico a entero o consultar una clave inexistente. Python identifica el tipo de excepción y presenta una traza para ayudar a localizar la operación que falló.",
-          "try contiene instrucciones que podrían fallar y except captura un tipo específico para ejecutar una respuesta alternativa. int(\"hola\") genera ValueError porque la cadena no representa un entero válido.",
-          "Conviene capturar los errores que esperas manejar. Un except demasiado general puede ocultar defectos reales; el mensaje debe indicar qué dato se esperaba y cómo corregirlo."
+          "Una excepción interrumpe el flujo normal de ejecución. ValueError puede aparecer al convertir texto no numérico en entero; KeyError al consultar una clave inexistente en un diccionario; IndexError al acceder a una posición que no existe en una lista.",
+          "try contiene instrucciones que podrían fallar y except captura el tipo de excepción esperado. Puedes utilizar varios bloques except para responder de manera distinta a cada problema. Evita un except general que oculte defectos reales.",
+          "else se ejecuta cuando el bloque try termina sin excepción; finally se ejecuta al final tanto si ocurrió un error como si no. Esta estructura permite separar el procesamiento correcto, los mensajes de error y las tareas que siempre deben completarse."
         ],
-        "example": "texto = \"veinte\"\ntry:\n    edad = int(texto)\n    print(edad)\nexcept ValueError:\n    print(\"Escribe una edad con números\")",
-        "exampleOutput": "Escribe una edad con números",
+        "example": "registro = {\"edad\": \"veinte\"}\ntry:\n    edad = int(registro[\"edad\"])\nexcept KeyError:\n    print(\"Falta el campo edad\")\nexcept ValueError:\n    print(\"La edad debe ser numérica\")\nelse:\n    print(f\"Edad: {edad}\")\nfinally:\n    print(\"Validación finalizada\")",
+        "exampleOutput": "La edad debe ser numérica\nValidación finalizada",
         "walkthrough": [
-          "int(texto) intenta realizar la conversión.",
-          "La conversión genera ValueError.",
-          "except presenta el mensaje alternativo."
+          "try intenta leer el campo y convertirlo a entero.",
+          "ValueError activa el bloque que explica qué tipo de dato se esperaba.",
+          "finally presenta su mensaje aunque la conversión no haya funcionado."
         ],
         "commonMistakes": [
-          "Capturar todos los errores sin distinguirlos.",
-          "Usar excepciones para esconder errores de lógica."
+          "Capturar todos los errores con except: sin distinguir el motivo.",
+          "Pensar que else se ejecuta cuando ocurre una excepción."
         ],
         "exercise": {
           "id": "b4-e7",
-          "title": "Manejar una conversión inválida",
-          "statement": "Intenta convertir \"12a\" a entero. Si ocurre ValueError, imprime Entrada invalida.",
-          "starterCode": "",
-          "solution": "try:\n    numero = int(\"12a\")\n    print(numero)\nexcept ValueError:\n    print(\"Entrada invalida\")",
+          "title": "Manejar una clave inexistente",
+          "statement": "Intenta consultar la clave edad en el diccionario persona = {\"nombre\": \"Ana\"}. Si falta la clave, captura KeyError e imprime Dato no encontrado.",
+          "starterCode": "persona = {\"nombre\": \"Ana\"}\n",
+          "solution": "persona = {\"nombre\": \"Ana\"}\ntry:\n    print(persona[\"edad\"])\nexcept KeyError:\n    print(\"Dato no encontrado\")",
           "tests": [
             {
               "input": [],
-              "expected": "Entrada invalida"
+              "expected": "Dato no encontrado"
             }
           ],
           "hints": [
-            "int() puede generar ValueError.",
-            "Captura específicamente esa excepción."
+            "La consulta persona[\"edad\"] puede generar KeyError.",
+            "Coloca la consulta dentro de try y captura KeyError."
           ],
           "difficulty": "medio",
           "xp": 20,
