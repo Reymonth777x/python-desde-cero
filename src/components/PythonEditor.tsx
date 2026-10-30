@@ -31,12 +31,10 @@ export default function PythonEditor({
 }) {
   const [code, setCode] = useState(defaultCode);
   const [input, setInput] = useState('');
-  const [mobilePanel, setMobilePanel] = useState<'instructions' | 'editor' | 'output' | 'turtle'>('instructions');
-  const [editorRequested, setEditorRequested] = useState(false);
-  const [desktopLayout, setDesktopLayout] = useState(false);
   const { resolvedTheme } = useTheme();
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<Monaco | null>(null);
+  const outputRef = useRef<HTMLElement | null>(null);
   const testBatchRef = useRef<TestBatch | null>(null);
   const onTestsCompleteRef = useRef(onTestsComplete);
   const [testProgress, setTestProgress] = useState<TestProgress | null>(null);
@@ -47,10 +45,19 @@ export default function PythonEditor({
     onTestsCompleteRef.current = onTestsComplete;
   }, [onTestsComplete]);
 
+  const revealOutput = useCallback(() => {
+    if (typeof window === 'undefined' || !window.matchMedia('(max-width: 767px)').matches) return;
+    window.requestAnimationFrame(() => {
+      outputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }, []);
+
   const onWorkerOutput = useCallback((out: string, err?: string) => {
-    if (err) setMobilePanel('output');
     const batch = testBatchRef.current;
-    if (!batch) return;
+    if (!batch) {
+      revealOutput();
+      return;
+    }
 
     const passed = matchesExerciseOutput(out, batch.cases[batch.index].expected, err);
     const completed = batch.index + 1;
@@ -64,11 +71,16 @@ export default function PythonEditor({
       setTestResult(result);
       setIsTesting(false);
       onTestsCompleteRef.current?.(result);
+      revealOutput();
       return;
     }
 
     testBatchRef.current = { ...batch, index: completed, passed: passedCount };
-  }, []);
+  }, [revealOutput]);
+
+  const onWorkerStatusChange = useCallback((status: 'idle' | 'loading' | 'ready' | 'error') => {
+    if (status === 'error') revealOutput();
+  }, [revealOutput]);
 
   const {
     workerState,
@@ -80,22 +92,9 @@ export default function PythonEditor({
     runCode: runWorkerCode,
     stopWorker,
   } = usePythonWorker({
-    onStatusChange: (status) => {
-      if (status === 'error') {
-        setMobilePanel('output');
-      }
-    },
+    onStatusChange: onWorkerStatusChange,
     onOutput: onWorkerOutput,
   });
-
-  useEffect(() => {
-    const desktopQuery = window.matchMedia('(min-width: 768px)');
-    const updateLayout = () => setDesktopLayout(desktopQuery.matches);
-    updateLayout();
-    desktopQuery.addEventListener('change', updateLayout);
-
-    return () => desktopQuery.removeEventListener('change', updateLayout);
-  }, []);
 
   const applyEditorTheme = useCallback((monaco: Monaco) => {
     const styles = getComputedStyle(document.documentElement);
@@ -141,18 +140,8 @@ export default function PythonEditor({
 
   const needsInput = /\binput\s*\(/.test(code);
   const usesTurtle = /\b(?:import\s+turtle|from\s+turtle\s+import)\b/.test(code);
-  const mobilePanels: Array<{ id: 'instructions' | 'editor' | 'output' | 'turtle'; label: string }> = [
-    { id: 'instructions', label: 'Guía' },
-    { id: 'editor', label: 'Código' },
-    { id: 'output', label: 'Resultado' },
-    ...(usesTurtle ? [{ id: 'turtle' as const, label: 'Gráficos' }] : []),
-  ];
-
-  const activeMobilePanel = mobilePanel === 'turtle' && !usesTurtle ? 'editor' : mobilePanel;
-
   const runCode = useCallback(() => {
     if (isRunning || testBatchRef.current) return;
-    setMobilePanel('output');
     if (tests?.length) {
       const cases = tests.map((test) => ({ input: [...test.input], expected: test.expected }));
       testBatchRef.current = { code, cases, index: 0, passed: 0 };
@@ -222,65 +211,50 @@ export default function PythonEditor({
   };
 
   return (
-    <section className="w-full" aria-label="Espacio de práctica de Python">
-      <div role="tablist" aria-label="Paneles del laboratorio" className={`mb-4 grid ${usesTurtle ? "grid-cols-4" : "grid-cols-3"} border-b border-[var(--theme-border)] md:hidden`}>
-        {mobilePanels.map(({ id: panel, label }) => (
-          <button
-            key={panel}
-            type="button"
-            role="tab"
-            id={`practice-tab-${panel}`}
-            aria-controls={`practice-panel-${panel}`}
-            aria-selected={activeMobilePanel === panel}
-            onClick={() => {
-              setMobilePanel(panel);
-              if (panel === 'editor') setEditorRequested(true);
-            }}
-            className={`min-h-12 border-b-2 px-2 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] ${activeMobilePanel === panel ? 'border-[var(--theme-accent)] text-[var(--theme-accent)]' : 'border-transparent text-[var(--theme-muted)]'}`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+    <section className="w-full space-y-6" aria-label="Laboratorio de Python">
+      <section aria-labelledby="python-lab-guide" className="border-l-2 border-[var(--theme-border-dark)] bg-[var(--theme-bg-secondary)] p-4 sm:p-5">
+        <p className="text-[0.68rem] font-bold tracking-[0.14em] text-[var(--theme-accent)]">LABORATORIO · EN TRES PASOS</p>
+        <h2 id="python-lab-guide" className="mt-1 font-serif text-xl text-[var(--theme-ink)]">Prueba tu código</h2>
+        <ol className="mt-3 grid gap-2 text-sm leading-5 sm:grid-cols-3">
+          <li className="flex items-start gap-2">
+            <span className="font-mono font-bold text-[var(--theme-accent)]">01</span>
+            <span><strong className="block text-[var(--theme-ink)]">Escribe</strong><span className="text-[var(--theme-muted)]">Edita el ejemplo en el cuadro de código.</span></span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="font-mono font-bold text-[var(--theme-accent)]">02</span>
+            <span><strong className="block text-[var(--theme-ink)]">Ejecuta</strong><span className="text-[var(--theme-muted)]">Pulsa el botón que aparece debajo del editor.</span></span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="font-mono font-bold text-[var(--theme-accent)]">03</span>
+            <span><strong className="block text-[var(--theme-ink)]">Revisa</strong><span className="text-[var(--theme-muted)]">El resultado aparece justo después.</span></span>
+          </li>
+        </ol>
+        <details className="mt-3 border-t border-[var(--theme-border)] pt-3">
+          <summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold text-[var(--theme-accent)]">Ver indicaciones de esta actividad</summary>
+          <p className="pb-2 text-sm leading-6 text-[var(--theme-muted)]">{instructions}</p>
+        </details>
+      </section>
 
-      {workerState !== 'ready' && (
-        <p role="status" aria-live="polite" className="mb-4 flex min-h-11 items-center gap-2 text-sm text-[var(--theme-muted)]">
-          {workerState === 'loading' && <span aria-hidden="true" className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--theme-border)] border-t-[var(--theme-accent)] motion-reduce:animate-none" />}
-          {workerState === 'idle' ? 'Python se cargará al ejecutar tu primer programa; todavía no se ha iniciado.' : workerState === 'loading' ? 'Preparando Python en este dispositivo. La primera carga puede tardar.' : 'El ejecutor necesita atención. Consulta el resultado para ver opciones.'}
-        </p>
-      )}
+      <section aria-labelledby="python-editor-title" className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 id="python-editor-title" className="font-serif text-xl text-[var(--theme-ink)]">Tu código Python</h2>
+          <span className="text-xs text-[var(--theme-muted)]">Puedes modificar el ejemplo</span>
+        </div>
 
-      <div
-        id="practice-panel-instructions"
-        role="tabpanel"
-        aria-labelledby="practice-tab-instructions"
-        className={`${activeMobilePanel === 'instructions' ? 'block' : 'hidden'} md:hidden`}
-      >
-        <section className="border-l-2 border-[var(--theme-border-dark)] bg-[var(--theme-bg-secondary)] p-4 sm:p-5">
-          <h2 className="font-serif text-xl">Guía de práctica</h2>
-          <p className="mt-2 text-sm leading-6 text-[var(--theme-muted)]">{instructions}</p>
-          <button
-            type="button"
-            onClick={() => {
-              setMobilePanel('editor');
-              setEditorRequested(true);
-            }}
-            className="mt-4 min-h-12 w-full bg-[var(--theme-accent)] px-5 py-3 text-sm font-semibold text-[var(--theme-ink-inverse)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"
-          >
-            Ir al editor
-          </button>
-        </section>
-      </div>
+        {workerState !== 'ready' ? (
+          <p role="status" aria-live="polite" className="flex min-h-11 items-center gap-2 text-sm text-[var(--theme-muted)]">
+            {workerState === 'loading' && <span aria-hidden="true" className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--theme-border)] border-t-[var(--theme-accent)] motion-reduce:animate-none" />}
+            {workerState === 'idle'
+              ? 'Python se prepara al ejecutar tu primer programa. La primera carga puede tardar un poco.'
+              : workerState === 'loading'
+                ? 'Preparando Python en este dispositivo…'
+                : 'No se pudo iniciar Python. Revisa el resultado y vuelve a intentar.'}
+          </p>
+        ) : (
+          <p role="status" className="text-xs text-[var(--theme-muted)]">Python está listo y se ejecuta en este dispositivo.</p>
+        )}
 
-      <div
-        id="practice-panel-editor"
-        role="tabpanel"
-        aria-labelledby="practice-tab-editor"
-        className={`${activeMobilePanel === 'editor' ? 'block' : 'hidden'} space-y-4 md:block`}
-      >
-        {(editorRequested || desktopLayout) && (
-          <>
-        <div className="h-[min(42svh,420px)] min-h-[280px] w-full overflow-hidden border border-[var(--theme-border)] bg-[var(--theme-code-bg)] sm:h-[460px]">
+        <div data-testid="python-editor-frame" className="h-[min(52svh,460px)] min-h-[280px] w-full overflow-hidden border border-[var(--theme-border)] bg-[var(--theme-code-bg)] sm:h-[460px]">
           <Editor
             height="100%"
             defaultLanguage="python"
@@ -305,134 +279,137 @@ export default function PythonEditor({
           />
         </div>
 
-        <div aria-label="Teclas de Python para pantalla táctil" className="flex flex-wrap gap-2 md:hidden">
-          {[
-            { label: '()', accessible: 'Insertar paréntesis', text: '()', cursor: 1 },
-            { label: '""', accessible: 'Insertar comillas', text: '""', cursor: 1 },
-            { label: ':', accessible: 'Insertar dos puntos', text: ':' },
-            { label: '=', accessible: 'Insertar signo igual', text: '=' },
-            { label: '+', accessible: 'Insertar signo más', text: '+' },
-            { label: '*', accessible: 'Insertar asterisco', text: '*' },
-            { label: 'Tab', accessible: 'Insertar sangría de cuatro espacios', text: '    ' },
-          ].map((key) => (
-            <button
-              key={key.accessible}
-              type="button"
-              aria-label={key.accessible}
-              onClick={() => insertOnMobile(key.text, key.cursor)}
-              className="min-h-11 min-w-11 border border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 font-mono text-base text-[var(--theme-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"
-            >
-              {key.label}
-            </button>
-          ))}
+        <div className="space-y-2 md:hidden">
+          <p className="text-xs font-semibold text-[var(--theme-muted)]">Atajos para escribir en la pantalla táctil</p>
+          <div aria-label="Teclas de Python para pantalla táctil" className="grid grid-cols-7 gap-2">
+            {[
+              { label: '()', accessible: 'Insertar paréntesis', text: '()', cursor: 1 },
+              { label: '""', accessible: 'Insertar comillas', text: '""', cursor: 1 },
+              { label: ':', accessible: 'Insertar dos puntos', text: ':' },
+              { label: '=', accessible: 'Insertar signo igual', text: '=' },
+              { label: '+', accessible: 'Insertar signo más', text: '+' },
+              { label: '*', accessible: 'Insertar asterisco', text: '*' },
+              { label: 'Tab', accessible: 'Insertar sangría de cuatro espacios', text: '    ' },
+            ].map((key) => (
+              <button
+                key={key.accessible}
+                type="button"
+                aria-label={key.accessible}
+                onClick={() => insertOnMobile(key.text, key.cursor)}
+                className="flex min-h-11 min-w-0 items-center justify-center border border-[var(--theme-border)] bg-[var(--theme-surface)] px-1 font-mono text-sm text-[var(--theme-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"
+              >
+                {key.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {needsInput && !tests?.length && (
-          <label className="block text-base font-semibold text-[var(--theme-ink)] sm:text-sm">
-          Entrada para input() <span className="font-normal text-[var(--theme-muted)]">(una línea por solicitud)</span>
-          <textarea
-            value={input}
-            onChange={(event) => { setInput(event.target.value); invalidateTests(); }}
-            maxLength={10000}
-            rows={3}
-            placeholder="Escribe aquí las líneas que leerá tu programa"
-            className="mt-2 block min-h-20 w-full resize-y border border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 py-3 font-mono text-base font-normal text-[var(--theme-ink)] outline-none focus:border-[var(--theme-accent)] focus:ring-1 focus:ring-[var(--theme-focus-ring)] sm:text-sm"
-          />
+          <label className="block text-sm font-semibold text-[var(--theme-ink)]">
+            Datos que pide tu programa con input()
+            <span className="mt-1 block text-xs font-normal leading-5 text-[var(--theme-muted)]">Escribe una respuesta por línea y luego ejecuta el código.</span>
+            <textarea
+              value={input}
+              onChange={(event) => { setInput(event.target.value); invalidateTests(); }}
+              maxLength={10000}
+              rows={3}
+              placeholder="Escribe aquí las respuestas"
+              className="mt-2 block min-h-24 w-full resize-y border border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 py-3 font-mono text-base font-normal text-[var(--theme-ink)] outline-none focus:border-[var(--theme-accent)] focus:ring-1 focus:ring-[var(--theme-focus-ring)]"
+            />
           </label>
         )}
-          </>
-        )}
 
-        <button
-          type="button"
-          onClick={runCode}
-          disabled={isRunning || isTesting || workerState === 'loading'}
-          className="flex min-h-12 w-full items-center justify-center bg-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:text-sm"
-        >
-          {isRunning ? 'Ejecutando...' : workerState === 'loading' ? 'Preparando Python...' : 'Ejecutar código'}
-        </button>
-
-        {workerState === 'error' && (
+        <div className="grid gap-2 sm:flex sm:flex-wrap">
           <button
             type="button"
-            onClick={() => {
-              stopWorker();
-              createWorker();
-            }}
-            className="flex min-h-11 w-full items-center justify-center border border-[var(--theme-accent)] px-4 py-2 text-sm font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] sm:w-auto"
+            data-testid="python-run"
+            onClick={runCode}
+            disabled={isRunning || isTesting || workerState === 'loading'}
+            className="flex min-h-12 w-full items-center justify-center bg-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           >
-            Reintentar carga
+            {isTesting
+              ? 'Comprobando ejercicio…'
+              : isRunning && workerState === 'loading'
+                ? 'Preparando Python…'
+                : isRunning
+                  ? 'Ejecutando…'
+                  : tests?.length
+                    ? 'Comprobar ejercicio'
+                    : 'Ejecutar código'}
           </button>
-        )}
-      </div>
 
-      <div
+          {isRunning && (
+            <button
+              type="button"
+              onClick={cancelExecution}
+              className="flex min-h-12 w-full items-center justify-center border border-[var(--theme-border-dark)] px-5 py-3 text-base font-semibold text-[var(--theme-muted)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-border-dark)] sm:w-auto"
+            >
+              Detener ejecución
+            </button>
+          )}
+
+          {workerState === 'error' && (
+            <button
+              type="button"
+              onClick={() => {
+                stopWorker();
+                createWorker();
+              }}
+              className="flex min-h-12 w-full items-center justify-center border border-[var(--theme-accent)] px-4 py-3 text-sm font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] sm:w-auto"
+            >
+              Reintentar carga de Python
+            </button>
+          )}
+        </div>
+      </section>
+
+      <section
+        ref={outputRef}
         id="practice-panel-output"
-        role="tabpanel"
-        aria-labelledby="practice-tab-output"
-        className={`${activeMobilePanel === 'output' ? 'block' : 'hidden'} mt-4 md:block`}
+        data-testid="python-output"
+        aria-labelledby="python-output-title"
+        tabIndex={-1}
+        className="scroll-mt-4 space-y-3 border border-[var(--theme-border)] bg-[var(--theme-surface)] p-4 sm:p-5"
       >
-        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-sm font-semibold text-[var(--theme-ink)]">Salida del programa</h2>
-          <span className="text-xs text-[var(--theme-muted)]">{isRunning ? 'Ejecución en curso' : workerState === 'ready' ? 'Ejecución local en el navegador' : 'Entorno Python'}</span>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 id="python-output-title" className="font-serif text-xl text-[var(--theme-ink)]">{tests?.length ? 'Resultado de tu ejercicio' : 'Resultado del programa'}</h2>
+          <span className="text-xs text-[var(--theme-muted)]">{isRunning ? 'Ejecución en curso' : workerState === 'ready' ? 'Entorno Python listo' : 'Esperando la primera ejecución'}</span>
         </div>
         <pre
           aria-live="polite"
           aria-atomic="true"
-          className="max-h-[42svh] min-h-28 overflow-auto whitespace-pre-wrap break-words border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] p-4 font-mono text-sm leading-6 text-[var(--theme-ink)] sm:max-h-64"
+          className="max-h-[42svh] min-h-32 overflow-auto whitespace-pre-wrap break-words border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] p-4 font-mono text-sm leading-6 text-[var(--theme-ink)] sm:max-h-64"
         >
-          {error ? `Error de ejecución:\n${error}` : output || (workerState === 'ready' ? '> Entorno listo. Ejecuta código para consultar el resultado.' : workerState === 'idle' ? '> Pulsa Ejecutar para cargar Python por primera vez.' : '> Cargando Python en este dispositivo...')}
+          {error
+            ? 'Error de ejecución: ' + error
+            : output || (workerState === 'ready'
+              ? '> Entorno listo. Ejecuta tu programa para ver el resultado.'
+              : workerState === 'idle'
+                ? '> El resultado aparecerá aquí después de ejecutar el código.'
+                : '> Preparando el entorno Python…')}
         </pre>
         {tests?.length ? (
-          <p role="status" aria-live="polite" className="mt-3 text-sm text-[var(--theme-muted)]">
+          <p role="status" aria-live="polite" className="text-sm text-[var(--theme-muted)]">
             {testResult
               ? testResult.allPassed
-                ? `Pruebas superadas: ${testResult.passed} de ${testResult.total}.`
-                : `Pruebas superadas: ${testResult.passed} de ${testResult.total}. Revisa el código y vuelve a ejecutar.`
+                ? 'Ejercicio superado: ' + testResult.passed + ' de ' + testResult.total + ' pruebas correctas.'
+                : 'Resultado: ' + testResult.passed + ' de ' + testResult.total + ' pruebas correctas. Ajusta el código e inténtalo de nuevo.'
               : testProgress
                 ? testProgress.completed < testProgress.total
-                  ? `Ejecutando prueba ${testProgress.completed + 1} de ${testProgress.total}…`
-                  : `Pruebas comprobadas: ${testProgress.completed} de ${testProgress.total}.`
-                : 'Ejecuta el código para comprobar todos los casos del proyecto.'}
+                  ? 'Comprobando prueba ' + (testProgress.completed + 1) + ' de ' + testProgress.total + '…'
+                  : 'Pruebas revisadas: ' + testProgress.completed + ' de ' + testProgress.total + '.'
+                : 'Pulsa «Comprobar ejercicio» para revisar tu respuesta.'}
           </p>
         ) : null}
-        <button
-          type="button"
-          onClick={runCode}
-          disabled={isRunning || workerState === 'loading'}
-          className="mt-3 flex min-h-12 w-full items-center justify-center border border-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50 md:hidden"
-        >
-          {isTesting ? 'Comprobando pruebas...' : isRunning ? 'Ejecutando...' : 'Ejecutar de nuevo'}
-        </button>
-        {isRunning && (
-          <button
-            type="button"
-            onClick={cancelExecution}
-            className="mt-3 flex min-h-12 w-full items-center justify-center border border-[var(--theme-border-dark)] px-5 py-3 text-base font-semibold text-[var(--theme-muted)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-border-dark)]"
-          >
-            Detener
-          </button>
-        )}
-        {workerState === 'error' && (
-          <button
-            type="button"
-            onClick={() => {
-              stopWorker();
-              createWorker();
-            }}
-            className="mt-2 flex min-h-11 w-full items-center justify-center border border-[var(--theme-accent)] px-4 py-2 text-sm font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-surface)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] md:hidden"
-          >
-            Reintentar carga de Python
-          </button>
-        )}
-      </div>
+      </section>
 
       {usesTurtle && (
       <div
         id="practice-panel-turtle"
         role="tabpanel"
         aria-labelledby="practice-tab-turtle"
-        className={`${activeMobilePanel === 'turtle' ? 'block' : 'hidden'} mt-4 md:block`}
+        data-testid="python-turtle-output"
+        className="mt-6 space-y-3"
       >
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-semibold text-[var(--theme-ink)]">Gráficos de Turtle</h2>
