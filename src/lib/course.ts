@@ -734,9 +734,27 @@ export const courseModules: CourseModule[] = [
           "tests": [
             {
               "input": [
+                "0"
+              ],
+              "expected": "0"
+            },
+            {
+              "input": [
+                "1"
+              ],
+              "expected": "1500"
+            },
+            {
+              "input": [
                 "3"
               ],
               "expected": "4500"
+            },
+            {
+              "input": [
+                "5"
+              ],
+              "expected": "7500"
             }
           ],
           "hints": [
@@ -802,6 +820,30 @@ export const courseModules: CourseModule[] = [
                 "2"
               ],
               "expected": "Cuaderno: 2500.00 colones"
+            },
+            {
+              "input": [
+                "lapiz",
+                "0.5",
+                "4"
+              ],
+              "expected": "Lapiz: 2.00 colones"
+            },
+            {
+              "input": [
+                "  cuaderno universitario  ",
+                "349.9",
+                "1"
+              ],
+              "expected": "Cuaderno Universitario: 349.90 colones"
+            },
+            {
+              "input": [
+                "marcador",
+                "1200.25",
+                "3"
+              ],
+              "expected": "Marcador: 3600.75 colones"
             }
           ],
           "hints": [
@@ -2132,12 +2174,13 @@ export const courseModules: CourseModule[] = [
         "exercise": {
           "id": "b4-e10",
           "title": "Construye y valida el gestor de inventario",
-          "statement": "Completa el programa. Debe leer un nombre y una cantidad, guardar el producto en un diccionario mediante agregar_producto(), sumar las unidades con total_unidades() y rechazar nombres vacíos, cantidades no positivas o cantidades no numéricas. Ejecuta las cinco pruebas antes de enviar la revisión conceptual.",
-          "starterCode": "inventario = {}\n\ndef agregar_producto(inventario, nombre, cantidad):\n    # Rechaza el nombre vacío y cantidades no positivas.\n    # Si el producto existe, acumula la cantidad.\n    return False\n\ndef total_unidades(inventario):\n    # Recorre los valores y devuelve la suma.\n    return 0\n\ntry:\n    nombre = input()\n    cantidad = int(input())\n    if agregar_producto(inventario, nombre, cantidad):\n        print(f\"{nombre.strip()}: {inventario[nombre.strip()]}\")\n    else:\n        print(\"Datos no válidos\")\nexcept ValueError:\n    print(\"Cantidad no válida\")\n    print(\"Datos no válidos\")\n\nprint(\"Total:\", total_unidades(inventario))",
-          "solution": "inventario = {}\n\ndef agregar_producto(inventario, nombre, cantidad):\n    nombre = nombre.strip()\n    if not nombre or cantidad <= 0:\n        return False\n    inventario[nombre] = inventario.get(nombre, 0) + cantidad\n    return True\n\ndef total_unidades(inventario):\n    total = 0\n    for cantidad in inventario.values():\n        total += cantidad\n    return total\n\ntry:\n    nombre = input()\n    cantidad = int(input())\n    if agregar_producto(inventario, nombre, cantidad):\n        print(f\"{nombre.strip()}: {inventario[nombre.strip()]}\")\n    else:\n        print(\"Datos no válidos\")\nexcept ValueError:\n    print(\"Cantidad no válida\")\n    print(\"Datos no válidos\")\n\nprint(\"Total:\", total_unidades(inventario))",
+          "statement": "Lee cuántos registros vas a agregar. Para cada uno, lee el nombre y la cantidad. Guarda cada producto en un diccionario, acumula las cantidades cuando el nombre se repite, rechaza nombres vacíos y cantidades no positivas o no numéricas, y al final muestra el total de unidades.",
+          "starterCode": "inventario = {}\n\ndef agregar_producto(inventario, nombre, cantidad):\n    # Limpia y valida el nombre y la cantidad.\n    # Si el producto existe, acumula las unidades.\n    return False\n\ndef total_unidades(inventario):\n    # Suma las cantidades guardadas.\n    return 0\n\nregistros = int(input())\nfor _ in range(registros):\n    nombre = input()\n    cantidad = int(input())\n    if agregar_producto(inventario, nombre, cantidad):\n        print(f\"{nombre.strip()}: {inventario[nombre.strip()]}\")\n    else:\n        print(\"Datos no válidos\")\n\nprint(\"Total:\", total_unidades(inventario))",
+          "solution": "inventario = {}\n\ndef agregar_producto(inventario, nombre, cantidad):\n    nombre = nombre.strip()\n    if not nombre or cantidad <= 0:\n        return False\n    inventario[nombre] = inventario.get(nombre, 0) + cantidad\n    return True\n\ndef total_unidades(inventario):\n    total = 0\n    for cantidad in inventario.values():\n        total += cantidad\n    return total\n\nregistros = int(input())\nfor _ in range(registros):\n    nombre = input()\n    try:\n        cantidad = int(input())\n    except ValueError:\n        print(\"Cantidad no válida\")\n        continue\n    if agregar_producto(inventario, nombre, cantidad):\n        print(f\"{nombre.strip()}: {inventario[nombre.strip()]}\")\n    else:\n        print(\"Datos no válidos\")\n\nprint(\"Total:\", total_unidades(inventario))",
           "tests": [
             {
               "input": [
+                "1",
                 "Cuaderno",
                 "3"
               ],
@@ -2145,13 +2188,19 @@ export const courseModules: CourseModule[] = [
             },
             {
               "input": [
+                "3",
                 "Lapiz",
-                "10"
+                "10",
+                "Cuaderno",
+                "3",
+                "Lapiz",
+                "2"
               ],
-              "expected": "Lapiz: 10\nTotal: 10"
+              "expected": "Lapiz: 10\nCuaderno: 3\nLapiz: 12\nTotal: 15"
             },
             {
               "input": [
+                "1",
                 "",
                 "5"
               ],
@@ -2159,6 +2208,7 @@ export const courseModules: CourseModule[] = [
             },
             {
               "input": [
+                "1",
                 "Cuaderno",
                 "0"
               ],
@@ -2166,10 +2216,11 @@ export const courseModules: CourseModule[] = [
             },
             {
               "input": [
+                "1",
                 "Cuaderno",
                 "abc"
               ],
-              "expected": "Cantidad no válida\nDatos no válidos\nTotal: 0"
+              "expected": "Cantidad no válida\nTotal: 0"
             }
           ],
           "hints": [
