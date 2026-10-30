@@ -14,16 +14,17 @@ Actualizado el 30 de octubre de 2026 tras comprobar `master`, CI, despliegue y l
 - [x] Hacer que el calificador del servidor compruebe prerrequisitos, conserve las claves en esquema privado y no exponga aciertos por pregunta.
 - [x] Verificar en producción y DEV 67 claves v2 configuradas, sin claves faltantes en el catálogo vigente.
 - [x] Confirmar que las invitaciones utilizadas se conservan y que las no utilizadas pueden eliminarse.
-- [x] CI completo y despliegue del release de contenido `2940723e3a37a6556770169d0ae692e6bab2d943` completados correctamente; la portada nueva, `/muestra`, sitemap, marcador Turnstile y redirect `www` 308 quedaron verificados.
-- [x] Integrar PR #54: el workflow de producción compara el SHA del CI con el HEAD de `master` antes y después del build, para impedir que un evento atrasado publique código anterior.
-- [ ] Comprobar la primera publicación exitosa del HEAD `71fa854` con las nuevas barreras de SHA; el deploy disparado por un CI cancelado se omitió correctamente.
+- [x] CI completo del HEAD `71fa854381f0507f6b0b16b8a6fbf2a0c2efaa15` (workflow `41049538535`) y despliegue del mismo SHA (workflow `41049961984`) completados correctamente.
+- [x] Integrar PR #54: el workflow comparó el SHA del CI con el HEAD de `master` antes de compilar y volvió a comprobarlo inmediatamente antes del deploy; ambas validaciones pasaron en el release `71fa854`.
+- [x] Verificar en producción el hero `cambio.py`, la muestra pública `/muestra`, las cinco URLs del sitemap, el marcador Turnstile de `/login` y el redirect HTTP 308 de `www` al apex.
 
 ## 2. Trabajo de currículo en curso
 
 - [x] Integrar PR #52: `b3-l9` guía el acceso a una fila, el bucle exterior y el bucle interior. CI aprobado; fusionada en `master`.
 - [x] Integrar PR #55: el número de pruebas del proyecto se obtiene de `lesson.exercise.tests.length`, coincidiendo con los seis casos del catálogo. CI aprobado; fusionada en `master`.
 - [x] Integrar PR #57: aclara la demostración de variables y `print()` en las lecciones iniciales sin convertirlas en teoría adelantada. CI aprobado; fusionada en `master`.
-- [ ] Verificar que los cambios de PR #52, #55 y #57 están publicados después del CI del HEAD `71fa854...`; actualmente producción continúa en el release `2940723...`.
+- [x] Publicar en el release `71fa854...` los cambios de PR #52, #55 y #57; el HTML público de `/muestra` ya refleja el marco didáctico actualizado de `b1-l1`–`b1-l3`.
+- [ ] Verificar con sesión autenticada que las lecciones `b3-l9` y `b4-l10`, los seis casos del proyecto y los prerrequisitos se presentan y se completan correctamente.
 - [ ] Revisar de forma integral las 33 unidades obligatorias y los prerequisitos entre temas; retirar redundancias sin recortar el contenido necesario.
 - [ ] Ampliar prácticas con más entradas válidas, inválidas, límites y explicaciones de errores. Priorizar las unidades que aún tienen un solo caso de prueba.
 - [ ] Revisar la exactitud de las soluciones, la salida esperada, las pistas y la dificultad declarada en cada ejercicio.
@@ -36,7 +37,7 @@ Actualizado el 30 de octubre de 2026 tras comprobar `master`, CI, despliegue y l
 - [ ] Aprobar una evaluación y confirmar que la mejor nota y el estado se conservan después de cerrar sesión y volver a entrar.
 - [ ] Confirmar que el progreso de la portada coincide con el panel Academia.
 - [ ] Verificar la secuencia completa del módulo 4: completar `b4-l8`, ejecutar y aprobar las seis pruebas del proyecto `b4-l10`, superar su revisión conceptual y luego aprobar el examen `b4-l11`.
-- [ ] Añadir una rúbrica explícita para revisar el código del proyecto final y los criterios de aprobación docente/administrador; el sitio emite una evaluación formativa, no una certificación externa.
+- [ ] Añadir una rúbrica explícita para la revisión administrativa del código del proyecto final; no hay un rol docente en el modelo actual. El sitio emite una evaluación formativa, no una certificación externa.
 
 ## 4. Autenticación, CAPTCHA y correo
 
