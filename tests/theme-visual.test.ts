@@ -134,6 +134,35 @@ test("La paleta de temas móvil se adapta al ancho y no queda recortada", async 
   }
 });
 
+test("El diálogo móvil de temas mantiene el foco dentro y lo devuelve al activador", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 640 });
+  await page.goto("/");
+
+  const trigger = page.getByRole("button", { name: "Seleccionar tema visual" });
+  await trigger.click();
+
+  const dialog = page.getByRole("dialog", { name: "Tema visual" });
+  const options = dialog.locator("[data-theme-option]");
+  const close = dialog.getByRole("button", { name: "Cerrar selección de tema" });
+
+  await expect(options.first()).toBeFocused();
+
+  // Moving backward from the first theme option reaches the close control;
+  // one more Shift+Tab wraps to the final option instead of leaving the dialog.
+  await page.keyboard.press("Shift+Tab");
+  await expect(close).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(options.last()).toBeFocused();
+
+  // Moving forward from the final option wraps to the first focusable control.
+  await page.keyboard.press("Tab");
+  await expect(close).toBeFocused();
+
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+});
+
 test("Las páginas principales no generan desplazamiento horizontal en móvil", async ({ page }) => {
   const routesToCheck = ["/", "/login", "/academia", "/practica"];
   for (const width of [320, 360, 390]) {
