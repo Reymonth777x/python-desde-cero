@@ -49,7 +49,7 @@ Actualizado el 30 de octubre de 2026 tras comprobar `master`, CI, despliegue y l
 - [ ] Completar registro, confirmación de correo, login, logout y recuperación/cambio de contraseña en el dominio final con un buzón de prueba controlado.
 - [ ] Completar interactivamente el desafío Turnstile y comprobar que Supabase Auth acepta el token. La presencia del widget en el HTML no demuestra la validación del secreto.
 - [ ] Confirmar permisos de estudiante y administrador y las rutas protegidas con ambas cuentas.
-- [ ] Activar la protección de contraseñas filtradas en Supabase Auth (el Advisor la reportó desactivada).
+- [ ] Protección de contraseñas filtradas en Supabase Auth: el Advisor la reporta desactivada. La organización está en plan Free y la función requiere Pro o superior; reevaluar solo si se decide actualizar el plan.
 - [ ] Verificar SMTP, SPF, DKIM, DMARC, plantillas y URLs de redirección.
 
 ## 5. Laboratorio y experiencia de dispositivo

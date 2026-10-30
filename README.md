@@ -178,6 +178,6 @@ No se incluyen credenciales SMTP, tokens ni claves API en este repositorio.
 
 ## License
 
-No license has been applied yet. The repository is private until the owner decides on a license and visibility. Do not port or reuse course content without confirming licensing terms.
+No license has been applied yet. As of October 30, 2026, this GitHub repository is **public**; issue #21 tracks the owner's decision about keeping it public or moving internal development to a private repository. Public visibility allows anyone to inspect the source and its Git history, including historical course assessment material. The app's `server-only` boundaries protect runtime bundles, not the public Git repository. Do not port or reuse course content without confirming licensing terms.
 
 This project is independent educational material, created from scratch.
