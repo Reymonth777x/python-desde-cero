@@ -45,6 +45,7 @@ export default function ThemeSelector() {
       }
 
       setIsOpen(false);
+      triggerRef.current?.focus();
     };
 
     const isMobile = window.matchMedia('(max-width: 767px)').matches;
@@ -212,9 +213,13 @@ export default function ThemeSelector() {
 
       {isOpen && createPortal(
         <div
+          data-testid="theme-mobile-backdrop"
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-3 py-4 md:hidden"
           onPointerDown={(event) => {
-            if (event.target === event.currentTarget) setIsOpen(false);
+            if (event.target === event.currentTarget) {
+              setIsOpen(false);
+              triggerRef.current?.focus();
+            }
           }}
         >
           <section
