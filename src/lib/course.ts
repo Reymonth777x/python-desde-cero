@@ -1074,7 +1074,7 @@ export const courseModules: CourseModule[] = [
           "Recorrer una lista con for y procesar cada elemento."
         ],
         "explanation": [
-          "Una lista guarda varios valores en un orden definido. Se escribe entre corchetes, por ejemplo edades = [18, 21, 19]. A diferencia de una cadena, una lista puede modificarse después de crearla: puedes añadir, cambiar o quitar elementos.",
+          "Una lista unidimensional guarda varios valores en un orden definido. Se escribe entre corchetes, por ejemplo edades = [18, 21, 19]. A diferencia de una cadena, una lista puede modificarse después de crearla: puedes añadir, cambiar o quitar elementos.",
           "Los índices empiezan en cero: edades[0] consulta el primer elemento y edades[1] el segundo. Los índices negativos cuentan desde el final, así que edades[-1] consulta el último. len(edades) devuelve la cantidad de elementos.",
           "Un bucle for puede recorrer los valores sin que tengas que calcular cada índice. Cuando los datos llegan como texto separado por espacios, split() crea una lista de cadenas; convierte cada valor con int() o float() antes de hacer operaciones numéricas."
         ],
