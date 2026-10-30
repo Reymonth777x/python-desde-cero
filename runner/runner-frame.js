@@ -149,6 +149,11 @@
     };
     workerPort.start();
 
+    // Pyodide can finish initialization before the private port is attached.
+    // Accept that one early bootstrap message through the Worker event channel;
+    // all messages after the port handshake use workerPort exclusively.
+    nextWorker.onmessage = handleWorkerMessage;
+
     nextWorker.onerror = () => {
       sendToParent({ status: "runtime-error", error: "El ejecutor Python terminó inesperadamente." });
       stopWorker();
