@@ -124,7 +124,10 @@
     if (generation !== workerGeneration) return;
 
     const pyodideBaseUrl = new URL("/pyodide/0.29.5/full/", window.location.href).toString();
-    const bootstrap = "self.__PYODIDE_BASE_URL__ = " + JSON.stringify(pyodideBaseUrl) + ";\n";
+    const turtleCompatUrl = new URL("/turtle_compat.py", window.location.href).toString();
+    const bootstrap =
+      "self.__PYODIDE_BASE_URL__ = " + JSON.stringify(pyodideBaseUrl) + ";" +
+      "self.__TURTLE_COMPAT_URL__ = " + JSON.stringify(turtleCompatUrl) + ";";
     const blob = new Blob([bootstrap, source], { type: "text/javascript" });
     workerBlobUrl = URL.createObjectURL(blob);
 
@@ -237,9 +240,9 @@
   }
 
   window.addEventListener("message", (event) => {
-    // The sandboxed iframe has an opaque origin, so the first handshake
-    // necessarily uses targetOrigin="*". Validate source + parent origin and
-    // immediately switch all further traffic to the transferred MessagePort.
+    // The runner is hosted on a dedicated origin, separate from the academy.
+    // Validate the parent source and exact allowed origin before transferring
+    // the private MessagePort used for every subsequent message.
     if (parentPort || event.source !== window.parent || !ALLOWED_PARENT_ORIGINS.has(event.origin)) return;
     if (event.data?.type !== "connect" || event.ports?.length !== 1) return;
 
