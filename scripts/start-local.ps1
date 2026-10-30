@@ -100,7 +100,7 @@ if ($startExitCode -eq 0) {
 }
 
 if ($startExitCode -ne 0) {
-    throw 'Supabase local no pudo iniciar. Revisa el mensaje anterior y no ejecutes db push ni db reset contra el proyecto remoto.'
+    throw 'Supabase local no pudo iniciar. Confirma que Docker Desktop esté en ejecución y vuelve a probar. La salida de Supabase se oculta para no mostrar claves locales; no ejecutes db push ni db reset contra el proyecto remoto.'
 }
 
 $local = Get-SupabaseLocalEnv
