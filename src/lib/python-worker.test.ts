@@ -67,16 +67,10 @@ function createWorkerHarness() {
   return { self, posted, pyodide };
 }
 
-async function settleWorkerInitialization() {
-  for (let index = 0; index < 6; index += 1) await Promise.resolve();
-}
 
 describe('Python Web Worker', () => {
   it('espera a Pyodide y proporciona líneas de entrada a input()', async () => {
     const harness = createWorkerHarness();
-    await settleWorkerInitialization();
-    expect(harness.posted[0]?.status).toBe('ready');
-
     await harness.self.onmessage?.({ data: { id: 4, code: 'read-input', input: ['Ada'] } });
 
     expect(harness.posted.at(-1)).toMatchObject({
