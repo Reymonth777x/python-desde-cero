@@ -41,6 +41,20 @@ test.describe('Autenticacion y flujo de usuario', () => {
     await expect(page).toHaveURL(/.*\/login/);
   });
 
+  test('Login conserva el correo y limpia la contraseña cuando falta el token de Turnstile', async ({ page }) => {
+    await page.route('https://challenges.cloudflare.com/turnstile/**', (route) => route.abort());
+    await page.goto('/login');
+
+    await page.getByLabel('Correo electrónico').fill('captcha-test@example.test');
+    await page.getByLabel('Contraseña').fill('temporary-password');
+
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    await expect(page.getByRole('alert')).toContainText(/conservamos tu correo/);
+    await expect(page.getByLabel('Correo electrónico')).toHaveValue('captcha-test@example.test');
+    await expect(page.getByLabel('Contraseña')).toHaveValue('');
+  });
+
   test('Mensaje de error se muestra tras inicio de sesion fallido', async ({ page }) => {
     await page.goto('/login?error=login');
     await page.waitForLoadState('domcontentloaded');
