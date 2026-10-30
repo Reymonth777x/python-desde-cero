@@ -87,7 +87,7 @@ export function getTurtleViewBox(
 
   const addPoint = (x: number | undefined, y: number | undefined, radius = 0) => {
     if (typeof x === 'number' && Number.isFinite(x) && typeof y === 'number' && Number.isFinite(y)) {
-      points.push({ x, y, radius: Math.max(0, radius) });
+      points.push({ x, y, radius: Number.isFinite(radius) ? Math.max(0, radius) : 0 });
     }
   };
 
