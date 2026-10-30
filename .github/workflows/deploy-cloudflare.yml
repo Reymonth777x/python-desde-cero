@@ -28,8 +28,10 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           RAW_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY || secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
           WORKFLOW_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
           WORKFLOW_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch || github.ref_name }}
+          WORKFLOW_HEAD_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
         run: |
           set -euo pipefail
           if [[ "$GITHUB_EVENT_NAME" == "workflow_run" ]]; then
@@ -38,6 +40,25 @@ jobs:
               echo "::notice::Despliegue omitido de forma segura: solo se publica master después de un CI exitoso (rama: ${WORKFLOW_HEAD_BRANCH:-desconocida}; resultado: ${WORKFLOW_CONCLUSION:-sin estado})."
               exit 0
             fi
+
+            # A completed CI run can arrive after a newer push has already
+            # moved master. Never let that stale run roll production backwards.
+            current_master_sha="$(curl --fail --silent --show-error \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GITHUB_TOKEN" \
+              "https://api.github.com/repos/$GITHUB_REPOSITORY/git/ref/heads/master" |
+              jq -r '.object.sha // empty')"
+            if [[ -z "$current_master_sha" ]]; then
+              echo "configured=false" >> "$GITHUB_OUTPUT"
+              echo "::error::No se pudo verificar el HEAD actual de master. Se cancela el despliegue por seguridad."
+              exit 1
+            fi
+            if [[ "$WORKFLOW_HEAD_SHA" != "$current_master_sha" ]]; then
+              echo "configured=false" >> "$GITHUB_OUTPUT"
+              echo "::notice::Despliegue omitido: el CI aprobado pertenece a un SHA anterior (${WORKFLOW_HEAD_SHA:0:7}); master ya está en ${current_master_sha:0:7}. Se esperará el CI del HEAD actual."
+              exit 0
+            fi
+            echo "El CI aprobado corresponde al HEAD actual de master (${current_master_sha:0:7})."
           elif [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
             if [[ "$GITHUB_REF_NAME" != "master" ]]; then
               echo "configured=false" >> "$GITHUB_OUTPUT"
@@ -220,6 +241,28 @@ jobs:
           printf 'CLOUDFLARE_ACCOUNT_ID=%s\n' "$account_id" >> "$GITHUB_ENV"
           echo "Account ID validado; el valor permanece oculto."
 
+      - name: Confirmar que master no avanzó durante el build
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          EXPECTED_MASTER_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+        run: |
+          set -euo pipefail
+          current_master_sha="$(curl --fail --silent --show-error \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/git/ref/heads/master" |
+            jq -r '.object.sha // empty')"
+          if [[ -z "$current_master_sha" ]]; then
+            echo "::error::No se pudo volver a verificar el HEAD actual de master antes de publicar."
+            exit 1
+          fi
+          if [[ "$EXPECTED_MASTER_SHA" != "$current_master_sha" ]]; then
+            echo "::error::Se cancela este deploy: master avanzó durante la compilación (${EXPECTED_MASTER_SHA:0:7} → ${current_master_sha:0:7}). No se publicará un Worker obsoleto."
+            exit 1
+          fi
+          echo "Revisión final confirmada: el build coincide con el HEAD actual de master."
+
       - name: Desplegar Worker
         run: npm run deploy:vinext
         env:
@@ -250,6 +293,12 @@ jobs:
             "https://python-desdecero.com/?release=$GITHUB_SHA" -o /tmp/python-desde-cero-home.html
           grep -Fqi "Entiende lo que haces" /tmp/python-desde-cero-home.html
           grep -Fqi "Cuatro módulos principales" /tmp/python-desde-cero-home.html
+          # Assert the exact hero version introduced in PR #43, not just
+          # generic copy that existed in earlier builds as well.
+          if ! grep -Fq "cambio.py" /tmp/python-desde-cero-home.html || ! grep -Fq "PRIMERA LECCIÓN" /tmp/python-desde-cero-home.html; then
+            echo "::error::La portada nueva no contiene el ejemplo inicial (cambio.py); el Worker podría estar sirviendo un bundle antiguo."
+            exit 1
+          fi
           if grep -Fqi "MÓDULOS 01 Y 02" /tmp/python-desde-cero-home.html; then
             echo "::error::El dominio todavía está sirviendo la portada anterior."
             exit 1
