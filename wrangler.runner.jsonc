@@ -1,0 +1,8 @@
+{
+  "name": "python-desdecero-runner",
+  "compatibility_date": "2026-10-30",
+  "workers_dev": true,
+  "assets": {
+    "directory": "./runner-public"
+  }
+}
