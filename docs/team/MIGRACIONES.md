@@ -122,3 +122,24 @@ Mientras exista esta divergencia, no ejecutar supabase db push, migration repair
 3. Probarlo contra una instancia de desarrollo; registrar el resultado.
 4. Para producción, aplicar el SQL en una ventana coordinada con el código compatible y verificar la fila en el historial remoto.
 5. Actualizar esta matriz. No copiar SQL de un chat a producción sin dejar el archivo versionado.
+
+
+## Verificación consolidada del catálogo y rama preview — 30-10-2026
+
+Consulta de solo lectura posterior al despliegue del 30-10-2026:
+
+- Producción y DEV tienen las mismas 67 claves v2 del catálogo vigente: módulo 1 = 10, módulo 2 = 13, módulo 3 = 11, módulo 4 = 28 y módulo 5 opcional = 5.
+- En los cuatro módulos obligatorios hay 62 claves; las otras 5 pertenecen a la extensión opcional. No se detectaron filas con `correct_option_v2 IS NULL` en ese conjunto.
+- La tabla de producción contiene 110 filas: 67 claves v2 del catálogo actual y 43 filas heredadas con identificadores antiguos lesson-*, donde correct_option_v2 es NULL. Esas 43 filas no coinciden con ninguna de las 67 tuplas actuales (module_id, lesson_id, question_index); no son faltantes del catálogo vigente. DEV contiene solo las 67 filas actuales. Mantener las históricas hasta aprobar una reconciliación; no borrarlas ni reescribirlas como parte de este trabajo.
+- Producción confirma `public.submit_quiz_v2` como SECURITY INVOKER, sin permiso EXECUTE para `anon` y con permiso para `authenticated`. La función privada autoritativa es SECURITY DEFINER, valida `auth.uid()` y conserva el cálculo del lado servidor.
+- El trigger `invitations_prevent_used_deletion` está habilitado sobre `public.invitations`.
+
+### Versión de PostgreSQL y extensiones
+
+Producción y DEV ejecutan PostgreSQL 17.11.0.003. La consulta de solo lectura encontró pgcrypto 1.3 en ambos proyectos; no encontró ltree ni btree_gist. Revisar la nota de lanzamiento de Supabase/PostgreSQL 17.11 para pgcrypto antes de modificar datos cifrados; no se ejecutó reindex, rotación ni re-encriptado.
+
+### Rama preview fallida del proyecto de producción
+
+La consulta de `list_branches` al proyecto `nuqydanbbgqcofcftshk` devuelve una rama preview llamada `main`, ID `82612040-2379-41e3-8f76-100fadca6a2c`, con `status = MIGRATIONS_FAILED`. El proyecto separado `python-desde-cero-dev` (`fcwbkkivelsipqqrbpya`) está `ACTIVE_HEALTHY`; no confundir ambos recursos.
+
+No resetear, rebasar, fusionar ni eliminar la rama preview como solución rápida. Primero identificar qué migración falla, comparar su historial con producción y valorar si la rama puede repararse sin perder datos de preview. Esta incidencia no justifica ejecutar operaciones de migración en la base principal.
