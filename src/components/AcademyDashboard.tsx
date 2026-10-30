@@ -2,7 +2,7 @@ import Link from 'next/link';
 import ThemeSelector from '@/components/ThemeSelector';
 import { ArrowRight, BookOpenCheck, Circle, Lock, LogOut } from 'lucide-react';
 import { logout } from '@/app/login/actions';
-import { courseModules } from '@/lib/course';
+import { courseCatalog } from '@/lib/course-catalog';
 
 export type ProgressRow = {
   module_id: string;
@@ -21,7 +21,7 @@ type Props = {
 /** Returns true if the module at moduleIndex is accessible given the progress rows. */
 function isModuleUnlocked(moduleIndex: number, progressRows: ProgressRow[]): boolean {
   if (moduleIndex === 0) return true;
-  const prevModule = courseModules[moduleIndex - 1];
+  const prevModule = courseCatalog[moduleIndex - 1];
   const assessment = prevModule?.lessons.find((l) => l.assessment);
   if (!assessment) return true; // no gate lesson — allow access
   return progressRows.some(
@@ -46,8 +46,8 @@ export default function AcademyDashboard({
         row.is_completed,
     );
 
-  const coreModules = courseModules.filter((courseModule) => !courseModule.optional);
-  const extensionModules = courseModules.filter((courseModule) => courseModule.optional);
+  const coreModules = courseCatalog.filter((courseModule) => !courseModule.optional);
+  const extensionModules = courseCatalog.filter((courseModule) => courseModule.optional);
   const completedCount = coreModules.reduce(
     (total, courseModule) =>
       total + courseModule.lessons.filter((lesson) => completed(courseModule.id, lesson.id)).length,
@@ -68,9 +68,9 @@ export default function AcademyDashboard({
   );
 
   // The four core modules form the completion path; the applied project is an optional extension.
-  const findNextLesson = (modules: typeof courseModules) => modules
+  const findNextLesson = (modules: typeof courseCatalog) => modules
     .flatMap((courseModule) => {
-      const moduleIndex = courseModules.findIndex((item) => item.id === courseModule.id);
+      const moduleIndex = courseCatalog.findIndex((item) => item.id === courseModule.id);
       if (!progressUnavailable && !isModuleUnlocked(moduleIndex, progressRows)) return [];
       return courseModule.lessons.map((lesson) => ({ courseModule, lesson }));
     })
@@ -172,7 +172,7 @@ export default function AcademyDashboard({
 
         {/* Module list */}
         <div className="mt-10 space-y-10">
-          {courseModules.map((courseModule, moduleIndex) => {
+          {courseCatalog.map((courseModule, moduleIndex) => {
             const unlocked = progressUnavailable || isModuleUnlocked(moduleIndex, progressRows);
             const moduleCompleted = courseModule.lessons.filter((lesson) =>
               completed(courseModule.id, lesson.id),
@@ -180,7 +180,7 @@ export default function AcademyDashboard({
             const percentage = Math.round(
               (moduleCompleted / courseModule.lessons.length) * 100,
             );
-            const prevModule = courseModules[moduleIndex - 1];
+            const prevModule = courseCatalog[moduleIndex - 1];
             const prevAssessment = prevModule?.lessons.find((l) => l.assessment);
 
             return (
