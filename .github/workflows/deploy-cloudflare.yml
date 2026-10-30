@@ -18,6 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       configured: ${{ steps.check.outputs.configured }}
+      site_key: ${{ steps.check.outputs.site_key }}
     steps:
       - name: Comprobar disponibilidad de credenciales (sin imprimir valores)
         id: check
@@ -43,19 +44,53 @@ jobs:
             exit 0
           fi
 
-          if [[ ! "$site_key" =~ ^[A-Za-z0-9_-]{20,128}$ ]] ||
-             [[ "$site_key" == "1x00000000000000000000AA" ]] ||
-             [[ "$site_key" == "2x00000000000000000000AB" ]] ||
-             [[ "$site_key" == "1x00000000000000000000BB" ]] ||
-             [[ "$site_key" == "2x00000000000000000000BB" ]] ||
-             [[ "$site_key" == "3x00000000000000000000FF" ]]; then
+          is_real_site_key() {
+            local candidate="$1"
+            [[ "$candidate" =~ ^[A-Za-z0-9_-]{20,128}$ ]] &&
+              [[ "$candidate" != "1x00000000000000000000AA" ]] &&
+              [[ "$candidate" != "2x00000000000000000000AB" ]] &&
+              [[ "$candidate" != "1x00000000000000000000BB" ]] &&
+              [[ "$candidate" != "2x00000000000000000000BB" ]] &&
+              [[ "$candidate" != "3x00000000000000000000FF" ]]
+          }
+
+          # If the public key was not configured in GitHub Actions, make a
+          # read-only lookup. Only use a single widget explicitly allowlisting
+          # the production hostname; never guess between multiple candidates.
+          if ! is_real_site_key "$site_key"; then
+            echo "::notice::No hay una Sitekey real configurada; buscando un widget Turnstile existente para python-desdecero.com."
+            if widgets_json="$(curl --fail --silent --show-error               -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN"               "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/challenges/widgets?per_page=1000" 2>/dev/null)"; then
+              list_ok="$(jq -r '.success // false' <<< "$widgets_json")"
+              total_count="$(jq -r '.result_info.total_count // (.result | length) // 0' <<< "$widgets_json")"
+              if [[ "$list_ok" == "true" && "$total_count" -le 1000 ]]; then
+                matching_keys="$(jq -r '[.result[]? | select((.domains // []) | index("python-desdecero.com")) | .sitekey] | unique | .[]' <<< "$widgets_json")"
+                if [[ -n "$matching_keys" && "$(printf '%s\n' "$matching_keys" | wc -l | tr -d ' ')" == "1" ]]; then
+                  site_key="$matching_keys"
+                  echo "Se encontró exactamente un widget Turnstile con el hostname de producción permitido."
+                elif [[ -z "$matching_keys" ]]; then
+                  echo "::notice::Cloudflare no devolvió un widget que permita exactamente python-desdecero.com."
+                else
+                  echo "::warning::Hay varios widgets Turnstile para python-desdecero.com; no se seleccionará ninguno automáticamente."
+                fi
+              else
+                echo "::notice::No se pudo verificar una lista completa de widgets Turnstile con el permiso actual."
+              fi
+            else
+              echo "::notice::El API token actual no permite consultar widgets Turnstile; configura NEXT_PUBLIC_TURNSTILE_SITE_KEY en GitHub Actions Variables."
+            fi
+          fi
+
+          if ! is_real_site_key "$site_key"; then
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::error::Despliegue omitido: falta una sitekey real de Cloudflare Turnstile. Define NEXT_PUBLIC_TURNSTILE_SITE_KEY como variable de GitHub Actions (o secreto heredado). No uses llaves de prueba en producción."
+            echo "::error::Despliegue omitido: no se encontró una Sitekey real única para python-desdecero.com. Define NEXT_PUBLIC_TURNSTILE_SITE_KEY en GitHub Actions Variables. No uses llaves de prueba."
             exit 0
           fi
 
+          # A Turnstile sitekey is public and is required by the browser build.
+          # Never read, print, or export the widget's private secret here.
+          echo "site_key=$site_key" >> "$GITHUB_OUTPUT"
           echo "configured=true" >> "$GITHUB_OUTPUT"
-          echo "CI correcto; credenciales y sitekey real disponibles (valores ocultos)."
+          echo "CI correcto; credenciales y una Sitekey pública válida están disponibles (valores ocultos)."
 
   deploy:
     needs: check-credentials
@@ -82,7 +117,7 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
           NEXT_PUBLIC_SITE_URL: https://python-desdecero.com
-          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY || secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ needs.check-credentials.outputs.site_key }}
 
       - name: Diagnosticar y normalizar credenciales de Cloudflare sin revelarlas
         shell: bash
@@ -155,7 +190,7 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
           NEXT_PUBLIC_SITE_URL: https://python-desdecero.com
-          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY || secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ needs.check-credentials.outputs.site_key }}
 
       - name: Normalizar y validar Account ID sin exponerlo
         shell: bash
@@ -178,7 +213,7 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
           NEXT_PUBLIC_SITE_URL: https://python-desdecero.com
-          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY || secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ needs.check-credentials.outputs.site_key }}
 
       - name: Verificar dominio personalizado conectado al Worker
         shell: bash
