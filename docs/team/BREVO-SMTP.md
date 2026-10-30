@@ -14,6 +14,18 @@ La integración está en preparación, no certificada en producción.
 - La consulta TXT del apex no devolvió un registro SPF. Brevo indica que SPF/MX no son obligatorios para autenticar dominios con IP compartida; si la cuenta utiliza IP dedicada, los registros requeridos pueden ser diferentes. Supabase recomienda mantener SPF, DKIM y DMARC alineados para mejorar la entregabilidad. No añadir un segundo SPF ni cambiar los existentes sin ver primero todos los registros del dominio de envío.
 - No se ha podido inspeccionar el estado privado del dominio/remitente en el panel de Brevo. Tampoco se ha podido leer la configuración SMTP de Authentication de Supabase desde la conexión de proyecto disponible. No se afirma que el dominio esté marcado como “Authenticated”, que el remitente esté validado, que la clave SMTP esté guardada en Supabase ni que un correo haya sido entregado.
 
+## Evidencia de envío observada en Supabase Auth (30-10-2026)
+
+Consulta de solo lectura de los logs Auth de producción para las últimas 24 horas de la revisión:
+
+- A las `2026-10-30T21:12:07Z`, GoTrue registró que `GOTRUE_RATE_LIMIT_EMAIL_SENT` cambió de `2/1h` a `30`. Esto es consistente con el cambio/ajuste del límite al configurar SMTP personalizado, pero no expone el servidor SMTP ni identifica al proveedor.
+- Se agruparon 4 solicitudes de recuperación con HTTP 200, 3 eventos de registro con HTTP 303, 4 solicitudes de recuperación con HTTP 429 y 2 solicitudes de confirmación con HTTP 429.
+- El último rechazo de recuperación detalla una espera mínima de 17 segundos. No todos los `429` deben atribuirse al límite horario ni a una falla de Brevo: algunos son controles antiabuso/cooldown.
+- HTTP 200/303 acredita que Auth aceptó/procesó la solicitud, no que el servidor receptor haya recibido el mensaje. No se encontraron recibos SMTP ni encabezados del correo en los logs accesibles.
+- DEV no mostró eventos de email coincidentes durante la misma ventana.
+
+**Conclusión:** hay evidencia de que el límite de email de Auth en PROD se elevó a 30 y de que varios flujos Auth llegaron a procesarse. Sigue pendiente comprobar en Brevo el estado de entrega y en Supabase el host SMTP guardado; no reconfigurar credenciales a ciegas.
+
 ## Datos SMTP que se deben utilizar
 
 Para el servidor de correo de Brevo, la documentación oficial indica:
