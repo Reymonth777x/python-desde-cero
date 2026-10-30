@@ -17,6 +17,7 @@ const errorMessages: Record<string, string> = {
   logout: 'No se pudo cerrar la sesión. Inténtalo de nuevo.',
   configuration: 'El registro no está configurado para este entorno.',
   signup: 'No se pudo crear la cuenta. Revisa tus datos e inténtalo de nuevo.',
+  invitation: 'El código de invitación no es válido, venció o ya fue utilizado.',
 };
 
 const statusMessages: Record<string, string> = {
