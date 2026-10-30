@@ -532,7 +532,7 @@ export const courseModules: CourseModule[] = [
           "La salida es la conversación del programa con quien lo utiliza. Antes de mostrar un dato, limpia espacios innecesarios, conserva el formato adecuado y añade una etiqueta con su significado. Así evitas nombres inconsistentes y resultados que no se entienden.",
           "Un comentario comienza con # y sirve para explicar la intención de una parte del código. Python ignora ese texto al ejecutar el programa. Escribe comentarios breves que aporten contexto; no repitas palabra por palabra lo que la instrucción ya expresa."
         ],
-        "example": "entrada = \"  ana perez  \"\nnombre = entrada.strip().title()\nprecio = 1250.5\nprint(nombre)\nprint(f\"Total: {precio:.2f} colones\")",
+        "example": "entrada = \"  ana perez  \"\n# Limpia los espacios y normaliza el nombre\nnombre = entrada.strip().title()\nprecio = 1250.5\n# Presenta el importe con dos decimales\nprint(nombre)\nprint(f\"Total: {precio:.2f} colones\")",
         "exampleOutput": "Ana Perez\nTotal: 1250.50 colones",
         "walkthrough": [
           "strip() elimina los espacios que rodean el nombre.",
