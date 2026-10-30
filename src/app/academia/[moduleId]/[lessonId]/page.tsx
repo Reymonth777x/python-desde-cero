@@ -6,6 +6,7 @@ import {
   findCourseModule,
 } from '@/lib/course';
 import { toClientLesson } from '@/lib/server-quiz/public-lesson';
+import { canAccessLessonInSequence } from '@/lib/lesson-access';
 import { createClient } from '@/lib/supabase/server';
 
 type Props = {
@@ -73,13 +74,25 @@ export default async function LessonPage({ params }: Props) {
     }
   }
 
-  const { data: progress, error: progressError } = await supabase
+  const { data: moduleProgress, error: progressError } = await supabase
     .from('progress')
-    .select('is_completed, best_score')
+    .select('lesson_id, is_completed, best_score')
     .eq('user_id', user.id)
-    .eq('module_id', courseModule.id)
-    .eq('lesson_id', lesson.id)
-    .maybeSingle();
+    .eq('module_id', courseModule.id);
+
+  const currentProgress = moduleProgress?.find((row) => row.lesson_id === lesson.id);
+  const currentLessonCompleted = currentProgress?.is_completed === true;
+  const canOpenBySequence = canAccessLessonInSequence(
+    courseModule.id,
+    lessonIndex,
+    courseModule.lessons,
+    moduleProgress ?? [],
+    Boolean(progressError),
+  );
+
+  if (!currentLessonCompleted && !canOpenBySequence && lessonIndex > 0) {
+    redirect(`/academia/${courseModule.id}/${courseModule.lessons[lessonIndex - 1].id}`);
+  }
 
   return (
     <LessonStudy
@@ -88,8 +101,8 @@ export default async function LessonPage({ params }: Props) {
       moduleId={courseModule.id}
       moduleNumber={courseModule.number}
       moduleTitle={courseModule.title}
-      initialCompleted={progress?.is_completed === true}
-      initialScore={Number(progress?.best_score ?? 0)}
+      initialCompleted={currentLessonCompleted}
+      initialScore={Number(currentProgress?.best_score ?? 0)}
       progressUnavailable={Boolean(progressError)}
       expectedUserId={user.id}
       previousHref={previousLesson ? `/academia/${courseModule.id}/${previousLesson.id}` : null}
