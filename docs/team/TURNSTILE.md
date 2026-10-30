@@ -7,19 +7,21 @@ El workflow de producción:
 - exige una sitekey real antes de publicar;
 - acepta una variable de GitHub Actions llamada `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (preferida) o un secreto heredado con ese nombre;
 - inyecta la llave durante la compilación de Vinext y en el comando de despliegue;
-- rechaza las llaves de prueba oficiales.
+- rechaza las llaves de prueba oficiales;
+- si no hay una Sitekey configurada, consulta la API de Turnstile en modo solo lectura y usa el Sitekey público únicamente cuando encuentra un solo widget que permite el hostname exacto `python-desdecero.com`;
+- si la consulta no está autorizada, no hay widget o aparecen varios candidatos, omite el despliegue y pide configuración manual; nunca selecciona entre varios ni accede a la Secret key.
 
 El PR `#27`, en la rama `chore/verify-turnstile-on-live-login`, añade una comprobación HTTP posterior al despliegue para validar que la portada está actualizada y que el HTML de `/login` contiene el widget. La validación anterior solo comprobaba la portada. No se debe considerar completo un despliegue si el widget no aparece en la ruta de autenticación.
 
-Si la sitekey no está configurada, el paso de comprobación omite el despliegue y deja la versión de producción intacta.
+Si no hay una Sitekey manual, el workflow intenta encontrar un único widget existente para el hostname exacto mediante la API de solo lectura. Si no puede verificar una única coincidencia, omite el despliegue y deja la versión de producción intacta.
 
 ## Estado verificado — 30 de octubre de 2026
 
-- El commit `c1cbdcb339b40f085d4b496f2ea92b7eb5a4a1d7` está integrado en `master`.
-- CI #494 terminó correctamente para ese commit, incluyendo TypeScript, ESLint, build, Playwright y build Vinext.
-- El workflow de publicación #52 no desplegó: `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID` estaban disponibles, pero `RAW_TURNSTILE_SITE_KEY` llegó vacío.
-- El job `deploy` quedó omitido; por tanto, no afirmar que la versión móvil nueva o el CAPTCHA estén publicados/verificados en producción.
-- La cuenta Cloudflare debe proporcionar una sitekey real para `python-desdecero.com`; no sustituirla por las claves de prueba de CI.
+- El commit `99e39027409682ed3bf21d64754769b21199854f` está integrado en `master`; contiene la mejora de flujo móvil del laboratorio (PR #28).
+- CI #501 terminó correctamente para ese commit, incluyendo Vitest, TypeScript, ESLint, build Next, Playwright y build Vinext.
+- El workflow de publicación #54 (run `41038244192`) no desplegó ese commit: `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID` estaban disponibles, pero `RAW_TURNSTILE_SITE_KEY` llegó vacío y el job `deploy` quedó omitido.
+- El PR #29 intenta resolverlo buscando un único widget de producción mediante la API de solo lectura. Requiere `Turnstile Sites Read` o `Account Settings Read`; si el token no dispone de permiso, habrá que configurar la Sitekey manualmente.
+- No usar claves de prueba en producción ni habilitar CAPTCHA de Supabase antes de que el widget esté visible en la web publicada.
 
 ## Configuración de Cloudflare
 1. En Cloudflare Dashboard → Turnstile, abre o crea el widget correspondiente al sitio `python-desdecero.com`.
