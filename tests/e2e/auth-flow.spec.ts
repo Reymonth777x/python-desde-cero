@@ -23,7 +23,7 @@ test.describe('Autenticacion y flujo de usuario', () => {
     await page.getByLabel('Correo electrónico').fill('login@example.test');
     await page.getByLabel('Contraseña').fill('LoginPass123');
 
-    await page.getByRole('button', { name: 'Crear cuenta' }).first().click();
+    await page.getByRole('tablist').getByRole('button', { name: 'Crear cuenta' }).click();
     await expect(page.getByLabel('Correo electrónico')).toHaveValue('');
     await expect(page.getByLabel('Contraseña')).toHaveValue('');
 
@@ -31,7 +31,7 @@ test.describe('Autenticacion y flujo de usuario', () => {
     await page.getByLabel('Correo electrónico').fill('signup@example.test');
     await page.getByLabel('Contraseña').fill('SignupPass123');
 
-    await page.getByRole('button', { name: 'Entrar' }).click();
+    await page.getByRole('tablist').getByRole('button', { name: 'Entrar' }).click();
     await expect(page.getByLabel('Correo electrónico')).toHaveValue('');
     await expect(page.getByLabel('Contraseña')).toHaveValue('');
   });
