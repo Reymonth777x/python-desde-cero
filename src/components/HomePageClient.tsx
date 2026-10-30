@@ -233,7 +233,7 @@ export default function HomePageClient({ accountLinks, progressSummary }: HomePa
             <nav aria-label="Navegación principal" className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:gap-x-6 sm:text-sm">
               <a href="#ruta" className="inline-flex min-h-10 items-center text-[var(--theme-muted)] underline-offset-4 hover:text-[var(--theme-ink)] hover:underline">La ruta</a>
               <a href="#ejemplo" className="inline-flex min-h-10 items-center text-[var(--theme-muted)] underline-offset-4 hover:text-[var(--theme-ink)] hover:underline">Laboratorio</a>
-              <Link href="/academia" className="inline-flex min-h-10 items-center font-semibold text-[var(--theme-accent)] underline underline-offset-4">Ruta del curso</Link>
+              <Link href="/academia" className="inline-flex min-h-10 items-center font-semibold text-[var(--theme-accent)] underline underline-offset-4">Academia</Link>
               {accountLinks}
             </nav>
             <ThemeSelector />
