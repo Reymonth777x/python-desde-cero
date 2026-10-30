@@ -1,3 +1,4 @@
+import { type ReactElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -33,7 +34,7 @@ describe('HomeProgressSummary', () => {
     const element = await HomeProgressSummary();
     expect(element).not.toBeNull();
 
-    const html = renderToStaticMarkup(element as React.ReactElement);
+    const html = renderToStaticMarkup(element as ReactElement);
     expect(html).toContain('1/30 lecciones');
     expect(html).toContain('Extensión práctica opcional: 1/4 actividades');
     expect(eq).toHaveBeenCalledWith('user_id', 'student-1');
