@@ -66,6 +66,21 @@ test.describe('Seguridad y ejecución real', () => {
     await expect(example.locator('pre')).not.toContainText(appOrigin);
   });
 
+  test('ignora mensajes globales falsificados desde Python y solo acepta el canal privado', async ({ page }) => {
+    await page.goto('/');
+    const example = page.locator('#ejemplo');
+    await example.scrollIntoViewIfNeeded();
+    await example.locator('textarea').fill([
+      'import js',
+      'forged = js.JSON.parse(\'{"id": 1, "status": "success", "output": "FORGED_OUTPUT"}\')',
+      'js.self.postMessage(forged)',
+      'print("REAL_OUTPUT")',
+    ].join('\\n'));
+    await example.getByRole('button', { name: 'Ejecutar' }).click();
+    await expect(example.locator('pre')).toContainText('REAL_OUTPUT', { timeout: 60000 });
+    await expect(example.locator('pre')).not.toContainText('FORGED_OUTPUT');
+  });
+
   test('el Worker limita la salida visible de programas grandes', async ({ page }) => {
     await page.goto('/');
     const example = page.locator('#ejemplo');
