@@ -162,8 +162,14 @@ test("Turnstile entrega el token a acceso, registro y recuperación", async ({ p
       __turnstileResetCount?: number;
     };
     window.turnstile = {
-      render: (_container, options) => {
+      render: (container, options) => {
         testWindow.__turnstileOptions = options;
+        const mockFrame = document.createElement("div");
+        mockFrame.setAttribute("data-testid", "turnstile-mock-frame");
+        mockFrame.setAttribute("aria-label", "Turnstile test challenge");
+        mockFrame.style.width = "300px";
+        mockFrame.style.height = "65px";
+        container.appendChild(mockFrame);
         return 1;
       },
       remove: () => undefined,
