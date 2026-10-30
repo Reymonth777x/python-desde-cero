@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import InvitationCodeCopy from "@/components/InvitationCodeCopy";
+import InvitationLocalDateTime from "@/components/InvitationLocalDateTime";
 import InvitationExpiryInput from "@/components/InvitationExpiryInput";
 import { listInvitations, createInvitation, deleteInvitation } from "./actions";
 
@@ -193,7 +194,7 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
                         {new Date(inv.created_at).toLocaleDateString()}
                       </td>
                       <td className='border border-[var(--theme-border)] px-3 py-2 text-sm text-[var(--theme-muted)]'>
-                        {inv.expires_at ? new Date(inv.expires_at).toLocaleDateString() : 'Sin expiración'}
+                        {inv.expires_at ? <InvitationLocalDateTime value={inv.expires_at} /> : 'Sin expiración'}
                       </td>
                       <td className='border border-[var(--theme-border)] px-3 py-2'>
                         {!inv.is_used ? (
