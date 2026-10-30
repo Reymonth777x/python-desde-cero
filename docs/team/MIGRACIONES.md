@@ -124,12 +124,21 @@ Mientras exista esta divergencia, no ejecutar supabase db push, migration repair
 5. Actualizar esta matriz. No copiar SQL de un chat a producción sin dejar el archivo versionado.
 
 
+## Release de aplicación 30-10-2026: curso e invitaciones
+
+- Release `e758f9cf9da1aa647429669b112b7128ca9b126d`: CI [41076396982](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41076396982) y deploy [41076898388](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41076898388), ambos success.
+- PR #65 corrigió los saltos de línea en ejemplo, salida, starter y solución de `b3-l6`; no cambió el ID ni las claves del quiz.
+- PR #66 corrigió la expiración de invitaciones. La hora local se convierte en navegador a ISO UTC; el servidor valida que sea un instante UTC válido y futuro, y la lista muestra la hora local del administrador. No requirió migración ni cambió columnas.
+- PR #63 añadió práctica y pruebas de desplazamientos bit a bit en `b3-l2` y excepciones/`else`/`finally` en `b4-l7`. No cambió claves de quiz ni esquema.
+
 ## Verificación consolidada del catálogo y rama preview — 30-10-2026
 
 Consulta de solo lectura posterior al despliegue del 30-10-2026:
 
 - Producción y DEV tienen las mismas 67 claves v2 del catálogo vigente: módulo 1 = 10, módulo 2 = 13, módulo 3 = 11, módulo 4 = 28 y módulo 5 opcional = 5.
 - En los cuatro módulos obligatorios hay 62 claves; las otras 5 pertenecen a la extensión opcional. No se detectaron filas con `correct_option_v2 IS NULL` en ese conjunto.
+- Comparación directa con el catálogo (`questions.answer`): producción y DEV tienen 67/67 coincidencias, cero filas ausentes, cero `correct_option_v2` nulos y cero índices desalineados. En producción, 29/67 valores v2 difieren del campo histórico `correct_option`; no sobrescribir v2 desde el índice legacy.
+- Producción conserva 43 filas históricas con IDs `lesson-*` y sin v2, fuera de las 67 tuplas actuales. DEV contiene solo las 67 claves actuales; no borrar las filas históricas sin reconciliar primero.
 - Producción confirma `public.submit_quiz_v2` como SECURITY INVOKER, sin permiso EXECUTE para `anon` y con permiso para `authenticated`. La función privada autoritativa es SECURITY DEFINER, valida `auth.uid()` y conserva el cálculo del lado servidor.
 - El trigger `invitations_prevent_used_deletion` está habilitado sobre `public.invitations`.
 

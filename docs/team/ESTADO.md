@@ -5,11 +5,11 @@
 ## Repositorio y publicación
 
 - Repositorio: `Reymonth777x/python-desde-cero`; rama de producción: `master`.
-- HEAD actual de `master`: `71fa854381f0507f6b0b16b8a6fbf2a0c2efaa15` (incluye PR #43, #52, #54, #55 y #57). El CI de ese SHA terminó correctamente en el workflow [41049538535](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41049538535).
-- Última publicación comprobada: SHA `71fa854381f0507f6b0b16b8a6fbf2a0c2efaa15`, workflow [41049961984](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41049961984). El deploy hizo checkout del mismo SHA que `master`, confirmó que el HEAD no avanzó durante el build y pasó las comprobaciones HTTP posteriores.
-- El bundle publicado incluye PR #52 (`b3-l9`, matrices y bucles anidados), PR #55 (contador de seis casos del proyecto) y PR #57 (marco didáctico inicial de `b1-l1`–`b1-l3`). La lectura pública confirma el texto introductorio actualizado en `/muestra`; las pantallas de lecciones autenticadas todavía necesitan verificación con cuentas reales.
-- El smoke test público confirmó portada nueva, `/muestra`, `/sitemap.xml`, marcador Turnstile en `/login` y respuesta HTTP 308 desde `www.python-desdecero.com` al dominio principal.
-- PR #43 está integrado. Se retiró el prototipo de cocina del código activo sin borrar su historial Git; Orilla sigue fuera del alcance de esta versión.
+- HEAD actual de `master`: `e758f9cf9da1aa647429669b112b7128ca9b126d`. Incluye PR #43, #52, #54, #55, #57, #61, #63, #65 y #66. El CI completo terminó correctamente en [41076396982](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41076396982).
+- Última publicación comprobada: SHA `e758f9cf9da1aa647429669b112b7128ca9b126d`, workflow [41076898388](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41076898388). El job `deploy` terminó en success; compiló Vinext, confirmó que `master` no avanzó durante el build, publicó el Worker y verificó el dominio y la versión nueva.
+- El bundle publicado incluye PR #52 (`b3-l9`, matrices y bucles anidados), #55 (contador real de seis casos del proyecto), #57 (marco didáctico de `b1-l1`–`b1-l3`), #63 (desplazamientos bit a bit y práctica de excepciones), #65 (saltos de línea reales en `b3-l6`) y #66 (vencimientos de invitación interpretados en hora local y guardados en UTC). La lectura pública confirma el texto introductorio actualizado en `/muestra`; las pantallas de lecciones autenticadas todavía necesitan verificación con cuentas reales.
+- El smoke test externo posterior al release `e758f9c` leyó `/`, `/muestra`, `/login` y `/sitemap.xml`; el sitemap mantiene cinco URLs y `www.python-desdecero.com` termina en `https://python-desdecero.com/`. El workflow confirmó el marcador Turnstile y el HTTP 308.
+- PR #43 está integrado: la navegación presenta Academia y Laboratorio; no anuncia un panel docente no implementado.
 
 ## Producto y navegación
 
@@ -25,8 +25,8 @@
 - El proyecto final obligatorio es `b4-l10` (gestor de inventario). Incluye seis casos automáticos de ejecución y una revisión conceptual que requiere al menos 75%.
 - El examen final PE1 es `b4-l11`, con doce preguntas y mínimo de 75%.
 - Los prerrequisitos se comprueban tanto en la navegación del servidor como dentro del calificador privado de Supabase: examen anterior de módulo, evaluación del módulo 3 antes del proyecto, y proyecto aprobado antes del examen final.
-- Mejoras pedagógicas ya integradas en `master`: demostración inicial más clara en `b1-l1`–`b1-l3` (PR #57), conversiones y variables en `b2-l4`, operadores bit a bit en `b3-l2`, Bubble Sort guiado en `b3-l7`, matrices y bucles anidados paso a paso en `b3-l9` (PR #52) y contador del proyecto final derivado de los seis casos reales (PR #55).
-- Las PR #52, #55 y #57 están fusionadas y publicadas en producción dentro del HEAD `71fa854...`. La verificación de la experiencia autenticada de las lecciones y el progreso con cuentas reales sigue pendiente.
+- Mejoras pedagógicas ya integradas y publicadas: demostración inicial más clara en `b1-l1`–`b1-l3` (PR #57), conversiones y variables en `b2-l4` (PR #41), operadores y desplazamientos bit a bit en `b3-l2` (PR #48 y #63), Bubble Sort guiado en `b3-l7` (PR #45), matrices y bucles anidados en `b3-l9` (PR #52), contador real de pruebas del proyecto (PR #55), y corrección de saltos de línea en `b3-l6` (PR #65).
+- Las PR #52, #55, #57, #63 y #65 están fusionadas y publicadas en `e758f9c`. PR #66 también está fusionada y publicada: el selector de expiración usa la zona horaria del dispositivo, el servidor valida un ISO UTC futuro y la tabla muestra la hora local. El flujo aún necesita una comprobación manual con cuenta administradora.
 - La revisión integral de las 33 unidades y la ampliación de cobertura para ejercicios con entradas límite siguen pendientes.
 
 ## Supabase y seguridad de evaluaciones
@@ -35,7 +35,7 @@
 - Producción tiene 22 migraciones registradas; DEV tiene su propio historial. Las versiones 024–027 existen en ambos, pero con timestamps diferentes. La matriz exacta está en `docs/team/MIGRACIONES.md`.
 - Consultas SQL de solo lectura y comparación con `src/lib/course.ts` confirmaron 67 claves activas repartidas en 37 lecciones: módulo 1 = 10, módulo 2 = 13, módulo 3 = 11, módulo 4 = 28 y módulo opcional 5 = 5. Todas las claves activas tienen `correct_option_v2` y coinciden con el catálogo en ambos proyectos. Producción conserva además 43 filas heredadas (`lesson-1`…`lesson-8`) sin v2, fuera del catálogo actual; no borrarlas a ciegas. En 29 de las 67 claves activas, el índice v2 difiere del índice histórico.
 - `public.submit_quiz_v2` es `SECURITY INVOKER`: `anon` no tiene permiso de ejecución y `authenticated` sí. El calificador autoritativo vive en el esquema privado como `SECURITY DEFINER`, valida `auth.uid()` y devuelve calificación agregada.
-- El trigger `invitations_prevent_used_deletion` está activo. Las invitaciones usadas se conservan como historial; las no usadas pueden eliminarse.
+- El trigger `invitations_prevent_used_deletion` está activo. Las invitaciones usadas se conservan como historial; las no usadas pueden eliminarse. PR #66 corrige además la conversión de la fecha elegida localmente a un instante UTC explícito.
 - Existe una rama preview `main` asociada al proyecto de producción con ID `82612040-2379-41e3-8f76-100fadca6a2c`, cuyo estado de rama es `MIGRATIONS_FAILED`; el campo `preview_project_status` devuelve `ACTIVE_HEALTHY`. No es el proyecto DEV separado. No hacer reset, rebase, merge ni borrado de esa rama sin investigar su drift y preparar un plan explícito.
 - La divergencia entre los archivos locales y el historial remoto sigue bloqueando un `db push`, `migration repair` o `db reset` a ciegas. No repetir migraciones 024–027.
 
@@ -46,9 +46,14 @@
 - La configuración CAPTCHA dentro de Supabase Auth no se puede leer mediante las herramientas disponibles. La validación real debe completarse con un correo controlado en el dominio publicado.
 - El historial de CI no sustituye una prueba integral de registro, confirmación por correo, login, logout y recuperación de contraseña con cuentas reales.
 
+## Riesgos de repositorio y gobierno
+
+- El repositorio sigue siendo público y el código versionado contiene respuestas, explicaciones y soluciones de ejercicios. No es una filtración de credenciales, pero expone material evaluativo. La decisión de privatizarlo o mantener una copia pública saneada sigue abierta en el issue #21; no cambiar visibilidad ni reescribir historial sin decisión del propietario.
+- `master` sigue sin branch protection (`protected: false`). La integración de GitHub devuelve 403 al administrar esa configuración; el propietario debe activarla desde Settings → Branches. Seguimiento: issue #23.
+
 ## Bloqueos y próximos pasos
 
-1. Con una sesión autenticada, verificar que las lecciones `b3-l9` y `b4-l10` cargan la versión publicada, que las seis pruebas del proyecto se ejecutan y que los prerrequisitos se respetan.
+1. Con una sesión autenticada, verificar que las lecciones `b3-l6`, `b3-l9` y `b4-l10` cargan la versión publicada, que los ejemplos y las seis pruebas del proyecto se ejecutan y que los prerrequisitos se respetan.
 2. Completar pruebas manuales de Auth/Turnstile con un buzón controlado, incluyendo registro, confirmación, login, logout y recuperación de contraseña, sin compartir contraseñas ni Secret keys.
 3. Probar evaluaciones y progreso con dos estudiantes y un administrador; comprobar que un intento no aprobado no completa la unidad y que la mejor nota persiste después del cierre de sesión.
 4. Activar la protección de contraseñas filtradas en Supabase Auth; el Advisor de Auth la reportó desactivada.
