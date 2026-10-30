@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, CheckCircle2, LogOut } from 'lucide-react';
@@ -9,6 +9,7 @@ import type { ClientSafeLesson } from '@/lib/course-types';
 import { submitQuiz, type SubmitQuizResult } from '@/lib/server-quiz/submit-quiz.action';
 import PythonEditor from '@/components/PythonEditor';
 import type { ExerciseTestResult } from '@/lib/exercise-output';
+import { acquireSubmissionLock, releaseSubmissionLock } from '@/lib/submission-lock';
 
 type Props = {
   lesson: ClientSafeLesson;
@@ -39,6 +40,7 @@ export default function LessonStudy({
   const [result, setResult] = useState<SubmitQuizResult | null>(null);
   const [feedback, setFeedback] = useState('');
   const [saving, setSaving] = useState(false);
+  const submissionLockRef = useRef(false);
   const [completed, setCompleted] = useState(initialCompleted);
   const [savedScore, setSavedScore] = useState(initialScore);
   const [projectTestsPassed, setProjectTestsPassed] = useState(false);
@@ -49,7 +51,6 @@ export default function LessonStudy({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (saving) return;
 
     if (lesson.finalProject && !projectTestsPassed) {
       setFeedback(`Ejecuta el proyecto y supera las ${lesson.exercise.tests.length} pruebas automáticas antes de registrar su revisión.`);
@@ -61,22 +62,25 @@ export default function LessonStudy({
       return;
     }
 
+    // State updates are rendered asynchronously. A ref closes the same-tick
+    // double-submit window so one click sequence can trigger only one RPC.
+    if (!acquireSubmissionLock(submissionLockRef)) return;
+
     setSaving(true);
     setFeedback('');
     setResult(null);
 
-    const formData = new FormData();
-    formData.set('moduleId', moduleId);
-    formData.set('lessonId', lesson.id);
-    formData.set('expectedUserId', expectedUserId);
-    formData.set('answers', answersJson);
-
     try {
+      const formData = new FormData();
+      formData.set('moduleId', moduleId);
+      formData.set('lessonId', lesson.id);
+      formData.set('expectedUserId', expectedUserId);
+      formData.set('answers', answersJson);
+
       const serverResult = await submitQuiz(null, formData);
 
       if (serverResult.error) {
         setFeedback(serverResult.error);
-        setSaving(false);
         return;
       }
 
@@ -92,6 +96,7 @@ export default function LessonStudy({
     } catch {
       setFeedback('No se pudo guardar el progreso por un error de conexión. Inténtalo de nuevo.');
     } finally {
+      releaseSubmissionLock(submissionLockRef);
       setSaving(false);
     }
   }
