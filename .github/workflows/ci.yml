@@ -33,9 +33,9 @@ jobs:
   test-and-build:
     runs-on: ubuntu-latest
     env:
-      NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
-      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
-      NEXT_PUBLIC_SITE_URL: https://python-desde-cero.pythondesdecero.workers.dev
+      NEXT_PUBLIC_SUPABASE_URL: https://fcwbkkivelsipqqrbpya.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_3IhM0Ck1_EW84Lo8-u9mzg_DRorCBIE
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
 
     steps:
       - name: Checkout repository
