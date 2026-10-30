@@ -1,6 +1,6 @@
 /*
   Access-Control-Allow-Origin: *
-  Content-Security-Policy: default-src 'none'; script-src 'self' __PYTHON_RUNNER_ORIGIN__ 'wasm-unsafe-eval'; connect-src __PYTHON_RUNNER_ORIGIN__; worker-src blob:; object-src 'none'; base-uri 'none'; frame-ancestors https://python-desdecero.com https://www.python-desdecero.com http://localhost:3000 http://localhost:3001 http://127.0.0.1:3000 http://127.0.0.1:3001
+  Content-Security-Policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors https://python-desdecero.com https://www.python-desdecero.com http://localhost:3000 http://localhost:3001 http://127.0.0.1:3000 http://127.0.0.1:3001
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
   X-Robots-Tag: noindex, nofollow
