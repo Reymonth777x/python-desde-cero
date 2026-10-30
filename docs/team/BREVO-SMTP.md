@@ -10,7 +10,7 @@ La integración está en preparación, no certificada en producción.
   - `brevo1._domainkey.python-desdecero.com` CNAME → `b1.python-desdecero-com.dkim.brevo.com`
   - `brevo2._domainkey.python-desdecero.com` CNAME → `b2.python-desdecero-com.dkim.brevo.com`
 - El DNS público muestra un único registro DMARC: `v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com`. La política actual es de monitorización, no de cuarentena ni rechazo.
-- Los nameservers autoritativos publicados para el dominio son `chan.ns.cloudflare.com` y `dns.cloudflare.com`. Las respuestas DNS conservan los CNAME DKIM, por lo que no se observa aplanamiento que los convierta en TXT.
+- Los nameservers autoritativos publicados para el dominio son `piers.ns.cloudflare.com` y `chan.ns.cloudflare.com`. Las respuestas DNS conservan los CNAME DKIM, por lo que no se observa aplanamiento que los convierta en TXT.
 - La consulta TXT del apex no devolvió un registro SPF. Brevo indica que SPF/MX no son obligatorios para autenticar dominios con IP compartida; si la cuenta utiliza IP dedicada, los registros requeridos pueden ser diferentes. Supabase recomienda mantener SPF, DKIM y DMARC alineados para mejorar la entregabilidad. No añadir un segundo SPF ni cambiar los existentes sin ver primero todos los registros del dominio de envío.
 - No se ha podido inspeccionar el estado privado del dominio/remitente en el panel de Brevo. Tampoco se ha podido leer la configuración SMTP de Authentication de Supabase desde la conexión de proyecto disponible. No se afirma que el dominio esté marcado como “Authenticated”, que el remitente esté validado, que la clave SMTP esté guardada en Supabase ni que un correo haya sido entregado.
 
