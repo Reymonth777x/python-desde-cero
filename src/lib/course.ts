@@ -1069,8 +1069,69 @@ export const courseModules: CourseModule[] = [
         "estimatedMinutes": 45
       },
       {
-        "id": "b3-l6",
+        "id": "b3-l2",
         "section": "3.5",
+        "title": "Operadores lógicos y operaciones bit a bit",
+        "objectives": [
+          "Combinar condiciones con and, or y not.",
+          "Diferenciar operadores lógicos y bit a bit.",
+          "Interpretar operaciones &, | y ^ sobre enteros."
+        ],
+        "explanation": [
+          "and exige que ambas condiciones sean verdaderas; or requiere que al menos una lo sea y not invierte un valor booleano. Estos operadores expresan reglas compuestas como comprobar que una cuenta esté activa y tenga saldo suficiente.",
+          "Los operadores bit a bit actúan sobre la representación binaria de los enteros: & realiza AND, | realiza OR, ^ XOR, ~ invierte bits y << o >> desplazan posiciones. No son equivalentes a and y or, que evalúan condiciones.",
+          "El número 5 se representa como 0101 y el 3 como 0011. La operación 5 & 3 conserva los bits que son uno en ambos operandos y produce 0001, que equivale a 1; estas operaciones se utilizan en máscaras, permisos y protocolos."
+        ],
+        "example": "activo = True\nsaldo = 1200\nprint(activo and saldo >= 1000)\nprint(not activo)\nprint(5 & 3)\nprint(5 | 3)",
+        "exampleOutput": "True\nFalse\n1\n7",
+        "walkthrough": [
+          "and combina dos condiciones.",
+          "not invierte True a False.",
+          "5 & 3 conserva bits comunes y 5 | 3 combina posiciones activas."
+        ],
+        "commonMistakes": [
+          "Usar & como sustituto automático de and.",
+          "Confundir | con or en cualquier contexto."
+        ],
+        "exercise": {
+          "id": "b3-e2",
+          "title": "Combinar condiciones",
+          "statement": "Crea edad = 22 y tiene_entrada = True. Imprime True si tiene edad suficiente y entrada.",
+          "starterCode": "edad = 22\ntiene_entrada = True\n",
+          "solution": "edad = 22\ntiene_entrada = True\nprint(edad >= 18 and tiene_entrada)",
+          "tests": [
+            {
+              "input": [],
+              "expected": "True"
+            }
+          ],
+          "hints": [
+            "Compara la edad con 18.",
+            "and exige que ambas condiciones sean verdaderas."
+          ],
+          "difficulty": "medio",
+          "xp": 20,
+          "length": 5
+        },
+        "questions": [
+          {
+            "prompt": "¿Qué diferencia principal existe entre and y &?",
+            "options": [
+              "and combina condiciones booleanas; & opera bit a bit sobre enteros",
+              "Son siempre el mismo operador",
+              "and suma bits y & compara cadenas",
+              "& solo sirve para repetir bucles"
+            ],
+            "answer": 0,
+            "explanation": "and se utiliza para condiciones; & combina bits de valores enteros."
+          }
+        ],
+        "assessment": false,
+        "estimatedMinutes": 45
+      },
+      {
+        "id": "b3-l6",
+        "section": "3.6",
         "title": "Listas: crear, consultar y recorrer",
         "objectives": [
           "Crear listas ordenadas y consultar elementos mediante índices.",
@@ -1140,7 +1201,7 @@ export const courseModules: CourseModule[] = [
       },
       {
         "id": "b3-l7",
-        "section": "3.6",
+        "section": "3.7",
         "title": "Modificar, ordenar y procesar listas",
         "objectives": [
           "Añadir, insertar y eliminar elementos mediante métodos de lista.",
@@ -1200,69 +1261,70 @@ export const courseModules: CourseModule[] = [
         "estimatedMinutes": 45
       },
       {
-        "id": "b3-l2",
-        "section": "3.7",
-        "title": "Operadores lógicos y operaciones bit a bit",
+        "id": "b3-l9",
+        "section": "3.8",
+        "title": "Laboratorio integrador: analizar una tabla de calificaciones",
         "objectives": [
-          "Combinar condiciones con and, or y not.",
-          "Diferenciar operadores lógicos y bit a bit.",
-          "Interpretar operaciones &, | y ^ sobre enteros."
+          "Representar una tabla mediante una lista de listas.",
+          "Recorrer filas y valores con bucles anidados.",
+          "Contar resultados que cumplen una condición."
         ],
         "explanation": [
-          "and exige que ambas condiciones sean verdaderas; or requiere que al menos una lo sea y not invierte un valor booleano. Estos operadores expresan reglas compuestas como comprobar que una cuenta esté activa y tenga saldo suficiente.",
-          "Los operadores bit a bit actúan sobre la representación binaria de los enteros: & realiza AND, | realiza OR, ^ XOR, ~ invierte bits y << o >> desplazan posiciones. No son equivalentes a and y or, que evalúan condiciones.",
-          "El número 5 se representa como 0101 y el 3 como 0011. La operación 5 & 3 conserva los bits que son uno en ambos operandos y produce 0001, que equivale a 1; estas operaciones se utilizan en máscaras, permisos y protocolos."
+          "Una lista de listas permite organizar datos en filas y columnas. Por ejemplo, cada fila puede representar las notas de un estudiante y cada posición una evaluación. Los índices empiezan en cero: notas[1][0] consulta el primer valor de la segunda fila.",
+          "El primer bucle recorre las filas y el segundo recorre cada valor de la fila actual. Esta estructura permite calcular totales, promedios, máximos o cantidades que cumplen una condición sin escribir una instrucción diferente para cada celda.",
+          "Una condición dentro del bucle permite contar solo los datos que cumplen una regla. En este laboratorio se considera aprobada una nota mayor o igual a 70. Prueba también una matriz con filas de distinta longitud y comprueba cómo cambia el resultado."
         ],
-        "example": "activo = True\nsaldo = 1200\nprint(activo and saldo >= 1000)\nprint(not activo)\nprint(5 & 3)\nprint(5 | 3)",
-        "exampleOutput": "True\nFalse\n1\n7",
+        "example": "notas = [[80, 90], [65, 75]]\naprobadas = 0\nfor fila in notas:\n    for nota in fila:\n        if nota >= 70:\n            aprobadas += 1\nprint(aprobadas)",
+        "exampleOutput": "3",
         "walkthrough": [
-          "and combina dos condiciones.",
-          "not invierte True a False.",
-          "5 & 3 conserva bits comunes y 5 | 3 combina posiciones activas."
+          "notas contiene dos filas y cada fila contiene dos calificaciones.",
+          "El bucle exterior obtiene una fila; el interior examina cada nota.",
+          "La condición cuenta 80, 90 y 75 porque son mayores o iguales a 70."
         ],
         "commonMistakes": [
-          "Usar & como sustituto automático de and.",
-          "Confundir | con or en cualquier contexto."
+          "Recorrer solo la lista exterior y olvidar el segundo bucle.",
+          "Comparar una fila completa con 70 en lugar de comparar cada nota."
         ],
         "exercise": {
-          "id": "b3-e2",
-          "title": "Combinar condiciones",
-          "statement": "Crea edad = 22 y tiene_entrada = True. Imprime True si tiene edad suficiente y entrada.",
-          "starterCode": "edad = 22\ntiene_entrada = True\n",
-          "solution": "edad = 22\ntiene_entrada = True\nprint(edad >= 18 and tiene_entrada)",
+          "id": "b3-e9",
+          "title": "Contar las calificaciones aprobadas",
+          "statement": "Utiliza la matriz [[70, 85], [60, 95]] y dos bucles for para contar cuántas notas son mayores o iguales a 70. Imprime el total.",
+          "starterCode": "notas = [[70, 85], [60, 95]]\naprobadas = 0\n",
+          "solution": "notas = [[70, 85], [60, 95]]\naprobadas = 0\nfor fila in notas:\n    for nota in fila:\n        if nota >= 70:\n            aprobadas += 1\nprint(aprobadas)",
           "tests": [
             {
               "input": [],
-              "expected": "True"
+              "expected": "3"
             }
           ],
           "hints": [
-            "Compara la edad con 18.",
-            "and exige que ambas condiciones sean verdaderas."
+            "El primer for recorre cada fila.",
+            "El segundo for recorre las notas de la fila actual.",
+            "Incrementa el contador solo cuando nota >= 70."
           ],
           "difficulty": "medio",
-          "xp": 20,
+          "xp": 25,
           "length": 5
         },
         "questions": [
           {
-            "prompt": "¿Qué diferencia principal existe entre and y &?",
+            "prompt": "Si notas = [[80, 90], [65, 75]], ¿qué devuelve notas[1][0]?",
             "options": [
-              "and combina condiciones booleanas; & opera bit a bit sobre enteros",
-              "Son siempre el mismo operador",
-              "and suma bits y & compara cadenas",
-              "& solo sirve para repetir bucles"
+              "90",
+              "65",
+              "75",
+              "80"
             ],
-            "answer": 0,
-            "explanation": "and se utiliza para condiciones; & combina bits de valores enteros."
+            "answer": 1,
+            "explanation": "El primer índice selecciona la segunda fila; el segundo selecciona su primer elemento, que es 65."
           }
         ],
         "assessment": false,
-        "estimatedMinutes": 45
+        "estimatedMinutes": 60
       },
       {
         "id": "b3-l8",
-        "section": "3.8",
+        "section": "3.9",
         "title": "Evaluación del módulo 3: lógica, ciclos y listas",
         "objectives": [
           "Combinar comparaciones y operadores lógicos.",
@@ -1343,69 +1405,7 @@ export const courseModules: CourseModule[] = [
         "assessment": true,
         "estimatedMinutes": 45
       },
-      {
-        "id": "b3-l9",
-        "section": "3.9",
-        "title": "Laboratorio integrador: analizar una tabla de calificaciones",
-        "objectives": [
-          "Representar una tabla mediante una lista de listas.",
-          "Recorrer filas y valores con bucles anidados.",
-          "Contar resultados que cumplen una condición."
-        ],
-        "explanation": [
-          "Una lista de listas permite organizar datos en filas y columnas. Por ejemplo, cada fila puede representar las notas de un estudiante y cada posición una evaluación. Los índices empiezan en cero: notas[1][0] consulta el primer valor de la segunda fila.",
-          "El primer bucle recorre las filas y el segundo recorre cada valor de la fila actual. Esta estructura permite calcular totales, promedios, máximos o cantidades que cumplen una condición sin escribir una instrucción diferente para cada celda.",
-          "Una condición dentro del bucle permite contar solo los datos que cumplen una regla. En este laboratorio se considera aprobada una nota mayor o igual a 70. Prueba también una matriz con filas de distinta longitud y comprueba cómo cambia el resultado."
-        ],
-        "example": "notas = [[80, 90], [65, 75]]\naprobadas = 0\nfor fila in notas:\n    for nota in fila:\n        if nota >= 70:\n            aprobadas += 1\nprint(aprobadas)",
-        "exampleOutput": "3",
-        "walkthrough": [
-          "notas contiene dos filas y cada fila contiene dos calificaciones.",
-          "El bucle exterior obtiene una fila; el interior examina cada nota.",
-          "La condición cuenta 80, 90 y 75 porque son mayores o iguales a 70."
-        ],
-        "commonMistakes": [
-          "Recorrer solo la lista exterior y olvidar el segundo bucle.",
-          "Comparar una fila completa con 70 en lugar de comparar cada nota."
-        ],
-        "exercise": {
-          "id": "b3-e9",
-          "title": "Contar las calificaciones aprobadas",
-          "statement": "Utiliza la matriz [[70, 85], [60, 95]] y dos bucles for para contar cuántas notas son mayores o iguales a 70. Imprime el total.",
-          "starterCode": "notas = [[70, 85], [60, 95]]\naprobadas = 0\n",
-          "solution": "notas = [[70, 85], [60, 95]]\naprobadas = 0\nfor fila in notas:\n    for nota in fila:\n        if nota >= 70:\n            aprobadas += 1\nprint(aprobadas)",
-          "tests": [
-            {
-              "input": [],
-              "expected": "3"
-            }
-          ],
-          "hints": [
-            "El primer for recorre cada fila.",
-            "El segundo for recorre las notas de la fila actual.",
-            "Incrementa el contador solo cuando nota >= 70."
-          ],
-          "difficulty": "medio",
-          "xp": 25,
-          "length": 5
-        },
-        "questions": [
-          {
-            "prompt": "Si notas = [[80, 90], [65, 75]], ¿qué devuelve notas[1][0]?",
-            "options": [
-              "90",
-              "65",
-              "75",
-              "80"
-            ],
-            "answer": 1,
-            "explanation": "El primer índice selecciona la segunda fila; el segundo selecciona su primer elemento, que es 65."
-          }
-        ],
-        "assessment": false,
-        "estimatedMinutes": 60
-      }
-    ]
+   ]
   },
   {
     "id": "module-4",
