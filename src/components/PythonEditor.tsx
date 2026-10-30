@@ -102,7 +102,7 @@ export default function PythonEditor({
     return () => window.cancelAnimationFrame(frame);
   }, [applyEditorTheme]);
 
-  const needsInput = /\\binput\\s*\\(/.test(code);
+  const needsInput = /\binput\s*\(/.test(code);
 
   const runCode = useCallback(() => {
     if (isRunning) return;
