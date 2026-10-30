@@ -81,7 +81,7 @@ AS $function$
     WHERE id = (SELECT auth.uid())
       AND is_admin = TRUE
   );
-$function$
+$function$;
 
 CREATE OR REPLACE FUNCTION private.prevent_used_invitation_deletion()
  RETURNS trigger
@@ -96,7 +96,7 @@ BEGIN
 
   RETURN OLD;
 END;
-$function$
+$function$;
 
 CREATE OR REPLACE FUNCTION public.handle_new_user()
  RETURNS trigger
@@ -156,7 +156,7 @@ BEGIN
 
     RETURN NEW;
 END;
-$function$
+$function$;
 
 CREATE OR REPLACE FUNCTION private.submit_quiz_authoritative_v2(p_module_id text, p_lesson_id text, p_answers integer[])
  RETURNS jsonb
@@ -298,7 +298,7 @@ BEGIN
         'bestScore', COALESCE(v_best_score, 0)
     );
 END;
-$function$
+$function$;
 
 CREATE OR REPLACE FUNCTION public.submit_quiz_v2(
   p_module_id text,
