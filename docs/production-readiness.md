@@ -1,8 +1,9 @@
 # Preparación para producción — 30 de octubre de 2026
 
-**HEAD de master y release:** `e758f9cf9da1aa647429669b112b7128ca9b126d`  
+**Último release funcional de la aplicación:** `e758f9cf9da1aa647429669b112b7128ca9b126d`  
 **CI:** [41076396982](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41076396982) — success  
 **Despliegue:** [41076898388](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41076898388) — success, job `deploy` ejecutado  
+**Actualización documental posterior:** PR #67 en `10cc1b7`; CI [41092034385](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41092034385) y deploy [41092591412](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41092591412) — success; no cambia el código de la aplicación.  
 **Alcance:** GitHub, dominio público, Cloudflare Workers y dos proyectos Supabase. Las consultas Supabase fueron de solo lectura; no se ejecutaron migraciones ni escrituras.
 
 ## Dictamen
