@@ -51,6 +51,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Verify every course exercise solution with isolated Python runs
+        run: python3 scripts/verify-course-exercises.py
+
       - name: Run unit tests
         run: npm test
 
