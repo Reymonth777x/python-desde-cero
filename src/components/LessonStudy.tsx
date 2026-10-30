@@ -5,18 +5,12 @@ import type { FormEvent } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, CheckCircle2, LogOut } from 'lucide-react';
 import { logout } from '@/app/login/actions';
-import type { CourseExercise, CourseLesson, QuizQuestion } from '@/lib/course';
+import type { ClientSafeLesson } from '@/lib/course-types';
 import { submitQuiz, type SubmitQuizResult } from '@/lib/server-quiz/submit-quiz.action';
 import PythonEditor from '@/components/PythonEditor';
 
-type ClientSafeQuizQuestion = Omit<QuizQuestion, 'answer' | 'explanation'>;
-type ClientSafeExercise = Omit<CourseExercise, 'solution'>;
-
 type Props = {
-  lesson: Omit<CourseLesson, 'questions' | 'exercise'> & {
-    questions: ClientSafeQuizQuestion[];
-    exercise: ClientSafeExercise;
-  };
+  lesson: ClientSafeLesson;
   moduleId: string;
   moduleNumber: string;
   moduleTitle: string;
