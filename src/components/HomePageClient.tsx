@@ -256,11 +256,11 @@ export default function HomePageClient({ accountLinks, progressSummary }: HomePa
               Una ruta guiada para pasar de tus primeras instrucciones a resolver problemas con Python. Lee, modifica el código y ejecútalo en tu propio navegador.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
-              <a href="#ruta" className="inline-flex min-h-12 items-center justify-center gap-3 bg-[var(--theme-accent)] px-5 py-3 text-sm font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">
-                Explorar la ruta <span aria-hidden="true">↗</span>
-              </a>
-              <a href="#ejemplo" className="inline-flex min-h-12 items-center justify-center border border-[var(--theme-border)] px-5 py-3 text-sm font-semibold text-[var(--theme-ink)] transition-colors hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">
-                Probar Python
+              <Link href="/muestra" className="inline-flex min-h-12 items-center justify-center gap-3 bg-[var(--theme-accent)] px-5 py-3 text-sm font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">
+                Probar la primera lección <span aria-hidden="true">↗</span>
+              </Link>
+              <a href="#ruta" className="inline-flex min-h-12 items-center justify-center border border-[var(--theme-border)] px-5 py-3 text-sm font-semibold text-[var(--theme-ink)] transition-colors hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">
+                Explorar el recorrido
               </a>
             </div>
             {progressSummary}
