@@ -3,6 +3,7 @@ import ThemeSelector from '@/components/ThemeSelector';
 import { ArrowRight, BookOpenCheck, Circle, Lock, LogOut } from 'lucide-react';
 import { logout } from '@/app/login/actions';
 import { courseCatalog } from '@/lib/course-catalog';
+import { canAccessLessonInSequence, findFirstIncompleteLessonIndex } from '@/lib/lesson-access';
 
 export type ProgressRow = {
   module_id: string;
@@ -73,10 +74,27 @@ export default function AcademyDashboard({
   const findNextLesson = (modules: typeof courseCatalog) => modules
     .flatMap((courseModule) => {
       const moduleIndex = courseCatalog.findIndex((item) => item.id === courseModule.id);
-      if (!progressUnavailable && !isModuleUnlocked(moduleIndex, progressRows)) return [];
-      return courseModule.lessons.map((lesson) => ({ courseModule, lesson }));
+      const moduleUnlocked = progressUnavailable
+        ? moduleIndex === 0
+        : isModuleUnlocked(moduleIndex, progressRows);
+      if (!moduleUnlocked) return [];
+
+      return courseModule.lessons.map((lesson, lessonIndex) => ({
+        courseModule,
+        lesson,
+        lessonUnlocked: completed(courseModule.id, lesson.id) ||
+          canAccessLessonInSequence(
+            courseModule.id,
+            lessonIndex,
+            courseModule.lessons,
+            progressRows,
+            progressUnavailable,
+          ),
+      }));
     })
-    .find(({ courseModule, lesson }) => !completed(courseModule.id, lesson.id));
+    .find(({ courseModule, lesson, lessonUnlocked }) =>
+      lessonUnlocked && !completed(courseModule.id, lesson.id),
+    );
 
   const coreComplete = !progressUnavailable && completedCount === lessonCount;
   const nextLesson = findNextLesson(coreModules) ?? findNextLesson(extensionModules);
@@ -154,7 +172,7 @@ export default function AcademyDashboard({
         {/* Progress summary */}
         {progressUnavailable ? (
           <p role="alert" className="mt-6 border-l-4 border-[var(--theme-error)] bg-[var(--theme-surface)] px-4 py-3 text-sm leading-6 text-[var(--theme-error)]">
-            No se pudo consultar el progreso guardado. Puedes estudiar; la aplicación mostrará un error si no logra guardar una evaluación.
+            No se pudo consultar tu progreso. Por seguridad, solo estará disponible la primera lección hasta que se recupere la conexión y podamos comprobar tus avances.
           </p>
         ) : (
           <section aria-label="Progreso general" className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
@@ -175,7 +193,9 @@ export default function AcademyDashboard({
         {/* Module list */}
         <div className="mt-10 space-y-10">
           {courseCatalog.map((courseModule, moduleIndex) => {
-            const unlocked = progressUnavailable || isModuleUnlocked(moduleIndex, progressRows);
+            const unlocked = progressUnavailable
+              ? moduleIndex === 0
+              : isModuleUnlocked(moduleIndex, progressRows);
             const moduleCompleted = courseModule.lessons.filter((lesson) =>
               completed(courseModule.id, lesson.id),
             ).length;
@@ -217,10 +237,35 @@ export default function AcademyDashboard({
                 </div>
 
                 <ol className="divide-y divide-[var(--theme-border)]">
-                  {courseModule.lessons.map((lesson) => {
+                  {courseModule.lessons.map((lesson, lessonIndex) => {
                     const isCompleted = completed(courseModule.id, lesson.id);
+                    const lessonUnlocked = unlocked && (
+                      isCompleted ||
+                      canAccessLessonInSequence(
+                        courseModule.id,
+                        lessonIndex,
+                        courseModule.lessons,
+                        progressRows,
+                        progressUnavailable,
+                      )
+                    );
 
-                    if (!unlocked) {
+                    if (!lessonUnlocked) {
+                      const firstIncompleteIndex = findFirstIncompleteLessonIndex(
+                        courseModule.id,
+                        courseModule.lessons.slice(0, lessonIndex),
+                        progressRows,
+                        progressUnavailable,
+                      );
+                      const lockDescription = progressUnavailable
+                        ? 'No se pudo consultar el progreso. Actualiza la página cuando se recupere la conexión.'
+                        : !unlocked
+                          ? prevAssessment
+                            ? `Completa la evaluación del módulo ${prevModule.number} para desbloquear este módulo.`
+                            : 'Completa el módulo anterior para desbloquear este módulo.'
+                          : firstIncompleteIndex >= 0
+                            ? `Completa «${courseModule.lessons[firstIncompleteIndex].title}» para desbloquear esta lección.`
+                            : 'Esta lección estará disponible cuando podamos comprobar tu progreso.';
                       // Show lessons as locked, no links
                       return (
                         <li key={`${courseModule.id}-${lesson.id}`}>
@@ -230,6 +275,7 @@ export default function AcademyDashboard({
                               <span className="min-w-0">
                                 <span className="block text-xs font-semibold text-[var(--theme-muted)]">{lesson.section}{lesson.finalProject ? ' · PROYECTO FINAL' : lesson.finalAssessment ? ' · EXAMEN FINAL' : lesson.assessment ? ' · EVALUACIÓN' : ''}</span>
                                 <span className="mt-1 block font-medium text-[var(--theme-ink)]">{lesson.title}</span>
+                                <span className="mt-1 block text-xs leading-5 text-[var(--theme-muted)]">{lockDescription}</span>
                               </span>
                             </span>
                           </div>
