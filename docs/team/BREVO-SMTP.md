@@ -32,10 +32,10 @@ Brevo admite otros puertos, pero la configuración de cifrado debe coincidir con
 ## Orden correcto para terminar
 
 1. En Brevo → Settings → Senders, Domains, IPs, comprobar que `python-desdecero.com` aparece como **Authenticated** y que la dirección remitente está verificada. Si Brevo muestra registros adicionales para esta cuenta, comprobarlos antes de asumir que el DNS está completo.
-2. En Supabase DEV `python-desde-cero-dev` → Authentication → SMTP Settings, activar el SMTP personalizado e introducir host, puerto, usuario SMTP, la clave SMTP y el remitente verificado. Guardar el secreto directamente en el panel; no pegarlo en el chat ni en este repositorio.
+2. En Supabase DEV `python-desde-cero-dev` → Authentication → Emails → SMTP Settings, activar `Enable custom SMTP` e introducir host, puerto, SMTP login exacto, clave SMTP y remitente verificado. Guardar el secreto directamente en el panel; no pegarlo en el chat ni en este repositorio.
 3. Enviar una confirmación de registro y un restablecimiento de contraseña a un buzón controlado. Revisar recepción, enlaces, carpeta de spam y el encabezado del mensaje (`dkim=pass`, SPF y DMARC).
 4. Solo después de que DEV funcione, aplicar el mismo patrón al proyecto de producción `nuqydanbbgqcofcftshk` y probar una dirección controlada.
-5. Revisar los límites de envío de Supabase Auth y Brevo. Los logs previos registraron dos `over_email_send_rate_limit` (429), pero no identificaban el proveedor SMTP activo en ese momento.
+5. Revisar los límites de envío de Supabase Auth y Brevo. La documentación vigente de Supabase indica un máximo de 2 mensajes/hora para el SMTP compartido por defecto y un límite inicial de 30 mensajes/hora después de configurar SMTP personalizado (ajustable en Rate Limits). Los logs previos registraron dos `over_email_send_rate_limit` (429), pero no identificaban el proveedor SMTP activo en ese momento.
 
 ## Separación de entornos y seguridad
 
@@ -49,4 +49,5 @@ Brevo admite otros puertos, pero la configuración de cifrado debe coincidir con
 - [Brevo: Enviar emails transaccionales con SMTP](https://help.brevo.com/hc/es/articles/7924908994450-Enviar-emails-transaccionales-con-Brevo-SMTP)
 - [Brevo: Autenticar el dominio (código, DKIM, DMARC)](https://help.brevo.com/hc/es/articles/12163873383186-Autenticar-el-dominio-con-Brevo-c%C3%B3digo-Brevo-DKIM-DMARC)
 - [Brevo: Crear y administrar claves SMTP](https://help.brevo.com/hc/es/articles/7959631848850-Crear-y-administrar-claves-SMTP)
+- [Brevo: Conectar SMTP de Brevo con Supabase](https://developers.brevo.com/docs/supabase-smtp-integration)
 - [Supabase: Send emails with custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp)
