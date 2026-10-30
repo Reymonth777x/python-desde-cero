@@ -1,125 +1,93 @@
-# Estado del Proyecto — Python desde Cero
+# Estado del proyecto — Python desde Cero
 
-## Hito actual: H2 (Editor, ejecutor sandbox, Turtle)
+**Corte:** 30 de octubre de 2026, 10:37 UTC  
+**Rama principal:** `master`  
+**Commit publicado observado:** `ef6b1b7807dd9816ce6064ba5ae5ea6f11bf389f`
 
-## Hito H0 — COMPLETADO ✅
-- Rama `producto-v1` creada desde `fase-3-5-correctivos`
-- `npm install` exit 0, 440 paquetes, 0 vulnerabilidades
-- `postinstall` repara Pyodide y Monaco
-- `npx tsc --noEmit` exit 0
-- `npx vitest run` exit 0, 22 tests pasando
-- `npm run build` exit 0, 14 páginas estáticas
-- `npm run dev` — localhost:3000 responde HTTP 200
-- `npm run doctor` creado, exit 0
-- Supabase local: NO EJECUTADO (Docker no disponible)
+## Resumen ejecutivo
 
-## Hito H1 — COMPLETADO ✅
-- 6 temas: Original, Oscuro, Drácula, Cyberpunk, Hacker, Rosa + Sistema
-- Tokens CSS semánticos completos en `src/app/themes.css`
-- 381+25 colores hardcoded migrados a `var(--theme-*)`
-- ThemeProvider con 7 temas, persistencia localStorage, data-theme en html
-- ThemeSelector con preview de color, estados hover/focus/active
-- Páginas 404, 500, offline con identidad propia
-- Scripts `check:theme-coverage` y `check:contrast` pasando
-- `docs/informes/h1-inventario-ui.md` — inventario de todos los elementos UI
-- `docs/informes/h1-temas/index.html` — hoja de contactos
-- `tests/theme-visual.test.ts` — pruebas visuales Playwright
-- tsc, vitest, build en exit 0
+La aplicación está desplegada en Cloudflare Workers y compila correctamente. La ruta educativa principal, las evaluaciones, el progreso, Auth y el laboratorio existen en el código. Aún no debe declararse lanzamiento completo: falta comprobar el recorrido real de una persona desde el registro hasta la primera evaluación aprobada y el progreso recuperado, además de resolver la exposición de respuestas en el repositorio público.
 
-## Hito H2 — COMPLETADO ✅
-- Ejecutor sandbox: clear_commands vía pyodide.globals (sin stdout), to_json para comandos turtle
-- turtle_compat.py: sys.modules['turtle'] registrado, mainloop/exitonclick añadidos
-- TurtleCanvas.tsx: SVG renderizado, play/pausa/velocidad/paso a paso/reiniciar, tema-aware
-- python-error-translator.ts: errores de Python → español con pista pedagógica
-- tsc, vitest (22 tests), build — todos exit 0
+## Publicación y CI
 
-## Próximos: H4-H10
-- H4: Backend, cuentas, correos, antifraude
-- H5: Seguridad 7+1 capas
-- H6: Contenido 100+ ejercicios
-- H7: Juego de cocina determinista
-- H8: Portada, navegación, pulido UX
-- H9: Despliegue reproducible
-- H10: QA final y entrega
+- CI de `master` para el commit publicado: [ejecución 41040829424](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41040829424), finalizada correctamente.
+- Despliegue manual del Worker: [ejecución 41041886743](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41041886743), finalizada correctamente.
+- El despliegue comprobó el dominio raíz, la nueva portada y la presencia del marcador del widget Turnstile en `/login`.
+- La portada publicada anuncia cuatro módulos y 33 unidades obligatorias, más una extensión opcional con cuatro actividades.
+- La PR #28 de flujo móvil del laboratorio se fusionó y sus pruebas CI pasaron. Falta validación en teléfonos físicos.
+- La PR #31 configura el dominio `www` y redirección 308 al dominio raíz. Verificar DNS, certificado y redirección en clientes externos.
 
-## Bloqueos
-- Docker no disponible: Supabase local, pgTAP tests NO EJECUTADOS
-- .env.local apunta a Supabase remoto (debe apuntar a local para desarrollo)
-- npm run lint se cuelga en este entorno
+Un build o deploy exitoso no demuestra que registro, correo, CAPTCHA, login, evaluación y progreso funcionen de extremo a extremo.
 
-## Comando para retomar
-`cd c:\Users\USUARIO\python-pe1-academy && npm install && npm run build`
-# Estado del proyecto — Hito H1 (en progreso)
+## Producto y contenidos
 
-**Rama:** `producto-v1` (desde `fase-3-5-correctivos`)
-**Fecha:** 27/10/2026
-**Hito actual:** H1 — Identidad, sistema de diseño, 6 temas y microinteracciones (EN PROGRESO)
-**Hito anterior:** H0 — Línea base que arranca y compila (COMPLETADO)
+- Cuatro módulos principales de PE1; 33 unidades obligatorias según `src/lib/course-catalog.ts`.
+- Evaluación formal del módulo 1, primer programa Hello World del módulo 2, evaluaciones de módulos y proyecto final/examen global definidos en el catálogo actual.
+- Extensión de archivos y persistencia separada como contenido opcional.
+- Editor Monaco, Pyodide en Web Worker y visualización Turtle implementados.
+- El laboratorio móvil usa un recorrido vertical de guía, editor, ejecución y resultado.
+- La portada aún utiliza un ejemplo Turtle con `for` como pieza visual principal. Debe cambiarse por una demostración que represente la primera unidad para principiantes.
+- El laboratorio de portada y la primera lección de Academia todavía no forman una experiencia única de prueba y conversión.
 
-## Qué está hecho (H0)
-- Rama `producto-v1` creada desde `fase-3-5-correctivos`
-- `npm install` completado (exit 0, 0 vulnerabilidades)
-- `scripts/restore-browser-assets.js` reparado
-- `postinstall` verificado: Pyodide + Monaco copiados a `public/`
-- `npx tsc --noEmit`: exit 0
-- `npx vitest run`: exit 0, 22 tests pasados
-- `npm run build`: exit 0, 14/14 páginas estáticas
-- `npm run doctor`: exit 0 (3 advertencias: puerto 3000 en uso, Docker/CLI no disponibles)
+## Supabase
 
-## Qué está hecho (H1 — parcial)
-- `src/app/themes.css`: 6 temas + Sistema con tokens CSS semánticos completos (--theme-bg, --theme-ink, --theme-accent, --theme-border, --theme-success, --theme-error, --theme-warning, --theme-focus-ring, --theme-shadow, --theme-glow, --theme-ink-inverse, etc.)
-- `src/app/globals.css`: limpiado, sin variables hardcoded, delega a themes.css
-- `src/app/theme-provider.tsx`: 7 temas (original, dark, dracula, cyberpunk, hacker, rosa, sistema), persistencia localStorage, data-theme en HTML, data-color-scheme, prefers-reduced-motion, forced-colors
-- `src/components/ThemeSelector.tsx`: 7 opciones con preview de color, estados hover, focus-visible, usando var(--theme-*) para todos los colores
-- `src/components/AcademyDashboard.tsx`: migrado a tokens CSS
-- `src/components/LessonStudy.tsx`: migrado a tokens CSS
-- `src/components/LessonProgress.tsx`: migrado a tokens CSS
-- `src/components/PythonEditor.tsx`: migrado a tokens CSS
-- `src/components/PortadaLab.tsx`: migrado a tokens CSS
-- `src/app/login/page.tsx`: migrado a tokens CSS
-- `src/app/login/forgot-password/page.tsx`: migrado a tokens CSS
-- `src/app/login/reset-password/page.tsx`: migrado a tokens CSS
-- `src/app/admin/invitaciones/page.tsx`: migrado a tokens CSS
-- `src/app/practica/page.tsx`: migrado a tokens CSS
-- `src/app/page.tsx`: migrado a tokens CSS
-- `src/app/python-runner/page.tsx`: migrado a tokens CSS (text-red-600 → text-[var(--theme-error)])
-- `scripts/migrate-colors.mjs`: script de migración (381 replacements)
-- `scripts/migrate-colors2.mjs`: segunda pasada (25 replacements)
-- `scripts/check-theme-coverage.mjs`: verifica que no haya colores fijos en src/ fuera de themes.css → ✅ PASA
-- `scripts/check-contrast.mjs`: verifica contraste WCAG en 6 temas → ✅ PASA (0 pares debajo del umbral)
-- `package.json`: agregados scripts `check:theme-coverage` y `check:contrast`
-- `npm run build`: exit 0
-- `npx tsc --noEmit`: exit 0
-- `npx vitest run`: exit 0, 22 tests pasados
+Hay un proyecto de producción y otro de desarrollo, ambos observados como activos.
 
-## Qué falta (H1)
-- Pruebas visuales Playwright: cada ruta × cada tema, verifica colores calculados difieren
-- `docs/informes/h1-inventario-ui.md`: inventario de cada botón/enlace con su función
-- `docs/informes/h1-temas/index.html`: hoja de contactos (páginas × 6 temas × móvil/desktop)
+La producción tiene aplicadas las migraciones remotas desde 004–015, 018–027, con versiones timestamp que no siempre coinciden con los prefijos de los archivos locales. La migración local 028 no aparece aplicada en producción al momento de esta comprobación. Las variantes locales 001–003 y 016–017 tampoco deben ejecutarse sin reconciliación.
 
-## Qué está hecho (H1 — páginas de error)
-- `src/app/not-found.tsx`: 404 con diseño propio, enlaces funcional, tema-aware
-- `src/app/error.tsx`: 500 con botón recargar, tema-aware
-- `src/app/offline/page.tsx`: sin conexión, tema-aware, sin 'use client' (metadata es server-only)
+En una inspección de solo lectura:
+- RLS está habilitada en las tablas públicas y privadas revisadas.
+- Las respuestas correctas se almacenan en `private.quiz_answer_key`.
+- `public.submit_quiz_v2` es `SECURITY INVOKER`; el calificador autoritativo privado valida la identidad autenticada.
+- Los estudiantes no tienen escritura directa sobre `profiles.is_admin`; la lectura del perfil está limitada por RLS.
+- El progreso de las evaluaciones se escribe desde el calificador privado.
 
-## Qué falta (H0 — pendientes)
-- Verificar `npm run dev` en `http://localhost:3000` sin errores de consola
-- `npm run lint` (se cuelga en este entorno, problema conocido documentado)
-- Supabase local NO DISPONIBLE (Docker y Supabase CLI no están instalados localmente) → NO EJECUTADO
-- `.env.local` actualmente apunta a Supabase remoto; para desarrollo local debe apuntar a `http://localhost:54322`
-- `supabase test db` (pgTAP) → NO EJECUTADO sin Docker
+No ejecutar `db push`, `migration repair` o `db reset` en producción hasta reconciliar historial y archivos, probar en desarrollo y confirmar respaldo/rollback. Ver [docs/team/MIGRACIONES.md](team/MIGRACIONES.md).
 
-## Decisiones tomadas
-- Un solo camino de build: Next.js 16.4.3 estándar
-- CSP completa con Report-Only en dev / enforce en prod
-- Turnstile + Supabase captchaToken
-- Tokens CSS semánticos en `src/app/themes.css` con `[data-theme="..."]` selectores
-- Tema por defecto: "sistema" (sigue prefers-color-scheme del dispositivo)
-- Todos los colores de componentes usan `var(--theme-*)` vía clases Tailwind arbitrarias `[color:var(--theme-*)]`, `bg-[var(--theme-*)]`, etc.
+## Pendientes que bloquean el lanzamiento
 
-## Bloqueos
-- ESLint scope completo se cuelga en este entorno
-- Docker/Supabase CLI pueden no estar disponibles para Supabase local
+### P0 — Validar el recorrido del alumno
+- Probar registro, confirmación de correo, Turnstile, login, cierre y recuperación con cuentas desechables.
+- Completar una lección real, ejecutar Python, enviar una evaluación, reprobar, aprobar y verificar que la nota/progreso sobreviven al cierre de sesión.
+- Repetir las pruebas con dos estudiantes distintos para comprobar aislamiento de datos.
+- Publicar una primera lección de muestra con ejecución real sin guardar progreso ni revelar respuestas. Solicitar registro cuando el alumno quiera conservar avances o enviar una evaluación.
 
-## Comando para retomar
-`git checkout producto-v1 && npm install && npx tsc --noEmit && npm test && npm run build`
+### P0 — Resolver respuestas expuestas en el repositorio público
+El repositorio es público. Aunque `src/lib/course.ts` esté marcado `server-only`, el propio archivo versionado contiene campos `answer` y `exercise.solution`. Eso evita una exposición en el bundle cliente, pero no impide que cualquier visitante los lea en GitHub. Resolver la visibilidad del repositorio o mover claves/soluciones fuera del código público. Seguimiento: issue [#21](https://github.com/Reymonth777x/python-desde-cero/issues/21).
+
+### P1 — Seguridad y operación
+- Proteger `master` con PR obligatorio, aprobación y checks obligatorios. Seguimiento: issue [#23](https://github.com/Reymonth777x/python-desde-cero/issues/23).
+- Verificar correo real, URLs allowlist, SMTP y DNS SPF/DKIM/DMARC.
+- Revisar límites de Auth, controles/MFA de administración, backups y restauración.
+- Resolver la advertencia de Supabase sobre protección de contraseñas filtradas.
+- Mantener la auditoría de dependencias como control explícito: el paso `npm audit` de CI no bloquea actualmente la publicación.
+
+### P1 — QA y gobierno del contenido
+- Probar Monaco/Pyodide/Turtle, `input()`, errores y tiempos de espera en dispositivos físicos y redes lentas.
+- Auditar las 33 unidades para eliminar repeticiones, confirmar progresión de dificultad y comprobar alineación con el temario PE1.
+- Revisar invitaciones automáticas/personalizadas, edición, borrado de no usadas y rechazo de las ya utilizadas.
+- Completar privacidad, términos, retención y revisión legal para Costa Rica.
+- Actualizar sitemap/robots solo después de decidir qué lecciones introductorias serán públicas.
+
+## Validaciones CI actuales
+
+El workflow de CI ejecuta:
+1. Pruebas unitarias Vitest.
+2. TypeScript.
+3. ESLint.
+4. Build Next.js.
+5. Playwright sobre build de producción (incluye proyecto Chromium y emulación móvil).
+6. Build de Cloudflare Workers con Vinext.
+
+Estas pruebas comprueban el código y la interfaz en un entorno automatizado; no sustituyen pruebas con cuentas reales, correo real ni dispositivos físicos.
+
+## Cómo retomar el desarrollo local
+
+Desde la raíz del repositorio clonado:
+
+```powershell
+npm ci
+npm run check:release
+```
+
+Para Supabase local, seguir el lanzador y las restricciones descritas en el README y en `docs/TAREAS_PENDIENTES.md`. No conectar pruebas locales a producción ni ejecutar migraciones remotas sin el procedimiento de reconciliación.
