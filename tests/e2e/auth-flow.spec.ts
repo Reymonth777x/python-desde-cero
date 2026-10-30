@@ -17,6 +17,25 @@ test.describe('Autenticacion y flujo de usuario', () => {
     await expect(page.getByRole('button', { name: 'Continuar' })).toBeVisible();
   });
 
+  test('Los campos de registro e inicio permanecen separados al cambiar de formulario', async ({ page }) => {
+    await page.goto('/login');
+
+    await page.getByLabel('Correo electrónico').fill('login@example.test');
+    await page.getByLabel('Contraseña').fill('LoginPass123');
+
+    await page.getByRole('button', { name: 'Crear cuenta' }).first().click();
+    await expect(page.getByLabel('Correo electrónico')).toHaveValue('');
+    await expect(page.getByLabel('Contraseña')).toHaveValue('');
+
+    await page.getByLabel('Nombre completo').fill('Estudiante de prueba');
+    await page.getByLabel('Correo electrónico').fill('signup@example.test');
+    await page.getByLabel('Contraseña').fill('SignupPass123');
+
+    await page.getByRole('button', { name: 'Entrar' }).click();
+    await expect(page.getByLabel('Correo electrónico')).toHaveValue('');
+    await expect(page.getByLabel('Contraseña')).toHaveValue('');
+  });
+
   test('Visitante anonimo es redirigido al acceder a rutas protegidas', async ({ page }) => {
     await page.goto('/academia');
     await expect(page).toHaveURL(/.*\/login/);
