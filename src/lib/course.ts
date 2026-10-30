@@ -1321,8 +1321,8 @@ export const courseModules: CourseModule[] = [
           "Los índices empiezan en cero: edades[0] consulta el primer elemento y edades[1] el segundo. Los índices negativos cuentan desde el final, así que edades[-1] consulta el último. len(edades) devuelve la cantidad de elementos.",
           "Un bucle for puede recorrer los valores sin que tengas que calcular cada índice. Cuando los datos llegan como texto separado por espacios, split() crea una lista de cadenas; convierte cada valor con int() o float() antes de hacer operaciones numéricas."
         ],
-        "example": "edades = [18, 21, 19]\\nprint(edades[0])\\nprint(edades[-1])\\nprint(len(edades))\\nfor edad in edades:\\n    print(edad)",
-        "exampleOutput": "18\\n19\\n3\\n18\\n21\\n19",
+        "example": "edades = [18, 21, 19]\nprint(edades[0])\nprint(edades[-1])\nprint(len(edades))\nfor edad in edades:\n    print(edad)",
+        "exampleOutput": "18\n19\n3\n18\n21\n19",
         "walkthrough": [
           "La lista edades contiene tres números y conserva su orden.",
           "El índice 0 selecciona el primer elemento; -1 selecciona el último.",
@@ -1337,19 +1337,25 @@ export const courseModules: CourseModule[] = [
           "id": "b3-e6",
           "title": "Sumar números recibidos en una lista",
           "statement": "Lee una línea con números separados por espacios, conviértelos a enteros, recórrelos con for y muestra la suma.",
-          "starterCode": "datos = input()\\nnumeros = datos.split()\\ntotal = 0\\n",
-          "solution": "datos = input()\\nnumeros = datos.split()\\ntotal = 0\\nfor texto in numeros:\\n    total += int(texto)\\nprint(total)",
+          "starterCode": "datos = input()\nnumeros = datos.split()\ntotal = 0\n",
+          "solution": "datos = input()\nnumeros = datos.split()\ntotal = 0\nfor texto in numeros:\n    total += int(texto)\nprint(total)",
           "tests": [
             {
-              "input": ["10 20 30"],
+              "input": [
+                "10 20 30"
+              ],
               "expected": "60"
             },
             {
-              "input": ["5"],
+              "input": [
+                "5"
+              ],
               "expected": "5"
             },
             {
-              "input": ["-2 7"],
+              "input": [
+                "-2 7"
+              ],
               "expected": "5"
             }
           ],
