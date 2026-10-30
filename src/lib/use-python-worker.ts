@@ -203,14 +203,15 @@ export function usePythonWorker({
       setTurtleCommands([]);
       setError(null);
       setIsRunning(true);
-      setWorkerState('loading');
 
       const worker = workerRef.current;
       if (worker && workerState === 'ready') {
+        // El entorno sigue listo entre ejecuciones; no volver a bloquear el editor.
         executeRef.current(worker, { code, input });
         return;
       }
 
+      setWorkerState('loading');
       pendingExecutionRef.current = { code, input };
       setOutput('Preparando Python; la primera carga puede tardar un poco...');
       if (!worker) createWorker();
