@@ -1,75 +1,84 @@
-# Estado del proyecto — revisión de entrega para el equipo
+# Estado actual del proyecto — 30 de octubre de 2026
 
-## Estado de integración y publicación
+## Rama y Pull Request
 
-- Repositorio: `Reymonth777x/python-desde-cero`.
-- Rama de trabajo: `fix/lider-20261028`.
-- Revisión: [PR #6](https://github.com/Reymonth777x/python-desde-cero/pull/6), dirigida a `master`.
-- El PR sigue en **draft**, abierto y sin fusionar. La versión de esta rama no se ha publicado en producción.
-- Producción prevista: `https://python-desdecero.com`; respaldo: `https://python-desdecero.pythondesdecero.workers.dev`. No afirmar que esos dominios sirven esta versión hasta que se fusione, despliegue y compruebe el workflow de producción.
+- Rama de trabajo: fix/lider-20261028.
+- PR principal: #6, todavía en draft; no fusionar ni publicar hasta cerrar los bloqueos de este documento.
+- PR #8: no fusionar directamente. Está basado en una historia antigua, reutiliza un timestamp de migración ya aplicado en remoto y contiene variantes incompatibles de evaluaciones/invitaciones.
+- PR #14 y #15: cerrados como duplicados/PR con base incorrecta. El cambio de Turtle está en la rama principal de trabajo.
+- No se ha desplegado una versión nueva a producción durante esta ronda.
 
-## Última verificación de CI
+## Cambios incorporados en esta ronda
 
-La ejecución de GitHub Actions **#251** para el commit `26f46a225f897f2440eedb7012ce3fbad438f526` terminó correctamente:
-- Vitest: 26/26 pruebas.
-- TypeScript: aprobado.
-- ESLint: 0 errores y 56 advertencias.
-- Build de producción Next.js: aprobado.
-- Playwright: 146/146 pruebas, incluyendo el dibujo Turtle en Chromium y móvil.
-- Build de Cloudflare Workers con Vinext: aprobado.
-- Auditoría informativa de dependencias: completada.
+- Turtle: encuadre automático, cursor real con forma/color/orientación y respeto por hideturtle(); pruebas unitarias nuevas.
+- Módulo 3: secuencia de aprendizaje corregida para enseñar decisiones y ciclos antes de operadores bit a bit; listas simples antes de listas anidadas.
+- Práctica b3-l6: ahora acepta varias entradas y valida tres casos, incluidos un único elemento y números negativos.
+- Inicio: la portada es Server Component y delega la interacción a HomePageClient; enlaces de sesión y resumen de progreso consultan Supabase desde el servidor para evitar desincronización del estado cliente.
+- Entorno local: el lanzador usa Supabase CLI 2.121.0 mediante npx, por lo que no exige instalación global. No aplica migraciones automáticamente mientras exista divergencia de historial.
+- Documentación académica y de migraciones actualizada con los hallazgos reales.
 
-Esta CI verifica código y builds en GitHub. No demuestra que Docker/Supabase local ya haya arrancado en cada computadora ni reemplaza pruebas manuales contra el entorno local o producción.
+## Estado académico real
 
-## Interfaz y laboratorio de portada
+- PE1 tiene cuatro módulos principales.
+- El catálogo tiene 30 unidades principales y cuatro unidades opcionales de extensión.
+- El módulo 5 es opcional y está fuera del PE1; no se debe sumar al progreso ni presentarlo como módulo oficial.
+- Hay tres evaluaciones formales de módulo; falta la evaluación del módulo 1.
+- El contenido de primer programa/salida/comentarios está colocado en el módulo 1 y debe reubicarse o convertirse en un cierre evaluativo correcto.
+- Falta una evaluación global PE1.
+- El proyecto final está dentro de la extensión opcional; debe convertirse en un requisito de graduación PE1, sin exigir lectura de archivos como conocimiento central.
+- En la auditoría inicial, 29 de 30 prácticas principales tenían un único caso automático; b3-l6 ya tiene tres. Hace falta ampliar los demás casos de prueba con entradas límite y errores típicos.
+- Las lecciones de nivel medio y los temas bit a bit/bubble sort necesitan andamiaje, ejemplos resueltos y prerequisitos visibles.
 
-- La portada se rediseñó como una página editorial de aprendizaje: hero, ejemplo visual, ruta con los cinco módulos reales y selector de seis ejemplos ejecutables.
-- La ruta de módulos y el total de lecciones se leen desde `src/lib/course.ts`; no se duplicó un catálogo fijo de dos módulos.
-- El laboratorio de portada se amplió con editor, lienzo SVG a tamaño útil y consola; los errores de Python se muestran en lugar de quedar ocultos por el mensaje de estado.
-- Pyodide continúa ejecutándose en `public/python-worker.js` y Turtle entrega objetos JavaScript nativos mediante `PyProxy.toJs()`; la prueba unitaria cubre conversión y liberación del proxy.
+## Estado de autenticación, evaluaciones e invitaciones
 
-## Desarrollo local con Docker y usuarios de prueba
+- El código actual de la rama usa submit_quiz_v2 y las claves correctas se mantienen en el servidor.
+- La lectura de solo esquema confirmó que la RPC existe y que las claves activas del catálogo tienen correct_option_v2 configurado.
+- No se pudo reproducir un intento real de estudiante porque no se dispone de una sesión de prueba autenticada en esta ejecución. La verificación con cuentas reales sigue pendiente.
+- Las invitaciones no utilizadas se pueden eliminar; las utilizadas se conservan como historial.
+- El código personalizado debe persistirse exactamente; dejar el campo vacío genera un código aleatorio.
+- La nueva portada consulta la sesión y el progreso desde el servidor, pero requiere E2E autenticado para confirmar el comportamiento real.
 
-- `scripts/start-local.ps1` inicia Supabase local mediante Docker, consulta `supabase status --output env`, configura `.env.development.local` para Next.js y arranca el servidor en localhost.
-- No ejecuta `supabase link`, `db push` ni `db reset`; no debe conectarse a producción para sembrar cuentas.
-- `scripts/seed-dev-users.mjs` solo acepta una URL HTTP local y crea dos estudiantes más un administrador (`profiles.is_admin = true`). El perfil actual no tiene una columna `role` o `is_teacher`, por lo que no se crea un rol docente ficticio.
-- Las contraseñas generadas se guardan en `.local/dev-users.credentials.json`, ignorado por Git; nunca se imprimen ni se suben al repositorio.
-- Comando de arranque: `.\scripts\start-local.ps1`. Opción `-SkipSeed` para mantener las contraseñas ya creadas.
-- La primera ejecución de Docker/Supabase local en la computadora del responsable sigue pendiente de confirmación manual. Después se deben comprobar login/logout, aislamiento entre los dos estudiantes, admin/invitaciones, progreso, quiz y recuperación de contraseña.
+## Divergencia crítica de migraciones
 
-## Qué se encontró sobre el supuesto juego
+El historial remoto y la carpeta local no coinciden. Los detalles están en docs/team/MIGRACIONES.md.
 
-- La rama contiene seis ejemplos interactivos de Python y gráficos Turtle; son ejercicios de programación, no un minijuego de usuario independiente.
-- El antiguo `/python-runner` era un puente de comunicación con un iframe/Worker para ejecutar Python, no un juego.
-- No se encontró un componente o ruta de minijuego independiente en los archivos revisados de la rama. El minijuego de restaurante ya aparece como pendiente en la auditoría anterior.
-- Puede existir un artefacto local no versionado de una sesión previa de Cline; debe buscarse en los archivos locales no rastreados antes de concluir que nunca se creó. No se debe borrar esa evidencia.
+- El remoto contiene las versiones 011–015 con timestamps distintos a las variantes locales.
+- El remoto no registra las migraciones base 001–003 ni algunas migraciones locales posteriores.
+- Las variantes locales 011–015 no son equivalentes a las versiones remotas; unas crean public.quiz_attempts/private.quiz_keys y otras usan private.quiz_attempts/private.quiz_answer_key.
+- Las migraciones locales 016–017 no aparecen aplicadas en remoto y no se encontró uso activo de sus tablas en el código principal.
+- No ejecutar db push, migration repair ni db reset contra producción hasta reconciliar el historial y verificar el esquema.
 
-## Cambios de producto y seguridad previamente incorporados
+## Validación CI
 
-- `src/proxy.ts` verifica sesión y autorización admin para las rutas protegidas.
-- El login valida el destino `next`, conserva el contexto de redirección y muestra mensajes accesibles.
-- El quiz usa `submit_quiz_v2`; las respuestas correctas y soluciones no se serializan al navegador.
-- La migración 020 agrega `correct_option_v2` y `submit_quiz_v2` sin alterar la columna antigua.
-- El Worker Pyodide limita código, salida, entrada, duración y comandos Turtle.
-- Se mantiene la guía de incorporación para cuatro socios: cuentas individuales, ramas y PR, nunca compartir secretos.
+- En el SHA 353842412cd63e0c81b80a8d28b3e1e346477d3d se aprobaron Vitest, TypeScript, ESLint y build Next.js.
+- Los checks E2E y Vinext seguían en curso en esa ejecución.
+- Hay commits posteriores de portada, currículo, launcher y documentación; se debe esperar el workflow del HEAD actual antes de declarar CI verde.
+- La inspección interactiva del sitio de producción no llegó a ejecutarse porque el servicio de navegador externo no tenía saldo suficiente. No afirmar que el dominio público fue probado.
 
-## Estado remoto de Supabase y migraciones
+## Cómo iniciar el entorno local y consultar usuarios de prueba
 
-- Proyecto remoto inspeccionado: `nuqydanbbgqcofcftshk`.
-- Las migraciones 018, 019 y 020 aparecen en el historial remoto.
-- 41 claves de quiz v2 configuradas; `anon` no puede ejecutar el RPC v2 y `authenticated` sí.
-- No se han aplicado nuevas migraciones en este trabajo de portada/local-dev. No ejecutar `db push` para “probar” Docker.
-- Mantener la matriz y procedimientos de `docs/team/MIGRACIONES.md` como referencia canónica.
+Desde la raíz del repositorio, en PowerShell:
 
-## Pendientes antes de un release público
+    .\scripts\start-local.ps1
 
-1. Arrancar por primera vez `scripts/start-local.ps1` en la computadora del propietario y confirmar que Supabase local inicia, crea las cuentas y Next sirve `http://localhost:3000`.
-2. Ejecutar pruebas manuales con las cuentas de prueba: login, logout, reset, RLS/IDOR entre estudiantes, admin, invitaciones, progreso y quiz.
-3. Inspeccionar la portada en móvil y escritorio desde localhost; corregir los detalles visuales que aparezcan en capturas/dispositivos reales.
-4. Localizar el artefacto de juego que el usuario recuerda de Cline o definirlo como una tarea separada; no presentarlo como ya entregado mientras no haya componente y prueba.
-5. Mantener CI verde en el SHA final, revisar el PR y solo después aprobar/fusionar siguiendo el proceso del equipo.
-6. Tras fusionar, comprobar Cloudflare y las páginas reales en ambos dominios, login, recuperación, temas, quiz, progreso e invitaciones.
+El lanzador inicia Supabase local, lee las variables locales y ejecuta el seed de desarrollo. No aplica migraciones ni restablece la base.
 
-## Regla de release
+En otra terminal PowerShell:
 
-No se afirma que producción está actualizada hasta que el workflow de Cloudflare termine y la comprobación del dominio sea exitosa. No aplicar migraciones remotas de manera improvisada ni compartir secretos del propietario.
+    Get-Content .local\dev-users.credentials.json
+
+El archivo contiene el administrador y dos estudiantes con contraseñas aleatorias. Está excluido de Git; no copiarlo al repositorio ni compartirlo. El seed solo admite endpoints loopback.
+
+Si el seed falla porque falta el esquema local, detenerse y reportar el error. No ejecutar db reset ni conectar el proyecto remoto para “arreglarlo”.
+
+## Bloqueos antes de declarar la versión lista
+
+1. Completar la evaluación formal del módulo 1 y alinear primer programa/comentarios con el módulo 2 mediante una migración creada con Supabase CLI.
+2. Añadir evaluación global y proyecto final obligatorio PE1.
+3. Ampliar las prácticas y evaluaciones para que comprueben comprensión, depuración y casos límite.
+4. Verificar guardado de evaluaciones y progreso con dos estudiantes y un administrador reales.
+5. Verificar login, registro, logout, recuperación, navegación y resumen de progreso.
+6. Probar creación/guardado de códigos personalizados, generación automática y eliminación de invitaciones no utilizadas; confirmar que las utilizadas no se borran.
+7. Completar E2E, Vinext y pruebas en un entorno local con migraciones reconciliadas.
+8. Reconciliar migraciones con evidencia antes de cualquier despliegue.
+9. Fusionar PR #6 solo con checks verdes y revisión final; después comprobar producción y el dominio.
