@@ -33,6 +33,7 @@ export function usePythonWorker({
   onOutput,
 }: UsePythonWorkerOptions = {}) {
   const sandboxFrameRef = useRef<HTMLIFrameElement | null>(null);
+  const runnerPortRef = useRef<MessagePort | null>(null);
   const runnerOriginRef = useRef<string | null>(null);
   const frameRequestedRef = useRef(false);
   const frameLoadedRef = useRef(false);
@@ -78,13 +79,24 @@ export function usePythonWorker({
     }
   }, []);
 
-  const sendToRunner = useCallback((message: Record<string, unknown>) => {
-    const origin = runnerOriginRef.current;
-    const frame = sandboxFrameRef.current;
-    if (!origin || !frame?.contentWindow || !frameRequestedRef.current) return false;
+  const closeRunnerPort = useCallback(() => {
+    const port = runnerPortRef.current;
+    if (!port) return;
+    port.onmessage = null;
+    port.onmessageerror = null;
+    port.close();
+    runnerPortRef.current = null;
+  }, []);
 
-    frame.contentWindow.postMessage(message, origin);
-    return true;
+  const sendToRunner = useCallback((message: Record<string, unknown>) => {
+    const port = runnerPortRef.current;
+    if (!port || !frameRequestedRef.current) return false;
+    try {
+      port.postMessage(message);
+      return true;
+    } catch {
+      return false;
+    }
   }, []);
 
   const startInitializationWatchdog = useCallback(() => {
@@ -140,13 +152,11 @@ export function usePythonWorker({
   }, [clearExecutionTimeout, sendToRunner]);
   executeRef.current = executeRequest;
 
-  const handleWindowMessage = useCallback((event: MessageEvent<WorkerResponse>) => {
-    const frame = sandboxFrameRef.current;
-    const origin = runnerOriginRef.current;
-    if (!frame?.contentWindow || !origin) return;
-    if (event.source !== frame.contentWindow || event.origin !== origin) return;
-
-    const message = event.data;
+  const handleRunnerMessage = useCallback((event: MessageEvent) => {
+    // The MessagePort was transferred only after the iframe checked both
+    // event.source and the exact parent origin. It is now the capability used
+    // for responses; no untrusted window "message" event is accepted.
+    const message = event.data as WorkerResponse;
     if (!message || typeof message !== 'object') return;
 
     if (message.status === 'ready') {
@@ -211,34 +221,78 @@ export function usePythonWorker({
   }, [clearExecutionTimeout, clearInitializationTimeout]);
 
   useEffect(() => {
-    window.addEventListener('message', handleWindowMessage);
     return () => {
-      window.removeEventListener('message', handleWindowMessage);
       clearInitializationTimeout();
       clearExecutionTimeout();
-      const frame = sandboxFrameRef.current;
-      const origin = runnerOriginRef.current;
-      if (frame?.contentWindow && origin) {
-        frame.contentWindow.postMessage({ type: 'stop' }, origin);
+      try {
+        runnerPortRef.current?.postMessage({ type: 'stop' });
+      } catch {
+        // The iframe may already have navigated away.
       }
+      closeRunnerPort();
     };
-  }, [clearExecutionTimeout, clearInitializationTimeout, handleWindowMessage]);
+  }, [clearExecutionTimeout, clearInitializationTimeout, closeRunnerPort]);
 
   const handleSandboxFrameLoad = useCallback(() => {
     if (!frameRequestedRef.current) return;
+
+    const frame = sandboxFrameRef.current;
+    const origin = runnerOriginRef.current;
+    if (!frame?.contentWindow || !origin) {
+      setWorkerState('error');
+      setError('No se pudo preparar el canal seguro del ejecutor Python.');
+      callbacksRef.current.onStatusChange?.('error');
+      return;
+    }
+
+    closeRunnerPort();
+    const channel = new MessageChannel();
+    const parentPort = channel.port1;
+    parentPort.onmessage = handleRunnerMessage;
+    parentPort.onmessageerror = () => {
+      if (runnerPortRef.current === parentPort) runnerPortRef.current = null;
+      parentPort.close();
+      clearInitializationTimeout();
+      clearExecutionTimeout();
+      activeRequestIdRef.current = null;
+      pendingExecutionRef.current = null;
+      isRunningRef.current = false;
+      setIsRunning(false);
+      setWorkerState('error');
+      setError('Se perdió la comunicación con el ejecutor Python aislado.');
+      callbacksRef.current.onStatusChange?.('error');
+    };
+    parentPort.start();
+    runnerPortRef.current = parentPort;
     frameLoadedRef.current = true;
     startInitializationWatchdog();
-    if (!sendToRunner({ type: 'connect' })) {
+
+    try {
+      // The iframe is on a different, allow-listed origin. It validates this
+      // sender before accepting the transferred port; all later messages use
+      // that port instead of the global window message channel.
+      frame.contentWindow.postMessage({ type: 'connect' }, origin, [channel.port2]);
+    } catch {
+      channel.port2.close();
+      closeRunnerPort();
+      frameLoadedRef.current = false;
       setWorkerState('error');
-      setError('No se pudo conectar con el ejecutor Python aislado.');
+      setError('No se pudo abrir el canal del ejecutor Python aislado.');
       callbacksRef.current.onStatusChange?.('error');
     }
-  }, [sendToRunner, startInitializationWatchdog]);
+  }, [
+    clearExecutionTimeout,
+    clearInitializationTimeout,
+    closeRunnerPort,
+    handleRunnerMessage,
+    startInitializationWatchdog,
+  ]);
 
   const handleSandboxFrameError = useCallback(() => {
     if (!frameRequestedRef.current) return;
     clearInitializationTimeout();
     frameLoadedRef.current = false;
+    closeRunnerPort();
     pendingExecutionRef.current = null;
     activeRequestIdRef.current = null;
     isRunningRef.current = false;
@@ -246,7 +300,7 @@ export function usePythonWorker({
     setWorkerState('error');
     setError('No se pudo cargar el entorno aislado de Python. Reintenta la carga.');
     callbacksRef.current.onStatusChange?.('error');
-  }, [clearInitializationTimeout]);
+  }, [clearInitializationTimeout, closeRunnerPort]);
 
   const createWorker = useCallback(() => {
     const origin = runnerOriginRef.current;
@@ -273,6 +327,7 @@ export function usePythonWorker({
     const mustReload = !frameRequestedRef.current || !frameLoadedRef.current || workerState === 'error';
     if (mustReload) {
       clearInitializationTimeout();
+      closeRunnerPort();
       frameRequestedRef.current = true;
       frameLoadedRef.current = false;
       frameBootIdRef.current += 1;
@@ -285,7 +340,7 @@ export function usePythonWorker({
 
     startInitializationWatchdog();
     sendToRunner({ type: 'connect' });
-  }, [clearInitializationTimeout, sendToRunner, startInitializationWatchdog, workerState]);
+  }, [clearInitializationTimeout, closeRunnerPort, sendToRunner, startInitializationWatchdog, workerState]);
 
   const runCode = useCallback((code: string, input: string[] = []) => {
     if (isRunningRef.current) return;
@@ -348,11 +403,12 @@ export function usePythonWorker({
       sendToRunner({ type: 'stop' });
     } else {
       frameRequestedRef.current = false;
+      closeRunnerPort();
     }
 
     setWorkerState('idle');
     callbacksRef.current.onStatusChange?.('idle');
-  }, [clearExecutionTimeout, clearInitializationTimeout, sendToRunner]);
+  }, [clearExecutionTimeout, clearInitializationTimeout, closeRunnerPort, sendToRunner]);
 
   return {
     workerState,
