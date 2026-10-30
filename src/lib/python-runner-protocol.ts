@@ -37,9 +37,23 @@ export function resolvePythonRunnerOrigin(
       return url.origin;
     }
 
+    const hostnameParts = url.hostname.split('.');
+    const accountLabel = hostnameParts[1] ?? '';
+    const validAccountLabel =
+      accountLabel.length > 0 &&
+      [...accountLabel].every((character) =>
+        (character >= 'a' && character <= 'z') ||
+        (character >= '0' && character <= '9') ||
+        character === '-',
+      );
+
     if (
       url.protocol !== 'https:' ||
-      !/^python-desdecero-runner\.[a-z0-9-]+\.workers\.dev$/.test(url.hostname)
+      hostnameParts.length !== 4 ||
+      hostnameParts[0] !== 'python-desdecero-runner' ||
+      !validAccountLabel ||
+      hostnameParts[2] !== 'workers' ||
+      hostnameParts[3] !== 'dev'
     ) return null;
     return url.origin;
   } catch {
