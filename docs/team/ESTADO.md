@@ -5,9 +5,9 @@
 ## Repositorio y publicación
 
 - Repositorio: `Reymonth777x/python-desde-cero`; rama de producción: `master`.
-- HEAD actual de `master`: `021f4cc006c417a3ad648134796529e9f34fa31b` (incluye PR #52 y #55). Su CI está en curso en el workflow [41049003539](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41049003539); todavía no declarar esta revisión como publicada.
-- Última publicación comprobada: SHA `2940723e3a37a6556770169d0ae692e6bab2d943`, workflow [41048172586](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41048172586). Cloudflare confirmó Worker y dominio personalizado `python-desdecero.com`.
-- El CI completo de ese último HEAD publicado terminó correctamente en el workflow [41048172812](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41048172812).
+- HEAD actual de `master`: `4f5cface065077c8d8b2b42e7ab41fa96ebd4b4c` (incluye PR #52, #55 y #57). Su CI está en curso en el workflow [41049390574](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41049390574); no declarar esta revisión como publicada todavía.
+- Última publicación comprobada: SHA `2940723e3a37a6556770169d0ae692e6bab2d943`, workflow [41048172586](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41048172586). Los intentos de despliegue que recibieron un CI upstream cancelado se omitieron de forma segura; por eso las fusiones posteriores todavía no se consideran visibles en producción.
+- El CI completo del último HEAD efectivamente publicado terminó correctamente en el workflow [41048172812](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41048172812).
 - El smoke test público confirmó portada nueva, `/muestra`, `/sitemap.xml`, marcador Turnstile en `/login` y respuesta HTTP 308 desde `www.python-desdecero.com` al dominio principal.
 - PR #43 está integrado. Se retiró el prototipo de cocina del código activo sin borrar su historial Git; Orilla sigue fuera del alcance de esta versión.
 
@@ -25,8 +25,8 @@
 - El proyecto final obligatorio es `b4-l10` (gestor de inventario). Incluye seis casos automáticos de ejecución y una revisión conceptual que requiere al menos 75%.
 - El examen final PE1 es `b4-l11`, con doce preguntas y mínimo de 75%.
 - Los prerrequisitos se comprueban tanto en la navegación del servidor como dentro del calificador privado de Supabase: examen anterior de módulo, evaluación del módulo 3 antes del proyecto, y proyecto aprobado antes del examen final.
-- Mejoras pedagógicas ya integradas: conversión y variables en `b2-l4`, operadores bit a bit en `b3-l2`, recorrido guiado de Bubble Sort en `b3-l7` y demostración completa del ordenamiento.
-- PR #52 (recorrido guiado de matrices y bucles anidados de `b3-l9`) y PR #55 (contador dinámico de pruebas del proyecto final) ya están integrados en `master`. Ambos cambios están incluidos en el HEAD `021f4cc...`, pero siguen pendientes el CI y el despliegue de ese nuevo HEAD.
+- Mejoras pedagógicas ya integradas en `master`: demostración inicial más clara en `b1-l1`–`b1-l3` (PR #57), conversiones y variables en `b2-l4`, operadores bit a bit en `b3-l2`, Bubble Sort guiado en `b3-l7`, matrices y bucles anidados paso a paso en `b3-l9` (PR #52) y contador del proyecto final derivado de los seis casos reales (PR #55).
+- Las PR #52, #55 y #57 están fusionadas en `master` HEAD `4f5cface...`; su CI y posterior despliegue siguen pendientes. La producción todavía sirve el HEAD anterior `2940723...`.
 - La revisión integral de las 33 unidades y la ampliación de cobertura para ejercicios con entradas límite siguen pendientes.
 
 ## Supabase y seguridad de evaluaciones
@@ -48,17 +48,16 @@
 
 ## Bloqueos y próximos pasos
 
-1. Esperar CI verde y la publicación del HEAD `021f4cc...`; comprobar en producción que el texto del proyecto final informa seis pruebas y que `b3-l9` presenta el nuevo ejemplo paso a paso.
-2. Revisar PR #54: añade una comparación del SHA del CI aprobado con el HEAD actual de `master`, para evitar que un workflow atrasado revierta la publicación. No integrarlo hasta CI verde.
-3. Revisar PR #57 (sintaxis guiada de la primera lección) y corregir cualquier fallo de pruebas antes de integrarla.
-4. Completar pruebas manuales de Auth/Turnstile con un buzón controlado, sin compartir contraseñas ni Secret keys.
-5. Probar evaluación, progreso y prerrequisitos con dos estudiantes y un administrador; verificar que una evaluación no aprobada no complete la unidad y que los resultados sobrevivan al cierre de sesión.
-6. Activar la protección de contraseñas filtradas en Supabase Auth; el Advisor de Auth la reportó desactivada.
-7. Verificar SPF, DKIM, DMARC, plantillas y redirecciones de correo.
-8. Probar Pyodide, Worker, Turtle y timeouts en Chrome y Firefox y hacer una pasada en dispositivos móviles físicos. Los E2E emulados no sustituyen esas pruebas.
-9. Revisar en español las 33 unidades obligatorias, retirar repeticiones y ampliar prácticas con casos límite.
-10. Reconciliar migraciones locales/DEV/producción y resolver de forma controlada la rama preview fallida antes de cualquier operación de esquema.
-11. Completar revisión legal de privacidad, términos y cookies.
+1. Esperar CI verde y publicación del HEAD `4f5cface...`; confirmar en producción que `b3-l9`, los ejemplos introductorios y el texto del proyecto final corresponden a esa versión.
+2. Revisar PR #54: incluye una comparación inicial y otra justo antes del despliegue para impedir que una ejecución atrasada publique un Worker obsoleto. No integrarla hasta CI verde.
+3. Completar pruebas manuales de Auth/Turnstile con un buzón controlado, sin compartir contraseñas ni Secret keys.
+4. Probar evaluación, progreso y prerrequisitos con dos estudiantes y un administrador; verificar que una evaluación no aprobada no complete la unidad y que los resultados sobrevivan al cierre de sesión.
+5. Activar la protección de contraseñas filtradas en Supabase Auth; el Advisor de Auth la reportó desactivada.
+6. Verificar SPF, DKIM, DMARC, plantillas y redirecciones de correo.
+7. Probar Pyodide, Worker, Turtle y timeouts en Chrome y Firefox y hacer una pasada en dispositivos móviles físicos. Los E2E emulados no sustituyen esas pruebas.
+8. Revisar en español las 33 unidades obligatorias, retirar repeticiones y ampliar prácticas con casos límite.
+9. Reconciliar migraciones locales/DEV/producción y resolver de forma controlada la rama preview fallida antes de cualquier operación de esquema.
+10. Completar revisión legal de privacidad, términos y cookies.
 
 ## Regla operativa
 
