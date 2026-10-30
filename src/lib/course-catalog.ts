@@ -3,6 +3,8 @@ export type CourseCatalogLesson = {
   section: string;
   title: string;
   assessment?: boolean;
+  finalProject?: boolean;
+  finalAssessment?: boolean;
 };
 
 export type CourseCatalogModule = {
@@ -42,8 +44,9 @@ export const courseCatalog: CourseCatalogModule[] = [
       },
       {
         "id": "b1-l4",
-        "section": "1.3 práctica",
-        "title": "Primer contacto con un programa Python"
+        "section": "1.4",
+        "title": "Evaluación del módulo 1: fundamentos de programación",
+        "assessment": true
       }
     ]
   },
@@ -201,14 +204,26 @@ export const courseCatalog: CourseCatalogModule[] = [
         "section": "4.8",
         "title": "Evaluación del módulo 4: funciones y datos estructurados",
         "assessment": true
-      }
-    ]
+      },
+      {
+        "id": "b4-l10",
+        "section": "4.9",
+        "title": "Proyecto final obligatorio: gestor de inventario",
+        "finalProject": true
+      },
+      {
+        "id": "b4-l11",
+        "section": "4.10",
+        "title": "Examen final de Python: integración de los cuatro módulos",
+        "assessment": true,
+        "finalAssessment": true
+      }]
   },
   {
     "id": "module-5",
     "number": "5",
-    "title": "Proyecto aplicado y consolidación (extensión práctica)",
-    "summary": "Ampliación opcional del curso: planifica, construye, prueba y mejora un gestor de inventario utilizando los cuatro módulos anteriores.",
+    "title": "Archivos y persistencia (extensión práctica)",
+    "summary": "Ampliación opcional posterior al curso: guarda, recupera y valida datos con archivos de texto.",
     "lessons": [
       {
         "id": "b5-l1",
