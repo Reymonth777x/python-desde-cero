@@ -54,6 +54,7 @@ class Turtle:
         self.pen_size = 1
         self._speed = 6
         self.is_visible = True
+        self._shape = "classic"
         self.is_filling = False
         self.fill_points = []
 
@@ -141,6 +142,12 @@ class Turtle:
         if speed is not None:
             self._speed = float(speed)
         return self._speed
+
+    def shape(self, name=None):
+        """Match turtle.shape() without relying on a desktop drawing window."""
+        if name is not None:
+            self._shape = str(name)
+        return self._shape
 
     def hideturtle(self):
         self.is_visible = False
@@ -258,6 +265,7 @@ class Turtle:
 class Screen:
     def __init__(self):
         self.bgcolor_value = "white"
+        self.title_value = "Python Turtle"
 
     def bgcolor(self, color=None):
         global _screen_bgcolor
@@ -268,7 +276,9 @@ class Screen:
         return _screen_bgcolor
 
     def title(self, title=None):
-        return self.bgcolor_value
+        if title is not None:
+            self.title_value = str(title)
+        return self.title_value
 
     def done(self):
         pass
@@ -344,6 +354,10 @@ def width(size=None):
 
 def speed(speed=None):
     return _get_turtle().speed(speed)
+
+
+def shape(name=None):
+    return _get_turtle().shape(name)
 
 
 def hideturtle():
