@@ -6,7 +6,7 @@ import {
   findCourseModule,
 } from '@/lib/course';
 import { toClientLesson } from '@/lib/server-quiz/public-lesson';
-import { canAccessLessonInSequence } from '@/lib/lesson-access';
+import { canAccessLessonInSequence, findFirstIncompleteLessonIndex } from '@/lib/lesson-access';
 import { createClient } from '@/lib/supabase/server';
 
 type Props = {
@@ -91,7 +91,14 @@ export default async function LessonPage({ params }: Props) {
   );
 
   if (!currentLessonCompleted && !canOpenBySequence && lessonIndex > 0) {
-    redirect(`/academia/${courseModule.id}/${courseModule.lessons[lessonIndex - 1].id}`);
+    const firstIncompleteIndex = findFirstIncompleteLessonIndex(
+      courseModule.id,
+      courseModule.lessons.slice(0, lessonIndex),
+      moduleProgress ?? [],
+      Boolean(progressError),
+    );
+    const fallbackIndex = firstIncompleteIndex >= 0 ? firstIncompleteIndex : 0;
+    redirect(`/academia/${courseModule.id}/${courseModule.lessons[fallbackIndex].id}`);
   }
 
   return (
