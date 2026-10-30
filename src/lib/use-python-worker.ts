@@ -119,6 +119,9 @@ export function usePythonWorker({ onStatusChange, onOutput }: UsePythonWorkerOpt
         return;
       }
 
+      // A Python exception ends the current run, not the Worker itself.
+      // Keep the editor ready so the student can fix the code and run again.
+      setWorkerState('ready');
       setIsRunning(false);
       setOutput(data.output ?? (data.status === 'success' ? 'Ejecución completada sin salida.' : ''));
       setError(data.status === 'error' ? (data.error ?? 'Error desconocido.') : null);
