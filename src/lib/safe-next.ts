@@ -1,4 +1,4 @@
-const ALLOWED_PREFIXES = ['/academia', '/practica', '/estudiante', '/docente', '/admin'];
+const ALLOWED_PREFIXES = ['/academia', '/practica', '/admin'];
 
 export function safeNext(value: unknown, fallback = '/academia'): string {
   if (typeof value !== 'string' || value.length === 0 || value.length > 300) return fallback;
