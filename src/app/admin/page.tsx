@@ -17,7 +17,7 @@ export default async function AdminPage() {
     .single();
 
   if (!profile?.is_admin) {
-    redirect('/estudiante');
+    redirect('/academia');
   }
 
   return (
@@ -35,8 +35,8 @@ export default async function AdminPage() {
           </Link>
 
           <div className="flex items-center gap-3">
-            <Link href="/estudiante" className="text-sm text-[var(--theme-muted)] hover:text-[var(--theme-accent)]">
-              Volver a mi panel
+            <Link href="/academia" className="text-sm text-[var(--theme-muted)] hover:text-[var(--theme-accent)]">
+              Volver a mi ruta de aprendizaje
             </Link>
             <span className="text-xs px-2 py-1 bg-[var(--theme-surface)] border border-[var(--theme-border)] rounded text-[var(--theme-muted)]">
               Administrador
@@ -76,8 +76,8 @@ export default async function AdminPage() {
           </div>
 
           <div className="mt-8 flex gap-4">
-            <Link href="/estudiante" className="flex-1 min-h-12 border border-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-accent)] text-center transition-colors hover:bg-[var(--theme-bg-secondary)]">
-              Mi panel de estudiante
+            <Link href="/academia" className="flex-1 min-h-12 border border-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-accent)] text-center transition-colors hover:bg-[var(--theme-bg-secondary)]">
+              Mi ruta de aprendizaje
             </Link>
             <Link href="/academia" className="flex-1 min-h-12 border border-[var(--theme-border)] bg-[var(--theme-surface)] px-5 py-3 text-base font-semibold text-[var(--theme-ink)] text-center transition-colors hover:bg-[var(--theme-bg-secondary)]">
               Academia
