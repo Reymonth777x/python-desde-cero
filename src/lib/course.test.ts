@@ -244,6 +244,36 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(lesson.commonMistakes.join(' ')).toContain('no son equivalentes');
   });
 
+  it('guia el recorrido de listas de listas antes de contar aprobaciones', () => {
+    const lesson = courseModules
+      .find((courseModule) => courseModule.id === 'module-3')!
+      .lessons.find((item) => item.id === 'b3-l9')!;
+
+    expect(lesson.explanation.join(' ')).toContain('notas[0]');
+    expect(lesson.explanation.join(' ')).toContain('for fila in notas');
+    expect(lesson.explanation.join(' ')).toContain('for nota in fila');
+    expect(lesson.example).toContain('print("Primera fila:", notas[0])');
+    expect(lesson.example).toContain('for fila in notas:');
+    expect(lesson.example).toContain('for nota in fila:');
+    expect(lesson.example).toContain('if nota >= 70:');
+    expect(lesson.exampleOutput.split(String.fromCharCode(10))).toEqual([
+      'Primera fila: [80, 90]',
+      'Fila actual: [80, 90]',
+      'Fila actual: [65, 75]',
+      'Nota revisada: 80',
+      'Nota revisada: 90',
+      'Nota revisada: 65',
+      'Nota revisada: 75',
+      'Total aprobadas: 3',
+    ]);
+    expect(lesson.exercise.starterCode).toContain('for fila in notas:');
+    expect(lesson.exercise.solution).toContain('for nota in fila:');
+    expect(lesson.exercise.solution).toContain('aprobadas += 1');
+    expect(lesson.exercise.tests).toEqual([{ input: [], expected: '3' }]);
+    expect(lesson.exercise.hints).toHaveLength(4);
+    expect(lesson.commonMistakes.length).toBeGreaterThanOrEqual(4);
+  });
+
   it('califica todas las respuestas y exige al menos 75 por ciento', () => {
     const questions = [
       { prompt: '1', options: ['a', 'b'], answer: 0, explanation: '' },
