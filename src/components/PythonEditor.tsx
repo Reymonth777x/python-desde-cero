@@ -218,7 +218,7 @@ export default function PythonEditor({
 
         <div aria-label="Teclas de Python para pantalla táctil" className="flex flex-wrap gap-2 md:hidden">
           {[
-            { label: '()', accessible: 'Insertar par )ntesis', text: '()', cursor: 1 },
+            { label: '()', accessible: 'Insertar paréntesis', text: '()', cursor: 1 },
             { label: '""', accessible: 'Insertar comillas', text: '""', cursor: 1 },
             { label: ':', accessible: 'Insertar dos puntos', text: ':' },
             { label: '=', accessible: 'Insertar signo igual', text: '=' },
@@ -292,7 +292,7 @@ export default function PythonEditor({
           aria-atomic="true"
           className="max-h-[42svh] min-h-28 overflow-auto whitespace-pre-wrap break-words border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] p-4 font-mono text-sm leading-6 text-[var(--theme-ink)] sm:max-h-64"
         >
-          {output || (workerState === 'ready' ? '> Entorno listo. Ejecuta código para consultar el resultado.' : '> Preparando el entorno Python en el navegador...')}
+          {error ? `Error de ejecución:\n${error}` : output || (workerState === 'ready' ? '> Entorno listo. Ejecuta código para consultar el resultado.' : '> Preparando el entorno Python en el navegador...')}
         </pre>
         <button
           type="button"
