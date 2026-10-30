@@ -55,7 +55,7 @@ test.describe('Ejemplos de portada', () => {
       const button = lab.getByRole('button').filter({ hasText: example.title });
       await expect(button, `No se encontró el ejemplo "${example.title}"`).toBeVisible();
       await button.click();
-      await expect(editor).toHaveValue(new RegExp(example.marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+      await expect.poll(() => editor.inputValue()).toContain(example.marker);
     }
   });
 });
