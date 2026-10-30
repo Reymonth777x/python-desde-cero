@@ -28,6 +28,9 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(courseModules[1].lessons.at(-1)?.assessment).toBe(true);
     expect(courseModules[2].lessons.at(-1)?.assessment).toBe(true);
     expect(courseModules[3].lessons.at(-1)?.assessment).toBe(true);
+    expect(courseModules[1].lessons.at(-2)?.id).toBe('b2-l8');
+    expect(courseModules[2].lessons.at(-2)?.id).toBe('b3-l9');
+    expect(courseModules[3].lessons.at(-2)?.id).toBe('b4-l9');
     expect(courseModules[0].lessons.at(-1)?.assessment).toBe(false);
   });
 
