@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { resolveAuthCallbackUrl } from '@/lib/auth-callback-url';
 import { createClient } from '@/lib/supabase/server';
 import { safeNext } from '@/lib/safe-next';
+import { parseOptionalInvitationCode } from '@/lib/invitation-code';
 
 export async function login(formData: FormData) {
   const email = String(formData.get('email') ?? '').trim();
@@ -38,8 +39,10 @@ export async function signup(formData: FormData) {
   const email = String(formData.get('email') ?? '').trim();
   const password = String(formData.get('password') ?? '');
   const captchaToken = String(formData.get('captchaToken') ?? '');
+  const parsedInvitation = parseOptionalInvitationCode(String(formData.get('invitation_code') ?? ''));
 
   if (!fullName || !email || !password) redirect('/login?error=missing');
+  if (!parsedInvitation.ok) redirect('/login?error=invitation');
   if (fullName.length > 100 || email.length > 254) redirect('/login?error=missing');
   if (password.length < 8) redirect('/login?error=password');
 
@@ -54,12 +57,15 @@ export async function signup(formData: FormData) {
     email,
     password,
     options: {
-      data: { full_name: fullName },
+      data: {
+        full_name: fullName,
+        ...(parsedInvitation.code ? { invitation_code: parsedInvitation.code } : {}),
+      },
       emailRedirectTo,
       captchaToken: captchaToken || undefined,
     },
   });
-  if (error) redirect('/login?error=signup');
+  if (error) redirect(parsedInvitation.code ? '/login?error=invitation' : '/login?error=signup');
 
   if (data.session) {
     revalidatePath('/', 'layout');
