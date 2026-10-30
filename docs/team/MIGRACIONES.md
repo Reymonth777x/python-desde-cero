@@ -23,10 +23,12 @@ La salida consultada del historial remoto empieza por la entrada timestamp 004; 
 Archivo canónico:
 `supabase/migrations/20261029051953_020_balance_quiz_answer_positions_v2.sql`
 
-La migración agrega `private.quiz_answer_key.correct_option_v2`, configura las 41 filas del catálogo actual y publica `public.submit_quiz_v2(text,text,integer[])`. Conserva intacta la columna `correct_option` y el RPC anterior para que el código anterior no quede roto durante el despliegue. Comprobaciones remotas:
-- 41 filas del catálogo y 41 claves v2 configuradas.
-- 31 filas usan un índice v2 distinto del anterior; el texto de la opción correcta se conservó al reordenar el catálogo.
+La migración agregó `private.quiz_answer_key.correct_option_v2` y publicó `public.submit_quiz_v2(text,text,integer[])`. En el momento de aplicar la migración se configuraron 41 preguntas. La verificación remota de solo lectura del 30-10-2026 contra el catálogo vigente encontró:
+- 44 claves del catálogo actual repartidas en 34 lecciones; las 44 tienen `correct_option_v2` configurado.
+- 31 de las 44 usan un índice v2 distinto del índice histórico; el texto de la opción correcta se conservó al reordenar el catálogo.
+- Hay 43 claves históricas de IDs antiguos sin v2; no pertenecen al catálogo actual `bN-lN` y no deben confundirse con claves faltantes del curso vigente.
 - `anon` no puede ejecutar el RPC v2; `authenticated` sí.
+- El RPC usa `SECURITY DEFINER`, valida `auth.uid()`, registra intentos y actualiza `progress` al aprobar. Aplica un límite de 5 intentos por 5 minutos.
 
 ## Otras migraciones
 
