@@ -6,6 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "build:vinext": "vite build",
+    "prepare:python-runner": "node scripts/prepare-python-runner.mjs",
+    "dev:runner": "npm run prepare:python-runner && npx --yes wrangler@4.148.0 dev --config wrangler.runner.jsonc --local --ip 127.0.0.1 --port 8788",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit --incremental false",
