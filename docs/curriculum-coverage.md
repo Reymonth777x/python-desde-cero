@@ -36,7 +36,7 @@ El módulo 5 está marcado explícitamente como opcional. Incluye lectura/escrit
 - Las tres evaluaciones formales actuales tienen 5, 3 y 3 preguntas respectivamente; el módulo 1 no tiene una evaluación formal.
 - Esto no alcanza todavía el estándar de calidad definido abajo. Las prácticas restantes necesitan casos límite adecuados a cada objetivo y las evaluaciones requieren más preguntas de lectura, razonamiento y depuración.
 
-En el módulo 3 se corrigió la progresión: comparaciones → decisiones → while → for → listas simples → modificación/ordenamiento → operadores lógicos y bit a bit → evaluación → laboratorio integrador. La primera lección de listas ahora trabaja listas unidimensionales; las listas anidadas quedan para el laboratorio integrador, después de practicar índices y recorridos.
+En el módulo 3 se corrigió la progresión: comparaciones y decisiones → while → for → operadores lógicos y bit a bit → listas simples → modificación/ordenamiento → aplicación avanzada con listas anidadas → evaluación. La primera lección de listas trabaja listas unidimensionales; las listas anidadas aparecen después de practicar índices y recorridos, antes de la evaluación del módulo.
 
 
 ## Hallazgos que deben corregirse
