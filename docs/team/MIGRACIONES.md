@@ -36,6 +36,38 @@ La migración agrega `private.quiz_answer_key.correct_option_v2`, configura las 
 - Se eliminó de la rama la migración redundante `20261028220816_grant_delete_invitations.sql`; no debe duplicarse el permiso ya incluido en 018.
 - Algunos archivos tienen prefijos ordinales repetidos (por ejemplo, más de un archivo que empieza por 014 o 015). El orden real de Supabase lo determina el timestamp de versión, no solo el número que aparece en el nombre.
 
+## Diferencias detectadas entre el repositorio y Supabase remoto
+
+Comparación de solo lectura realizada el 30-10-2026 entre los archivos de supabase/migrations/ de fix/lider-20261028 y supabase_migrations.schema_migrations del proyecto remoto.
+
+### Versiones locales que no aparecen en el historial remoto
+
+- 001, 002 y 003: migraciones base del repositorio; el historial remoto consultado comienza en 004. No asumir que se pueden ejecutar sobre una base que ya contiene esas tablas.
+- 20261026083730: 005_public_signup_optional_invitation.
+- 20261026093000, 20261026093001 y 20261026100000: variantes locales de 011, 012 y 013.
+- 20261027000000, 20261027000001, 20261027000002 y 20261027000003: preferencias de perfil, exercise_submissions, achievements/audit y project_submissions. No aparecen como aplicadas en el proyecto remoto.
+
+### Versiones remotas que no están en la carpeta local
+
+- 20261026221230 — 011_secure_quiz_submission.
+- 20261026221332 — 012_deny_direct_quiz_table_access.
+- 20261026222246 — 013_randomize_quiz_option_order.
+- 20261026230434 — 014_require_invitation_expiry.
+- 20261026230815 — 015_private_quiz_rpc_wrapper.
+
+Las variantes locales 011–015 no son equivalentes a las versiones remotas. Por ejemplo, el 011 local crea public.quiz_attempts y el 013 local usa private.quiz_keys; las versiones remotas usan private.quiz_attempts y private.quiz_answer_key. No se deben combinar ni aplicar a ciegas.
+
+### Acciones obligatorias antes de cualquier despliegue de migraciones
+
+1. Recuperar y versionar en Git las migraciones exactas que ya están aplicadas en remoto.
+2. Comparar las variantes locales no aplicadas con el esquema y el código actual.
+3. Archivar o convertir las migraciones locales obsoletas mediante migraciones nuevas, sin reescribir versiones ya aplicadas.
+4. Reconciliar 001–003 con el historial remoto mediante un plan explícito de migration repair, solo después de verificar objetos existentes.
+5. Ejecutar una prueba completa en una base local limpia y otra con datos locales preservados.
+6. Obtener aprobación humana antes de cualquier migration repair, db push o cambio de esquema en producción.
+
+Mientras exista esta divergencia, no ejecutar supabase db push, migration repair ni db reset contra producción. El lanzador local tampoco aplica migraciones automáticamente.
+
 ## Procedimiento seguro para cambios futuros
 
 1. Crear un archivo SQL nuevo con timestamp único en `supabase/migrations/`.
