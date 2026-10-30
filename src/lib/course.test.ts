@@ -212,6 +212,38 @@ describe('ruta de aprendizaje Python desde cero', () => {
     ]);
   });
 
+  it('separa operadores logicos y practica AND, OR y XOR bit a bit', () => {
+    const lesson = courseModules
+      .find((courseModule) => courseModule.id === 'module-3')!
+      .lessons.find((item) => item.id === 'b3-l2')!;
+
+    expect(lesson.objectives.join(' ')).toContain('AND (&), OR (|) y XOR (^)');
+    expect(lesson.explanation.join(' ')).toContain('0101 & 0011 = 0001');
+    expect(lesson.explanation.join(' ')).toContain('el resultado es 0111 (7)');
+    expect(lesson.explanation.join(' ')).toContain('el resultado es 0110 (6)');
+    expect(lesson.explanation.join(' ')).toContain('5 << 1');
+    expect(lesson.explanation.join(' ')).toContain('5 >> 1');
+    expect(lesson.exampleOutput.split(String.fromCharCode(10))).toEqual([
+      'True',
+      'False',
+      '1',
+      '7',
+      '6',
+      '10',
+      '2',
+      '-6',
+    ]);
+    expect(lesson.exercise.statement).toContain('permisos & solicitud');
+    expect(lesson.exercise.statement).toContain('permisos | solicitud');
+    expect(lesson.exercise.statement).toContain('permisos ^ solicitud');
+    expect(lesson.exercise.solution).toContain('edad >= 18 and tiene_entrada');
+    expect(lesson.exercise.tests).toEqual([
+      { input: [], expected: ['True', '1', '7', '6'].join(String.fromCharCode(10)) },
+    ]);
+    expect(lesson.exercise.hints).toHaveLength(4);
+    expect(lesson.commonMistakes.join(' ')).toContain('no son equivalentes');
+  });
+
   it('califica todas las respuestas y exige al menos 75 por ciento', () => {
     const questions = [
       { prompt: '1', options: ['a', 'b'], answer: 0, explanation: '' },
