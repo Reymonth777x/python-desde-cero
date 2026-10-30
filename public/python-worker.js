@@ -95,14 +95,27 @@ self.onmessage = async (event) => {
 
         let turtleCommands = null;
         if (turtleLoaded) {
+            let commands = null;
+            let pyCommands = null;
+
             try {
-                const commands = pyodide.globals.get("get_commands");
+                commands = pyodide.globals.get("get_commands");
                 if (commands) {
-                    const pyCommands = commands();
-                    turtleCommands = pyodide.to_js(pyCommands);
+                    pyCommands = commands();
+                    // Los comandos deben convertirse en objetos JavaScript nativos:
+                    // React necesita acceder a cmd.type, cmd.color, cmd.points, etc.
+                    // create_pyproxies:false evita dejar proxies Python anidados vivos.
+                    turtleCommands = pyCommands.toJs({
+                        dict_converter: Object.fromEntries,
+                        create_pyproxies: false,
+                    });
                 }
-            } catch {
-                // Ignorar errores al leer comandos de Turtle
+            } catch (error) {
+                console.warn("No se pudieron recuperar los comandos de Turtle:", error);
+            } finally {
+                // Los objetos PyProxy pertenecen a Pyodide y deben liberarse.
+                pyCommands?.destroy?.();
+                commands?.destroy?.();
             }
         }
 
