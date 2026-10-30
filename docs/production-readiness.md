@@ -1,17 +1,16 @@
 # Preparación para producción — 30 de octubre de 2026
 
-**Último release funcional de la aplicación:** `e758f9cf9da1aa647429669b112b7128ca9b126d`  
-**CI:** [41076396982](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41076396982) — success  
-**Despliegue:** [41076898388](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41076898388) — success, job `deploy` ejecutado  
-**Actualización documental posterior:** PR #67 en `10cc1b7`; CI [41092034385](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41092034385) y deploy [41092591412](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41092591412) — success; no cambia el código de la aplicación.  
-**Último cambio de código integrado:** PR #84, commit `04604585d899173439f73c8a9d1975451e771200`; los jobs `test-and-build` y `powershell-launcher` pasaron en el CI del PR. El despliegue post-merge de ese SHA aún no está verificado.  
-**Alcance:** GitHub, dominio público, Cloudflare Workers y dos proyectos Supabase. Las consultas Supabase fueron de solo lectura; no se ejecutaron migraciones ni escrituras.
+**Última publicación comprobada:** `04604585d899173439f73c8a9d1975451e771200` (30-10-2026)  
+**CI de master:** [41108215559](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41108215559) — success  
+**Despliegue Cloudflare:** [41108747917](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41108747917) — success, incluido el smoke test de producción  
+**Cloudflare Worker Version ID:** `522d1b30-13fd-4bed-aefa-8395986367c4`  
+**Alcance:** GitHub, dominio público, Cloudflare Workers y dos proyectos Supabase. La función de acceso histórico quedó aplicada en PROD/DEV y la interfaz correspondiente quedó publicada mediante PR #84; no se inventaron notas ni se modificó el progreso de alumnos.
 
 ## Dictamen
 
 **Publicado y comprobado técnicamente; todavía no aprobado como lanzamiento educativo completo.**
 
-El release `e758f9c` pasó CI completo y despliegue Cloudflare. El smoke test externo confirmó `/`, `/muestra`, `/login`, sitemap de cinco URLs y redirección `www` al dominio canónico. Esto no sustituye pruebas reales del recorrido autenticado, correo, Turnstile interactivo ni hardware móvil.
+El release `0460458` pasó CI completo y despliegue Cloudflare. El smoke test confirmó portada, `/muestra`, `/login`, sitemap, marcador Turnstile, conexión del dominio al Worker y redirección `www` al dominio canónico. PR #84 está publicado; las pruebas reales del recorrido autenticado, correo, Turnstile interactivo y hardware móvil siguen pendientes.
 
 ## Sitio y capacidades publicadas
 
@@ -20,7 +19,9 @@ El release `e758f9c` pasó CI completo y despliegue Cloudflare. El smoke test ex
 - `/muestra` permite leer y ejecutar la primera lección sin cuenta. El serializador excluye preguntas, respuestas, soluciones, pruebas ocultas y progreso.
 - `/academia` y `/practica` requieren sesión. El modelo de autorización distingue estudiante y administrador; no hay panel docente.
 - El panel administrativo ofrece gestión de invitaciones; administración de usuarios y auditoría no están disponibles en esta versión.
-- PR #54 protege los despliegues frente a workflows obsoletos verificando el SHA antes y después de compilar.
+- PR #54 protege los despliegues frente a workflows obsoletos verificando el SHA antes y después de compilar. El despliegue del 30-10-2026 omitió ejecuciones obsoletas y publicó finalmente el HEAD actual.
+- PR #82 ejecuta las soluciones de referencia de todas las actividades de código con 62 casos en procesos Python aislados; el examen conceptual final se excluye porque no requiere código adicional.
+- PR #81 recupera el foco al activar el cierre del selector móvil. La suite Playwright comprueba el diálogo a 320, 360 y 390 px, su encaje en pantalla, el scroll interno y el foco de teclado. Aún falta validar en un teléfono físico.
 - El smoke test externo leyó `/`, `/muestra`, `/login`, `/sitemap.xml` y `www`. El workflow también comprobó el marcador Turnstile y el redirect HTTP 308.
 
 ## Curso y correcciones recientes
@@ -47,7 +48,7 @@ Se compararon las 67 tuplas actuales de `questions.answer` con `private.quiz_ans
 
 `public.submit_quiz_v2` es `SECURITY INVOKER`; `anon` no tiene EXECUTE y `authenticated` sí. El calificador autoritativo vive en el esquema privado como `SECURITY DEFINER`, valida `auth.uid()` y devuelve calificación agregada. La ruta antigua `public.submit_quiz` y `private.submit_quiz_authoritative` usaba `correct_option` legacy y devolvía `answerCorrect`; el 30-10-2026 se revocó `EXECUTE` sobre ambas para `PUBLIC`, `anon`, `authenticated` y `service_role`. El flujo v2 sigue habilitado. Migración: `20261030174256_revoke_legacy_quiz_rpc_execution.sql`; verificador: `scripts/sql/verify-legacy-quiz-rpc-closed.sql`. El trigger `invitations_prevent_used_deletion` conserva las invitaciones usadas.
 
-El historial remoto consultado registra 24 migraciones en producción y 10 en DEV. La revocación del RPC heredado `revoke_legacy_quiz_rpc_execution` figura como producción `20261030174256` y DEV `20261030174245`. La migración local 028 (`grandfather_existing_module_progress`) figura como producción `20261030183117` y DEV `20261030183123`, ambos distintos del timestamp local `20261030091000`. Las versiones locales 001–003 y 016–017 y los timestamps 024–027 también presentan divergencias. La rama preview `main` del proyecto de producción tiene `MIGRATIONS_FAILED` (la base preview indica `ACTIVE_HEALTHY`), y no es el proyecto DEV separado. No ejecutar `db push`, `migration repair`, `db reset`, ni resetear/rebasar/borrar esa rama sin investigar el drift y preparar backup/rollback.
+El historial remoto de producción registra 23 migraciones y DEV registra 9. La migración 028 (`revoke_legacy_quiz_rpc_execution`) está aplicada en ambos entornos con timestamps distintos. Las versiones locales 001–003 y 016–017, además de varios timestamps 024–027, siguen difiriendo del historial remoto. La rama preview `main` del proyecto de producción tiene `MIGRATIONS_FAILED` (la base preview indica `ACTIVE_HEALTHY`), y no es el proyecto DEV separado. No ejecutar `db push`, `migration repair`, `db reset`, ni resetear/rebasar/borrar esa rama sin investigar el drift y preparar backup/rollback.
 
 Producción y DEV usan PostgreSQL 17.11.0.003 y `pgcrypto` 1.3. El Advisor de seguridad de producción reporta Leaked Password Protection desactivado. La organización está en plan Free y la documentación oficial de Supabase indica que la función requiere Pro o superior; no está disponible para activar en el plan actual. Mantener los requisitos básicos de contraseña y reevaluar si se decide actualizar. Dos índices de invitaciones muestran uso no observado (INFO); no cambiarlos sin medir.
 
