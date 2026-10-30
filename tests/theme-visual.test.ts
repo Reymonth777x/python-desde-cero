@@ -103,3 +103,31 @@ test("Respetar prefers-reduced-motion", async ({ page }) => {
 
   expect(animations).toBe(0);
 });
+
+test("La paleta de temas móvil se adapta al ancho y no queda recortada", async ({ page }) => {
+  for (const width of [320, 360, 390]) {
+    await page.setViewportSize({ width, height: 568 });
+    await page.goto("/");
+
+    const trigger = page.getByRole("button", { name: "Seleccionar tema visual" });
+    await expect(trigger).toBeVisible();
+    await trigger.click();
+
+    const dialog = page.getByRole("dialog", { name: "Tema visual" });
+    await expect(dialog).toBeVisible();
+
+    const bounds = await dialog.boundingBox();
+    expect(bounds).not.toBeNull();
+    expect(bounds!.x).toBeGreaterThanOrEqual(0);
+    expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width);
+    expect(bounds!.y).toBeGreaterThanOrEqual(0);
+    expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(568);
+
+    await expect(dialog.locator("[data-theme-options]")).toHaveCSS("overflow-y", "auto");
+    await expect(dialog.getByRole("button", { name: /Cyberpunk/ })).toBeVisible();
+    await dialog.getByRole("button", { name: /Cyberpunk/ }).click();
+
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "cyberpunk");
+    await expect(dialog).toHaveCount(0);
+  }
+});
