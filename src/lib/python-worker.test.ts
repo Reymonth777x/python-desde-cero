@@ -73,7 +73,7 @@ describe('Python Web Worker', () => {
     const harness = createWorkerHarness();
     await harness.self.onmessage?.({ data: { id: 4, code: 'read-input', input: ['Ada'] } });
 
-    expect(harness.posted.at(-1)).toMatchObject({
+    expect(harness.posted.find((message) => message.id === 4)).toMatchObject({
       id: 4, status: 'success', output: 'Read: Ada\n',
     });
   });
