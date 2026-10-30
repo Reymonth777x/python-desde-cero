@@ -54,6 +54,15 @@ function applySecurityHeaders(response: NextResponse, csp: string) {
 }
 
 export async function proxy(request: NextRequest) {
+  // Keep one canonical public origin. Cloudflare registers both custom domains,
+  // then this early redirect sends www traffic to the apex before auth or pages run.
+  if (request.nextUrl.hostname.toLowerCase() === 'www.python-desdecero.com') {
+    const canonicalUrl = request.nextUrl.clone();
+    canonicalUrl.protocol = 'https:';
+    canonicalUrl.hostname = 'python-desdecero.com';
+    canonicalUrl.port = '';
+    return NextResponse.redirect(canonicalUrl, 308);
+  }
   // Next.js needs this per-response nonce in the incoming request CSP so its
   // framework and inline flight scripts can be authorized without unsafe-inline.
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
