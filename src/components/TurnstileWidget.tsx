@@ -13,23 +13,18 @@ export function TurnstileWidget({ siteKey, action = 'login' }: Props) {
   const widgetRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [isReady, setIsReady] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return Boolean(window.turnstile);
-  });
-  const [status, setStatus] = useState<TurnstileStatus>(() => {
-    if (typeof window === 'undefined') return 'loading';
-    return window.turnstile ? 'ready' : 'loading';
-  });
+  const [isReady, setIsReady] = useState(
+    () => typeof window !== 'undefined' && Boolean(window.turnstile),
+  );
+  const [status, setStatus] = useState<TurnstileStatus>(
+    () => (typeof window !== 'undefined' && window.turnstile ? 'ready' : 'loading'),
+  );
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    if (window.turnstile) {
-      setIsReady(true);
-      setStatus('ready');
-      return;
-    }
+    // State initializers already reflect a script loaded before this component mounted.
+    if (window.turnstile) return;
 
     const existingScript = document.querySelector<HTMLScriptElement>(
       'script[data-turnstile-loader="true"]',
@@ -47,7 +42,7 @@ export function TurnstileWidget({ siteKey, action = 'login' }: Props) {
 
     if (existingScript) {
       if (existingScript.dataset.loaded === 'true') {
-        handleLoad();
+        queueMicrotask(handleLoad);
       } else {
         existingScript.addEventListener('load', handleLoad);
         existingScript.addEventListener('error', handleError);
@@ -107,9 +102,8 @@ export function TurnstileWidget({ siteKey, action = 'login' }: Props) {
           setStatus('error');
         },
       });
-      setStatus('ready');
     } catch {
-      setStatus('error');
+      queueMicrotask(() => setStatus('error'));
     }
 
     return () => {
