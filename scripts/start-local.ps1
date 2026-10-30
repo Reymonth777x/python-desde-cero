@@ -82,6 +82,11 @@ if (-not (Get-Command npx -ErrorAction SilentlyContinue)) {
     throw 'No se encontro npx. Instala Node.js 24 y npm, ejecuta npm ci y vuelve a intentarlo.'
 }
 
+$portInUse = Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue
+if ($portInUse) {
+    throw 'El puerto 3000 ya esta ocupado. Deten el servidor anterior con Ctrl+C y vuelve a ejecutar este script.'
+}
+
 Write-Host "Usando Supabase CLI $SupabaseCliVersion mediante npx (no requiere instalacion global)..." -ForegroundColor Cyan
 
 Write-Host 'Iniciando Supabase local. No se enlaza ni se modifica el proyecto remoto...' -ForegroundColor Cyan
@@ -106,7 +111,9 @@ if ($startExitCode -ne 0) {
     throw 'Supabase local no pudo iniciar. Confirma que Docker Desktop este en ejecucion y vuelve a probar. La salida de Supabase se oculta para no mostrar claves locales; no ejecutes db push ni db reset contra el proyecto remoto.'
 }
 
-Write-Host 'No se aplican migraciones automáticamente: el historial local/remoto está pendiente de reconciliación.' -ForegroundColor Yellow`n`n$local = Get-SupabaseLocalEnv
+Write-Host 'No se aplican migraciones automáticamente: el historial local/remoto está pendiente de reconciliación.' -ForegroundColor Yellow
+
+$local = Get-SupabaseLocalEnv
 $developmentEnvPath = Join-Path $projectRoot '.env.development.local'
 
 $envLines = @(
@@ -156,10 +163,6 @@ if (-not $SkipSeed) {
     Write-Host 'Se omitio la creacion de cuentas (-SkipSeed).' -ForegroundColor Yellow
 }
 
-$portInUse = Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue
-if ($portInUse) {
-    throw 'El puerto 3000 ya esta ocupado. Deten el servidor anterior con Ctrl+C y vuelve a ejecutar este script.'
-}
 
 Write-Host ''
 Write-Host 'Listo. Iniciando Next.js contra la base Supabase local:' -ForegroundColor Green
