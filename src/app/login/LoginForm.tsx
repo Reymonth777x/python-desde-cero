@@ -34,6 +34,12 @@ export default function LoginForm({ error, message, next = '' }: Props) {
   const [loginState, loginAction] = useActionState(login, {} as LoginActionState);
   const [captchaAttempt, setCaptchaAttempt] = useState(0);
   const [loginActionError, setLoginActionError] = useState('');
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [signupName, setSignupName] = useState('');
+  const [signupEmail, setSignupEmail] = useState('');
+  const [signupPassword, setSignupPassword] = useState('');
+  const [invitationCode, setInvitationCode] = useState('');
 
   useEffect(() => {
     if (!loginState.error) return;
@@ -44,14 +50,9 @@ export default function LoginForm({ error, message, next = '' }: Props) {
     };
     setLoginActionError(messages[loginState.error]);
     setLoginPassword('');
-    if (loginState.error === 'captcha') setCaptchaAttempt((attempt) => attempt + 1);
+    // A submitted Turnstile token is single-use, even when credentials are rejected.
+    setCaptchaAttempt((attempt) => attempt + 1);
   }, [loginState]);
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  const [signupName, setSignupName] = useState('');
-  const [signupEmail, setSignupEmail] = useState('');
-  const [signupPassword, setSignupPassword] = useState('');
-  const [invitationCode, setInvitationCode] = useState('');
 
   function showLogin() {
     setSignupName('');
