@@ -1217,7 +1217,7 @@ export const courseModules: CourseModule[] = [
             "Comprueba numero % 2 == 0 y usa continue para saltar los pares.",
             "Coloca print(numero) después de las dos condiciones.",
           ],
-          "difficulty": "facil",
+          "difficulty": "medio",
           "xp": 20,
           "length": 5
         },
