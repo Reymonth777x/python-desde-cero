@@ -5,8 +5,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/login", "/login/forgot-password", "/login/reset-password"],
-        disallow: ["/academia", "/estudiante", "/practica", "/docente", "/admin", "/api", "/auth", "/python-runner"],
+        allow: ["/", "/muestra", "/login", "/login/forgot-password", "/login/reset-password"],
+        disallow: ["/academia", "/estudiante", "/practica", "/admin", "/api", "/auth", "/python-runner"],
       },
     ],
     sitemap: "https://python-desdecero.com/sitemap.xml",
