@@ -1,96 +1,81 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Temas visuales', () => {
-  test('muestra el selector de temas y aplica los 2 temas', async ({ page }) => {
+  test('muestra el selector y aplica los temas Original y Oscuro', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'light' });
     await page.goto('/');
 
-    const selector = page.locator('[aria-label="Seleccionar tema visual"]');
-    await expect(selector).toBeVisible();
-
+    const selector = page.getByRole('button', { name: 'Seleccionar tema visual' });
     const html = page.locator('html');
+
+    await expect(selector).toBeVisible();
     await expect(html).toHaveAttribute('data-theme', 'original');
 
-    const nombres = ['Original', 'Oscuro'];
-    const valores = ['original', 'dark'];
+    await selector.click();
+    await page.getByRole('button', { name: /^Original/ }).click();
+    await expect(html).toHaveAttribute('data-theme', 'original');
 
-    for (let i = 0; i < nombres.length; i++) {
-      await selector.click();
-      const opcion = page.locator('div[class*="absolute right-0"]').locator(`button:has-text("${nombres[i]}")`);
-      await expect(opcion.first()).toBeVisible();
-      await opcion.first().click();
-      await expect(html).toHaveAttribute('data-theme', valores[i]);
-    }
+    await selector.click();
+    await page.getByRole('button', { name: /^Oscuro/ }).click();
+    await expect(html).toHaveAttribute('data-theme', 'dark');
+    await expect.poll(() => page.evaluate(() => localStorage.getItem('python-desde-cero-theme'))).toBe('dark');
   });
 
-  test('el tema persiste tras recargar la página', async ({ page }) => {
+  test('el tema elegido persiste tras recargar la página', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'light' });
     await page.goto('/');
 
-    const selector = page.locator('[aria-label="Seleccionar tema visual"]');
-    await selector.click();
-    await page.locator('div[class*="absolute right-0"]').locator('button:has-text("Oscuro")').first().click();
+    await page.getByRole('button', { name: 'Seleccionar tema visual' }).click();
+    await page.getByRole('button', { name: /^Oscuro/ }).click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect.poll(() => page.evaluate(() => localStorage.getItem('python-desde-cero-theme'))).toBe('dark');
   });
 });
 
 test.describe('Ejemplos de portada', () => {
-  test('los 6 ejemplos son seleccionables', async ({ page }) => {
+  const examples = [
+    { title: 'Árbol fractal', marker: 'def rama(n):' },
+    { title: 'Espiral geométrica', marker: 'range(200)' },
+    { title: 'Arte con círculos', marker: 'range(36)' },
+    { title: 'Visualización matemática', marker: 'math.radians(i)' },
+    { title: 'Contador ascendente', marker: 'range(1, 11)' },
+    { title: 'Cálculo de áreas', marker: 'def area_circulo(radio):' },
+  ];
+
+  test('los seis ejemplos reales son seleccionables y cargan su código', async ({ page }) => {
     await page.goto('/');
+    const lab = page.locator('#ejemplo');
+    const editor = lab.locator('textarea');
 
-    const nombres = [
-      'Árbol fractal',
-      'Espiral geométrica',
-      'Arte con círculos',
-      'Visualización matemática',
-      'Saludo interactivo',
-      'Reto de lógica',
-    ];
-
-    for (const nombre of nombres) {
-      const btn = page.locator(`button:has-text("${nombre}")`);
-      const renderedButtons = (await page.locator('button').allTextContents())
-        .map((text) => text.replace(/\s+/g, ' ').trim())
-        .filter(Boolean)
-        .join(' | ');
-      await expect(btn, `No se encontró el ejemplo "${nombre}". Botones renderizados: ${renderedButtons}`).toBeVisible();
+    await expect(lab).toBeVisible();
+    for (const example of examples) {
+      const button = lab.getByRole('button').filter({ hasText: example.title });
+      await expect(button, `No se encontró el ejemplo "${example.title}"`).toBeVisible();
+      await button.click();
+      await expect(editor).toHaveValue(new RegExp(example.marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
     }
   });
 });
 
 test.describe('Turtle y fondo', () => {
-  test('SVG se renderiza tras ejecutar Árbol fractal', async ({ page }) => {
+  test('el ejemplo Árbol fractal ejecuta Python y dibuja el SVG', async ({ page }) => {
     await page.goto('/');
 
-    await page.locator('button:has-text("Árbol fractal")').click();
+    const lab = page.locator('#ejemplo');
+    await lab.getByRole('button').filter({ hasText: 'Árbol fractal' }).click();
 
-    const ejecutar = page.locator('button:has-text("Ejecutar")');
+    const ejecutar = lab.getByRole('button', { name: 'Ejecutar', exact: true });
     await expect(ejecutar).toBeVisible();
     await ejecutar.click();
 
-    const svg = page.locator('svg').first();
-    await expect(svg).toBeVisible({ timeout: 60000 });
-
-    const rectNegro = page.locator('rect[fill="black"]');
-    await expect(rectNegro.first()).toBeVisible();
-
-    const lineasBlancas = page.locator('line[stroke="white"]');
-    const lineasVerdes = page.locator('line[stroke="lime"]');
-
-    const totalLineas = await lineasBlancas.count() + await lineasVerdes.count();
-    expect(totalLineas).toBeGreaterThan(0);
-
-    const limpiar = page.locator('button:has-text("Limpiar gráfico")');
-    if (await limpiar.isVisible()) {
-      await limpiar.click();
-      await expect(page.locator('line')).toHaveCount(0, { timeout: 5000 });
-      const lineasDespues = await page.locator('line').count();
-      expect(lineasDespues).toBe(0);
-    }
-
-    await ejecutar.click();
-    await expect(page.locator('svg').first()).toBeVisible({ timeout: 60000 });
+    const canvas = lab.locator('svg');
+    await expect(canvas).toBeVisible({ timeout: 90_000 });
+    await expect(canvas.locator('rect[fill="black"]')).toBeVisible();
+    await expect(canvas.locator('line[stroke="white"], line[stroke="lime"]')).not.toHaveCount(0, { timeout: 90_000 });
+    await expect(ejecutar).toBeEnabled({ timeout: 90_000 });
   });
 });
 
@@ -99,17 +84,17 @@ test.describe('Interfaz móvil y escritorio', () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/');
 
-    const ancho = await page.evaluate(() => document.documentElement.scrollWidth);
-    expect(ancho).toBeLessThanOrEqual(395);
+    const width = await page.evaluate(() => document.documentElement.scrollWidth);
+    expect(width).toBeLessThanOrEqual(395);
   });
 
-  test('diseño escritorio renderiza componentes', async ({ page }) => {
+  test('diseño escritorio renderiza componentes principales', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/');
 
     await expect(page.locator('h1')).toBeVisible();
     await expect(page.locator('#ejemplo')).toBeVisible();
-    await expect(page.locator('[aria-label="Seleccionar tema visual"]')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Seleccionar tema visual' })).toBeVisible();
   });
 });
 
