@@ -1,7 +1,17 @@
-importScripts("/pyodide/0.29.5/full/pyodide.js");
-
 (() => {
     "use strict";
+
+    const PYODIDE_BASE_URL = typeof self.__PYODIDE_BASE_URL__ === "string"
+        ? self.__PYODIDE_BASE_URL__
+        : "/pyodide/0.29.5/full/";
+    const PYODIDE_SCRIPT_URL = /^https?:\\/\\//.test(PYODIDE_BASE_URL)
+        ? new URL("pyodide.js", PYODIDE_BASE_URL).toString()
+        : PYODIDE_BASE_URL + "pyodide.js";
+    const TURTLE_COMPAT_URL = /^https?:\\/\\//.test(PYODIDE_BASE_URL)
+        ? new URL("../../../turtle_compat.py", PYODIDE_BASE_URL).toString()
+        : "/turtle_compat.py";
+
+    importScripts(PYODIDE_SCRIPT_URL);
 
     const MAX_CODE_LENGTH = 50000;
     const MAX_OUTPUT_LENGTH = 20000;
@@ -14,7 +24,7 @@ importScripts("/pyodide/0.29.5/full/pyodide.js");
     let initializationError = "";
 
     const pyodideReadyPromise = loadPyodide({
-        indexURL: "/pyodide/0.29.5/full/",
+        indexURL: PYODIDE_BASE_URL,
     });
 
     let turtleLoaded = false;
@@ -32,7 +42,7 @@ importScripts("/pyodide/0.29.5/full/pyodide.js");
     pyodideReadyPromise
         .then(async (pyodide) => {
             try {
-                const turtleResponse = await fetch("/turtle_compat.py");
+                const turtleResponse = await fetch(TURTLE_COMPAT_URL, { credentials: "omit" });
                 if (!turtleResponse.ok) {
                     throw new Error("No se pudo cargar turtle_compat.py: " + turtleResponse.status);
                 }
