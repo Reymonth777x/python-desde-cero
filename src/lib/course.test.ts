@@ -171,7 +171,8 @@ describe('ruta de aprendizaje Python desde cero', () => {
     const inventoryProject = lesson('module-4', 'b4-l10');
     expect(inventoryProject.exercise.statement).toContain('acumula las cantidades');
     expect(inventoryProject.exercise.solution).toContain('inventario.get(nombre, 0)');
-    expect(inventoryProject.exercise.tests).toHaveLength(5);
+    expect(inventoryProject.exercise.tests).toHaveLength(6);
+    expect(inventoryProject.exercise.tests[5].input).toEqual(['1', 'Cuaderno', '-2']);
     expect(inventoryProject.exercise.tests[1].input).toEqual([
       '3',
       'Lapiz',
