@@ -34,7 +34,7 @@ El módulo 2 ahora sigue la secuencia: 2.1 primer programa “Hello, World!”, 
 | Lecciones/unidades principales | 33 (4 + 9 + 9 + 11; incluye evaluaciones, proyecto y examen) |
 | Evaluaciones de módulo | 4; M1, M2, M3 y M4 |
 | Laboratorios integradores | 3, ubicados al cierre de los módulos 2, 3 y 4 |
-| Preguntas registradas | 67 esperadas en el catálogo; DEV verificado con 67 claves v2. Producción tiene 44 claves v2 del catálogo anterior |
+| Preguntas registradas | 67 claves activas esperadas; DEV y producción verificados con 67/67 claves v2 configuradas |
 | Extensión adicional | 4 unidades opcionales en module-5 |
 | Proyecto aplicado | Proyecto obligatorio b4-l10; seis pruebas automáticas |
 | Evaluación final global | b4-l11 implementado en código; 12 preguntas |
@@ -58,7 +58,7 @@ En el módulo 3 se corrigió la progresión: comparaciones y decisiones → whil
 
 b1-l4 ahora es “Evaluación del módulo 1: fundamentos de programación”, con seis preguntas sobre algoritmo, código fuente, intérprete, IDE, errores de sintaxis y Python como lenguaje.
 
-**Estado de integración:** las migraciones 024 (evaluación M1, proyecto y examen final) y 025 (pregunta Hello, World!) se aplicaron y verificaron en DEV. La migración 026 (endurecimiento del RPC) ya está aplicada tanto en DEV como en producción. Aplicar 024 y 025 en producción junto con el despliegue del nuevo catálogo.
+**Estado de integración (30-10-2026):** 024 y 025 se aplicaron y verificaron en producción (versiones 20261030081610 y 20261030081612). 026 ya estaba aplicada (20261030073610). DEV también tiene 024/025/026 con sus propios timestamps. Ambos entornos tienen 67 claves v2. Los historiales usan timestamps diferentes; no ejecutar `db push` ni `migration repair` antes de reconciliarlos.
 
 ### 2. Módulo 2: secuencia y límites de conceptos
 
