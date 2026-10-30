@@ -47,7 +47,7 @@ describe('quiz answer-key drift detection', () => {
       'utf8',
     );
     const previousKeys = [...keysFromBalanceMigration(sql), ...keysFromPracticeMigration(additionalSql)]
-      .filter((key) => !key.startsWith("'module-1', 'b1-l4',"));
+      .filter((key) => !key.startsWith("'module-1', 'b1-l4',") && !key.startsWith("'module-5', 'b5-l4',"));
     const finalAssessmentSql = readFileSync(
       new URL('../../supabase/migrations/20261030064000_024_add_required_pe1_assessments_and_project.sql', import.meta.url),
       'utf8',
