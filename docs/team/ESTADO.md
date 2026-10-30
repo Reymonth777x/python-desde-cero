@@ -5,11 +5,12 @@
 ## Repositorio y publicación
 
 - Repositorio: `Reymonth777x/python-desde-cero`; rama de producción: `master`.
-- Última publicación de código comprobada: SHA `04604585d899173439f73c8a9d1975451e771200` (30-10-2026). CI de master [41108215559](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41108215559) y despliegue Cloudflare [41108747917](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41108747917), ambos `success`.
-- Cloudflare Worker Version ID de esa publicación: `522d1b30-13fd-4bed-aefa-8395986367c4`.
-- PR #84 está fusionado: dashboard y ruta de lección conservan acceso de estudiantes con progreso histórico, sin inventar calificaciones ni completar evaluaciones. CI del PR [41107541504](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41107541504) y CI de master [41108215559](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41108215559) pasaron ambos jobs.
-- El verificador de actividades ejecutó **62 casos de 36 actividades de código** en procesos/directorios aislados; el examen conceptual final se excluye. Conteo confirmado por CI [41107922028](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41107922028). Las pantallas autenticadas aún necesitan una comprobación manual con cuentas reales.
-- El smoke test de `0460458` confirmó portada, `/muestra`, `/login` con Turnstile, sitemap y redirección `www` HTTP 308 al dominio principal.
+- Última publicación comprobada: SHA `37db89ecb542a7a00abc0f55691872505146cd61` (30-10-2026). CI de master [41129443835](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41129443835) y despliegue Cloudflare [41129901037](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41129901037), ambos `success`.
+- Cloudflare Worker principal Version ID: `dd3dc42c-b29b-4e86-8604-25f3a94ebab5`.
+- PR #91 integró el ejecutor Python de origen separado. Su CI [41128849155](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41128849155) pasó pruebas unitarias, TypeScript, ESLint, build Next, E2E, build Vinext y auditoría informativa. El runner está publicado en `https://python-desdecero-runner.pythondesdecero.workers.dev`, versión `d831ac62-d7d8-4afb-95fb-8b17ae363a88`.
+- El workflow de publicación comprobó el mismo SHA de `master` antes de desplegar, verificó el origen y CSP del runner, y confirmó que `python-desdecero.com` continúa conectado al Worker principal. El smoke test de producción confirmó portada, `/muestra`, `/login` con widget Turnstile, sitemap y redirección `www` HTTP 308.
+- La CI verificó **62 casos de 36 actividades de código**. Las pruebas E2E cubren el runner de origen distinto en el entorno de CI; la publicación comprobó los assets y CSP del runner real. Sigue pendiente una ejecución manual interactiva desde un navegador en producción y una pasada en teléfonos físicos.
+- PR #84 conserva el acceso de estudiantes con progreso histórico, sin inventar calificaciones ni completar evaluaciones.
 - PR #43 está integrado: la navegación presenta Academia y Laboratorio; no anuncia un panel docente no implementado.
 
 ## Producto y navegación
@@ -48,8 +49,12 @@
 - La Sitekey pública está disponible en GitHub Actions y el HTML publicado de `/login` incluye el widget Turnstile.
 - La comprobación HTTP confirma que el widget se renderiza; no demuestra que una persona completó el desafío ni que Supabase Auth validó la Secret key privada.
 - La configuración CAPTCHA dentro de Supabase Auth no se puede leer mediante las herramientas disponibles. La validación real debe completarse con un correo controlado en el dominio publicado.
-- Los logs recientes de producción mostraron dos respuestas `over_email_send_rate_limit` (429). Esto confirma que el servicio de envío alcanzó su límite, pero no identifica por sí solo qué proveedor SMTP está configurado. Verificar el proveedor; si aún se usa el SMTP integrado por defecto, configurar SMTP propio antes de abrir el registro al público.
-- El historial de CI no sustituye una prueba integral de registro, confirmación por correo, login, logout y recuperación de contraseña con cuentas reales.
+- El propietario generó una clave SMTP Standard de Brevo el 30-10-2026. La clave no se copia al repositorio, al navegador ni a este documento.
+- La auditoría DNS pública confirma en `python-desdecero.com` el TXT de propiedad de Brevo, los CNAME `brevo1._domainkey` y `brevo2._domainkey` apuntando a DKIM de Brevo, y un único DMARC `v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com`. Los nameservers autoritativos son Cloudflare. Ambos CNAME DKIM se publican como CNAME en las respuestas DNS; el aplanamiento no los está convirtiendo a TXT.
+- No se pudo inspeccionar el estado privado del dominio/remitente dentro de Brevo ni leer la configuración SMTP de Supabase Auth con la conexión disponible. Por tanto, no se afirma que la clave SMTP esté guardada en Supabase, que el dominio aparezca como autenticado en el panel o que se haya entregado un correo de prueba. El detalle y los siguientes pasos están en `docs/team/BREVO-SMTP.md`.
+- El registro DMARC usa `p=none` (monitorización, no cuarentena/rechazo). No se encontró un SPF TXT en el apex durante esta consulta; Brevo indica que SPF/MX no son obligatorios para autenticar un dominio con IP compartida, pero Supabase recomienda SPF, DKIM y DMARC para entregabilidad. No crear un SPF adicional sin comprobar primero si ya existe otro en el dominio de envío.
+- Los logs previos de producción mostraron dos respuestas `over_email_send_rate_limit` (429). No se atribuyen automáticamente a Brevo: aún no se ha confirmado qué SMTP estaba activo en el momento de esos errores.
+- El historial de CI no sustituye una prueba real de registro, confirmación, login, logout y recuperación con una dirección controlada.
 - La organización Supabase está en plan Free. El Advisor de producción reporta `auth_leaked_password_protection` desactivado; Supabase documenta que esta función requiere Pro o superior. No se puede habilitar mediante SQL y no debe figurar como una corrección disponible en el plan actual. DEV no presenta avisos de seguridad.
 
 ## Riesgos de repositorio y gobierno
@@ -63,7 +68,7 @@
 2. Completar pruebas manuales de Auth/Turnstile con un buzón controlado, incluyendo registro, confirmación, login, logout y recuperación de contraseña, sin compartir contraseñas ni Secret keys.
 3. Probar evaluaciones y progreso con dos estudiantes y un administrador; comprobar que un intento no aprobado no completa la unidad y que la mejor nota persiste después del cierre de sesión.
 4. Protección de contraseñas filtradas: el Advisor la reporta desactivada, pero la organización está en plan Free y Supabase exige Pro o superior. No es una tarea ejecutable con el plan actual; mantener longitud mínima de ocho caracteres y reevaluar solo si se decide actualizar.
-5. Verificar SPF, DKIM, DMARC, plantillas y redirecciones de correo.
+5. Verificar en el panel de Brevo que el dominio y el remitente están autenticados; configurar la clave SMTP en Supabase Auth (primero DEV, luego PROD) y probar confirmación, login y recuperación con un buzón controlado. Revisar SPF si el dominio de envío/IP lo requiere.
 6. Probar Pyodide, Worker, Turtle y timeouts en Chrome y Firefox y hacer una pasada en móviles físicos. Los E2E emulados no sustituyen estas pruebas.
 7. Revisar en español las 33 unidades obligatorias, retirar repeticiones y ampliar prácticas con casos límite.
 8. Reconciliar migraciones locales/DEV/producción y resolver de forma controlada la rama preview fallida antes de cualquier operación de esquema.
