@@ -161,6 +161,12 @@ test("El diálogo móvil de temas mantiene el foco dentro y lo devuelve al activ
   await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0);
   await expect(trigger).toBeFocused();
+
+  await trigger.click();
+  await expect(dialog).toBeVisible();
+  await page.getByTestId("theme-mobile-backdrop").click({ position: { x: 4, y: 4 } });
+  await expect(dialog).toHaveCount(0);
+  await expect(trigger).toBeFocused();
 });
 
 test("Las páginas principales no generan desplazamiento horizontal en móvil", async ({ page }) => {
