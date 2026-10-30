@@ -24,11 +24,11 @@ Este documento reemplaza la lista anterior. No ejecutar pasos de producción has
 
 ## 3. Academia y calidad del curso PE1
 
-- [ ] Completar la evaluación formal del módulo 1.
+- [ ] Completar la evaluación formal del módulo 1 y alinearla con la sección 1.4 de Cisco PE1.
 - [ ] Mantener print() en b1-l4 solo como demostración de ejecución y verificar que la explicación formal de salida, cadenas y comentarios permanezca en el módulo 2.
-- [ ] Crear evaluación final global de PE1.
-- [ ] Convertir el proyecto final en requisito de graduación del PE1.
-- [ ] Revisar las 30 unidades principales para eliminar explicaciones repetidas y asegurar prerequisitos.
+- [ ] Crear evaluación final global de PE1, basada en los cuatro módulos y con preguntas de lectura, depuración y aplicación.
+- [ ] Convertir el proyecto final en requisito de graduación del PE1 y diseñar su rúbrica de evaluación.
+- [ ] Revisar las 30 unidades principales para eliminar explicaciones repetidas, asegurar prerequisitos y alinear la sección 2.1 Hello World y la numeración del módulo 2.
 - [ ] Ampliar prácticas con casos límite, entradas inválidas y retroalimentación explicativa.
 - [ ] Mantener la extensión de archivos claramente fuera del PE1 principal.
 - [ ] Revisar todo el contenido en español antes de traducirlo al inglés.
