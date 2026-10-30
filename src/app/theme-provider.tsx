@@ -88,11 +88,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const resolvedTheme = useMemo(() => {
     if (theme === 'sistema') return resolveSystemTheme();
-    return theme === 'dark' ? 'dark' : 'original';
+    return ['dark', 'dracula', 'cyberpunk', 'hacker'].includes(theme) ? 'dark' : 'original';
   }, [theme]);
 
   const setTheme = useCallback((next: ThemeName) => {
     setThemeOverride(next);
+    const resolved = next === 'sistema'
+      ? resolveSystemTheme()
+      : (['dark', 'dracula', 'cyberpunk', 'hacker'].includes(next) ? 'dark' : 'original');
+    document.documentElement.setAttribute('data-theme', next === 'sistema' ? resolved : next);
+    document.documentElement.setAttribute('data-color-scheme', resolved);
     try {
       window.localStorage.setItem(THEME_KEY, next);
     } catch {
