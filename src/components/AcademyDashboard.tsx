@@ -67,13 +67,17 @@ export default function AcademyDashboard({
     0,
   );
 
-  // Find the next lesson the user has not yet completed, within an unlocked module
-  const nextLesson = courseModules
-    .flatMap((courseModule, moduleIndex) => {
+  // The four core modules form the completion path; the applied project is an optional extension.
+  const findNextLesson = (modules: typeof courseModules) => modules
+    .flatMap((courseModule) => {
+      const moduleIndex = courseModules.findIndex((item) => item.id === courseModule.id);
       if (!progressUnavailable && !isModuleUnlocked(moduleIndex, progressRows)) return [];
       return courseModule.lessons.map((lesson) => ({ courseModule, lesson }));
     })
     .find(({ courseModule, lesson }) => !completed(courseModule.id, lesson.id));
+
+  const coreComplete = !progressUnavailable && completedCount === lessonCount;
+  const nextLesson = findNextLesson(coreModules) ?? findNextLesson(extensionModules);
 
   const completionPercent = lessonCount > 0
     ? Math.round((completedCount / lessonCount) * 100)
@@ -82,9 +86,13 @@ export default function AcademyDashboard({
   const hasProgress = completedCount > 0;
   const ctaLabel = progressUnavailable
     ? 'Abrir primera lección'
-    : hasProgress
-      ? 'Continuar aprendiendo'
-      : 'Comenzar a aprender';
+    : coreComplete
+      ? extensionLessonCount > extensionCompletedCount
+        ? 'Explorar la extensión práctica'
+        : 'Repasar el curso principal'
+      : hasProgress
+        ? 'Continuar aprendiendo'
+        : 'Comenzar a aprender';
 
   const ctaHref = nextLesson
     ? `/academia/${nextLesson.courseModule.id}/${nextLesson.lesson.id}`

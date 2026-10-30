@@ -19,8 +19,9 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(courseModules[4].optional).toBe(true);
     expect(courseModules[4].title).toContain('extensión práctica');
     expect(courseModules.slice(0, 4).map((courseModule) => courseModule.lessons.length)).toEqual([
-      4, 7, 8, 8, 4,
+      4, 7, 8, 8,
     ]);
+    expect(courseModules[4].lessons).toHaveLength(4);
   });
 
   it('asigna preguntas y ejemplos a cada actividad y mantiene ids únicos por módulo', () => {
