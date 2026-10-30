@@ -43,7 +43,7 @@ CREATE TABLE private.quiz_answer_key (
   option_count integer NOT NULL CHECK (option_count >= 2),
   correct_option_v2 integer,
   CONSTRAINT quiz_answer_key_pkey PRIMARY KEY (module_id,lesson_id,question_index),
-  CONSTRAINT quiz_answer_key_correct_option_check CHECK (correct_option < option_count),
+  CONSTRAINT quiz_answer_key_correct_option_range_check CHECK (correct_option < option_count),
   CONSTRAINT quiz_answer_key_v2_check CHECK (correct_option_v2 IS NULL OR (correct_option_v2 >= 0 AND correct_option_v2 < option_count))
 );
 
