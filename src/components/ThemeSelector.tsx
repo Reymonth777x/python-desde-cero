@@ -30,9 +30,18 @@ export default function ThemeSelector() {
   const desktopPanelRef = useRef<HTMLDivElement>(null);
   const mobilePanelRef = useRef<HTMLElement>(null);
   const mobileBackdropRef = useRef<HTMLDivElement>(null);
+  const wasOpenRef = useRef(false);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      if (wasOpenRef.current) {
+        wasOpenRef.current = false;
+        triggerRef.current?.focus();
+      }
+      return;
+    }
+
+    wasOpenRef.current = true;
 
     const onPointerDown = (event: PointerEvent) => {
       const target = event.target;
@@ -220,8 +229,6 @@ export default function ThemeSelector() {
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-3 py-4 md:hidden"
           onPointerDown={(event) => {
             if (event.target === event.currentTarget) {
-              // Keep the browser's pointer default from moving focus after we
-              // deliberately return it to the dialog's trigger.
               event.preventDefault();
               setIsOpen(false);
               triggerRef.current?.focus();
