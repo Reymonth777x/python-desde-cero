@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import Editor from '@monaco-editor/react';
+import Editor, { type Monaco } from '@monaco-editor/react';
 import type { editor } from 'monaco-editor';
 import { usePythonWorker } from '@/lib/use-python-worker';
+import { useTheme } from '@/app/theme-provider';
 
 // Configura Monaco Editor para usar workers autohospedados desde /monaco/vs/
 if (typeof window !== 'undefined' && !window.MonacoEnvironment) {
@@ -24,9 +25,9 @@ export default function PythonEditor({
   const [mobilePanel, setMobilePanel] = useState<'instructions' | 'editor' | 'output' | 'turtle'>('instructions');
   const [editorRequested, setEditorRequested] = useState(false);
   const [desktopLayout, setDesktopLayout] = useState(false);
-  const [turtleError, setTurtleError] = useState<string | null>(null);
-
+  const { resolvedTheme } = useTheme();
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const monacoRef = useRef<Monaco | null>(null);
 
   const {
     workerState,
@@ -59,6 +60,50 @@ export default function PythonEditor({
     return () => desktopQuery.removeEventListener('change', updateLayout);
   }, []);
 
+  const applyEditorTheme = useCallback((monaco: Monaco) => {
+    const styles = getComputedStyle(document.documentElement);
+    const readColor = (name: string, fallback: string) =>
+      styles.getPropertyValue(name).trim() || fallback;
+
+    monaco.editor.defineTheme('python-desde-cero', {
+      base: resolvedTheme === 'dark' ? 'vs-dark' : 'vs',
+      inherit: true,
+      rules: [
+        { token: 'comment', foreground: '72816F', fontStyle: 'italic' },
+        { token: 'keyword', foreground: resolvedTheme === 'dark' ? '8AB4F8' : '294936', fontStyle: 'bold' },
+        { token: 'string', foreground: resolvedTheme === 'dark' ? 'A5D6A7' : '8A4B27' },
+        { token: 'number', foreground: resolvedTheme === 'dark' ? 'D7A8F7' : '8054A1' },
+        { token: 'type.identifier', foreground: resolvedTheme === 'dark' ? '80CBC4' : '356B70' },
+      ],
+      colors: {
+        'editor.background': readColor('--theme-code-bg', '#ebe9df'),
+        'editor.foreground': readColor('--theme-ink', '#252b25'),
+        'editorLineNumber.foreground': readColor('--theme-muted', '#596259'),
+        'editorLineNumber.activeForeground': readColor('--theme-accent', '#294936'),
+        'editorCursor.foreground': readColor('--theme-accent', '#294936'),
+        'editor.selectionBackground': readColor('--theme-accent-light', '#dce5d8'),
+        'editor.inactiveSelectionBackground': readColor('--theme-bg-secondary', '#ebe9df'),
+        'editor.lineHighlightBackground': readColor('--theme-bg-secondary', '#ebe9df'),
+        'editorGutter.background': readColor('--theme-code-bg', '#ebe9df'),
+        'editorWidget.background': readColor('--theme-surface', '#ffffff'),
+        'editorWidget.border': readColor('--theme-border', '#9c865e'),
+        'editorSuggestWidget.background': readColor('--theme-surface', '#ffffff'),
+        'editorSuggestWidget.foreground': readColor('--theme-ink', '#252b25'),
+        'editorSuggestWidget.selectedBackground': readColor('--theme-bg-secondary', '#ebe9df'),
+      },
+    });
+    monaco.editor.setTheme('python-desde-cero');
+  }, [resolvedTheme]);
+
+  useEffect(() => {
+    const monaco = monacoRef.current;
+    if (!monaco) return;
+    const frame = window.requestAnimationFrame(() => applyEditorTheme(monaco));
+    return () => window.cancelAnimationFrame(frame);
+  }, [applyEditorTheme]);
+
+  const needsInput = /\\binput\\s*\\(/.test(code);
+
   const runCode = useCallback(() => {
     if (isRunning) return;
     setMobilePanel('output');
@@ -84,7 +129,7 @@ export default function PythonEditor({
 
   return (
     <section className="w-full" aria-label="Espacio de práctica de Python">
-      <div role="tablist" aria-label="Paneles del laboratorio" className="mb-4 grid grid-cols-3 border-b border-[var(--theme-border)] md:hidden">
+      <div role="tablist" aria-label="Paneles del laboratorio" className="mb-4 grid grid-cols-4 border-b border-[var(--theme-border)] md:hidden">
         {([
           ['instructions', 'Guía'],
           ['editor', 'Código'],
@@ -100,11 +145,7 @@ export default function PythonEditor({
             aria-selected={mobilePanel === panel}
             onClick={() => {
               setMobilePanel(panel);
-              if (panel === 'editor') {
-                setEditorRequested(true);
-                if (workerState === 'idle') {
-                }
-              }
+              if (panel === 'editor') setEditorRequested(true);
             }}
             className={`min-h-12 border-b-2 px-2 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] ${mobilePanel === panel ? 'border-[var(--theme-accent)] text-[var(--theme-accent)]' : 'border-transparent text-[var(--theme-muted)]'}`}
           >
@@ -134,8 +175,6 @@ export default function PythonEditor({
             onClick={() => {
               setMobilePanel('editor');
               setEditorRequested(true);
-              if (workerState === 'idle') {
-              }
             }}
             className="mt-4 min-h-12 w-full bg-[var(--theme-accent)] px-5 py-3 text-sm font-semibold text-[var(--theme-ink-inverse)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"
           >
@@ -152,12 +191,16 @@ export default function PythonEditor({
       >
         {(editorRequested || desktopLayout) && (
           <>
-        <div className="h-[min(42svh,420px)] min-h-[280px] w-full overflow-hidden border border-[var(--theme-border)] bg-[var(--theme-surface)] sm:h-[460px]">
+        <div className="h-[min(42svh,420px)] min-h-[280px] w-full overflow-hidden border border-[var(--theme-border)] bg-[var(--theme-code-bg)] sm:h-[460px]">
           <Editor
             height="100%"
             defaultLanguage="python"
-            theme="vs"
-            onMount={(editorInstance) => { editorRef.current = editorInstance; }}
+            theme="python-desde-cero"
+            onMount={(editorInstance, monaco) => {
+              editorRef.current = editorInstance;
+              monacoRef.current = monaco;
+              applyEditorTheme(monaco);
+            }}
             value={code}
             onChange={(value) => setCode(value ?? '')}
             options={{
@@ -195,7 +238,8 @@ export default function PythonEditor({
           ))}
         </div>
 
-        <label className="block text-base font-semibold text-[var(--theme-ink)] sm:text-sm">
+        {needsInput && (
+          <label className="block text-base font-semibold text-[var(--theme-ink)] sm:text-sm">
           Entrada para input() <span className="font-normal text-[var(--theme-muted)]">(una línea por solicitud)</span>
           <textarea
             value={input}
@@ -205,7 +249,8 @@ export default function PythonEditor({
             placeholder="Escribe aquí las líneas que leerá tu programa"
             className="mt-2 block min-h-20 w-full resize-y border border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 py-3 font-mono text-base font-normal text-[var(--theme-ink)] outline-none focus:border-[var(--theme-accent)] focus:ring-1 focus:ring-[var(--theme-focus-ring)] sm:text-sm"
           />
-        </label>
+          </label>
+        )}
           </>
         )}
 
@@ -270,6 +315,8 @@ export default function PythonEditor({
           <button
             type="button"
             onClick={() => {
+              stopWorker();
+              createWorker();
             }}
             className="mt-2 flex min-h-11 w-full items-center justify-center border border-[var(--theme-accent)] px-4 py-2 text-sm font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-surface)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] md:hidden"
           >
@@ -288,11 +335,6 @@ export default function PythonEditor({
           <h2 className="text-sm font-semibold text-[var(--theme-ink)]">Gráficos de Turtle</h2>
           <span className="text-xs text-[var(--theme-muted)]">{turtleCommands.length > 0 ? `${turtleCommands.length} trazo(s) dibujado(s)` : 'Ejecuta código con Turtle para ver el dibujo'}</span>
         </div>
-        {turtleError && (
-          <p className="mb-2 text-sm text-[var(--theme-error)] bg-[var(--theme-error-light)] border border-[var(--theme-error)] px-3 py-2 rounded">
-            {turtleError}
-          </p>
-        )}
         <div className="flex flex-col items-center justify-center min-h-[200px] max-h-[600px] overflow-auto border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] rounded-lg">
           {turtleCommands.length === 0 ? (
             <p className="text-sm text-[var(--theme-muted)] py-4">
@@ -374,14 +416,7 @@ export default function PythonEditor({
             </svg>
           )}
         </div>
-        <button
-          type="button"
-          onClick={() => {}}
-          disabled={turtleCommands.length === 0}
-          className="mt-3 flex min-h-11 w-full items-center justify-center border border-[var(--theme-accent)] px-4 py-2 text-sm font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50 md:hidden"
-        >
-          Limpiar gráfico
-        </button>
+button>
       </div>
     </section>
   );
