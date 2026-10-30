@@ -20,7 +20,7 @@ La página oficial de Cisco Networking Academy consultada el 30-10-2026 describe
 - Curso oficial y secciones: https://www.netacad.com/ja/courses/python-essentials-1?courseLang=en-US
 - Catálogo Cisco 2024 en español: https://www.netacad.com/sites/default/files/course-catalog-es.pdf
 
-La ruta de esta academia tiene cuatro módulos principales y 30 unidades, pero todavía no alcanza paridad académica completa: falta la evaluación formal del módulo 1, falta el examen final global y el proyecto final sigue dentro de la extensión opcional. No presentar la ruta como equivalente ni como preparación suficiente para PCEP hasta cerrar esos tres puntos y verificar las 30 prácticas.
+La rama de finalización incorpora una evaluación formal de M1, el proyecto final como requisito y un examen global de 12 preguntas. El código contiene 32 unidades principales (incluye evaluaciones, proyecto y examen) y cuatro unidades de extensión opcional. La migración que actualiza las claves privadas sigue pendiente de validación y aplicación en Supabase; no desplegar el nuevo catálogo hasta completar ese paso.
 
 El módulo 3 ahora sigue la secuencia oficial de prerequisitos: decisiones → ciclos → lógica/bit a bit → listas → ordenamiento → operaciones y aplicaciones avanzadas con listas → evaluación. La práctica con listas anidadas aparece después de dominar listas simples.
 
@@ -31,22 +31,22 @@ El módulo 2 contiene literales, operadores, variables, comentarios, salida e in
 | Área | Estado en el código |
 |---|---|
 | Módulos principales PE1 | 4 |
-| Lecciones/unidades principales | 30 (4 + 8 + 9 + 9) |
-| Evaluaciones de módulo | 3; falta una evaluación formal del módulo 1 |
+| Lecciones/unidades principales | 32 (4 + 8 + 9 + 11; incluye evaluaciones, proyecto y examen) |
+| Evaluaciones de módulo | 4; M1, M2, M3 y M4 |
 | Laboratorios integradores | 3, ubicados al cierre de los módulos 2, 3 y 4 |
-| Preguntas registradas | 44 entre el curso principal y la extensión |
+| Preguntas registradas | 66 esperadas tras la migración 024; remoto aún tiene 44 |
 | Extensión adicional | 4 unidades opcionales en module-5 |
-| Proyecto aplicado | Está en la extensión opcional, no como requisito de graduación PE1 |
-| Evaluación final global | Pendiente de implementar |
+| Proyecto aplicado | Proyecto obligatorio b4-l10; cinco pruebas automáticas |
+| Evaluación final global | b4-l11 implementado en código; 12 preguntas |
 
-El módulo 5 está marcado explícitamente como opcional. Incluye lectura/escritura de archivos y un gestor de inventario. Es una extensión posterior al PE1, no un quinto módulo oficial ni un requisito para completar la ruta principal. No se debe sumar al porcentaje de finalización PE1.
+El módulo 5 está marcado explícitamente como opcional. Ahora se concentra en persistencia con archivos de texto; no sustituye el proyecto obligatorio ni el examen final.
 
 ### Medición inicial de calidad didáctica
 
 - Las 30 unidades principales tienen una práctica ejecutable.
 - En la auditoría inicial, 29 de las 30 prácticas tenían un solo caso automático; la práctica b3-l6 se amplió a tres entradas (varios valores, un solo valor y valores negativos).
 - El catálogo principal contiene 39 preguntas conceptuales: la mayoría de las lecciones regulares solo tiene una pregunta.
-- Las tres evaluaciones formales actuales tienen 5, 3 y 3 preguntas respectivamente; el módulo 1 no tiene una evaluación formal.
+- Las evaluaciones de módulo tienen 6, 5, 3 y 3 preguntas. El examen global suma 12 preguntas; el proyecto final incluye cinco casos automáticos.
 - Esto no alcanza todavía el estándar de calidad definido abajo. Las prácticas restantes necesitan casos límite adecuados a cada objetivo y las evaluaciones requieren más preguntas de lectura, razonamiento y depuración.
 
 En el módulo 3 se corrigió la progresión: comparaciones y decisiones → while → for → operadores lógicos y bit a bit → listas simples → modificación/ordenamiento → aplicación avanzada con listas anidadas → evaluación. La primera lección de listas trabaja listas unidimensionales; las listas anidadas aparecen después de practicar índices y recorridos, antes de la evaluación del módulo.
@@ -170,3 +170,14 @@ No marcar el curso como terminado hasta verificar:
 - OpenEDG Python Institute, objetivos de aprendizaje de nivel inicial y alineación con PCEP.
 
 El contenido de esta plataforma debe ser original y didácticamente equivalente en objetivos; no se deben copiar lecciones, evaluaciones, capturas ni soluciones propietarias de Cisco.
+
+
+## Cambios preparados en la rama de finalización
+
+- b1-l4 se convierte en evaluación formal del módulo 1 con seis preguntas.
+- b4-l10 contiene el proyecto obligatorio de inventario y cinco casos de prueba locales.
+- b4-l11 contiene el examen global de 12 preguntas y requiere haber completado el proyecto.
+- El módulo 5 permanece opcional y pasa a tratar persistencia con archivos.
+- La migración 024 agrega/actualiza 23 claves privadas sin borrar filas ni modificar intentos o progreso.
+- **Bloqueo antes de producción:** la migración 024 no está aplicada. El remoto todavía contiene 44 claves; el nuevo catálogo espera 66. Probarla primero en una instancia de desarrollo y coordinar su aplicación antes de desplegar el nuevo código.
+- **Calidad pendiente:** la ruta principal aún debe completar el repaso de “Hello, World!” y la numeración de M2, y ampliar las prácticas regulares con casos límite y depuración.
