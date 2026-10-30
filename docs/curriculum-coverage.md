@@ -26,6 +26,10 @@ El módulo 3 ahora sigue la secuencia oficial de prerequisitos: decisiones → c
 
 El módulo 2 ahora sigue la secuencia: 2.1 primer programa “Hello, World!”, 2.2 literales y tipos, 2.3 operadores, 2.3.1 prioridad y conversiones, 2.4 variables, 2.5 cadenas, comentarios y salida formateada, 2.6 entrada del usuario, laboratorio integrador y 2.7 evaluación. Los laboratorios integradores de los módulos 2 y 4 se colocaron antes de sus evaluaciones; los módulos 2, 3 y 4 ahora terminan con su evaluación formal.
 
+**Nota sobre la progresión de variables y conversiones:** la secuencia conserva los apartados y los IDs existentes. La práctica de operadores y precedencia introduce explícitamente qué es una variable y cómo leer una asignación antes de utilizarla en expresiones; la lección 2.4 desarrolla después la creación de nombres y su actualización. La lección 2.3.1 practica `int()`, `float()` y `str()` tanto en el ejemplo como en el ejercicio, de modo que el alumno no depende de una conversión que solo aparece en la solución.
+
+
+
 ## Estado real del catálogo en la rama principal de trabajo
 
 | Área | Estado en el código |

@@ -121,3 +121,25 @@ No encontré evidencia para eliminar actividades por ser copias exactas. Sí hay
 - Verificar Bubble Sort con casos ordenado, inverso, repetidos y de un solo elemento.
 - Verificar ejemplos y ejercicios separados de operadores lógicos y bit a bit.
 - Confirmar que ninguna respuesta, solución ni salida esperada se incluye en la serialización enviada al navegador.
+
+
+## Seguimiento verificado — 30 de octubre de 2026
+
+La revisión de este documento fue una fotografía inicial del contenido. Al corte de hoy, los siguientes puntos ya están implementados en `src/lib/course.ts` y protegidos por pruebas en `src/lib/course.test.ts`:
+
+| Hallazgo inicial | Estado comprobado | Evidencia en código/pruebas |
+|---|---|---|
+| Proyecto `b4-l10` se detenía al recibir una cantidad no numérica | Corregido: el código inicial guía el manejo de `ValueError`; los seis casos cubren entradas válidas, nombre vacío, cero, negativa y texto no numérico | Pruebas del catálogo y verificador de ejercicios |
+| Bubble Sort se pedía sin demostrar el algoritmo | Corregido: hay una pasada trabajada y una implementación completa por comparación de vecinos; no usa `sort()` ni `sorted()` | Prueba de Bubble Sort en `course.test.ts` |
+| Variables se usaban antes de presentarlas en `b2-l4` | Mejorado: `b2-l4` define una variable explícitamente antes del ejemplo y la lección formal `b2-l2` desarrolla nombres y actualización | Prueba `presenta variables antes de usarlas...` |
+| `b2-l4` prometía `int()`, `float()` y `str()` sin practicarlas todas | Corregido: ejemplo y ejercicio aplican las tres conversiones y muestran salida esperada | Prueba de conversiones en `course.test.ts` |
+| Los operadores bit a bit no tenían práctica propia suficiente | Corregido: el ejercicio incluye AND, OR, XOR y desplazamientos, separados de la condición lógica | Prueba `separa operadores logicos...` |
+| El módulo 1 exigía `print()` antes de enseñarlo formalmente | Aclarado: las primeras llamadas se describen como demostraciones guiadas; la sintaxis formal se enseña en M2, 2.1 | Prueba `presenta variables y print como demostraciones guiadas...` |
+| La primera práctica con listas anidadas no tenía pasos puente | Corregido: se guía el recorrido por filas y luego por valores antes de contar | Prueba `guia el recorrido de listas de listas...` |
+| El examen global repetía la pregunta sobre el tipo devuelto por `input()` | Variado: la pregunta final ahora verifica el formato de salida de una f-string con dos decimales | Prueba del resultado `Total: 1250.50` |
+
+La verificación automatizada más reciente del repositorio, workflow CI **41114821771**, terminó correctamente: 62 casos de ejecución para 36 actividades, Vitest, TypeScript, ESLint, build de Next, E2E y build de Vinext.
+
+### Pendiente de revisión humana
+
+La corrección de estos hallazgos no equivale a certificar las 33 unidades. Todavía requiere una pasada humana completa para comprobar claridad, dificultad, pertinencia de cada ejemplo, retroalimentación y alineación sección por sección con el temario oficial vigente. No se debe dar el curso por finalizado hasta completar esa revisión y las pruebas autenticadas con cuentas de DEV.

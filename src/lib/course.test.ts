@@ -96,6 +96,14 @@ describe('ruta de aprendizaje Python desde cero', () => {
 
     const algoritmo = findQuestion('module-1', 'b1-l1', '¿Qué describe mejor un algoritmo?');
     expect(algoritmo.options[algoritmo.answer]).toBe('Una secuencia finita y ordenada de pasos para resolver un problema');
+
+    const formato = findQuestion(
+      'module-4',
+      'b4-l11',
+      '¿Qué muestra print(f"Total: {precio:.2f}") si precio = 1250.5?',
+    );
+    expect(formato.options[formato.answer]).toBe('Total: 1250.50');
+    expect(formato.explanation).toContain('dos posiciones decimales');
   });
 
   it('enseña Bubble Sort completo con dos bucles y un recorrido interior decreciente', () => {

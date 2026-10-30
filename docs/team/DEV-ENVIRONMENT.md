@@ -39,6 +39,14 @@ En Supabase → Authentication → URL Configuration, el propietario debe config
 
 El flujo de correo/SMTP y el CAPTCHA no están certificados en este entorno. Hasta verificar el envío de confirmación y recuperación, cada socio debe limitarse a pruebas de interfaz no destructivas y reportar cualquier error de Auth.
 
+### CAPTCHA y pruebas automatizadas aisladas
+
+- Para pruebas locales rápidas, deja `NEXT_PUBLIC_TURNSTILE_SITE_KEY=` vacío y confirma que **Authentication → Bot and Abuse Protection → CAPTCHA protection** esté desactivado en el proyecto DEV. Esta excepción es solo para DEV; producción mantiene su protección.
+- Para probar el widget sin desafíos interactivos, Cloudflare publica pares de claves de prueba: sitekey `1x00000000000000000000AA` y secret `1x0000000000000000000000000000000AA`. Si se usan, configura el secret de prueba únicamente en **Supabase DEV → Authentication → Bot and Abuse Protection**, y usa la sitekey pública en el `.env.local` del entorno local. El secret no se copia al repositorio ni a la aplicación.
+- Los tokens de las claves de prueba solo son válidos con el secret de prueba correspondiente. Nunca se deben enviar a producción ni reutilizar la sitekey real de producción en un entorno automatizado.
+- Para un evaluador externo, prepara un entorno temporal conectado exclusivamente a `python-desde-cero-dev` y a cuentas ficticias. No compartas contraseñas en el chat ni expongas el proyecto de producción. Cierra el túnel y elimina las cuentas temporales cuando termine la revisión.
+
+
 ## Inicio local
 
 ```powershell
