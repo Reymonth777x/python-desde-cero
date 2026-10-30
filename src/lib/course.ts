@@ -6,179 +6,182 @@ export const courseModules: CourseModule[] = [
   {
     "id": "module-1",
     "number": "1",
-    "title": "Fundamentos y primer programa",
-    "summary": "Comprende qué es un programa, escribe instrucciones, usa variables y tipos básicos, realiza cálculos y recibe datos del usuario.",
+    "title": "Introducción a Python y a la programación",
+    "summary": "Comprende problemas, algoritmos, lenguajes e intérprete; prepara un entorno y ejecuta tus primeros programas.",
     "lessons": [
       {
         "id": "b1-l1",
         "section": "1.1",
-        "title": "Qué es un programa y tu primera salida",
+        "title": "Resolver problemas mediante algoritmos",
         "objectives": [
-          "Explicar con tus palabras qué es un programa y qué es una instrucción.",
-          "Ejecutar instrucciones en orden y mostrar mensajes con print().",
-          "Distinguir texto literal de una instrucción de Python."
+          "Distinguir problema, algoritmo y programa.",
+          "Identificar entradas, proceso y salida.",
+          "Descomponer una tarea en pasos finitos y ordenados."
         ],
         "explanation": [
-          "Programar consiste en describir pasos precisos para que una computadora resuelva una tarea. Una secuencia de pasos ordenados que permite llegar a un resultado se llama algoritmo; cuando expresamos esos pasos en un lenguaje como Python, construimos un programa.",
-          "Python ejecuta normalmente las instrucciones de arriba hacia abajo. Cada línea debe estar escrita con una sintaxis que el intérprete pueda entender. Los paréntesis y las comillas tienen significado: print() es una función y el texto que queremos mostrar debe ir entre comillas.",
-          "La función print() muestra uno o varios valores en la consola. No guarda el resultado ni lo convierte en un archivo: simplemente presenta información para que una persona pueda leerla. Los comentarios que empiezan con # sirven para explicar el código y Python no los ejecuta."
+          "Programar comienza por entender una necesidad y definir el resultado correcto. Un algoritmo es una secuencia finita y ordenada de pasos que permite resolver esa tarea; cada paso debe ser claro y comprobable.",
+          "Un algoritmo puede escribirse con palabras, diagramas o pseudocódigo antes de convertirse en Python. Un programa traduce esos pasos a instrucciones de un lenguaje que el intérprete puede ejecutar siguiendo un orden definido.",
+          "Para calcular el cambio de una compra, identifica precio y pago como entradas, realiza la resta como proceso y muestra el resultado como salida. Separar estas etapas permite comprobar la lógica antes de escribir código."
         ],
-        "example": "print(\"Hola, Python\")\nprint(\"Estoy aprendiendo paso a paso\")",
-        "exampleOutput": "Hola, Python\nEstoy aprendiendo paso a paso",
+        "example": "precio = 3200\npago = 5000\ncambio = pago - precio\nprint(cambio)",
+        "exampleOutput": "1800",
         "walkthrough": [
-          "La primera llamada a print() muestra la primera línea; la segunda llamada muestra la siguiente.",
-          "El texto va entre comillas porque es una cadena de caracteres. Cambiar el contenido de las comillas cambia el mensaje, no la estructura de la instrucción."
+          "Entrada: precio = 3200 y pago = 5000.",
+          "Proceso: pago - precio calcula la diferencia.",
+          "Salida: print(cambio) muestra 1800."
         ],
         "commonMistakes": [
-          "Olvidar una comilla o un paréntesis produce un error de sintaxis.",
-          "Escribir Print() con mayúscula no es lo mismo que print(): Python distingue mayúsculas y minúsculas."
+          "Cambiar el orden de la resta y obtener un resultado negativo.",
+          "Omitir una entrada o no definir la salida esperada."
         ],
         "exercise": {
           "id": "b1-e1",
-          "title": "Presentación en dos líneas",
-          "statement": "Muestra tu nombre en la primera línea y la frase Estoy aprendiendo Python en la segunda.",
-          "starterCode": "# Escribe tu solución debajo\n",
-          "solution": "print(\"Alex\")\nprint(\"Estoy aprendiendo Python\")",
+          "title": "Calcular el cambio",
+          "statement": "Con un precio de 3200 y un pago de 5000, calcula el cambio, guárdalo en cambio e imprímelo.",
+          "starterCode": "precio = 3200\npago = 5000\n# calcula el cambio\n",
+          "solution": "precio = 3200\npago = 5000\ncambio = pago - precio\nprint(cambio)",
           "tests": [
             {
               "input": [],
-              "expected": "Alex\nEstoy aprendiendo Python"
+              "expected": "1800"
             }
           ],
           "hints": [
-            "Utiliza dos instrucciones print().",
-            "Cada texto debe estar entre comillas."
+            "Identifica qué cantidad se resta de cuál.",
+            "Guarda el resultado antes de imprimirlo."
           ],
           "difficulty": "facil",
-          "xp": 10,
+          "xp": 15,
           "length": 5
         },
         "questions": [
           {
-            "prompt": "¿Cuál es la función principal de print() en un programa sencillo?",
+            "prompt": "¿Qué describe mejor un algoritmo?",
             "options": [
-              "Guardar datos en un archivo",
-              "Convertir texto a número",
-              "Mostrar valores en la consola",
-              "Repetir instrucciones"
+              "Un nombre que almacena un dato",
+              "Un lenguaje que solo entiende el procesador",
+              "Una secuencia finita y ordenada de pasos para resolver un problema",
+              "Una ventana donde se escribe código"
             ],
             "answer": 2,
-            "explanation": "print() envía los valores a la salida de texto para que podamos verlos."
+            "explanation": "Un algoritmo ordena pasos para llegar a un resultado y define cuándo termina."
           },
           {
-            "prompt": "¿Qué representa un algoritmo?",
+            "prompt": "¿Qué diferencia a un programa de un algoritmo?",
             "options": [
-              "Un tipo especial de variable",
-              "Una instrucción exclusiva de Python",
-              "Un error que detiene el programa",
-              "Una secuencia ordenada de pasos para resolver una tarea"
+              "El algoritmo siempre se escribe en Python",
+              "El programa no necesita pasos ordenados",
+              "El algoritmo solo sirve para cálculos matemáticos",
+              "El programa expresa instrucciones mediante un lenguaje que puede ejecutarse"
             ],
             "answer": 3,
-            "explanation": "La opción correcta está en la posición configurada por el banco de evaluación: un algoritmo describe pasos ordenados para resolver un problema."
+            "explanation": "El algoritmo describe el procedimiento; el programa lo expresa en un lenguaje ejecutable."
           }
         ],
         "assessment": false,
-        "estimatedMinutes": 12
+        "estimatedMinutes": 40
       },
       {
         "id": "b1-l2",
         "section": "1.2",
-        "title": "Variables: dar nombre a los datos",
+        "title": "Lenguajes e intérprete de Python",
         "objectives": [
-          "Crear variables mediante asignación.",
-          "Elegir nombres descriptivos que respeten las reglas de Python.",
-          "Actualizar un valor y utilizarlo en otra expresión."
+          "Distinguir lenguaje, código fuente e intérprete.",
+          "Explicar la función del editor y la consola.",
+          "Describir qué ocurre al ejecutar un programa."
         ],
         "explanation": [
-          "Una variable es un nombre asociado a un valor. La asignación se realiza con un solo signo igual (=): Python evalúa el lado derecho y guarda el resultado bajo el nombre del lado izquierdo.",
-          "Los nombres pueden contener letras, números y guion bajo, pero no pueden empezar con un número ni contener espacios. Es recomendable usar nombres que expliquen el propósito del dato, por ejemplo precio_unitario o nombre_cliente.",
-          "Una variable puede recibir un nuevo valor más adelante. Cuando una expresión utiliza una variable, Python consulta el valor que tiene en ese momento; por eso, el orden de las asignaciones importa."
+          "Un lenguaje de programación ofrece reglas para expresar instrucciones. El código fuente es el texto que las contiene y debe cumplir la sintaxis del lenguaje para que pueda procesarse.",
+          "Python utiliza un intérprete que analiza y ejecuta el código. Un editor o IDE permite escribir y organizarlo; la consola presenta resultados y errores. Cada herramienta cumple una función diferente.",
+          "Esta academia usa Pyodide para ejecutar Python en el navegador mediante WebAssembly. En un equipo local puedes instalar Python y utilizar un editor; aunque cambie el entorno, las reglas del lenguaje y el razonamiento se mantienen."
         ],
-        "example": "producto = \"Cuaderno\"\nprecio = 850\nprecio = precio + 150\nprint(producto)\nprint(precio)",
-        "exampleOutput": "Cuaderno\n1000",
+        "example": "print(\"Escribo código en el editor\")\nprint(\"El intérprete ejecuta Python\")",
+        "exampleOutput": "Escribo código en el editor\nEl intérprete ejecuta Python",
         "walkthrough": [
-          "producto guarda una cadena de texto y precio guarda un número entero.",
-          "La asignación precio = precio + 150 calcula 850 + 150 y después sustituye el valor anterior por 1000."
+          "El editor contiene las instrucciones.",
+          "El intérprete procesa el código.",
+          "La consola presenta la salida."
         ],
         "commonMistakes": [
-          "Usar = cuando se quiere comparar dos valores; la comparación se estudia en el siguiente módulo.",
-          "Poner espacios en un nombre, por ejemplo precio final, no es válido. Usa precio_final."
+          "Confundir el editor con el lenguaje.",
+          "Pensar que cualquier texto puede ejecutarse sin respetar la sintaxis."
         ],
         "exercise": {
           "id": "b1-e2",
-          "title": "Calcular un subtotal",
-          "statement": "Crea las variables precio = 1200 y cantidad = 3. Calcula subtotal multiplicando ambos valores e imprime el resultado.",
-          "starterCode": "precio = 1200\ncantidad = 3\n# Calcula el subtotal\n",
-          "solution": "precio = 1200\ncantidad = 3\nsubtotal = precio * cantidad\nprint(subtotal)",
+          "title": "Distinguir las herramientas",
+          "statement": "Muestra un mensaje que indique que el editor contiene el código y otro que Python ejecuta las instrucciones.",
+          "starterCode": "# escribe dos mensajes\n",
+          "solution": "print(\"El editor contiene el código\")\nprint(\"El intérprete ejecuta Python\")",
           "tests": [
             {
               "input": [],
-              "expected": "3600"
+              "expected": "El editor contiene el código\nEl intérprete ejecuta Python"
             }
           ],
           "hints": [
-            "El operador de multiplicación es *.",
-            "Guarda el resultado en una tercera variable."
+            "Escribe una llamada print() por mensaje.",
+            "Mantén el texto entre comillas."
           ],
           "difficulty": "facil",
-          "xp": 10,
+          "xp": 15,
           "length": 5
         },
         "questions": [
           {
-            "prompt": "Después de ejecutar cantidad = 4 y luego cantidad = cantidad + 2, ¿qué valor tiene cantidad?",
+            "prompt": "¿Cuál es la función del intérprete de Python?",
             "options": [
-              "6",
-              "4",
-              "42",
-              "Error: una variable no puede cambiar"
+              "Procesar y ejecutar instrucciones escritas en Python",
+              "Diseñar la interfaz del editor",
+              "Guardar contraseñas",
+              "Convertir cualquier texto en código válido"
             ],
             "answer": 0,
-            "explanation": "La asignación vuelve a calcular la expresión y actualiza la variable. La opción correcta se mantiene en el índice 0 del banco actual."
+            "explanation": "El intérprete analiza el código y ejecuta las instrucciones que cumplen las reglas del lenguaje."
           }
         ],
         "assessment": false,
-        "estimatedMinutes": 12
+        "estimatedMinutes": 40
       },
       {
         "id": "b1-l3",
         "section": "1.3",
-        "title": "Tipos de datos y operaciones aritméticas",
+        "title": "Preparar el entorno y ejecutar Python",
         "objectives": [
-          "Reconocer int, float y str en ejemplos cotidianos.",
-          "Aplicar suma, resta, multiplicación, división y módulo.",
-          "Predecir el resultado respetando la prioridad de operaciones."
+          "Reconocer un entorno de ejecución y un archivo .py.",
+          "Distinguir ejecución local y práctica en navegador.",
+          "Comprobar que Python responde a instrucciones."
         ],
         "explanation": [
-          "Los valores que maneja un programa tienen tipos. int representa números enteros, float representa números con parte decimal y str representa texto. El tipo determina qué operaciones tienen sentido y cómo se comporta un valor.",
-          "Los operadores aritméticos habituales son +, -, *, /, //, % y **. El operador / realiza una división que produce un número decimal; // calcula el cociente entero, % obtiene el residuo y ** eleva a una potencia.",
-          "Python respeta la prioridad matemática: primero resuelve paréntesis, potencias, multiplicación y división, y después suma y resta. Cuando una expresión sea difícil de leer, agrúpala con paréntesis para que la intención quede clara."
+          "Para programar necesitas un entorno que pueda ejecutar Python. En un equipo local normalmente instalas la distribución oficial y ejecutas archivos desde una terminal o un editor.",
+          "Los archivos Python suelen utilizar la extensión .py. Desde una terminal puedes ejecutar un archivo con python nombre_archivo.py; en algunos sistemas el comando disponible es python3. python --version permite consultar la versión instalada.",
+          "El navegador de esta academia ya incluye Python mediante Pyodide, así que no necesitas instalarlo en tu dispositivo para completar las prácticas. Lo importante es comprobar que el intérprete responde y que puedes ejecutar instrucciones."
         ],
-        "example": "precio = 1250\nunidades = 3\ntotal = precio * unidades\nprint(total)\nprint(10 % 3)",
-        "exampleOutput": "3750\n1",
+        "example": "print(\"Python está listo para ejecutar instrucciones\")",
+        "exampleOutput": "Python está listo para ejecutar instrucciones",
         "walkthrough": [
-          "1250 y 3 son valores int; la multiplicación devuelve 3750.",
-          "10 % 3 devuelve 1 porque al dividir 10 entre 3 sobra una unidad."
+          "Escribe una llamada print() en el editor.",
+          "Pulsa Ejecutar para enviar el programa al intérprete.",
+          "Comprueba el mensaje en la consola."
         ],
         "commonMistakes": [
-          "Confundir / con //: 7 / 2 produce 3.5, mientras que 7 // 2 produce 3.",
-          "Olvidar la prioridad de operaciones. Usa paréntesis cuando quieras hacer explícito el orden."
+          "Confundir el editor con la instalación del intérprete.",
+          "Pensar que un error del código demuestra que Python no está instalado."
         ],
         "exercise": {
           "id": "b1-e3",
-          "title": "Costo con descuento",
-          "statement": "Un producto cuesta 2400 y se compran 2 unidades. Aplica un descuento de 500 al total y muestra cuánto se paga.",
-          "starterCode": "precio = 2400\ncantidad = 2\ndescuento = 500\n",
-          "solution": "precio = 2400\ncantidad = 2\ndescuento = 500\ntotal = precio * cantidad - descuento\nprint(total)",
+          "title": "Comprobar la ejecución",
+          "statement": "Escribe una instrucción que muestre Python está listo para practicar y ejecútala.",
+          "starterCode": "# comprueba que Python responde\n",
+          "solution": "print(\"Python está listo para practicar\")",
           "tests": [
             {
               "input": [],
-              "expected": "4300"
+              "expected": "Python está listo para practicar"
             }
           ],
           "hints": [
-            "Calcula primero el precio por la cantidad.",
-            "Resta el descuento al subtotal."
+            "Utiliza print().",
+            "Escribe el mensaje como una cadena."
           ],
           "difficulty": "facil",
           "xp": 15,
@@ -186,59 +189,60 @@ export const courseModules: CourseModule[] = [
         },
         "questions": [
           {
-            "prompt": "¿Qué valor devuelve 17 % 5?",
+            "prompt": "¿Qué comando suele ejecutar practica.py desde una terminal con Python disponible?",
             "options": [
-              "3",
-              "5",
-              "2",
-              "3.4"
+              "open practica.py",
+              "run-python practica.py",
+              "python practica.py",
+              "python install practica.py"
             ],
             "answer": 2,
-            "explanation": "El operador módulo devuelve el residuo. La clave de evaluación mantiene la respuesta en el índice 2."
+            "explanation": "El comando python seguido del nombre del archivo solicita ejecutar ese archivo."
           }
         ],
         "assessment": false,
-        "estimatedMinutes": 14
+        "estimatedMinutes": 40
       },
       {
         "id": "b1-l4",
         "section": "1.4",
-        "title": "Entrada, conversión y salida",
+        "title": "Primer programa, salida y comentarios",
         "objectives": [
-          "Leer datos escritos por el usuario con input().",
-          "Entender que input() devuelve texto.",
-          "Convertir una entrada a int o float antes de hacer cálculos."
+          "Utilizar print() para mostrar texto y valores.",
+          "Escribir comentarios de una línea con #.",
+          "Reconocer errores sencillos de sintaxis."
         ],
         "explanation": [
-          "Un programa interactivo recibe información, la procesa y presenta un resultado. input() pausa el programa y devuelve como texto lo que la persona escribe; incluso si escribe 25, el tipo recibido es str.",
-          "Si necesitamos realizar operaciones numéricas, debemos convertir el texto. int() convierte una cadena que representa un entero y float() permite números decimales. Una conversión falla si el texto no representa el tipo esperado; más adelante aprenderás a manejar ese error.",
-          "Un flujo de entrada-proceso-salida tiene tres etapas: leer los datos, calcular con ellos y mostrar una respuesta. Separar esas etapas facilita encontrar errores y cambiar el programa sin reescribirlo por completo."
+          "print() muestra información en la consola. El texto debe escribirse entre comillas; los números pueden escribirse sin ellas. Python ejecuta las instrucciones en orden, normalmente de arriba hacia abajo.",
+          "Un comentario comienza con # y permite explicar una decisión o dejar una nota para quien lee el programa. Python ignora los comentarios durante la ejecución; una comilla sin cerrar o un paréntesis faltante puede producir un error de sintaxis.",
+          "Cuando aparezca un error, lee el mensaje, localiza la línea indicada y revisa nombres, comillas y paréntesis antes de modificar otras partes. Un comentario útil añade contexto y no repite literalmente el código."
         ],
-        "example": "cantidad = int(input())\nprecio = 750\nprint(cantidad * precio)",
-        "exampleOutput": "3\n2250  (si la entrada es 3)",
+        "example": "# Mensaje de bienvenida\nprint(\"Hola, Python\")\nprint(2026)",
+        "exampleOutput": "Hola, Python\n2026",
         "walkthrough": [
-          "input() obtiene el valor escrito y lo entrega como str.",
-          "int() convierte esa cadena a entero; luego el programa multiplica la cantidad por el precio."
+          "La primera línea es un comentario.",
+          "La primera llamada muestra texto.",
+          "La segunda llamada muestra un número."
         ],
         "commonMistakes": [
-          "Intentar sumar directamente un str y un int, por ejemplo input() + 5.",
-          "Olvidar convertir la entrada cuando se necesita una operación matemática."
+          "Escribir texto literal sin comillas.",
+          "Cambiar mayúsculas en print() o dejar un paréntesis abierto."
         ],
         "exercise": {
           "id": "b1-e4",
-          "title": "Calcular el doble de una cantidad",
-          "statement": "Lee un número entero desde la entrada estándar, calcula su doble e imprime el resultado.",
-          "starterCode": "# La persona escribirá un número\n",
-          "solution": "numero = int(input())\nprint(numero * 2)",
+          "title": "Presentación en tres líneas",
+          "statement": "Muestra Ana, Estoy aprendiendo Python y 2026, cada uno en una línea.",
+          "starterCode": "# completa el programa\n",
+          "solution": "print(\"Ana\")\nprint(\"Estoy aprendiendo Python\")\nprint(2026)",
           "tests": [
             {
               "input": [],
-              "expected": "14"
+              "expected": "Ana\nEstoy aprendiendo Python\n2026"
             }
           ],
           "hints": [
-            "Lee con input().",
-            "Convierte el texto a entero usando int()."
+            "Usa tres llamadas print().",
+            "El año puede mostrarse como número."
           ],
           "difficulty": "facil",
           "xp": 15,
@@ -246,19 +250,19 @@ export const courseModules: CourseModule[] = [
         },
         "questions": [
           {
-            "prompt": "¿Qué tipo de dato devuelve input() antes de convertirlo?",
+            "prompt": "¿Qué carácter inicia un comentario de una línea en Python?",
             "options": [
-              "int",
-              "float",
-              "bool",
-              "str"
+              "//",
+              "--",
+              "**",
+              "#"
             ],
             "answer": 3,
-            "explanation": "input() devuelve una cadena de texto; la conversión depende de int() o float()."
+            "explanation": "El símbolo # hace que Python ignore el resto de esa línea como comentario."
           }
         ],
         "assessment": false,
-        "estimatedMinutes": 14
+        "estimatedMinutes": 40
       }
     ]
   },
