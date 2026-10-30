@@ -4,11 +4,9 @@
     const PYODIDE_BASE_URL = typeof self.__PYODIDE_BASE_URL__ === "string"
         ? self.__PYODIDE_BASE_URL__
         : "/pyodide/0.29.5/full/";
-    const PYODIDE_SCRIPT_URL = /^https?:\\/\\//.test(PYODIDE_BASE_URL)
-        ? new URL("pyodide.js", PYODIDE_BASE_URL).toString()
-        : PYODIDE_BASE_URL + "pyodide.js";
-    const TURTLE_COMPAT_URL = /^https?:\\/\\//.test(PYODIDE_BASE_URL)
-        ? new URL("../../../turtle_compat.py", PYODIDE_BASE_URL).toString()
+    const PYODIDE_SCRIPT_URL = PYODIDE_BASE_URL + "pyodide.js";
+    const TURTLE_COMPAT_URL = typeof self.__TURTLE_COMPAT_URL__ === "string"
+        ? self.__TURTLE_COMPAT_URL__
         : "/turtle_compat.py";
 
     importScripts(PYODIDE_SCRIPT_URL);
