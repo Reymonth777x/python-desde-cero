@@ -132,6 +132,7 @@ def run_case(code: str, input_lines: list[str], expected: str) -> tuple[bool, st
 def main() -> int:
     modules = load_course_modules()
     total_cases = 0
+    skipped_assessments = 0
     failures: list[str] = []
 
     for module in modules:
@@ -139,6 +140,11 @@ def main() -> int:
         for lesson in module.get("lessons", []):
             lesson_id = str(lesson.get("id", "sin-id"))
             title = str(lesson.get("title", lesson_id))
+            if lesson.get("finalAssessment") is True:
+                # A conceptual final exam has a reading sample, not a coding solution.
+                skipped_assessments += 1
+                continue
+
             exercise = lesson.get("exercise") or {}
             solution = exercise.get("solution")
             cases = exercise.get("tests")
@@ -185,9 +191,11 @@ def main() -> int:
             print(f" - {failure}", file=sys.stderr)
         return 1
 
+    total_lessons = sum(len(m.get("lessons", [])) for m in modules)
     print(
-        f"Correcto: {total_cases} casos de {sum(len(m.get('lessons', [])) for m in modules)} "
-        "actividades ejecutados en procesos y directorios aislados."
+        f"Correcto: {total_cases} casos de {total_lessons - skipped_assessments} "
+        f"actividades de código ejecutados en procesos y directorios aislados; "
+        f"{skipped_assessments} examen conceptual excluido."
     )
     return 0
 
