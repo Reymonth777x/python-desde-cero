@@ -92,17 +92,11 @@ finally {
     $ErrorActionPreference = $previousErrorActionPreference
 }
 
-$secretsHidden = $false
-foreach ($line in $startOutput) {
-    $text = [string]$line
-    if ($text -match '^\s*│\s*(?:Publishable|Secret|Access Key|Secret Key|Region)\s*│') {
-        if (-not $secretsHidden) {
-            Write-Host '  [Claves locales ocultas por seguridad]' -ForegroundColor DarkGray
-            $secretsHidden = $true
-        }
-        continue
-    }
-    Write-Host $text
+# No mostrar la salida de "supabase start": algunas versiones de la CLI imprimen
+# claves locales en una tabla. Así evitamos filtrarlas y no dependemos de caracteres
+# Unicode de los bordes de esa tabla para interpretar el resultado.
+if ($startExitCode -eq 0) {
+    Write-Host 'Supabase local está iniciado.' -ForegroundColor Green
 }
 
 if ($startExitCode -ne 0) {
