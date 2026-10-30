@@ -50,7 +50,7 @@ test.describe('Autenticacion y flujo de usuario', () => {
 
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    await expect(page.getByRole('alert')).toContainText(/conservamos tu correo/);
+    await expect(page.getByRole('alert').filter({ hasText: /conservamos tu correo/ })).toBeVisible();
     await expect(page.getByLabel('Correo electrónico')).toHaveValue('captcha-test@example.test');
     await expect(page.getByLabel('Contraseña')).toHaveValue('');
   });
