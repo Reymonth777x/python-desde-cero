@@ -45,7 +45,7 @@ export default function LessonProgress() {
           .select('is_completed')
           .eq('user_id', user.id)
           .eq('module_id', 'module-1')
-          .eq('lesson_id', 'lesson-1')
+          .eq('lesson_id', 'b1-l1')
           .maybeSingle();
 
         if (error) {
@@ -113,7 +113,7 @@ export default function LessonProgress() {
         </Link>
       )}
       {(status === 'pending' || status === 'error') && (
-        <Link href="/academia/module-1/lesson-1" className="mt-4 inline-flex min-h-11 items-center font-semibold text-[var(--theme-accent)] underline underline-offset-4">
+        <Link href="/academia/module-1/b1-l1" className="mt-4 inline-flex min-h-11 items-center font-semibold text-[var(--theme-accent)] underline underline-offset-4">
           Completar la comprobación en la academia
         </Link>
       )}
