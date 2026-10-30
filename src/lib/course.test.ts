@@ -234,7 +234,7 @@ describe('ruta de aprendizaje Python desde cero', () => {
       .find((courseModule) => courseModule.id === 'module-3')!
       .lessons.find((item) => item.id === 'b3-l7')!;
     const explanation = lesson.explanation.join(' ');
-    const onePass = lesson.example.split('# Una pasada de bubble sort\\n')[1] ?? '';
+    const onePass = lesson.example.split('# Una pasada de bubble sort\n')[1] ?? '';
 
     expect(explanation).toContain('una sola pasada');
     expect(explanation).toContain('range(len(numeros) - 1 - pasada)');
