@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
+import InvitationCodeCopy from "@/components/InvitationCodeCopy";
 import { listInvitations, createInvitation, deleteInvitation } from "./actions";
 
 type InvitationRow = {
@@ -96,7 +97,7 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
             Gestión de Invitaciones
           </h1>
           <p className='mt-2 leading-7 text-[var(--theme-muted)]'>
-            Crea un código para identificar a una persona invitada o a un grupo de difusión y compártelo directamente; no se envía por correo automáticamente. El registro sigue abierto aunque la persona no tenga código: la invitación es opcional y no concede permisos especiales. Si alguien la utiliza al crear su cuenta, queda marcada como usada y vinculada a ese registro. Los códigos sin fecha vencen en siete días.
+            Crea códigos para distinguir campañas, cohortes o grupos de difusión y compártelos directamente; no se envían por correo. Deja el campo vacío para generar uno aleatorio o escribe uno propio para reconocer de qué grupo llega cada estudiante. El registro general sigue abierto sin invitación. Cada código se usa una sola vez; los utilizados se conservan como historial y los que aún no se han usado sí se pueden eliminar. Si no eliges fecha, vence en siete días.
           </p>
 
           {listError && (
@@ -121,7 +122,7 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <div>
                   <label htmlFor='code' className='block text-sm font-semibold text-[var(--theme-ink)] mb-1'>
-                    Código personalizado (opcional)
+                    Código propio (deja vacío para generar uno automático)
                   </label>
                   <input
                     id='code'
@@ -134,7 +135,7 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
                     autoComplete='off'
                     className='mt-1 min-h-12 w-full border border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 py-3 text-base text-[var(--theme-ink)] outline-none focus:border-[var(--theme-accent)] focus:ring-1 focus:ring-[var(--theme-focus-ring)]'
                   />
-                  <p className='mt-2 text-xs text-[var(--theme-muted)]'>Es opcional: déjalo vacío para generar uno aleatorio. Si lo personalizas, usa 8–32 letras, números o guiones; no se admiten guiones dobles.</p>
+                  <p className='mt-2 text-xs text-[var(--theme-muted)]'>Ejemplo: EQUIPO-OCT-26. Usa 8–32 letras, números o guiones para identificar una campaña o grupo. Si lo dejas vacío, el sistema genera un código aleatorio.</p>
                 </div>
                 <div>
                   <label htmlFor='expires_at' className='block text-sm font-semibold text-[var(--theme-ink)] mb-1'>
@@ -156,6 +157,9 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
 
           {invitations.length > 0 && (
             <div className='mt-8'>
+              <p className='mb-4 text-xs leading-5 text-[var(--theme-muted)]'>
+                Puedes eliminar invitaciones que todavía no se han utilizado, incluso si ya vencieron. Las utilizadas quedan bloqueadas para conservar el historial de registro.
+              </p>
               <h2 className='font-semibold text-[var(--theme-ink)] mb-4'>Invitaciones existentes</h2>
               <table className='w-full border-collapse border border-[var(--theme-border)]'>
                 <thead>
@@ -171,7 +175,9 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
                 <tbody>
                   {invitations.map((inv: InvitationRow) => (
                     <tr key={inv.id} className='border-b border-[var(--theme-border)]'>
-                      <td className='border border-[var(--theme-border)] px-3 py-2 text-sm font-mono text-[var(--theme-ink)]'>{inv.code}</td>
+                      <td className='border border-[var(--theme-border)] px-3 py-2 text-sm text-[var(--theme-ink)]'>
+                        <InvitationCodeCopy code={inv.code} />
+                      </td>
                       <td className='border border-[var(--theme-border)] px-3 py-2 text-sm text-[var(--theme-ink)]'>
                         {inv.is_used ? (
                           <span className='text-[var(--theme-muted)]'>Usada</span>

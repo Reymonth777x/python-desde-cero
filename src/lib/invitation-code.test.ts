@@ -35,6 +35,11 @@ describe('códigos de invitación', () => {
     expect(normalizeInvitationCode('CURSO2026-')).toBeNull();
   });
 
+  it('permite personalizar códigos legibles para grupos y cohortes', () => {
+    expect(normalizeInvitationCode('EQUIPO-OCT-26')).toBe('EQUIPO-OCT-26');
+    expect(normalizeInvitationCode('  aula-python-2026  ')).toBe('AULA-PYTHON-2026');
+  });
+
   it('acepta cadena vacía como ausencia de invitación', () => {
     expect(parseOptionalInvitationCode('')).toEqual({ ok: true, code: null });
   });
