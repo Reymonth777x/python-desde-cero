@@ -20,21 +20,21 @@ La página oficial de Cisco Networking Academy consultada el 30-10-2026 describe
 - Curso oficial y secciones: https://www.netacad.com/ja/courses/python-essentials-1?courseLang=en-US
 - Catálogo Cisco 2024 en español: https://www.netacad.com/sites/default/files/course-catalog-es.pdf
 
-La rama de finalización incorpora una evaluación formal de M1, el proyecto final como requisito y un examen global de 12 preguntas. El código contiene 32 unidades principales (incluye evaluaciones, proyecto y examen) y cuatro unidades de extensión opcional. La migración que actualiza las claves privadas sigue pendiente de validación y aplicación en Supabase; no desplegar el nuevo catálogo hasta completar ese paso.
+La rama de finalización incorpora una evaluación formal de M1, el proyecto final como requisito y un examen global de 12 preguntas. El código contiene 33 unidades principales (incluye evaluaciones, proyecto y examen) y cuatro unidades de extensión opcional. Las migraciones 024 y 025 ya se probaron en Supabase DEV: 67 claves, todas con respuesta v2. Producción todavía requiere la aplicación coordinada de ambas migraciones antes de desplegar el catálogo.
 
 El módulo 3 ahora sigue la secuencia oficial de prerequisitos: decisiones → ciclos → lógica/bit a bit → listas → ordenamiento → operaciones y aplicaciones avanzadas con listas → evaluación. La práctica con listas anidadas aparece después de dominar listas simples.
 
-El módulo 2 contiene literales, operadores, variables, comentarios, salida e interacción, pero aún requiere una pasada de alineación para incluir explícitamente “Hello, World!” como sección 2.1 y verificar que el orden y la numeración coincidan con la estructura oficial. Los laboratorios integradores de los módulos 2 y 4 se colocaron antes de sus evaluaciones; los módulos 2, 3 y 4 ahora terminan con su evaluación formal.
+El módulo 2 ahora sigue la secuencia: 2.1 primer programa “Hello, World!”, 2.2 literales y tipos, 2.3 operadores, 2.3.1 prioridad y conversiones, 2.4 variables, 2.5 cadenas, comentarios y salida formateada, 2.6 entrada del usuario, laboratorio integrador y 2.7 evaluación. Los laboratorios integradores de los módulos 2 y 4 se colocaron antes de sus evaluaciones; los módulos 2, 3 y 4 ahora terminan con su evaluación formal.
 
 ## Estado real del catálogo en la rama principal de trabajo
 
 | Área | Estado en el código |
 |---|---|
 | Módulos principales PE1 | 4 |
-| Lecciones/unidades principales | 32 (4 + 8 + 9 + 11; incluye evaluaciones, proyecto y examen) |
+| Lecciones/unidades principales | 33 (4 + 9 + 9 + 11; incluye evaluaciones, proyecto y examen) |
 | Evaluaciones de módulo | 4; M1, M2, M3 y M4 |
 | Laboratorios integradores | 3, ubicados al cierre de los módulos 2, 3 y 4 |
-| Preguntas registradas | 66 esperadas tras la migración 024; remoto aún tiene 44 |
+| Preguntas registradas | 67 esperadas en el catálogo; DEV verificado con 67 claves v2. Producción tiene 44 claves v2 del catálogo anterior |
 | Extensión adicional | 4 unidades opcionales en module-5 |
 | Proyecto aplicado | Proyecto obligatorio b4-l10; cinco pruebas automáticas |
 | Evaluación final global | b4-l11 implementado en código; 12 preguntas |
@@ -43,9 +43,9 @@ El módulo 5 está marcado explícitamente como opcional. Ahora se concentra en 
 
 ### Medición inicial de calidad didáctica
 
-- El núcleo ahora contiene 32 unidades: 26 lecciones/laboratorios, cuatro evaluaciones de módulo, un proyecto final obligatorio y un examen global. El proyecto suma cinco casos de prueba; no se debe confundir el total de unidades con el objetivo de 30 laboratorios oficiales.
+- El núcleo ahora contiene 33 unidades: 27 lecciones/laboratorios, cuatro evaluaciones de módulo, un proyecto final obligatorio y un examen global. El proyecto suma cinco casos de prueba; no se debe confundir el total de unidades con el objetivo de 30 laboratorios oficiales.
 - En la auditoría inicial, 29 de las 30 prácticas tenían un solo caso automático; la práctica b3-l6 se amplió a tres entradas (varios valores, un solo valor y valores negativos).
-- El catálogo principal contiene 39 preguntas conceptuales: la mayoría de las lecciones regulares solo tiene una pregunta.
+- El catálogo principal contiene 40 preguntas conceptuales: la mayoría de las lecciones regulares solo tiene una pregunta.
 - Las evaluaciones de módulo tienen 6, 5, 3 y 3 preguntas. El examen global suma 12 preguntas; el proyecto final incluye cinco casos automáticos.
 - Esto no alcanza todavía el estándar de calidad definido abajo. Las prácticas restantes necesitan casos límite adecuados a cada objetivo y las evaluaciones requieren más preguntas de lectura, razonamiento y depuración.
 
@@ -58,15 +58,16 @@ En el módulo 3 se corrigió la progresión: comparaciones y decisiones → whil
 
 b1-l4 ahora es “Evaluación del módulo 1: fundamentos de programación”, con seis preguntas sobre algoritmo, código fuente, intérprete, IDE, errores de sintaxis y Python como lenguaje.
 
-**Bloqueo de integración:** la migración 024 cambia la clave existente de b1-l4 de una a seis preguntas. El catálogo no debe desplegarse en producción hasta que esa migración se pruebe y se aplique de forma coordinada con el código.
+**Estado de integración:** la migración 024 (evaluación M1, proyecto y examen final) y la 025 (pregunta Hello, World!) ya se aplicaron y verificaron en DEV. No desplegar a producción hasta que ambas migraciones se apliquen allí de forma coordinada con el código.
 
 ### 2. Módulo 2: secuencia y límites de conceptos
 
 Debe cubrir de forma explícita y ordenada: Hello, World!, literales, tipos numéricos y texto, operadores, precedencia, variables, comentarios, print() e input() con conversiones.
 
-**Corrección requerida:**
-- Evitar volver a enseñar el primer programa en dos módulos.
-- Mantener un único lugar principal para cada concepto y utilizar las unidades posteriores para practicarlo, no para repetir la misma explicación.
+**Corrección incorporada en la rama:**
+- Añadir Hello, World! como primera unidad de M2, con explicación, ejemplo, práctica y una pregunta conceptual propia.
+- Colocar tipos y literales antes de operadores; operadores y precedencia antes de variables; y conversiones/entrada antes del laboratorio.
+- Mantener una explicación principal por concepto y usar laboratorios para combinarlo, no para repetir la misma lección.
 - Distinguir texto (str) de números y explicar por qué input() devuelve texto antes de introducir int() y float().
 
 ### 3. Módulo 3: temas difíciles con andamiaje
@@ -117,7 +118,7 @@ Antes de publicar o considerar terminada una lección, debe cumplir lo siguiente
 
 b4-l10 requiere construir un gestor de inventario de consola con diccionarios, funciones, validación de nombres y cantidades, y manejo de ValueError. Incluye cinco casos automáticos: dos productos válidos, nombre vacío, cantidad cero y cantidad no numérica. El estudiante debe ejecutar las pruebas locales y aprobar cinco preguntas conceptuales con al menos 75%.
 
-**Limitación deliberada:** la comparación de salidas se ejecuta en el navegador mediante el Worker de Python; no constituye una certificación ni una atestación inviolable del código ejecutado. La nota de las preguntas sí se calcula en el servidor a partir de las claves privadas una vez aplicada la migración 024.
+**Limitación deliberada:** la comparación de salidas se ejecuta en el navegador mediante el Worker de Python; no constituye una certificación ni una atestación inviolable del código ejecutado. La nota de las preguntas sí se calcula en el servidor a partir de claves privadas. Las migraciones 024 y 025 están aplicadas en DEV; en producción siguen pendientes.
 
 ### Examen final PE1 implementado en la rama
 
@@ -125,19 +126,19 @@ b4-l10 requiere construir un gestor de inventario de consola con diccionarios, f
 - Combina tipos, operadores, entrada/salida, condiciones, ciclos, listas, bubble sort, funciones y excepciones.
 - No introduce archivos, POO ni paquetes externos como requisito de PE1.
 - Umbral de aprobación: 75%.
-- Las claves privadas de estas preguntas se añaden mediante la migración 024, aún pendiente de aplicar.
+- Las claves privadas del examen se añaden mediante la migración 024 y se verificaron en DEV; producción sigue pendiente.
 
 
 ## Puerta de calidad antes de publicar
 
 No marcar el curso como terminado hasta verificar:
 
-- [ ] Cuatro módulos PE1 y sus contenidos en el orden correcto.
-- [x] Evaluación formal incluida en el código para los cuatro módulos (M1–M4); migración 024 aún pendiente.
+- [x] Cuatro módulos PE1 y sus contenidos en el orden revisado; M2 incorpora Hello, World! en 2.1 y respeta la progresión de prerequisitos.
+- [x] Evaluación formal incluida en el código para los cuatro módulos (M1–M4); claves 024 verificadas en DEV.
 - [ ] Treinta prácticas diferenciadas, sin copiar el mismo enunciado cambiando solo nombres o números.
-- [x] Proyecto obligatorio y examen global incluidos en el código; migración 024 aún pendiente.
+- [x] Proyecto obligatorio y examen global incluidos en el código; claves 024 verificadas en DEV.
 - [ ] Las lecciones avanzadas tienen prerequisitos y ejemplos progresivos.
-- [ ] No hay claves de respuestas desincronizadas con las preguntas visibles.
+- [x] No hay claves desincronizadas en DEV: 67 claves v2 para 67 preguntas del catálogo.
 - [ ] Completar la matriz de pruebas de los ejercicios regulares con casos límite; el proyecto final ejecuta cinco casos en el Worker del estudiante.
 - [ ] Las evaluaciones se guardan, recuperan y aíslan por usuario.
 - [ ] La extensión opcional no altera el porcentaje ni el certificado de finalización PE1.
@@ -156,19 +157,21 @@ El contenido de esta plataforma debe ser original y didácticamente equivalente 
 - b1-l4 se convierte en evaluación formal del módulo 1 con seis preguntas.
 - b4-l10 contiene el proyecto obligatorio de inventario y cinco casos de prueba locales.
 - b4-l11 contiene el examen global de 12 preguntas y requiere haber completado el proyecto.
+- b2-l9 introduce “Hello, World!” como sección 2.1 de M2, antes de tipos y literales.
 - El módulo 5 permanece opcional y pasa a tratar persistencia con archivos.
 - La migración 024 agrega/actualiza 24 claves privadas sin borrar filas ni modificar intentos o progreso.
-- **Bloqueo antes de producción:** la migración 024 no está aplicada. El remoto todavía contiene 44 claves; el nuevo catálogo espera 66. Probarla primero en una instancia de desarrollo y coordinar su aplicación antes de desplegar el nuevo código.
-- **Calidad pendiente:** la ruta principal aún debe completar el repaso de “Hello, World!” y la numeración de M2, y ampliar las prácticas regulares con casos límite y depuración.
+- La migración 025 agrega la clave privada de la nueva pregunta b2-l9 sin tocar intentos ni progreso.
+- **Bloqueo antes de producción:** 024 y 025 se aplicaron en DEV y dejaron 67 claves v2. Producción todavía tiene 44 claves v2 del catálogo anterior; ambas migraciones deben aplicarse allí de forma coordinada antes de desplegar.
+- **Calidad pendiente:** ampliar las prácticas regulares con casos límite, depuración y retroalimentación más específica.
 
 ## Integración y estado real de la rama
 
-La evaluación de M1, el proyecto y el examen global ya están escritos en el catálogo de la rama. La migración 024 aporta 24 claves privadas (dos claves existentes actualizadas (M1 y la nueva pregunta de la extensión) y 22 nuevas) y debe dejar 66 claves para el catálogo actual. La base remota aún muestra 44 claves.
+La evaluación de M1, el proyecto, el examen global y la lección Hello, World! están escritos en el catálogo de la rama. La migración 024 añade/actualiza claves para las nuevas evaluaciones y el proyecto; la migración 025 añade la clave de b2-l9. DEV quedó con 67 claves, todas con correct_option_v2 no nulo. Producción aún tiene 44 claves v2 del catálogo anterior y no se modificó.
 
 No fusionar ni desplegar el cambio de catálogo hasta:
-1. Probar 024 en una instancia de desarrollo con esquema equivalente.
-2. Confirmar que la función `submit_quiz_v2` califica M1, el proyecto y el examen con las nuevas claves.
-3. Coordinar y aprobar la aplicación de la migración en producción.
-4. Repetir el CI y comprobar que el progreso y los intentos siguen aislados por usuario.
+1. Confirmar que el CI completo pasa después de los cambios de M2 y que sus credenciales de prueba apuntan solo a DEV.
+2. Obtener autorización del responsable para aplicar 024 y 025 en producción y hacerlo de forma coordinada con el código.
+3. Verificar las 67 claves v2 y los permisos del RPC en producción después de la migración.
+4. Realizar una prueba real de guardar una evaluación con una cuenta de prueba autenticada; en DEV todavía no hay usuarios de prueba, por lo que la escritura end-to-end aún no se ha confirmado.
 
-El curso aún no debe anunciarse como equivalente a Cisco PE1 o como preparación suficiente para PCEP. Falta la revisión completa de la secuencia M2, incluida la posición y tratamiento explícitos de “Hello, World!”, y la ampliación de casos límite y retroalimentación de las prácticas regulares.
+La secuencia M2 ya incluye Hello, World! y está ordenada. La calidad pedagógica global aún requiere ampliar casos límite y retroalimentación de prácticas regulares. El curso no debe anunciarse como equivalente a Cisco PE1 ni como preparación suficiente para PCEP.
