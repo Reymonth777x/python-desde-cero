@@ -108,6 +108,21 @@ export default function LoginForm({ error, message, next = '' }: Props) {
                   <input id="signup-password" name="password" type="password" autoComplete="new-password" minLength={8} required className={inputStyle} />
                   <p className="mt-2 text-xs text-[var(--theme-muted)]">Mínimo 8 caracteres.</p>
                 </div>
+                <div>
+                  <label htmlFor="invitation-code" className="text-sm font-semibold">Código de invitación (opcional)</label>
+                  <input
+                    id="invitation-code"
+                    name="invitation_code"
+                    type="text"
+                    inputMode="text"
+                    autoComplete="off"
+                    maxLength={16}
+                    pattern="[A-Fa-f0-9]{16}"
+                    placeholder="16 caracteres"
+                    className={inputStyle}
+                  />
+                  <p className="mt-2 text-xs text-[var(--theme-muted)]">Introduce el código de un solo uso que te compartió el administrador.</p>
+                </div>
                 {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
                   <TurnstileWidget siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} />
                 )}
