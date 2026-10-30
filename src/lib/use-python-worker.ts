@@ -151,6 +151,10 @@ export function usePythonWorker({
     };
 
     worker.onerror = () => {
+      if (initializationTimeoutRef.current !== null) {
+        clearTimeout(initializationTimeoutRef.current);
+        initializationTimeoutRef.current = null;
+      }
       if (timeoutRef.current !== null) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
@@ -165,6 +169,18 @@ export function usePythonWorker({
     };
 
     workerRef.current = worker;
+    initializationTimeoutRef.current = setTimeout(() => {
+      if (workerRef.current !== worker) return;
+      worker.terminate();
+      workerRef.current = null;
+      pendingExecutionRef.current = null;
+      initializationTimeoutRef.current = null;
+      setWorkerState('error');
+      setError('La carga de Python tardó demasiado. Reintenta la carga.');
+      setIsRunning(false);
+      onStatusChange?.('error');
+    }, 60_000);
+
     executeRef.current = (w, request) => {
       const requestId = ++requestIdRef.current;
       startWatchdog();
