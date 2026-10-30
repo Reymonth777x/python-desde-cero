@@ -20,9 +20,68 @@ DECLARE
     v_passed boolean;
     v_recent_attempts integer;
     v_best_score numeric := 0;
+    v_previous_module_id text;
+    v_previous_lesson_id text;
 BEGIN
     IF v_user_id IS NULL THEN
         RAISE EXCEPTION 'quiz_auth_required' USING ERRCODE = '28000';
+    END IF;
+
+    -- Enforce module prerequisites inside the SECURITY DEFINER grader itself.
+    -- Authenticated users can execute this function directly, so the public
+    -- wrapper cannot be the only place that performs these checks.
+    CASE p_module_id
+        WHEN 'module-2' THEN
+            v_previous_module_id := 'module-1';
+            v_previous_lesson_id := 'b1-l4';
+        WHEN 'module-3' THEN
+            v_previous_module_id := 'module-2';
+            v_previous_lesson_id := 'b2-l7';
+        WHEN 'module-4' THEN
+            v_previous_module_id := 'module-3';
+            v_previous_lesson_id := 'b3-l8';
+        WHEN 'module-5' THEN
+            v_previous_module_id := 'module-4';
+            v_previous_lesson_id := 'b4-l11';
+        ELSE
+            v_previous_module_id := NULL;
+            v_previous_lesson_id := NULL;
+    END CASE;
+
+    IF v_previous_lesson_id IS NOT NULL
+       AND NOT EXISTS (
+           SELECT 1
+             FROM public.progress AS progress
+            WHERE progress.user_id = v_user_id
+              AND progress.module_id = v_previous_module_id
+              AND progress.lesson_id = v_previous_lesson_id
+              AND progress.is_completed IS TRUE
+       ) THEN
+        RAISE EXCEPTION 'quiz_prerequisite_required' USING ERRCODE = 'P0001';
+    END IF;
+
+    IF p_module_id = 'module-4' AND p_lesson_id = 'b4-l10'
+       AND NOT EXISTS (
+           SELECT 1
+             FROM public.progress AS progress
+            WHERE progress.user_id = v_user_id
+              AND progress.module_id = 'module-4'
+              AND progress.lesson_id = 'b4-l8'
+              AND progress.is_completed IS TRUE
+       ) THEN
+        RAISE EXCEPTION 'quiz_prerequisite_required' USING ERRCODE = 'P0001';
+    END IF;
+
+    IF p_module_id = 'module-4' AND p_lesson_id = 'b4-l11'
+       AND NOT EXISTS (
+           SELECT 1
+             FROM public.progress AS progress
+            WHERE progress.user_id = v_user_id
+              AND progress.module_id = 'module-4'
+              AND progress.lesson_id = 'b4-l10'
+              AND progress.is_completed IS TRUE
+       ) THEN
+        RAISE EXCEPTION 'quiz_prerequisite_required' USING ERRCODE = 'P0001';
     END IF;
 
     IF p_module_id IS NULL OR p_module_id !~ '^module-[0-9]+$'
@@ -153,68 +212,9 @@ SET search_path TO ''
 AS $function$
 DECLARE
     v_user_id uuid := auth.uid();
-    v_previous_module_id text;
-    v_previous_lesson_id text;
 BEGIN
     IF v_user_id IS NULL THEN
         RAISE EXCEPTION 'quiz_auth_required' USING ERRCODE = '28000';
-    END IF;
-
-    -- Every module is gated by the previous module's final assessment.
-    CASE p_module_id
-        WHEN 'module-2' THEN
-            v_previous_module_id := 'module-1';
-            v_previous_lesson_id := 'b1-l4';
-        WHEN 'module-3' THEN
-            v_previous_module_id := 'module-2';
-            v_previous_lesson_id := 'b2-l7';
-        WHEN 'module-4' THEN
-            v_previous_module_id := 'module-3';
-            v_previous_lesson_id := 'b3-l8';
-        WHEN 'module-5' THEN
-            v_previous_module_id := 'module-4';
-            v_previous_lesson_id := 'b4-l11';
-        ELSE
-            v_previous_module_id := NULL;
-            v_previous_lesson_id := NULL;
-    END CASE;
-
-    IF v_previous_lesson_id IS NOT NULL
-       AND NOT EXISTS (
-           SELECT 1
-             FROM public.progress AS progress
-            WHERE progress.user_id = v_user_id
-              AND progress.module_id = v_previous_module_id
-              AND progress.lesson_id = v_previous_lesson_id
-              AND progress.is_completed IS TRUE
-       ) THEN
-        RAISE EXCEPTION 'quiz_prerequisite_required' USING ERRCODE = 'P0001';
-    END IF;
-
-    -- The mandatory inventory project requires the Module 4 assessment.
-    IF p_module_id = 'module-4' AND p_lesson_id = 'b4-l10'
-       AND NOT EXISTS (
-           SELECT 1
-             FROM public.progress AS progress
-            WHERE progress.user_id = v_user_id
-              AND progress.module_id = 'module-4'
-              AND progress.lesson_id = 'b4-l8'
-              AND progress.is_completed IS TRUE
-       ) THEN
-        RAISE EXCEPTION 'quiz_prerequisite_required' USING ERRCODE = 'P0001';
-    END IF;
-
-    -- The global PE1 exam is available only after the mandatory project is passed.
-    IF p_module_id = 'module-4' AND p_lesson_id = 'b4-l11'
-       AND NOT EXISTS (
-           SELECT 1
-             FROM public.progress AS progress
-            WHERE progress.user_id = v_user_id
-              AND progress.module_id = 'module-4'
-              AND progress.lesson_id = 'b4-l10'
-              AND progress.is_completed IS TRUE
-       ) THEN
-        RAISE EXCEPTION 'quiz_prerequisite_required' USING ERRCODE = 'P0001';
     END IF;
 
     RETURN private.submit_quiz_authoritative_v2(
@@ -226,6 +226,7 @@ END;
 $function$;
 
 -- Preserve the intended RPC ACL: only authenticated sessions may use the public wrapper.
+GRANT USAGE ON SCHEMA private TO authenticated;
 REVOKE ALL PRIVILEGES ON FUNCTION public.submit_quiz_v2(text, text, integer[]) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.submit_quiz_v2(text, text, integer[]) TO authenticated;
 
