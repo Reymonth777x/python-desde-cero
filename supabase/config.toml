@@ -6,7 +6,7 @@ host = "localhost"
 port = 54322
 
 [auth]
-site_url = "https://python-desde-cero.pythondesdecero.workers.dev"
+site_url = "http://localhost:3000"
 additional_redirect_urls = [
   "http://localhost:3000",
   "http://localhost:3001",
