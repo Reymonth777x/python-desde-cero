@@ -116,7 +116,7 @@ Antes de publicar o considerar terminada una lección, debe cumplir lo siguiente
 
 ### Proyecto final obligatorio implementado en la rama
 
-b4-l10 requiere construir un gestor de inventario de consola con diccionarios, funciones, validación de nombres y cantidades, y manejo de ValueError. Incluye cinco casos automáticos: dos productos válidos, nombre vacío, cantidad cero y cantidad no numérica. El estudiante debe ejecutar las pruebas locales y aprobar cinco preguntas conceptuales con al menos 75%.
+b4-l10 requiere construir un gestor de inventario de consola que lea varios registros, guarde productos en un diccionario, acumule cantidades cuando se repite un nombre, valide nombres y cantidades y maneje ValueError. Incluye cinco casos automáticos: un producto, varios productos con acumulación de un producto repetido, nombre vacío, cantidad cero y cantidad no numérica. Las prácticas b2-l6 (entrada de cantidad) y b2-l8 (recibo) tienen cuatro casos cada una, incluidos cero, cantidades distintas, precios decimales y limpieza de espacios en nombres. El estudiante debe ejecutar las pruebas locales y aprobar cinco preguntas conceptuales con al menos 75%.
 
 **Limitación deliberada:** la comparación de salidas se ejecuta en el navegador mediante el Worker de Python; no constituye una certificación ni una atestación inviolable del código ejecutado. La nota de las preguntas sí se calcula en el servidor a partir de claves privadas. Las migraciones 024 y 025 están aplicadas en DEV; en producción siguen pendientes.
 
