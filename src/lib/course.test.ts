@@ -104,7 +104,7 @@ describe('ruta de aprendizaje Python desde cero', () => {
       .lessons.find((item) => item.id === 'b3-l7')!;
     const manualExample = lesson.example.split('numeros = [5, 2, 4, 1]')[1] ?? '';
     const executableLines = manualExample
-      .split('\\n')
+      .split('\n')
       .filter((line) => !line.trimStart().startsWith('#'))
       .join('\\n');
 
