@@ -12,32 +12,44 @@
   const MAX_CODE_LENGTH = 50000;
   const MAX_INPUT_LINES = 20;
   const MAX_INPUT_LINE_LENGTH = 1000;
+  const MAX_WORKER_SOURCE_LENGTH = 1000000;
 
-  let parentOrigin = null;
+  let parentPort = null;
   let worker = null;
-  let outputPort = null;
+  let workerPort = null;
+  let workerBlobUrl = null;
   let workerReady = false;
+  let workerGeneration = 0;
+  let pendingStartGeneration = null;
+  let workerStartPromise = null;
+  let restartAfterStart = false;
   let queuedExecutions = [];
 
   function sendToParent(message) {
-    if (!parentOrigin || window.parent === window) return;
-    window.parent.postMessage(message, parentOrigin);
+    if (!parentPort) return;
+    parentPort.postMessage(message);
   }
 
   function stopWorker() {
+    workerGeneration += 1;
     workerReady = false;
     queuedExecutions = [];
-    if (outputPort) {
-      outputPort.onmessage = null;
-      outputPort.onmessageerror = null;
-      outputPort.close();
-      outputPort = null;
+
+    if (workerPort) {
+      workerPort.onmessage = null;
+      workerPort.onmessageerror = null;
+      workerPort.close();
+      workerPort = null;
     }
     if (worker) {
       worker.onerror = null;
       worker.onmessageerror = null;
       worker.terminate();
       worker = null;
+    }
+    if (workerBlobUrl) {
+      URL.revokeObjectURL(workerBlobUrl);
+      workerBlobUrl = null;
     }
   }
 
@@ -52,11 +64,11 @@
   }
 
   function dispatchQueuedExecutions() {
-    if (!workerReady || !outputPort) return;
+    if (!workerReady || !workerPort) return;
     const queue = queuedExecutions;
     queuedExecutions = [];
     for (const message of queue) {
-      outputPort.postMessage({
+      workerPort.postMessage({
         type: "execute",
         id: message.id,
         code: message.code,
@@ -95,56 +107,103 @@
     }
   }
 
+  async function initializeWorker(generation) {
+    const workerScriptUrl = new URL("/python-worker.js", window.location.href);
+    const response = await fetch(workerScriptUrl.toString(), {
+      credentials: "omit",
+      cache: "no-store"
+    });
+    if (!response.ok) {
+      throw new Error("No se pudo cargar el ejecutor Python: HTTP " + response.status);
+    }
+
+    const source = await response.text();
+    if (source.length > MAX_WORKER_SOURCE_LENGTH) {
+      throw new Error("El archivo del ejecutor Python supera el tamaño permitido.");
+    }
+    if (generation !== workerGeneration) return;
+
+    const pyodideBaseUrl = new URL("/pyodide/0.29.5/full/", window.location.href).toString();
+    const bootstrap = "self.__PYODIDE_BASE_URL__ = " + JSON.stringify(pyodideBaseUrl) + ";\n";
+    const blob = new Blob([bootstrap, source], { type: "text/javascript" });
+    workerBlobUrl = URL.createObjectURL(blob);
+
+    const nextWorker = new Worker(workerBlobUrl, { name: "python-desde-cero-opaque-sandbox" });
+    if (generation !== workerGeneration) {
+      nextWorker.terminate();
+      URL.revokeObjectURL(workerBlobUrl);
+      workerBlobUrl = null;
+      return;
+    }
+
+    const channel = new MessageChannel();
+    worker = nextWorker;
+    workerPort = channel.port1;
+    workerPort.onmessage = handleWorkerMessage;
+    workerPort.onmessageerror = () => {
+      sendToParent({ status: "runtime-error", error: "Se perdió la comunicación con Python." });
+      stopWorker();
+    };
+    workerPort.start();
+
+    nextWorker.onerror = () => {
+      sendToParent({ status: "runtime-error", error: "El ejecutor Python terminó inesperadamente." });
+      stopWorker();
+    };
+    nextWorker.onmessageerror = () => {
+      sendToParent({ status: "runtime-error", error: "El ejecutor devolvió un mensaje no válido." });
+      stopWorker();
+    };
+
+    // This Blob worker inherits the iframe's opaque origin. Its only network
+    // access is to the exact public runner origin allowed by the iframe CSP.
+    nextWorker.postMessage({ type: "connect" }, [channel.port2]);
+  }
+
   function startWorker() {
     if (worker) {
       if (workerReady) sendToParent({ status: "ready" });
       return;
     }
 
-    try {
-      const nextWorker = new Worker("/python-worker.js", { name: "python-desde-cero-sandbox" });
-      const channel = new MessageChannel();
-      worker = nextWorker;
-      outputPort = channel.port1;
-      outputPort.onmessage = handleWorkerMessage;
-      outputPort.onmessageerror = () => {
-        sendToParent({ status: "runtime-error", error: "Se perdió la comunicación con Python." });
-        stopWorker();
-      };
-      outputPort.start();
-
-      nextWorker.onerror = () => {
-        sendToParent({ status: "runtime-error", error: "El ejecutor Python terminó inesperadamente." });
-        stopWorker();
-      };
-      nextWorker.onmessageerror = () => {
-        sendToParent({ status: "runtime-error", error: "El ejecutor devolvió un mensaje no válido." });
-        stopWorker();
-      };
-
-      // The worker receives its private response port through a transfer.
-      // Its global postMessage channel is deliberately not used for results.
-      nextWorker.postMessage({ type: "connect" }, [channel.port2]);
-    } catch {
-      sendToParent({ status: "init-error", error: "No se pudo crear el entorno aislado de Python." });
-      stopWorker();
+    if (workerStartPromise) {
+      if (pendingStartGeneration !== workerGeneration) restartAfterStart = true;
+      return;
     }
+
+    const generation = workerGeneration;
+    pendingStartGeneration = generation;
+    const startPromise = initializeWorker(generation)
+      .catch((error) => {
+        if (generation !== workerGeneration) return;
+        sendToParent({
+          status: "init-error",
+          error: error?.message || "No se pudo iniciar el entorno aislado de Python."
+        });
+        stopWorker();
+      })
+      .finally(() => {
+        if (workerStartPromise === startPromise) {
+          workerStartPromise = null;
+          pendingStartGeneration = null;
+        }
+        if (restartAfterStart) {
+          restartAfterStart = false;
+          if (!worker) startWorker();
+        }
+      });
+
+    workerStartPromise = startPromise;
   }
 
-  window.addEventListener("message", (event) => {
-    if (event.source !== window.parent || !ALLOWED_PARENT_ORIGINS.has(event.origin)) return;
-
+  function handleParentMessage(event) {
     const message = event.data;
     if (!message || typeof message !== "object" || typeof message.type !== "string") return;
 
     if (message.type === "connect") {
-      if (parentOrigin && parentOrigin !== event.origin) return;
-      parentOrigin = event.origin;
       startWorker();
       return;
     }
-
-    if (!parentOrigin || event.origin !== parentOrigin) return;
 
     if (message.type === "execute") {
       if (!validExecution(message)) {
@@ -158,8 +217,8 @@
       }
 
       if (!worker) startWorker();
-      if (workerReady && outputPort) {
-        outputPort.postMessage({
+      if (workerReady && workerPort) {
+        workerPort.postMessage({
           type: "execute",
           id: message.id,
           code: message.code,
@@ -175,5 +234,23 @@
       stopWorker();
       sendToParent({ status: "stopped" });
     }
+  }
+
+  window.addEventListener("message", (event) => {
+    // The sandboxed iframe has an opaque origin, so the first handshake
+    // necessarily uses targetOrigin="*". Validate source + parent origin and
+    // immediately switch all further traffic to the transferred MessagePort.
+    if (parentPort || event.source !== window.parent || !ALLOWED_PARENT_ORIGINS.has(event.origin)) return;
+    if (event.data?.type !== "connect" || event.ports?.length !== 1) return;
+
+    parentPort = event.ports[0];
+    parentPort.onmessage = handleParentMessage;
+    parentPort.onmessageerror = () => {
+      stopWorker();
+      parentPort?.close();
+      parentPort = null;
+    };
+    parentPort.start();
+    startWorker();
   });
 })();
