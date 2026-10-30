@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
 import ThemeSelector from '@/components/ThemeSelector';
 import PortadaLab from '@/components/PortadaLab';
-import { courseModules } from '@/lib/course';
+import { courseCatalog } from '@/lib/course-catalog';
 
 type Example = {
   id: string;
@@ -132,9 +132,9 @@ print("Área del cuadrado (lado 4):", area_cuadrado(4))`,
   },
 ];
 
-const CORE_MODULES = courseModules.filter((module) => !module.optional);
+const CORE_MODULES = courseCatalog.filter((courseModule) => !courseModule.optional);
 const TOTAL_LESSONS = CORE_MODULES.reduce(
-  (total, module) => total + module.lessons.length,
+  (total, courseModule) => total + courseModule.lessons.length,
   0,
 );
 
@@ -301,22 +301,22 @@ export default function HomePageClient({ accountLinks, progressSummary }: HomePa
           </div>
 
           <div className="mt-10 grid border-y border-[var(--theme-border)] sm:grid-cols-2 xl:grid-cols-5">
-            {courseModules.map((module, index) => (
+            {courseCatalog.map((courseModule, index) => (
               <article
-                key={module.id}
+                key={courseModule.id}
                 className="group flex min-h-[220px] flex-col border-b border-[var(--theme-border)] p-5 last:border-b-0 sm:odd:border-r sm:even:border-r-0 xl:border-b-0 xl:border-r xl:last:border-r-0"
               >
                 <div className="flex items-center justify-between gap-3">
-                  <span className="font-mono text-xs text-[var(--theme-accent)]">{module.optional ? 'EX' : `0${index + 1}`}</span>
-                  {module.optional && (
+                  <span className="font-mono text-xs text-[var(--theme-accent)]">{courseModule.optional ? 'EX' : `0${index + 1}`}</span>
+                  {courseModule.optional && (
                     <span className="border border-[var(--theme-accent)]/40 px-2 py-1 text-[9px] font-bold tracking-[0.14em] text-[var(--theme-accent)]">EXTENSIÓN OPCIONAL</span>
                   )}
                   <span className="h-2 w-2 rounded-full border border-[var(--theme-border-dark)] transition-colors group-hover:bg-[var(--theme-accent)]" />
                 </div>
-                <h3 className="mt-8 text-lg font-semibold leading-snug tracking-tight">{module.title}</h3>
-                <p className="mt-3 text-xs leading-6 text-[var(--theme-muted)]">{module.summary}</p>
+                <h3 className="mt-8 text-lg font-semibold leading-snug tracking-tight">{courseModule.title}</h3>
+                <p className="mt-3 text-xs leading-6 text-[var(--theme-muted)]">{courseModule.summary}</p>
                 <p className="mt-auto border-t border-[var(--theme-border)]/60 pt-3 font-mono text-[10px] tracking-[0.12em] text-[var(--theme-muted)]">
-                  {module.lessons.length.toString().padStart(2, '0')} {module.optional ? 'ACTIVIDADES' : 'LECCIONES DEL NÚCLEO'}
+                  {courseModule.lessons.length.toString().padStart(2, '0')} {courseModule.optional ? 'ACTIVIDADES' : 'LECCIONES DEL NÚCLEO'}
                 </p>
               </article>
             ))}
