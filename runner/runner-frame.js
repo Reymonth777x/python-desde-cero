@@ -10,6 +10,9 @@
     "http://127.0.0.1:3001"
   ]);
   const MAX_CODE_LENGTH = 50000;
+  const MAX_OUTPUT_LENGTH = 20000;
+  const OUTPUT_TRUNCATION_NOTICE = "\n[Salida limitada para proteger el navegador.]";
+  const MAX_OUTPUT_WITH_NOTICE_LENGTH = MAX_OUTPUT_LENGTH + OUTPUT_TRUNCATION_NOTICE.length;
   const MAX_INPUT_LINES = 20;
   const MAX_INPUT_LINE_LENGTH = 1000;
   const MAX_WORKER_SOURCE_LENGTH = 1000000;
@@ -100,7 +103,9 @@
       sendToParent({
         id: message.id,
         status: message.status,
-        output: typeof message.output === "string" ? message.output.slice(0, 20000) : "",
+        output: typeof message.output === "string"
+          ? message.output.slice(0, MAX_OUTPUT_WITH_NOTICE_LENGTH)
+          : "",
         error: typeof message.error === "string" ? message.error.slice(0, 2000) : undefined,
         turtle_commands: Array.isArray(message.turtle_commands) ? message.turtle_commands.slice(0, 5000) : []
       });
