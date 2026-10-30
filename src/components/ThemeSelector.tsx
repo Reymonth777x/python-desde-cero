@@ -47,10 +47,40 @@ export default function ThemeSelector() {
       setIsOpen(false);
     };
 
+    const isMobile = window.matchMedia('(max-width: 767px)').matches;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setIsOpen(false);
         triggerRef.current?.focus();
+        return;
+      }
+
+      if (!isMobile || event.key !== 'Tab') return;
+
+      const panel = mobilePanelRef.current;
+      if (!panel) return;
+
+      const focusable = Array.from(panel.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ));
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (!first || !last) {
+        event.preventDefault();
+        panel.focus();
+        return;
+      }
+
+      if (!panel.contains(document.activeElement)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
 
@@ -193,6 +223,7 @@ export default function ThemeSelector() {
             role="dialog"
             aria-modal="true"
             aria-labelledby={`theme-title-mobile-${id}`}
+            tabIndex={-1}
             className="flex w-full max-w-sm flex-col overflow-hidden rounded-xl border shadow-2xl"
             style={{
               maxHeight: 'min(82dvh, 36rem)',
@@ -215,7 +246,10 @@ export default function ThemeSelector() {
               </div>
               <button
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false);
+                  triggerRef.current?.focus();
+                }}
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-xl leading-none hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"
                 style={{ color: 'var(--theme-ink)' }}
                 aria-label="Cerrar selección de tema"
