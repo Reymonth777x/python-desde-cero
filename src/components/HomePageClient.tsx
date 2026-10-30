@@ -272,7 +272,7 @@ export default function HomePageClient({ accountLinks, progressSummary }: HomePa
               </div>
               <div className="border-l border-[var(--theme-border)] px-3 sm:px-5">
                 <p className="font-mono text-2xl font-semibold tracking-tight text-[var(--theme-ink)]">{TOTAL_LESSONS.toString().padStart(2, '0')}</p>
-                <p className="mt-1 text-[10px] leading-4 text-[var(--theme-muted)] sm:text-xs">lecciones guiadas</p>
+                <p className="mt-1 text-[10px] leading-4 text-[var(--theme-muted)] sm:text-xs">unidades obligatorias</p>
               </div>
               <div className="border-l border-[var(--theme-border)] pl-3 sm:pl-5">
                 <p className="font-mono text-2xl font-semibold tracking-tight text-[var(--theme-ink)]">100%</p>
