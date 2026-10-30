@@ -4,7 +4,11 @@
 
 Los archivos que describen cambios de base de datos se guardan en `supabase/migrations/`. Las migraciones históricas deben conservarse; no se borran porque parezcan duplicadas sin verificar el historial remoto.
 
-## Estado remoto comprobado
+## Estado remoto comprobado (corte 30-10-2026)
+
+- Producción registra **24 migraciones** y DEV **10**. `supabase/migrations/` contiene 30 archivos; el timestamp de la migración 028 se alineó con producción (`20261030183117`).
+- Las dos últimas funciones aplicadas son `revoke_legacy_quiz_rpc_execution` (producción `20261030174256`, DEV `20261030174245`) y `grandfather_existing_module_progress` (producción `20261030183117`, DEV `20261030183123`). Son dos migraciones diferentes; la retirada del RPC heredado no es la migración 028.
+- Supabase Preview sigue fallando porque hay versiones históricas remotas sin archivo local equivalente y archivos locales con timestamps diferentes. No ejecutar `db push`, `migration repair` ni reset para intentar arreglarlo automáticamente.
 
 El historial de Supabase para el proyecto `nuqydanbbgqcofcftshk` incluye, entre otras, las entradas timestamp:
 - `20261026221230` — `011_secure_quiz_submission`
@@ -23,10 +27,6 @@ El historial de Supabase para el proyecto `nuqydanbbgqcofcftshk` incluye, entre 
 - `20261030081612` — `add_module_2_hello_world_quiz` (025; ya aplicada en producción)
 - `20261030084138` — `harden_quiz_result_and_enforce_prerequisites` (027; aplicada en DEV)
 - `20261030084308` — `harden_quiz_result_and_enforce_prerequisites` (027; aplicada en producción)
-- `20261030174245` — `revoke_legacy_quiz_rpc_execution` (DEV)
-- `20261030174256` — `revoke_legacy_quiz_rpc_execution` (producción)
-- `20261030183117` — `grandfather_existing_module_progress` (producción; archivo local 028)
-- `20261030183123` — `grandfather_existing_module_progress` (DEV; archivo local 028)
 
 La salida consultada del historial remoto empieza por la entrada timestamp 004; no asumir que las primeras migraciones locales 001-003 están registradas con el mismo historial de CLI. El esquema remoto existe. Antes de cualquier `db push`, comparar tablas, funciones, políticas y migraciones línea por línea.
 
@@ -89,7 +89,7 @@ Los nombres de las migraciones coinciden, pero Supabase identifica las migracion
 
 ## Diferencias detectadas entre el repositorio y Supabase remoto
 
-Comparación de solo lectura realizada el 30-10-2026 entre los archivos de supabase/migrations/ de fix/lider-20261028 y supabase_migrations.schema_migrations del proyecto remoto.
+Comparación de versiones realizada el 30-10-2026 entre los 30 archivos locales de supabase/migrations/ en master y los historiales de producción (24) y DEV (10).
 
 ### Versiones locales que no aparecen en el historial remoto
 
@@ -105,6 +105,10 @@ Comparación de solo lectura realizada el 30-10-2026 entre los archivos de supab
 - 20261026222246 — 013_randomize_quiz_option_order.
 - 20261026230434 — 014_require_invitation_expiry.
 - 20261026230815 — 015_private_quiz_rpc_wrapper.
+- 20261030073610 — `harden_quiz_rpc_invoker` (archivo local 026 usa 20261030074000).
+- 20261030081610 — `add_required_pe1_assessments_and_project` (archivo local 024 usa 20261030064000).
+- 20261030081612 — `add_module_2_hello_world_quiz` (archivo local 025 usa 20261030072000).
+- 20261030084308 — `harden_quiz_result_and_enforce_prerequisites` (archivo local 027 usa 20261030090000).
 
 Las variantes locales 011–015 no son equivalentes a las versiones remotas. Por ejemplo, el 011 local crea public.quiz_attempts y el 013 local usa private.quiz_keys; las versiones remotas usan private.quiz_attempts y private.quiz_answer_key. No se deben combinar ni aplicar a ciegas.
 
@@ -153,7 +157,7 @@ La consulta de `list_branches` al proyecto `nuqydanbbgqcofcftshk` devuelve una r
 No resetear, rebasar, fusionar ni eliminar la rama preview como solución rápida. Primero identificar qué migración falla, comparar su historial con producción y valorar si la rama puede repararse sin perder datos de preview. Esta incidencia no justifica ejecutar operaciones de migración en la base principal.
 
 
-## Cierre del RPC de evaluación heredado (30-10-2026)
+## Retirar el RPC de evaluación heredado — migración de seguridad (30-10-2026)
 
 La auditoría encontró que producción conservaba `public.submit_quiz` y `private.submit_quiz_authoritative` con `EXECUTE` para `authenticated`. Esa ruta antigua usaba `correct_option` (índice histórico), devolvía el arreglo `answerCorrect` y no aplicaba los prerrequisitos añadidos al calificador v2. Como 29 de las 67 claves actuales tienen un índice distinto entre legacy y v2, un estudiante podía intentar el RPC heredado directamente en lugar de usar el flujo actual.
 
@@ -161,15 +165,18 @@ La auditoría encontró que producción conservaba `public.submit_quiz` y `priva
 - Producción registra `20261030174256`; DEV registra `20261030174245`. El nombre y el SQL son iguales; Supabase asignó timestamps distintos por entorno.
 - La migración revoca `EXECUTE` de `PUBLIC`, `anon`, `authenticated` y `service_role` sobre el calificador heredado y su wrapper público, si existen.
 - No elimina las definiciones, claves antiguas, intentos, invitaciones ni progreso. En DEV, donde la función privada heredada no existe y `public.submit_quiz` ya reenvía a v2, no se revoca el wrapper vigente.
-- Verificación de solo lectura posterior: las dos funciones heredadas en producción ya no son ejecutables por `anon`, `authenticated`, `service_role` ni `PUBLIC`; `public.submit_quiz_v2` y `private.submit_quiz_authoritative_v2` siguen disponibles para authenticated. Los conteos de datos se mantienen: 10 perfiles, 2 invitaciones, 22 progresos, 16 intentos y 110 filas de claves históricas/actuales.
+- Verificación posterior: las dos funciones heredadas en producción ya no son ejecutables por `anon`, `authenticated`, `service_role` ni `PUBLIC`; `public.submit_quiz_v2` y `private.submit_quiz_authoritative_v2` siguen disponibles para `authenticated`. La migración solo revoca permisos de ejecución; no contiene operaciones DML.
 - Verificador repetible: `scripts/sql/verify-legacy-quiz-rpc-closed.sql`.
 
 No volver a conceder `EXECUTE` a la ruta heredada. La aplicación usa `submit_quiz_v2` exclusivamente.
 
-## 028 — Conservar acceso histórico a módulos con progreso (30-10-2026)
+## 028 — Conservar el acceso de estudiantes con progreso histórico (30-10-2026)
 
-- Archivo canónico del repositorio: `supabase/migrations/20261030091000_028_grandfather_existing_module_progress.sql`.
-- El historial remoto registra la misma migración por nombre con versiones distintas al timestamp local: producción `20261030183117` y DEV `20261030183123`.
-- Las consultas de solo lectura sobre `private.submit_quiz_authoritative_v2` confirmaron en ambos entornos la excepción `existing_module_progress`, además de conservar las comprobaciones históricas del proyecto y examen (`existing_project_progress` y `existing_exam_progress`). No se crean calificaciones ni se completa progreso ficticio.
-- PR #84 quedó fusionado en `master` mediante el commit `04604585d899173439f73c8a9d1975451e771200`. Añade la misma conservación de acceso en el dashboard y en la ruta directa de lección, con pruebas unitarias; sus jobs `test-and-build` y `powershell-launcher` finalizaron correctamente en el workflow 41107541504.
-- Esta verificación no resuelve la deriva general de timestamps ni el estado `MIGRATIONS_FAILED` de la rama preview `main`. No ejecutar `db push`, `migration repair`, `db reset` ni operaciones sobre esa rama hasta completar una reconciliación y un plan de respaldo/rollback.
+- Archivo canónico: `supabase/migrations/20261030183117_028_grandfather_existing_module_progress.sql`.
+- Producción registra la versión `20261030183117`; DEV registra `20261030183123`. Supabase asignó timestamps distintos al aplicar el mismo SQL en cada proyecto.
+- Reemplaza únicamente `private.submit_quiz_authoritative_v2` para que un estudiante que ya tiene una fila de progreso en el módulo destino pueda continuar aunque aún no tenga completada la evaluación previa que se incorporó después.
+- Conserva los controles específicos de progreso previo del proyecto `b4-l10` y el examen `b4-l11`. No fabrica puntuaciones, no marca lecciones como completadas y no modifica filas de `progress` ni `quiz_attempts`.
+- La función permanece `SECURITY DEFINER`, conserva `auth.uid()`, `search_path` vacío, validación de opciones, el límite de intentos y la respuesta agregada sin `answerCorrect`.
+- Verificación de solo lectura en producción y DEV: los indicadores `existing_module_progress`, `existing_project_progress` y `existing_exam_progress` están presentes en la definición remota del calificador.
+
+La excepción de progreso histórico también se aplica en la interfaz: el PR #84 se fusionó en `04604585d899173439f73c8a9d1975451e771200`. Su CI de PR [41107541504](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41107541504) y CI de master [41108215559](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41108215559) pasaron; Cloudflare publicó ese mismo SHA en [41108747917](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41108747917), con smoke tests de producción satisfactorios.
