@@ -236,8 +236,8 @@ export default function HomePageClient({ accountLinks, progressSummary }: HomePa
               <Link href="/muestra" className="inline-flex min-h-12 items-center justify-center gap-3 bg-[var(--theme-accent)] px-5 py-3 text-sm font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">
                 Probar la primera lección <span aria-hidden="true">↗</span>
               </Link>
-              <a href="#ruta" className="inline-flex min-h-12 items-center justify-center border border-[var(--theme-border)] px-5 py-3 text-sm font-semibold text-[var(--theme-ink)] transition-colors hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">
-                Explorar el recorrido
+              <a href="#ruta" className="inline-flex min-h-11 items-center px-2 text-sm font-medium text-[var(--theme-muted)] underline underline-offset-4 transition-colors hover:text-[var(--theme-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">
+                Consultar el temario
               </a>
             </div>
             {progressSummary}
