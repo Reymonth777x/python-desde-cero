@@ -18,6 +18,12 @@ export default async function AcademyPage() {
     .select('module_id, lesson_id, is_completed, best_score')
     .eq('user_id', user.id);
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_admin')
+    .eq('id', user.id)
+    .maybeSingle();
+
   const displayName = user.user_metadata?.full_name;
 
   return (
@@ -25,6 +31,7 @@ export default async function AcademyPage() {
       displayName={typeof displayName === 'string' ? displayName : ''}
       progressRows={progress ?? []}
       progressUnavailable={Boolean(progressError)}
+      isAdmin={profile?.is_admin === true}
     />
   );
 }
