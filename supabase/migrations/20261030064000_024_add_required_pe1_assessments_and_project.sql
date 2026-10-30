@@ -27,7 +27,8 @@ VALUES
   ('module-4', 'b4-l11', 8, 3, 4, 3),
   ('module-4', 'b4-l11', 9, 2, 4, 2),
   ('module-4', 'b4-l11', 10, 1, 4, 1),
-  ('module-4', 'b4-l11', 11, 0, 4, 0)
+  ('module-4', 'b4-l11', 11, 0, 4, 0),
+  ('module-5', 'b5-l4', 0, 0, 4, 0)
 ON CONFLICT (module_id, lesson_id, question_index)
 DO UPDATE SET
   correct_option = EXCLUDED.correct_option,
@@ -38,3 +39,4 @@ DO UPDATE SET
 -- Reversión manual, solo tras revisar intentos asociados:
 -- Borrar solo claves b4-l10/b4-l11; restaurar b1-l4/q0 a correct_option=0,
 -- option_count=4, correct_option_v2=3 y borrar índices 1..5.
+-- Restaurar b5-l4/q0 a correct_option=0, option_count=4, correct_option_v2=2.
