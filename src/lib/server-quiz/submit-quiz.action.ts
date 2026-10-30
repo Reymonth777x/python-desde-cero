@@ -68,7 +68,12 @@ export async function submitQuiz(
     error: authError,
   } = await supabase.auth.getUser();
   if (authError || !user) {
-    return { ...EMPTY_RESULT, error: 'No autenticado' };
+    return { ...EMPTY_RESULT, error: 'Tu sesión expiró o ya no es válida. Vuelve a iniciar sesión.' };
+  }
+
+  const expectedUserId = String(formData.get('expectedUserId') ?? '');
+  if (expectedUserId && expectedUserId !== user.id) {
+    return { ...EMPTY_RESULT, error: 'La sesión cambió de cuenta. Recarga la lección antes de guardar el resultado.' };
   }
 
   let correctAnswers: number[];
