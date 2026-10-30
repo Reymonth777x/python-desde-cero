@@ -25,7 +25,7 @@ Este documento reemplaza la lista anterior. No ejecutar pasos de producción has
 ## 3. Academia y calidad del curso PE1
 
 - [ ] Completar la evaluación formal del módulo 1.
-- [ ] Reubicar la introducción a Hello World, print() y comentarios en el módulo 2.
+- [ ] Mantener print() en b1-l4 solo como demostración de ejecución y verificar que la explicación formal de salida, cadenas y comentarios permanezca en el módulo 2.
 - [ ] Crear evaluación final global de PE1.
 - [ ] Convertir el proyecto final en requisito de graduación del PE1.
 - [ ] Revisar las 30 unidades principales para eliminar explicaciones repetidas y asegurar prerequisitos.
