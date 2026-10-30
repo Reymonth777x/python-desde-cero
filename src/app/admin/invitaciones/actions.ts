@@ -43,7 +43,7 @@ export async function createInvitation(formData: FormData) {
     .eq('id', user.id)
     .single();
 
-  if (!profile?.is_admin) redirect('/estudiante');
+  if (!profile?.is_admin) redirect('/academia');
 
   const submittedCode = String(formData.get('code') ?? '').trim().toUpperCase();
   const code = submittedCode || randomBytes(8).toString('hex').toUpperCase();
@@ -97,7 +97,7 @@ export async function deleteInvitation(id: string) {
     .eq('id', user.id)
     .single();
 
-  if (!profile?.is_admin) redirect('/estudiante');
+  if (!profile?.is_admin) redirect('/academia');
   if (!/^[0-9a-f-]{36}$/i.test(id)) return { error: 'Identificador de invitación inválido.' };
 
   const { error } = await supabase.from('invitations').delete().eq('id', id);
