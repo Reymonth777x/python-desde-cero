@@ -46,10 +46,18 @@ describe('quiz answer-key drift detection', () => {
       new URL('../../supabase/migrations/20261030051205_add_three_core_integration_labs.sql', import.meta.url),
       'utf8',
     );
-    const actual = [...keysFromBalanceMigration(sql), ...keysFromPracticeMigration(additionalSql)].sort();
+    const previousKeys = [...keysFromBalanceMigration(sql), ...keysFromPracticeMigration(additionalSql)]
+      .filter((key) => !key.startsWith("'module-1', 'b1-l4',"));
+    const finalAssessmentSql = readFileSync(
+      new URL('../../supabase/migrations/20261030064000_024_add_required_pe1_assessments_and_project.sql', import.meta.url),
+      'utf8',
+    );
+    const actual = [...previousKeys, ...keysFromPracticeMigration(finalAssessmentSql)].sort();
     expect(sql).toContain('SET correct_option_v2 = mapping.correct_option_v2');
     expect(sql).toContain('CREATE OR REPLACE FUNCTION public.submit_quiz_v2');
     expect(sql).not.toContain('SET correct_option = mapping.correct_option');
+    expect(finalAssessmentSql).toContain('ON CONFLICT (module_id, lesson_id, question_index) DO UPDATE');
+    expect(finalAssessmentSql).not.toContain('DELETE FROM private.quiz_answer_key');
     expect(actual).toHaveLength(expected.length);
     expect(actual).toEqual(expected);
   });
