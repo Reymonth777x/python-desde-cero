@@ -1,6 +1,7 @@
 """Modulo de compatibilidad con Turtle para Pyodide en navegador."""
 
 import math
+import sys
 
 MAX_TURTLE_COMMANDS = 5000
 
@@ -244,7 +245,7 @@ class Turtle:
 
     def clear(self):
         global _commands
-        _commands = []
+        _commands = _TurtleCommandBuffer()
         self.home()
         self.pen_down = True
         self.pen_color = "black"
@@ -274,11 +275,11 @@ class Screen:
 
     def bye(self):
         global _commands
-        _commands = []
+        _commands = _TurtleCommandBuffer()
 
     def clearscreen(self):
         global _commands
-        _commands = []
+        _commands = _TurtleCommandBuffer()
 
     def reset(self):
         self.clearscreen()
@@ -427,7 +428,7 @@ def get_commands():
 
 def clear_commands():
     global _commands
-    _commands = []
+    _commands = _TurtleCommandBuffer()
 
 
 def mainloop():
@@ -440,7 +441,7 @@ def exitonclick():
 
 def clear_commands():
     global _commands
-    _commands = []
+    _commands = _TurtleCommandBuffer()
 
 # Registrar el módulo para que "import turtle as t" funcione
 sys.modules["turtle"] = sys.modules[__name__]
