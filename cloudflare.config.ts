@@ -1,4 +1,4 @@
-﻿// Configuración de Cloudflare para vite-plugin
+// Configuración de Cloudflare para vite-plugin
 // La configuración de Wrangler se gestiona mediante wrangler.jsonc
 
 export default {
