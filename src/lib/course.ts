@@ -1396,7 +1396,7 @@ export const courseModules: CourseModule[] = [
           "title": "Ordenar con bubble sort",
           "statement": "Completa el ordenamiento por burbuja para ordenar [5, 2, 4, 1] de menor a mayor y muestra la lista final.",
           "starterCode": "numeros = [5, 2, 4, 1]\nfor pasada in range(len(numeros) - 1):\n    for indice in range(len(numeros) - 1 - pasada):\n        # compara e intercambia vecinos\n        pass\n",
-          "solution": "numeros = [5, 2, 4, 1]\nfor pasada in range(len(numeros)):\n    for indice in range(len(numeros) - 1 - pasada):\n        if numeros[indice] > numeros[indice + 1]:\n            temporal = numeros[indice]\n            numeros[indice] = numeros[indice + 1]\n            numeros[indice + 1] = temporal\nprint(numeros)",
+          "solution": "numeros = [5, 2, 4, 1]\nfor pasada in range(len(numeros) - 1):\n    for indice in range(len(numeros) - 1 - pasada):\n        if numeros[indice] > numeros[indice + 1]:\n            temporal = numeros[indice]\n            numeros[indice] = numeros[indice + 1]\n            numeros[indice + 1] = temporal\nprint(numeros)",
           "tests": [
             {
               "input": [],
