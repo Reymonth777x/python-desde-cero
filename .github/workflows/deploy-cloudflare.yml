@@ -264,4 +264,19 @@ jobs:
             echo "::error::La ruta /login no muestra el widget Turnstile después del despliegue."
             exit 1
           fi
-          echo "Dominio público sirve la nueva portada y el widget Turnstile en /login."
+          curl --fail --silent --show-error --location --retry 5 --retry-delay 3 --retry-all-errors \
+            "https://python-desdecero.com/muestra?release=$GITHUB_SHA" -o /tmp/python-desde-cero-sample.html
+          grep -Fq "Resolver problemas mediante algoritmos" /tmp/python-desde-cero-sample.html
+
+          curl --fail --silent --show-error --location --retry 5 --retry-delay 3 --retry-all-errors \
+            "https://python-desdecero.com/sitemap.xml?release=$GITHUB_SHA" -o /tmp/python-desde-cero-sitemap.xml
+          grep -Fq "https://python-desdecero.com/muestra" /tmp/python-desde-cero-sitemap.xml
+
+          www_status="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' \
+            "https://www.python-desdecero.com/?release=$GITHUB_SHA")"
+          if [[ "$www_status" != "308" ]]; then
+            echo "::error::www debe redirigir al dominio principal con HTTP 308. Estado recibido: $www_status."
+            exit 1
+          fi
+
+          echo "Producción sirve la portada, /muestra, sitemap, el widget Turnstile y la redirección canónica www → apex."
