@@ -92,7 +92,9 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
             Gestión de Invitaciones
           </h1>
           <p className='mt-2 leading-7 text-[var(--theme-muted)]'>
-            Crea códigos de invitación para permitir el registro de nuevos estudiantes.
+            Crea códigos de un solo uso y compártelos directamente con los estudiantes. No se envían correos automáticamente.
+            El estudiante los introduce al crear su cuenta; al registrarse correctamente, el código queda marcado como usado.
+            Si no indicas una fecha, vence en siete días.
           </p>
 
           {listError && (
