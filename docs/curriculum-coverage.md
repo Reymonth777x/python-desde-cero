@@ -116,6 +116,39 @@ Antes de publicar o considerar terminada una lección, debe cumplir lo siguiente
 - El proyecto final debe ser obligatorio para la finalización completa y evaluar análisis, diseño, implementación, pruebas y depuración.
 - Una calificación no debe otorgarse por ejecutar cualquier código ni por pulsar “completar”; debe corresponder a evidencias de aprendizaje.
 
+### Diseño propuesto del proyecto final obligatorio
+
+**Proyecto: gestor de inventario de una tienda pequeña, ejecutado en memoria.** Se mantiene dentro de PE1: no requiere archivos, bases de datos, clases, paquetes externos ni conceptos de Python Essentials 2.
+
+Requisitos mínimos:
+- Mantener productos en una lista de diccionarios.
+- Mostrar un menú que se repita hasta elegir salir.
+- Agregar productos con nombre, precio y cantidad.
+- Buscar y actualizar productos; eliminar un producto cuando corresponda.
+- Calcular el valor total del inventario.
+- Separar responsabilidades en funciones con parámetros y valores de retorno.
+- Validar entradas, evitar precios o existencias negativas y manejar conversiones incorrectas con excepciones.
+- Probar los flujos principales y explicar al menos dos errores encontrados y corregidos.
+
+Rúbrica de 100 puntos:
+- Funcionalidad y requisitos: 30.
+- Uso correcto de listas y diccionarios: 20.
+- Diseño de funciones y alcance: 15.
+- Validación y manejo de excepciones: 15.
+- Pruebas y depuración: 10.
+- Claridad, nombres y formato del código: 10.
+
+Umbral recomendado: 75/100, con retroalimentación por criterio. El estudiante debe poder volver a entregar después de corregir.
+
+### Diseño propuesto del examen final PE1
+
+- 25 preguntas, con al menos cinco preguntas de integración entre módulos.
+- Combinar predicción de salida, lectura de código, detección de errores, selección de estructuras y razonamiento sobre casos límite.
+- Cubrir los cuatro módulos; no incluir archivos, POO, paquetes externos ni temas no enseñados.
+- Umbral recomendado: 75%.
+- Mostrar explicación por respuesta y un resumen por competencia, no solo una nota total.
+
+
 ## Puerta de calidad antes de publicar
 
 No marcar el curso como terminado hasta verificar:
