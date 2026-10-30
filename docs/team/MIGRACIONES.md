@@ -19,6 +19,8 @@ El historial de Supabase para el proyecto `nuqydanbbgqcofcftshk` incluye, entre 
 - `20261030050915` — `protect_redeemed_invitation_history` (022)
 - `20261030051205` — `add_three_core_integration_labs` (023)
 - `20261030073610` — `harden_quiz_rpc_invoker` (026; ya aplicado en producción)
+- `20261030081610` — `add_required_pe1_assessments_and_project` (024; ya aplicada en producción)
+- `20261030081612` — `add_module_2_hello_world_quiz` (025; ya aplicada en producción)
 
 La salida consultada del historial remoto empieza por la entrada timestamp 004; no asumir que las primeras migraciones locales 001-003 están registradas con el mismo historial de CLI. El esquema remoto existe. Antes de cualquier `db push`, comparar tablas, funciones, políticas y migraciones línea por línea.
 
@@ -53,19 +55,19 @@ Las tres migraciones se probaron y aplicaron en DEV. El historial remoto de solo
 
 | Cambio | DEV (fcwbkkivelsipqqrbpya) | Producción (nuqydanbbgqcofcftshk) |
 |---|---|---|
-| 024 — evaluación M1, proyecto y examen | Aplicada: versión 20261030070355, add_required_pe1_assessments_and_project | Pendiente |
-| 025 — pregunta Hello, World! | Aplicada: versión 20261030071200, add_module_2_hello_world_quiz | Pendiente |
+| 024 — evaluación M1, proyecto y examen | Aplicada: versión 20261030070355, add_required_pe1_assessments_and_project | Aplicada: versión 20261030081610, add_required_pe1_assessments_and_project |
+| 025 — pregunta Hello, World! | Aplicada: versión 20261030071200, add_module_2_hello_world_quiz | Aplicada: versión 20261030081612, add_module_2_hello_world_quiz |
 | 026 — RPC público SECURITY INVOKER | Aplicada: versión 20261030073304, harden_quiz_rpc_invoker | Aplicada: versión 20261030073610, harden_quiz_rpc_invoker |
 
 Consultas SQL de solo lectura del 30-10-2026:
 - DEV tiene 67 claves activas del catálogo (bN-lN), las 67 con correct_option_v2 y cero claves v2 faltantes.
-- Producción tiene 44 claves activas del catálogo anterior, las 44 con correct_option_v2 y cero claves v2 faltantes para ese catálogo.
+- Producción tiene 67 claves activas del catálogo nuevo, las 67 con correct_option_v2 y cero claves v2 faltantes.
 - En ambos entornos, public.submit_quiz_v2 tiene prosecdef = false (SECURITY INVOKER), search_path vacío, anon no tiene EXECUTE y authenticated sí.
 - La implementación autoritativa privada sigue siendo SECURITY DEFINER y valida auth.uid().
 
 **Divergencia de versiones que bloquea un db push a ciegas:** los timestamps registrados remotamente no coinciden con los prefijos de los tres archivos locales:
-- Local 024: 20261030064000; remoto DEV: 20261030070355.
-- Local 025: 20261030072000; remoto DEV: 20261030071200.
+- Local 024: 20261030064000; remoto DEV: 20261030070355; remoto producción: 20261030081610.
+- Local 025: 20261030072000; remoto DEV: 20261030071200; remoto producción: 20261030081612.
 - Local 026: 20261030074000; remoto DEV: 20261030073304; remoto producción: 20261030073610.
 
 Los nombres de las migraciones coinciden, pero Supabase identifica las migraciones por versión/timestamp. No ejecutar supabase db push, migration repair ni renombrar/aplicar estos archivos hasta preparar una reconciliación explícita para ambos entornos. No repetir 026 en producción. La divergencia se registra aquí para que ningún socio interprete que los archivos locales pendientes se deben aplicar sin más.
