@@ -2,7 +2,7 @@
 
 # Inventario de Interfaz de Usuario
 
-Inventario de todos los botones, enlaces y controles interactivos de la aplicación Python desde Cero.
+Captura antigua de los controles de una versión anterior. Las filas son evidencia histórica, no una enumeración de controles activos.
 
 ## Navegación Principal
 
