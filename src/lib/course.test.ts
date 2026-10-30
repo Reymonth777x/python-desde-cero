@@ -198,14 +198,23 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(lesson.explanation.join(' ')).toContain('el resultado es 0110 (6)');
     expect(lesson.explanation.join(' ')).toContain('5 << 1');
     expect(lesson.explanation.join(' ')).toContain('5 >> 1');
-    expect(lesson.exampleOutput).toBe('True\\nFalse\\n1\\n7\\n6\\n10\\n2\\n-6');
+    expect(lesson.exampleOutput.split(String.fromCharCode(10))).toEqual([
+      'True',
+      'False',
+      '1',
+      '7',
+      '6',
+      '10',
+      '2',
+      '-6',
+    ]);
     expect(lesson.exercise.statement).toContain('permisos & solicitud');
     expect(lesson.exercise.statement).toContain('permisos | solicitud');
     expect(lesson.exercise.statement).toContain('permisos ^ solicitud');
     expect(lesson.exercise.solution).toContain('edad >= 18 and tiene_entrada');
     expect(lesson.exercise.tests).toEqual([
+      { input: [], expected: ['True', '1', '7', '6'].join(String.fromCharCode(10)) },
       { input: [], expected: 'True\\n1\\n7\\n6' },
-    ]);
     expect(lesson.exercise.hints).toHaveLength(4);
     expect(lesson.commonMistakes.join(' ')).toContain('no son equivalentes');
   });
