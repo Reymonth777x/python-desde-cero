@@ -330,8 +330,70 @@ export const courseModules: CourseModule[] = [
     "summary": "Representa datos, utiliza variables, construye expresiones, convierte valores y trabaja con entrada y salida.",
     "lessons": [
       {
-        "id": "b2-l1",
+        "id": "b2-l9",
         "section": "2.1",
+        "title": "Primer programa: Hello, World!",
+        "objectives": [
+          "Ejecutar una instrucción que muestre un mensaje en la consola.",
+          "Reconocer print() como una función integrada de Python.",
+          "Identificar el texto entre comillas como argumento de la función."
+        ],
+        "explanation": [
+          "Un programa puede empezar con una instrucción que muestre un mensaje. En Python, print() envía a la consola los valores que recibe. Prueba con un mensaje corto y observa exactamente qué aparece.",
+          "El nombre print identifica una función integrada. Los paréntesis indican que la estás llamando y el texto entre comillas es el argumento que le entregas. Las comillas delimitan una cadena; no aparecen en el resultado de la consola.",
+          "Una llamada a print() termina normalmente con un salto de línea. También puedes pasar varios valores separados por comas: Python los muestra separados por un espacio. En esta primera práctica basta con un mensaje; después podrás combinarlo con variables y datos."
+        ],
+        "example": "print(\"Hola, mundo\")\nprint(\"Estoy aprendiendo\", \"Python\")",
+        "exampleOutput": "Hola, mundo\nEstoy aprendiendo Python",
+        "walkthrough": [
+          "La primera llamada muestra la cadena Hola, mundo.",
+          "La segunda llamada recibe dos argumentos y los separa con un espacio.",
+          "Cada llamada escribe su resultado en una línea diferente."
+        ],
+        "commonMistakes": [
+          "Olvidar una de las comillas que delimitan el texto.",
+          "Escribir Print() con mayúscula: los nombres de las funciones distinguen mayúsculas y minúsculas.",
+          "Olvidar el paréntesis de cierre."
+        ],
+        "exercise": {
+          "id": "b2-e9",
+          "title": "Mostrar tu primer mensaje",
+          "statement": "Escribe un programa que muestre exactamente el mensaje Hola, mundo desde Python.",
+          "starterCode": "# muestra el mensaje solicitado\n",
+          "solution": "print(\"Hola, mundo desde Python\")",
+          "tests": [
+            {
+              "input": [],
+              "expected": "Hola, mundo desde Python"
+            }
+          ],
+          "hints": [
+            "Usa la función print().",
+            "Escribe el mensaje entre comillas y no agregues texto extra."
+          ],
+          "difficulty": "facil",
+          "xp": 10,
+          "length": 3
+        },
+        "questions": [
+          {
+            "prompt": "¿Qué hace print(\"Hola\") al ejecutarse?",
+            "options": [
+              "Guarda el texto en un archivo",
+              "Muestra Hola en la consola",
+              "Solicita que la persona escriba un dato",
+              "Crea una variable llamada Hola"
+            ],
+            "answer": 1,
+            "explanation": "print() muestra en la consola el valor que recibe. Las comillas delimitan la cadena y no forman parte del resultado mostrado."
+          }
+        ],
+        "assessment": false,
+        "estimatedMinutes": 20
+      },
+      {
+        "id": "b2-l1",
+        "section": "2.2",
         "title": "Tipos de datos y literales",
         "objectives": [
           "Reconocer int, float, str y bool.",
@@ -385,67 +447,6 @@ export const courseModules: CourseModule[] = [
             ],
             "answer": 2,
             "explanation": "Un número con parte decimal se representa normalmente mediante float."
-          }
-        ],
-        "assessment": false,
-        "estimatedMinutes": 40
-      },
-      {
-        "id": "b2-l2",
-        "section": "2.2",
-        "title": "Variables y nombres claros",
-        "objectives": [
-          "Crear variables mediante asignación.",
-          "Elegir identificadores válidos y descriptivos.",
-          "Actualizar una variable con su valor anterior."
-        ],
-        "explanation": [
-          "Una variable es un nombre asociado a un valor durante la ejecución. El signo igual realiza una asignación: Python evalúa el lado derecho y guarda el resultado en el nombre izquierdo.",
-          "Un identificador puede contener letras, números y guion bajo, pero no empezar con un número ni contener espacios. Nombres como precio_unitario y cantidad permiten entender mejor el programa.",
-          "Una variable puede cambiar: puntos = puntos + 5 calcula un nuevo valor y lo asigna de nuevo. puntos += 5 expresa la misma actualización de forma abreviada y se usa en contadores y acumuladores."
-        ],
-        "example": "puntos = 10\npuntos += 5\nproducto = \"Cuaderno\"\nprint(producto)\nprint(puntos)",
-        "exampleOutput": "Cuaderno\n15",
-        "walkthrough": [
-          "puntos comienza en diez y aumenta cinco.",
-          "producto conserva el texto.",
-          "La última línea muestra el valor actualizado."
-        ],
-        "commonMistakes": [
-          "Usar espacios en nombres de variables.",
-          "Confundir =, que asigna, con ==, que compara."
-        ],
-        "exercise": {
-          "id": "b2-e2",
-          "title": "Actualizar una cantidad",
-          "statement": "Crea stock = 12, suma cinco unidades con += e imprime el valor final.",
-          "starterCode": "stock = 12\n",
-          "solution": "stock = 12\nstock += 5\nprint(stock)",
-          "tests": [
-            {
-              "input": [],
-              "expected": "17"
-            }
-          ],
-          "hints": [
-            "Usa += para actualizar la variable.",
-            "Imprime después de asignar."
-          ],
-          "difficulty": "facil",
-          "xp": 15,
-          "length": 5
-        },
-        "questions": [
-          {
-            "prompt": "¿Qué hace total = total + 3?",
-            "options": [
-              "Compara total con 3",
-              "Calcula el valor anterior más 3 y lo asigna nuevamente a total",
-              "Crea una cadena llamada total",
-              "Elimina total"
-            ],
-            "answer": 1,
-            "explanation": "Python evalúa el lado derecho y asigna el nuevo resultado a total."
           }
         ],
         "assessment": false,
@@ -514,7 +515,7 @@ export const courseModules: CourseModule[] = [
       },
       {
         "id": "b2-l4",
-        "section": "2.4",
+        "section": "2.3.1",
         "title": "Prioridad y conversión de expresiones",
         "objectives": [
           "Aplicar la prioridad de operadores.",
@@ -568,6 +569,67 @@ export const courseModules: CourseModule[] = [
             ],
             "answer": 1,
             "explanation": "int() convierte una cadena que representa un entero en un valor int."
+          }
+        ],
+        "assessment": false,
+        "estimatedMinutes": 40
+      },
+      {
+        "id": "b2-l2",
+        "section": "2.4",
+        "title": "Variables y nombres claros",
+        "objectives": [
+          "Crear variables mediante asignación.",
+          "Elegir identificadores válidos y descriptivos.",
+          "Actualizar una variable con su valor anterior."
+        ],
+        "explanation": [
+          "Una variable es un nombre asociado a un valor durante la ejecución. El signo igual realiza una asignación: Python evalúa el lado derecho y guarda el resultado en el nombre izquierdo.",
+          "Un identificador puede contener letras, números y guion bajo, pero no empezar con un número ni contener espacios. Nombres como precio_unitario y cantidad permiten entender mejor el programa.",
+          "Una variable puede cambiar: puntos = puntos + 5 calcula un nuevo valor y lo asigna de nuevo. puntos += 5 expresa la misma actualización de forma abreviada y se usa en contadores y acumuladores."
+        ],
+        "example": "puntos = 10\npuntos += 5\nproducto = \"Cuaderno\"\nprint(producto)\nprint(puntos)",
+        "exampleOutput": "Cuaderno\n15",
+        "walkthrough": [
+          "puntos comienza en diez y aumenta cinco.",
+          "producto conserva el texto.",
+          "La última línea muestra el valor actualizado."
+        ],
+        "commonMistakes": [
+          "Usar espacios en nombres de variables.",
+          "Confundir =, que asigna, con ==, que compara."
+        ],
+        "exercise": {
+          "id": "b2-e2",
+          "title": "Actualizar una cantidad",
+          "statement": "Crea stock = 12, suma cinco unidades con += e imprime el valor final.",
+          "starterCode": "stock = 12\n",
+          "solution": "stock = 12\nstock += 5\nprint(stock)",
+          "tests": [
+            {
+              "input": [],
+              "expected": "17"
+            }
+          ],
+          "hints": [
+            "Usa += para actualizar la variable.",
+            "Imprime después de asignar."
+          ],
+          "difficulty": "facil",
+          "xp": 15,
+          "length": 5
+        },
+        "questions": [
+          {
+            "prompt": "¿Qué hace total = total + 3?",
+            "options": [
+              "Compara total con 3",
+              "Calcula el valor anterior más 3 y lo asigna nuevamente a total",
+              "Crea una cadena llamada total",
+              "Elimina total"
+            ],
+            "answer": 1,
+            "explanation": "Python evalúa el lado derecho y asigna el nuevo resultado a total."
           }
         ],
         "assessment": false,
