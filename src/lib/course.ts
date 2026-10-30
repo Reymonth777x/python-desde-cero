@@ -2152,12 +2152,12 @@ export const courseModules: CourseModule[] = [
           "Crear funciones que validen y actualicen registros.",
           "Recorrer cantidades para calcular un total.",
           "Manejar entradas inválidas y excepciones.",
-          "Ejecutar y superar cinco pruebas automáticas."
+          "Ejecutar y superar seis pruebas automáticas."
         ],
         "explanation": [
           "El proyecto integra las herramientas centrales del curso en un gestor de inventario de consola. Cada producto tiene un nombre y una cantidad. Un diccionario asocia cada nombre con su cantidad y permite actualizar un registro.",
           "La función agregar_producto concentra las reglas: el nombre no puede estar vacío y la cantidad debe ser positiva. La función total_unidades recorre los valores y suma las cantidades. Separar ambas operaciones facilita revisar y reutilizar el código.",
-          "El programa recibe datos con input(), convierte la cantidad a entero y controla ValueError cuando la entrada no es numérica. Ejecuta cinco casos de prueba y corrige el código hasta superarlos. La finalización se registra después de aprobar también la revisión conceptual."
+          "El programa recibe datos con input(), convierte la cantidad a entero y controla ValueError cuando la entrada no es numérica. Ejecuta seis casos de prueba y corrige el código hasta superarlos. La finalización se registra después de aprobar también la revisión conceptual."
         ],
         "example": "inventario = {\"Cuaderno\": 3}\n\ndef total_unidades(datos):\n    total = 0\n    for cantidad in datos.values():\n        total += cantidad\n    return total\n\nprint(\"Total:\", total_unidades(inventario))",
         "exampleOutput": "Total: 3",
@@ -2221,6 +2221,14 @@ export const courseModules: CourseModule[] = [
                 "abc"
               ],
               "expected": "Cantidad no válida\nTotal: 0"
+            },
+            {
+              "input": [
+                "1",
+                "Cuaderno",
+                "-2"
+              ],
+              "expected": "Datos no válidos\nTotal: 0"
             }
           ],
           "hints": [
