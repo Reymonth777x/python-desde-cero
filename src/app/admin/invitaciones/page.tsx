@@ -32,7 +32,7 @@ function feedbackCode(error: string | null | undefined, success: string) {
   if (!error) return success;
   if (error.includes('Ya existe')) return 'duplicate';
   if (error.includes('se conserva como historial')) return 'used';
-  if (error.includes('inválid') || error.includes('requerido') || error.includes('caracteres: letras') || error.includes('futura')) return 'invalid';
+  if (error.includes('inválid') || error.includes('no es válida') || error.includes('requerido') || error.includes('caracteres: letras') || error.includes('futura')) return 'invalid';
   return 'failed';
 }
 
