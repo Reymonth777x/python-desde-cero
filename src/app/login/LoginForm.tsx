@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useActionState, useEffect, useState, type ReactNode } from 'react';
 import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
 import { TurnstileWidget } from '@/components/TurnstileWidget';
-import { signup, login } from './actions';
+import { signup, login, type LoginActionState } from './actions';
 
 type Props = {
   error?: string;
@@ -31,6 +31,21 @@ const inputStyle =
 
 export default function LoginForm({ error, message, next = '' }: Props) {
   const [isSignup, setIsSignup] = useState(false);
+  const [loginState, loginAction] = useActionState(login, {} as LoginActionState);
+  const [captchaAttempt, setCaptchaAttempt] = useState(0);
+  const [loginActionError, setLoginActionError] = useState('');
+
+  useEffect(() => {
+    if (!loginState.error) return;
+    const messages: Record<NonNullable<LoginActionState['error']>, string> = {
+      missing: 'Completa tu correo y contraseña.',
+      captcha: 'La verificación no se completó. Vuelve a marcar el control de seguridad; conservamos tu correo.',
+      login: 'No se pudo iniciar sesión. Comprueba tu correo y contraseña.',
+    };
+    setLoginActionError(messages[loginState.error]);
+    setLoginPassword('');
+    if (loginState.error === 'captcha') setCaptchaAttempt((attempt) => attempt + 1);
+  }, [loginState]);
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [signupName, setSignupName] = useState('');
@@ -44,6 +59,7 @@ export default function LoginForm({ error, message, next = '' }: Props) {
     setSignupPassword('');
     setInvitationCode('');
     setIsSignup(false);
+    setLoginActionError('');
   }
 
   function showSignup() {
@@ -151,7 +167,7 @@ export default function LoginForm({ error, message, next = '' }: Props) {
                 <SubmitButton pendingText="Creando cuenta...">Crear cuenta</SubmitButton>
               </form>
             ) : (
-              <form action={login} className="mt-6 space-y-4">
+              <form action={loginAction} className="mt-6 space-y-4">
                 <input type="hidden" name="next" value={next} />
                 <div>
                   <label htmlFor="login-email" className="text-sm font-semibold">Correo electrónico</label>
@@ -162,7 +178,12 @@ export default function LoginForm({ error, message, next = '' }: Props) {
                   <input id="login-password" name="password" type="password" autoComplete="section-login current-password" value={loginPassword} onChange={(event) => setLoginPassword(event.target.value)} required className={inputStyle} />
                 </div>
                 {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-                  <TurnstileWidget siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} action="login" />
+                  <TurnstileWidget key={captchaAttempt} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} action="login" />
+                )}
+                {loginActionError && (
+                  <p role="alert" aria-live="polite" className="border-l-4 border-[var(--theme-error)] bg-[var(--theme-surface)] px-4 py-3 text-sm leading-6 text-[var(--theme-ink)]">
+                    {loginActionError}
+                  </p>
                 )}
                 <SubmitButton pendingText="Entrando...">Continuar</SubmitButton>
               </form>
