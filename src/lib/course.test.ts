@@ -187,6 +187,29 @@ describe('ruta de aprendizaje Python desde cero', () => {
     ]);
   });
 
+  it('separa operadores logicos y practica AND, OR y XOR bit a bit', () => {
+    const lesson = courseModules
+      .find((courseModule) => courseModule.id === 'module-3')!
+      .lessons.find((item) => item.id === 'b3-l2')!;
+
+    expect(lesson.objectives.join(' ')).toContain('AND (&), OR (|) y XOR (^)');
+    expect(lesson.explanation.join(' ')).toContain('0101 & 0011 = 0001');
+    expect(lesson.explanation.join(' ')).toContain('0101 | 0011 = 0111');
+    expect(lesson.explanation.join(' ')).toContain('0101 ^ 0011 = 0110');
+    expect(lesson.explanation.join(' ')).toContain('5 << 1');
+    expect(lesson.explanation.join(' ')).toContain('5 >> 1');
+    expect(lesson.exampleOutput).toBe('True\\nFalse\\n1\\n7\\n6\\n10\\n2\\n-6');
+    expect(lesson.exercise.statement).toContain('permisos & solicitud');
+    expect(lesson.exercise.statement).toContain('permisos | solicitud');
+    expect(lesson.exercise.statement).toContain('permisos ^ solicitud');
+    expect(lesson.exercise.solution).toContain('edad >= 18 and tiene_entrada');
+    expect(lesson.exercise.tests).toEqual([
+      { input: [], expected: 'True\\n1\\n7\\n6' },
+    ]);
+    expect(lesson.exercise.hints).toHaveLength(4);
+    expect(lesson.commonMistakes.join(' ')).toContain('no son equivalentes');
+  });
+
   it('califica todas las respuestas y exige al menos 75 por ciento', () => {
     const questions = [
       { prompt: '1', options: ['a', 'b'], answer: 0, explanation: '' },
