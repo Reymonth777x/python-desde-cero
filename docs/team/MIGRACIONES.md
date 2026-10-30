@@ -31,9 +31,9 @@ La salida consultada del historial remoto empieza por la entrada timestamp 004; 
 Archivo canónico:
 `supabase/migrations/20261029051953_020_balance_quiz_answer_positions_v2.sql`
 
-La migración agregó `private.quiz_answer_key.correct_option_v2` y publicó `public.submit_quiz_v2(text,text,integer[])`. En el momento de aplicar la migración se configuraron 41 preguntas. La verificación remota de solo lectura del 30-10-2026 contra el catálogo vigente encontró:
+La migración agregó `private.quiz_answer_key.correct_option_v2` y publicó `public.submit_quiz_v2(text,text,integer[])`. En el momento de aplicar la migración se configuraron 41 preguntas. La verificación remota de solo lectura del 30-10-2026 contra el catálogo vigente encontró (separando los IDs activos de las filas heredadas):
 - 67 claves del catálogo actual repartidas en 37 lecciones; las 67 tienen `correct_option_v2` configurado.
-- 31 de las 44 usan un índice v2 distinto del índice histórico; el texto de la opción correcta se conservó al reordenar el catálogo.
+- 29 de las 67 claves activas usan un índice v2 distinto del índice histórico; el texto de la opción correcta se conservó al reordenar el catálogo.
 - Hay 43 claves históricas de IDs antiguos sin v2; no pertenecen al catálogo actual `bN-lN` y no deben confundirse con claves faltantes del curso vigente.
 - `anon` no puede ejecutar el RPC v2; `authenticated` sí.
 - La implementación autoritativa privada usa `SECURITY DEFINER`, valida `auth.uid()`, registra intentos y actualiza `progress` al aprobar. Desde la migración 026, el RPC público `submit_quiz_v2` es un envoltorio `SECURITY INVOKER`. La migración 027 retira el arreglo `answerCorrect` del JSON público y mueve las verificaciones de prerrequisitos al interior de la función privada `SECURITY DEFINER`, para que tampoco puedan evitarse llamando esa función directamente. Se mantiene el límite de 5 intentos por 5 minutos.
@@ -53,7 +53,7 @@ Verificación remota adicional del 30-10-2026:
 **Conflicto de PR #8:** su archivo `20261030050000_021_pe1_course_catalog_refresh.sql` reutiliza la versión `20261030050000` con contenido y propósito distintos. Esa versión ya está aplicada en remoto como `scope_quiz_attempt_cleanup_to_current_user`. No fusionar ni aplicar la migración de PR #8. Revisar sus cambios de código y rescatar únicamente los que no dupliquen ni contradigan la ruta canónica.
 ## Migraciones 024–027 — estado remoto verificado el 30-10-2026
 
-Las tres migraciones se probaron y aplicaron en DEV. El historial remoto de solo lectura confirma:
+Las cuatro migraciones 024–027 se probaron y aplicaron en DEV. El historial remoto de solo lectura confirma:
 
 | Cambio | DEV (fcwbkkivelsipqqrbpya) | Producción (nuqydanbbgqcofcftshk) |
 |---|---|---|
@@ -122,3 +122,19 @@ Mientras exista esta divergencia, no ejecutar supabase db push, migration repair
 3. Probarlo contra una instancia de desarrollo; registrar el resultado.
 4. Para producción, aplicar el SQL en una ventana coordinada con el código compatible y verificar la fila en el historial remoto.
 5. Actualizar esta matriz. No copiar SQL de un chat a producción sin dejar el archivo versionado.
+
+
+## Verificación consolidada del catálogo y rama preview — 30-10-2026
+
+Consulta de solo lectura posterior al despliegue del 30-10-2026:
+
+- Producción y DEV tienen las mismas 67 claves v2 del catálogo vigente: módulo 1 = 10, módulo 2 = 13, módulo 3 = 11, módulo 4 = 28 y módulo 5 opcional = 5.
+- En los cuatro módulos obligatorios hay 62 claves; las otras 5 pertenecen a la extensión opcional. No se detectaron filas con `correct_option_v2 IS NULL` en ese conjunto.
+- Producción confirma `public.submit_quiz_v2` como SECURITY INVOKER, sin permiso EXECUTE para `anon` y con permiso para `authenticated`. La función privada autoritativa es SECURITY DEFINER, valida `auth.uid()` y conserva el cálculo del lado servidor.
+- El trigger `invitations_prevent_used_deletion` está habilitado sobre `public.invitations`.
+
+### Rama preview fallida del proyecto de producción
+
+La consulta de `list_branches` al proyecto `nuqydanbbgqcofcftshk` devuelve una rama preview llamada `main`, ID `82612040-2379-41e3-8f76-100fadca6a2c`, con `status = MIGRATIONS_FAILED` y `preview_project_status = ACTIVE_HEALTHY`. El proyecto separado `python-desde-cero-dev` (`fcwbkkivelsipqqrbpya`) está `ACTIVE_HEALTHY`; no confundir ambos recursos.
+
+No resetear, rebasar, fusionar ni eliminar la rama preview como solución rápida. Primero identificar qué migración falla, comparar su historial con producción y valorar si la rama puede repararse sin perder datos de preview. Esta incidencia no justifica ejecutar operaciones de migración en la base principal.
