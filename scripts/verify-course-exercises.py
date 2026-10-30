@@ -34,7 +34,7 @@ def remove_trailing_commas(source: str) -> str:
             output.append(char)
             if escaped:
                 escaped = False
-            elif char == "\\\\":
+            elif char == "\\":
                 escaped = True
             elif char == '"':
                 in_string = False
@@ -81,11 +81,11 @@ def load_course_modules() -> list[dict[str, Any]]:
 
 def normalize_output(value: str) -> str:
     """Match the browser editor's CRLF and trailing-newline normalization."""
-    return value.replace("\\r\\n", "\\n").rstrip("\\n")
+    return value.replace("\r\n", "\n").rstrip("\n")
 
 
 def run_case(code: str, input_lines: list[str], expected: str) -> tuple[bool, str]:
-    input_text = "".join(f"{line}\\n" for line in input_lines)
+    input_text = "".join(f"{line}\n" for line in input_lines)
     child_env = {
         "PATH": os.environ.get("PATH", ""),
         "PYTHONIOENCODING": "utf-8",
