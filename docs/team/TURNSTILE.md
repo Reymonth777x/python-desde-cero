@@ -3,12 +3,12 @@
 ## Estado comprobado el 30 de octubre de 2026
 
 - La variable pública `NEXT_PUBLIC_TURNSTILE_SITE_KEY` está disponible en GitHub Actions y el workflow la inyecta durante el build de Vinext.
-- La publicación actual de `master` es el SHA `37db89ecb542a7a00abc0f55691872505146cd61`. CI de master [41129443835](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41129443835) y despliegue Cloudflare [41129901037](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41129901037) terminaron correctamente. El Worker principal tiene versión `dd3dc42c-b29b-4e86-8604-25f3a94ebab5`.
-- PR #89 conserva el correo de login al fallar Turnstile y permite reintentar el widget sin guardar la contraseña ni debilitar la verificación. PR #91 está integrado y publicó el runner Python separado: `https://python-desdecero-runner.pythondesdecero.workers.dev`, versión `d831ac62-d7d8-4afb-95fb-8b17ae363a88`.
+- La publicación actual comprobada de `master` es el SHA `d072f962d96a9e3deb1d5d2a7a4a8a83ebec4e21`. CI de master [41133763686](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41133763686) y despliegue Cloudflare [41134083974](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41134083974) terminaron correctamente. El Worker principal tiene versión `e9fbc812-68fa-4617-b23e-f1057dc2a6f5`.
+- PR #89 conserva el correo de login al fallar Turnstile y permite reintentar el widget sin guardar la contraseña ni debilitar la verificación. PR #91 está integrado y publicó el runner Python separado: `https://python-desdecero-runner.pythondesdecero.workers.dev`, versión actual `612bdbbc-a1ef-4579-96c6-692a8ae5bc7f`.
 - El workflow validó las credenciales de Cloudflare sin imprimirlas, preparó y publicó los assets del runner, comprobó CSP y origen, compiló Vinext, comparó el SHA actual de `master` antes de publicar y verificó el dominio `python-desdecero.com` conectado al Worker.
-- El smoke test de producción verificó portada, `/muestra`, `/login` con widget Turnstile, sitemap y redirección `www` HTTP 308. Esto demuestra presencia del widget en el HTML, no que el desafío haya sido completado ni que Supabase Auth haya validado un token en un inicio de sesión real.
+- El smoke test de producción del SHA actual verificó portada, `/muestra`, `/login` con widget Turnstile, sitemap, asociación del dominio con el Worker y redirección `www` HTTP 308. Esto demuestra presencia del widget en el HTML, no que el desafío haya sido completado ni que Supabase Auth haya validado un token en un inicio de sesión real.
 - La Secret key privada de Turnstile y el estado de CAPTCHA protection no se pueden leer mediante la inspección del repositorio ni el estado básico del proyecto Supabase. Su configuración en Supabase Auth sigue pendiente de confirmación.
-- Tampoco se completó una prueba real de correo, registro o restablecimiento; estos puntos siguen abiertos.
+- Brevo muestra el dominio `python-desdecero.com` como **Autentificado** y **Con marca**, con subdominio `em`. Su vista general aportada por el propietario mostró cuatro emails transaccionales en 7 días, 100 % entregados y 0 % hard bounce/bloqueados; esa estadística no prueba por sí sola el recorrido Auth de registro/confirmación/recuperación. La comprobación completa con un buzón controlado sigue pendiente.
 
 ## Aislamiento del laboratorio Python en Cloudflare
 
@@ -38,7 +38,7 @@ El código de servidor envía `captchaToken` en sign-in, sign-up y password rese
 
 ## Despliegue y señal de fallo
 
-La publicación requiere CI exitoso en `master`, credenciales válidas de Cloudflare y una Sitekey real. El workflow verifica el HTML de `/login`, la muestra pública, el sitemap y el redirect `www` 308. Las credenciales ausentes o una Sitekey inválida provocan fallo visible; una ejecución de CI antigua o cancelada se omite de forma segura. PR #54 está integrado: compara el SHA del CI con el HEAD real de `master` antes de compilar y vuelve a comprobarlo justo antes de ejecutar el deploy. Ambas barreras pasaron en los releases funcionales `71fa854`, `2445f68` y `e758f9c`, y en el deploy documental posterior `10cc1b7`.
+La publicación requiere CI exitoso en `master`, credenciales válidas de Cloudflare y una Sitekey real. El workflow verifica el HTML de `/login`, la muestra pública, el sitemap y el redirect `www` 308. Las credenciales ausentes o una Sitekey inválida provocan fallo visible; una ejecución de CI antigua o cancelada se omite de forma segura. El workflow compara el SHA del CI con el HEAD real de `master` antes de compilar y vuelve a comprobarlo justo antes de ejecutar el deploy. Ambas barreras pasaron en el release `d072f962` (CI `41133763686`, deploy `41134083974`).
 
 ## Desarrollo y pruebas automatizadas
 

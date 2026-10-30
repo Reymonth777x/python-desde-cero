@@ -2,7 +2,7 @@
 
 ## Estado comprobado el 30 de octubre de 2026
 
-La integración está en preparación, no certificada en producción.
+**Autenticación de dominio completada en Brevo; validación end-to-end con Supabase Auth aún pendiente de evidencia.**
 
 - El propietario generó una clave SMTP Standard en Brevo el 30-10-2026, con la expiración anual que mostraba el panel. La clave es privada: no se registra aquí ni se almacena en GitHub, en el frontend o en `.env`.
 - Los DNS públicos del dominio raíz `python-desdecero.com` muestran el TXT de verificación de Brevo.
@@ -12,7 +12,10 @@ La integración está en preparación, no certificada en producción.
 - El DNS público muestra un único registro DMARC: `v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com`. La política actual es de monitorización, no de cuarentena ni rechazo.
 - Los nameservers autoritativos publicados para el dominio son `piers.ns.cloudflare.com` y `chan.ns.cloudflare.com`. Las respuestas DNS conservan los CNAME DKIM, por lo que no se observa aplanamiento que los convierta en TXT.
 - La consulta TXT del apex no devolvió un registro SPF. Brevo indica que SPF/MX no son obligatorios para autenticar dominios con IP compartida; si la cuenta utiliza IP dedicada, los registros requeridos pueden ser diferentes. Supabase recomienda mantener SPF, DKIM y DMARC alineados para mejorar la entregabilidad. No añadir un segundo SPF ni cambiar los existentes sin ver primero todos los registros del dominio de envío.
-- No se ha podido inspeccionar el estado privado del dominio/remitente en el panel de Brevo. Tampoco se ha podido leer la configuración SMTP de Authentication de Supabase desde la conexión de proyecto disponible. No se afirma que el dominio esté marcado como “Authenticated”, que el remitente esté validado, que la clave SMTP esté guardada en Supabase ni que un correo haya sido entregado.
+- El propietario mostró el panel de Brevo donde `python-desdecero.com` aparece **Autentificado**, **Con marca**, con subdominio de marca `em`. La captura confirma el dominio y el branded subdomain; no muestra por sí sola el estado individual de cada remitente.
+- La vista general de Brevo aportada por el propietario muestra 4 emails transaccionales enviados durante los últimos 7 días, 100 % entregados, 0 % hard bounce y 0 % bloqueados. Es una estadística agregada; no permite asignar esos mensajes concretos a registro/confirmación/recuperación de Supabase.
+- El propietario confirmó que generó una clave SMTP Standard. El valor nunca se comparte ni se registra en archivos.
+- Las herramientas de conexión no permiten leer Authentication → SMTP Settings ni inspeccionar los recibos individuales de Brevo. Por tanto, no se inventa el host/login actualmente guardado ni se declara completada la aceptación de todos los flujos Auth.
 
 ## Evidencia de envío observada en Supabase Auth (30-10-2026)
 
@@ -24,7 +27,7 @@ Consulta de solo lectura de los logs Auth de producción para las últimas 24 ho
 - HTTP 200/303 acredita que Auth aceptó/procesó la solicitud, no que el servidor receptor haya recibido el mensaje. No se encontraron recibos SMTP ni encabezados del correo en los logs accesibles.
 - DEV no mostró eventos de email coincidentes durante la misma ventana.
 
-**Conclusión:** hay evidencia de que el límite de email de Auth en PROD se elevó a 30 y de que varios flujos Auth llegaron a procesarse. Sigue pendiente comprobar en Brevo el estado de entrega y en Supabase el host SMTP guardado; no reconfigurar credenciales a ciegas.
+**Conclusión:** el dominio está autenticado y con marca en Brevo, y la vista general registra cuatro emails transaccionales entregados. Supabase Auth registró solicitudes aceptadas/procesadas y el límite cambió a 30/h. Esto es evidencia positiva de actividad, pero no prueba que los cuatro envíos observados correspondan a los flujos de Auth ni revela el host SMTP guardado. No regenerar ni cambiar credenciales a ciegas.
 
 ## Datos SMTP que se deben utilizar
 
@@ -41,13 +44,14 @@ Para el servidor de correo de Brevo, la documentación oficial indica:
 
 Brevo admite otros puertos, pero la configuración de cifrado debe coincidir con el puerto seleccionado. Para el puerto 465 se usa SSL/TLS; para 587 no activar SSL implícito.
 
-## Orden correcto para terminar
+## Cierre de la integración
 
-1. En Brevo → Settings → Senders, Domains, IPs, comprobar que `python-desdecero.com` aparece como **Authenticated** y que la dirección remitente está verificada. Si Brevo muestra registros adicionales para esta cuenta, comprobarlos antes de asumir que el DNS está completo.
-2. En Supabase DEV `python-desde-cero-dev` → Authentication → Emails → SMTP Settings, activar `Enable custom SMTP` e introducir host, puerto, SMTP login exacto, clave SMTP y remitente verificado. Guardar el secreto directamente en el panel; no pegarlo en el chat ni en este repositorio.
-3. Enviar una confirmación de registro y un restablecimiento de contraseña a un buzón controlado. Revisar recepción, enlaces, carpeta de spam y el encabezado del mensaje (`dkim=pass`, SPF y DMARC).
-4. Solo después de que DEV funcione, aplicar el mismo patrón al proyecto de producción `nuqydanbbgqcofcftshk` y probar una dirección controlada.
-5. Revisar los límites de envío de Supabase Auth y Brevo. La documentación vigente de Supabase indica un máximo de 2 mensajes/hora para el SMTP compartido por defecto y un límite inicial de 30 mensajes/hora después de configurar SMTP personalizado (ajustable en Rate Limits). Los logs previos registraron dos `over_email_send_rate_limit` (429), pero no identificaban el proveedor SMTP activo en ese momento.
+1. La autenticación del dominio `python-desdecero.com` y la configuración de marca `em` ya están confirmadas en el panel de Brevo. Los 9 registros de Cloudflare compartidos por el propietario incluyen dos CNAME DKIM, tres CNAME de marca, el TXT de verificación de Brevo y DMARC. No hay que repetir esa configuración.
+2. La clave SMTP Standard ya fue generada por el propietario. No crear una segunda ni revocar la actual salvo que aparezca un error de autenticación SMTP verificable.
+3. El dato que sigue sin prueba independiente es qué host/login/remitente están guardados en Supabase Auth DEV y PROD. Cuando se revise el panel, comparar con `smtp-relay.brevo.com`, puerto `587`, el login SMTP exacto de Brevo, la clave Standard y un remitente individual verificado. No cambiar ningún campo si ya coincide.
+4. Ejecutar con un buzón externo controlado: registro → recepción y apertura de confirmación → login; después recuperación → recepción y apertura → cambio de contraseña. Correlacionar hora, destinatario enmascarado y estado en Brevo Transactional Email Logs. No reutilizar una cuenta real de estudiante.
+5. Revisar encabezados del mensaje para `dkim=pass`, SPF y DMARC. DMARC actual es `p=none` (monitorización); no endurecerlo durante esta integración.
+6. Los logs previos de Auth incluyen HTTP 429 tanto por límites horarios como por enfriamiento antiabuso (uno informó 17 segundos). No repetir solicitudes en ráfaga ni interpretar todos los 429 como un rechazo de Brevo.
 
 ## Separación de entornos y seguridad
 
