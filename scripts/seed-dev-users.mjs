@@ -1,109 +1,186 @@
 #!/usr/bin/env node
 
 import { randomBytes } from 'node:crypto';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
+import { createClient } from '@supabase/supabase-js';
 
-/**
- * Semilla de usuarios de desarrollo.
- * Solo permite Supabase local (localhost/127.0.0.1/::1).
- * Requiere SUPABASE_SERVICE_ROLE_KEY en el entorno local; nunca la guardes en Git.
- */
-
-import { createClient } from "@supabase/supabase-js";
-
-const SUPABASE_URL = process.env.SUPABASE_URL || 'http://localhost:54322';
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-// Validar el hostname exacto: evitar dominios como localhost.example.com.
-let supabaseHostname;
-try {
-  supabaseHostname = new URL(SUPABASE_URL).hostname;
-} catch {
-  console.error('ERROR: SUPABASE_URL no es una URL valida.');
-  process.exit(1);
-}
-const localHostnames = new Set(["localhost", "127.0.0.1", "[::1]", "::1"]);
-if (!localHostnames.has(supabaseHostname)) {
-  console.error('ERROR: seed-dev-users.mjs solo permite Supabase local.');
-  console.error('   URL detectada: ' + SUPABASE_URL);
-  process.exit(1);
-}
-if (!SUPABASE_SERVICE_ROLE_KEY) {
-  console.error('ERROR: define SUPABASE_SERVICE_ROLE_KEY solo en tu terminal local.');
-  console.error('   No la pongas en .env.example, codigo fuente ni en variables NEXT_PUBLIC_.');
-  process.exit(1);
-}
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-  auth: { autoRefreshToken: false, persistSession: false },
-});
+const SUPABASE_URL = process.env.SUPABASE_URL || process.env.API_URL || 'http://127.0.0.1:54321';
+const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const CREDENTIALS_PATH = resolve(process.cwd(), '.local', 'dev-users.credentials.json');
 
 const DEV_USERS = [
   {
-    email: 'estudiante@python-desdecero.local',
+    email: 'estudiante1@python-desdecero.local',
+    fullName: 'Estudiante de Prueba 1',
+    isAdmin: false,
     role: 'student',
-    full_name: 'Estudiante de Prueba',
   },
   {
-    email: 'docente@python-desdecero.local',
-    role: 'teacher',
-    full_name: 'Docente de Prueba',
+    email: 'estudiante2@python-desdecero.local',
+    fullName: 'Estudiante de Prueba 2',
+    isAdmin: false,
+    role: 'student',
   },
   {
     email: 'admin@python-desdecero.local',
+    fullName: 'Administrador de Prueba',
+    isAdmin: true,
     role: 'admin',
-    full_name: 'Administrador de Prueba',
   },
 ];
 
-function generateSecurePassword() {
-  return randomBytes(16).toString('base64url');
+function validateLocalTarget() {
+  let url;
+
+  try {
+    url = new URL(SUPABASE_URL);
+  } catch {
+    throw new Error('SUPABASE_URL no es una URL válida.');
+  }
+
+  const allowedHosts = new Set(['localhost', '127.0.0.1', '[::1]', '::1']);
+  if (url.protocol !== 'http:' || !allowedHosts.has(url.hostname)) {
+    throw new Error(
+      'Por seguridad, seed-dev-users.mjs solo permite una API HTTP local (localhost, 127.0.0.1 o ::1).',
+    );
+  }
+
+  if (!SERVICE_ROLE_KEY) {
+    throw new Error(
+      'Falta SUPABASE_SERVICE_ROLE_KEY. Obtenla de "supabase status --output env" y mantenla solo en esta terminal.',
+    );
+  }
+}
+
+function generatePassword() {
+  return randomBytes(24).toString('base64url');
+}
+
+async function saveCredentials(users) {
+  await mkdir(dirname(CREDENTIALS_PATH), { recursive: true });
+  await writeFile(
+    CREDENTIALS_PATH,
+    JSON.stringify(
+      {
+        generatedAt: new Date().toISOString(),
+        supabaseUrl: SUPABASE_URL,
+        note: 'Solo para desarrollo local. No subir este archivo ni reutilizar estas contraseñas en producción.',
+        users,
+      },
+      null,
+      2,
+    ) + '\n',
+    { encoding: 'utf8', mode: 0o600 },
+  );
 }
 
 async function main() {
-  console.log('Creando usuarios de desarrollo en Supabase local...');
+  validateLocalTarget();
+
+  const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
+  const { data: listData, error: listError } = await supabase.auth.admin.listUsers({
+    page: 1,
+    perPage: 1000,
+  });
+
+  if (listError) {
+    throw new Error(`No se pudieron consultar los usuarios locales: ${listError.message}`);
+  }
+
+  const existingUsers = listData.users;
+  const credentials = [];
+
+  console.log('Preparando cuentas aisladas para pruebas en Supabase local...');
 
   for (const user of DEV_USERS) {
-    const password = generateSecurePassword();
-    try {
+    const password = generatePassword();
+    const existing = existingUsers.find(
+      (candidate) => candidate.email?.toLowerCase() === user.email.toLowerCase(),
+    );
+
+    let authUser;
+
+    if (existing) {
+      const { data, error } = await supabase.auth.admin.updateUserById(existing.id, {
+        password,
+        user_metadata: { full_name: user.fullName },
+      });
+
+      if (error || !data.user) {
+        throw new Error(
+          `No se pudo renovar la cuenta ${user.email}: ${error?.message ?? 'usuario no devuelto'}`,
+        );
+      }
+
+      authUser = data.user;
+      console.log(`Actualizada: ${user.email}`);
+    } else {
       const { data, error } = await supabase.auth.admin.createUser({
         email: user.email,
         password,
-        user_metadata: { full_name: user.full_name },
+        user_metadata: { full_name: user.fullName },
         email_confirm: true,
       });
 
-      if (error) {
-        if (error.message.includes('already registered') || error.message.includes('User already registered')) {
-          console.log(user.email + ' ya existe, saltando...');
-        } else {
-          console.error('Error creando ' + user.email + ': ' + error.message);
-        }
-      } else {
-        if (user.role === 'admin' && data.user) {
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .update({ is_admin: true })
-            .eq('id', data.user.id);
-          if (profileError) {
-            console.error('No se pudo habilitar is_admin para el usuario local: ' + profileError.message);
-          }
-        }
-        console.log('Creado ' + user.email + ' (rol: ' + user.role + ')');
+      if (error || !data.user) {
+        throw new Error(
+          `No se pudo crear la cuenta ${user.email}: ${error?.message ?? 'usuario no devuelto'}`,
+        );
       }
-    } catch (err) {
-      console.error('Excepcion creando ' + user.email + ': ' + err.message);
+
+      authUser = data.user;
+      existingUsers.push(authUser);
+      console.log(`Creada: ${user.email}`);
     }
+
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .upsert(
+        {
+          id: authUser.id,
+          email: user.email,
+          full_name: user.fullName,
+          is_admin: user.isAdmin,
+        },
+        { onConflict: 'id' },
+      )
+      .select('id, is_admin')
+      .single();
+
+    if (profileError || !profile) {
+      throw new Error(
+        `La cuenta ${user.email} existe, pero no se pudo preparar su perfil local: ${profileError?.message ?? 'perfil no devuelto'}`,
+      );
+    }
+
+    credentials.push({
+      email: user.email,
+      password,
+      role: user.role,
+      userId: authUser.id,
+      isAdmin: profile.is_admin,
+    });
+
+    // Save after each account so a later failure never loses already-issued passwords.
+    await saveCredentials(credentials);
   }
 
-  console.log('\nCredenciales de desarrollo:');
-  console.log('----------------------------------------');
-  for (const user of DEV_USERS) {
-    console.log(user.email + ' / contrasena generada - ver consola al crear (' + user.role + ')');
+  console.log('');
+  console.log('Cuentas locales listas:');
+  for (const user of credentials) {
+    console.log(`- ${user.email} (${user.role}, is_admin=${user.isAdmin})`);
   }
-  console.log('----------------------------------------');
-  console.log('\nSolo para entorno de desarrollo local. Nunca usar en produccion.');
+  console.log('');
+  console.log(`Contraseñas guardadas localmente en: ${CREDENTIALS_PATH}`);
+  console.log('El archivo está excluido de Git. No se imprimen contraseñas en la terminal.');
+  console.log('El esquema actual solo tiene is_admin; no se inventó un rol docente.');
 }
 
-main().catch((err) => {
-  console.error('Error fatal:', err.message);
-  process.exit(1);
+main().catch((error) => {
+  console.error(`ERROR: ${error instanceof Error ? error.message : String(error)}`);
+  process.exitCode = 1;
 });
