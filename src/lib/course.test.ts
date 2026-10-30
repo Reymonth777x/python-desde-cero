@@ -251,7 +251,7 @@ describe('ruta de aprendizaje Python desde cero', () => {
 
     const algorithms = lesson('b1-l1');
     expect(algorithms.explanation.join(' ')).toContain('demostración guiada');
-    expect(algorithms.explanation.join(' ')).toContain('se estudia formalmente en la lección 2.1');
+    expect(algorithms.explanation.join(' ')).toContain('se estudia en la lección 2.1');
     expect(algorithms.walkthrough[0]).toContain('etiquetas');
     expect(algorithms.exercise.hints.join(' ')).toContain('seguir la lógica');
 
