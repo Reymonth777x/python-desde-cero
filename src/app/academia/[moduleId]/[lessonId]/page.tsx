@@ -4,28 +4,9 @@ import {
   courseModules,
   findCourseLesson,
   findCourseModule,
-  type CourseExercise,
-  type CourseLesson,
-  type QuizQuestion,
 } from '@/lib/course';
+import { toClientLesson } from '@/lib/server-quiz/public-lesson';
 import { createClient } from '@/lib/supabase/server';
-
-type ClientSafeQuizQuestion = Omit<QuizQuestion, 'answer' | 'explanation'>;
-type ClientSafeExercise = Omit<CourseExercise, 'solution'>;
-type ClientSafeLesson = Omit<CourseLesson, 'questions' | 'exercise'> & {
-  questions: ClientSafeQuizQuestion[];
-  exercise: ClientSafeExercise;
-};
-
-function toClientLesson(lesson: CourseLesson): ClientSafeLesson {
-  const { solution: _solution, ...exercise } = lesson.exercise;
-  void _solution;
-  return {
-    ...lesson,
-    exercise,
-    questions: lesson.questions.map(({ prompt, options }) => ({ prompt, options })),
-  };
-}
 
 type Props = {
   params: Promise<{ moduleId: string; lessonId: string }>;
