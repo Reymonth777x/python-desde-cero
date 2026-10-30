@@ -23,6 +23,17 @@ Si no hay una Sitekey manual, el workflow intenta encontrar un único widget exi
 - El PR #29 intenta resolverlo buscando un único widget de producción mediante la API de solo lectura. Requiere `Turnstile Sites Read` o `Account Settings Read`; si el token no dispone de permiso, habrá que configurar la Sitekey manualmente.
 - No usar claves de prueba en producción ni habilitar CAPTCHA de Supabase antes de que el widget esté visible en la web publicada.
 
+## Reintentar el despliegue después de guardar la Sitekey
+
+El workflow también permite un inicio manual, limitado a la rama `master`. Esto evita tener que crear un commit vacío o modificar código solo para volver a probar el despliegue después de guardar la variable pública:
+
+1. Abre GitHub → Actions → **Deploy Cloudflare Worker**.
+2. Selecciona **Run workflow** y la rama `master`.
+3. Ejecuta el workflow. Volverá a validar la Sitekey y las credenciales antes de compilar o publicar.
+4. Si no hay una Sitekey real válida, la publicación seguirá omitida y producción permanecerá intacta.
+
+El inicio manual no omite CI, no permite desplegar ramas distintas de `master`, ni lee la Secret key privada de Turnstile.
+
 ## Configuración de Cloudflare
 1. En Cloudflare Dashboard → Turnstile, abre o crea el widget correspondiente al sitio `python-desdecero.com`.
 2. En Hostname Management incluye `python-desdecero.com` y cualquier hostname público que realmente uses (por ejemplo `www.python-desdecero.com`, solo si está activo). No uses hostnames de localhost en el widget de producción.
