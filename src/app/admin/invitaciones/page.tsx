@@ -97,7 +97,7 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
             Gestión de Invitaciones
           </h1>
           <p className='mt-2 leading-7 text-[var(--theme-muted)]'>
-            Crea códigos para distinguir campañas, cohortes o grupos de difusión y compártelos directamente; no se envían por correo. Deja el campo vacío para generar uno aleatorio o escribe uno propio para reconocer de qué grupo llega cada estudiante. El registro general sigue abierto sin invitación. Cada código se usa una sola vez; los utilizados se conservan como historial y los que aún no se han usado sí se pueden eliminar. Si no eliges fecha, vence en siete días.
+            Crea códigos para distinguir campañas, cohortes o grupos de difusión y compártelos directamente; no se envían por correo. Si escribes un código propio, ese será el código guardado para esta invitación (se normaliza a mayúsculas). Si dejas el campo vacío, el sistema genera uno aleatorio. El registro general sigue abierto sin invitación. Cada código se usa una sola vez; los utilizados se conservan como historial y los que aún no se han usado sí se pueden eliminar. Si no eliges fecha, vence en siete días.
           </p>
 
           {listError && (
@@ -122,7 +122,7 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <div>
                   <label htmlFor='code' className='block text-sm font-semibold text-[var(--theme-ink)] mb-1'>
-                    Código propio (deja vacío para generar uno automático)
+                    Código personalizado (opcional)
                   </label>
                   <input
                     id='code'
@@ -135,7 +135,7 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
                     autoComplete='off'
                     className='mt-1 min-h-12 w-full border border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 py-3 text-base text-[var(--theme-ink)] outline-none focus:border-[var(--theme-accent)] focus:ring-1 focus:ring-[var(--theme-focus-ring)]'
                   />
-                  <p className='mt-2 text-xs text-[var(--theme-muted)]'>Ejemplo: EQUIPO-OCT-26. Usa 8–32 letras, números o guiones para identificar una campaña o grupo. Si lo dejas vacío, el sistema genera un código aleatorio.</p>
+                  <p className='mt-2 text-xs text-[var(--theme-muted)]'>Ejemplo: EQUIPO-OCT-26. Si escribes un código de 8–32 letras, números o guiones, se guardará en la invitación. Si lo dejas vacío, se genera uno aleatorio.</p>
                 </div>
                 <div>
                   <label htmlFor='expires_at' className='block text-sm font-semibold text-[var(--theme-ink)] mb-1'>
