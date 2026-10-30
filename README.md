@@ -54,7 +54,7 @@ The application follows Next.js App Router conventions:
 
 ## Local setup (Windows + Docker)
 
-Use Node.js 24, npm, Docker Desktop and the Supabase CLI. The repository already contains `supabase/config.toml` and the canonical migrations in `supabase/migrations/`.
+Use Node.js 24, npm and Docker Desktop. The local launcher downloads and runs a pinned Supabase CLI 2.121.0 through npx on first use; a global CLI installation is not required. The repository already contains `supabase/config.toml` and the canonical migrations in `supabase/migrations/`.
 
 1. Install dependencies once:
 
@@ -82,7 +82,7 @@ To start the app without resetting the local test passwords:
 .\scripts\start-local.ps1 -SkipSeed
 ```
 
-To stop Next.js, press `Ctrl+C`. To stop the local Supabase containers when finished, run `supabase stop`; this preserves their data volumes.
+To stop Next.js, press `Ctrl+C`. To stop the local Supabase containers when finished, run `npx --yes supabase@2.121.0 stop`; this preserves their data volumes.
 
 For a hosted Supabase development project instead of Docker, copy `.env.example` to `.env.local` and use that project's own URL and publishable key. Never put a service-role/secret key in a `NEXT_PUBLIC_` variable or commit it.
 
