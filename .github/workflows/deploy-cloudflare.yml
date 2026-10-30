@@ -206,4 +206,14 @@ jobs:
             echo "::error::El dominio todavía está sirviendo la portada anterior."
             exit 1
           fi
-          echo "Dominio público sirve la nueva portada de cuatro módulos."
+
+          # Verify the production login route actually rendered the configured
+          # Turnstile widget; checking only the homepage would miss a broken
+          # authentication build.
+          curl --fail --silent --show-error --location --retry 5 --retry-delay 3 --retry-all-errors \
+            "https://python-desdecero.com/login?release=$GITHUB_SHA" -o /tmp/python-desde-cero-login.html
+          if ! grep -Fq 'data-testid="turnstile-widget"' /tmp/python-desde-cero-login.html; then
+            echo "::error::La ruta /login no muestra el widget Turnstile después del despliegue."
+            exit 1
+          fi
+          echo "Dominio público sirve la nueva portada y el widget Turnstile en /login."

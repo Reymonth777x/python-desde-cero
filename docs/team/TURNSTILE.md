@@ -3,19 +3,29 @@
 ## Diagnóstico
 La web pública se revisó el 30-10-2026 y la ruta `/login` no mostraba el widget. El componente solo se renderiza cuando está definida `NEXT_PUBLIC_TURNSTILE_SITE_KEY`. El workflow anterior construía el Worker de producción sin inyectar esa variable, aunque el entorno local podía tenerla en `.env.local`.
 
-El workflow de producción ahora:
+El workflow de producción:
 - exige una sitekey real antes de publicar;
 - acepta una variable de GitHub Actions llamada `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (preferida) o un secreto heredado con ese nombre;
 - inyecta la llave durante la compilación de Vinext y en el comando de despliegue;
-- rechaza las llaves de prueba oficiales;
-- comprueba después de publicar que `/login` contiene el widget.
+- rechaza las llaves de prueba oficiales.
+
+El PR `#27`, en la rama `chore/verify-turnstile-on-live-login`, añade una comprobación HTTP posterior al despliegue para validar que la portada está actualizada y que el HTML de `/login` contiene el widget. La validación anterior solo comprobaba la portada. No se debe considerar completo un despliegue si el widget no aparece en la ruta de autenticación.
 
 Si la sitekey no está configurada, el paso de comprobación omite el despliegue y deja la versión de producción intacta.
+
+## Estado verificado — 30 de octubre de 2026
+
+- El commit `c1cbdcb339b40f085d4b496f2ea92b7eb5a4a1d7` está integrado en `master`.
+- CI #494 terminó correctamente para ese commit, incluyendo TypeScript, ESLint, build, Playwright y build Vinext.
+- El workflow de publicación #52 no desplegó: `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID` estaban disponibles, pero `RAW_TURNSTILE_SITE_KEY` llegó vacío.
+- El job `deploy` quedó omitido; por tanto, no afirmar que la versión móvil nueva o el CAPTCHA estén publicados/verificados en producción.
+- La cuenta Cloudflare debe proporcionar una sitekey real para `python-desdecero.com`; no sustituirla por las claves de prueba de CI.
 
 ## Configuración de Cloudflare
 1. En Cloudflare Dashboard → Turnstile, abre o crea el widget correspondiente al sitio `python-desdecero.com`.
 2. En Hostname Management incluye `python-desdecero.com` y cualquier hostname público que realmente uses (por ejemplo `www.python-desdecero.com`, solo si está activo). No uses hostnames de localhost en el widget de producción.
 3. Copia la **Sitekey** y guárdala en GitHub → Settings → Secrets and variables → Actions → Variables con el nombre `NEXT_PUBLIC_TURNSTILE_SITE_KEY`. La Sitekey es pública y se entrega al navegador; nunca pegues aquí la Secret key.
+4. Confirma que la variable quedó guardada en el repositorio correcto (`Reymonth777x/python-desde-cero`) y no como variable personal o de otro repositorio.
 
 ## Configuración de Supabase Auth
 Para que el desafío no sea solo visual:
