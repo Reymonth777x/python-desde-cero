@@ -1,107 +1,91 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { parseOptionalInvitationCode } from '@/lib/invitation-code';
+
+const INVITATIONS_PATH = '/admin/invitaciones';
+
+async function requireAdmin() {
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) redirect('/login');
+
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('is_admin')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (profileError || profile?.is_admin !== true) redirect('/estudiante');
+  return { supabase, user };
+}
 
 export async function listInvitations() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login');
-  }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('is_admin')
-    .eq('id', user.id)
-    .single();
-
-  if (!profile?.is_admin) {
-    redirect('/estudiante');
-  }
-
-  const { data: invitations, error } = await supabase
+  const { supabase } = await requireAdmin();
+  const { data, error } = await supabase
     .from('invitations')
-    .select('*')
+    .select('id, code, is_used, used_by, expires_at, created_at, created_by')
     .order('created_at', { ascending: false });
 
-  if (error) {
-    return { invitations: [], error: error.message };
-  }
-
-  return { invitations: invitations ?? [], error: null };
+  return { invitations: data ?? [], error: error?.message ?? null };
 }
 
-export async function createInvitation(formData: FormData) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+export async function createInvitation(formData: FormData): Promise<{ error: string | null; success?: string }> {
+  const { supabase, user } = await requireAdmin();
+  const parsed = parseOptionalInvitationCode(String(formData.get('code') ?? ''));
 
-  if (!user) {
-    redirect('/login');
+  if (!parsed.ok || !parsed.code) {
+    return { error: 'Usa entre 4 y 32 caracteres: letras, números y guiones. El código no puede empezar ni terminar con guion.' };
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('is_admin')
-    .eq('id', user.id)
-    .single();
+  const expiresInput = String(formData.get('expires_at') ?? '').trim();
+  const insertData: {
+    code: string;
+    created_by: string;
+    expires_at?: string;
+  } = { code: parsed.code, created_by: user.id };
 
-  if (!profile?.is_admin) {
-    redirect('/estudiante');
+  if (expiresInput) {
+    const date = new Date(expiresInput);
+    if (Number.isNaN(date.getTime())) return { error: 'La fecha de expiración no es válida.' };
+    if (date.getTime() <= Date.now()) return { error: 'La fecha de expiración debe estar en el futuro.' };
+    insertData.expires_at = date.toISOString();
   }
-
-  const code = String(formData.get('code') ?? '').trim().toUpperCase();
-  const expiresAt = String(formData.get('expires_at') ?? '');
-
-  if (!code) {
-    return { error: 'El código de invitación es requerido' };
-  }
-
-  if (!/^[A-F0-9]{16}$/.test(code)) {
-    return { error: 'El código debe tener 16 caracteres hexadecimales' };
-  }
-
-  const insertData = {
-    code,
-    is_used: false,
-    used_by: null,
-    expires_at: expiresAt || null,
-    created_by: user.id,
-  };
-
+  // Al omitir expires_at, Postgres aplica el DEFAULT configurado (7 días).
   const { error } = await supabase.from('invitations').insert(insertData);
 
+  if (error?.code === '23505') return { error: 'Ese código ya existe. Prueba con otro.' };
   if (error) {
-    return { error: error.message };
+    console.error('[invitations:create]', { code: error.code, message: error.message });
+    return { error: 'No se pudo crear la invitación. Revisa los datos e inténtalo de nuevo.' };
   }
 
-  return { error: null };
+  revalidatePath(INVITATIONS_PATH);
+  return { error: null, success: `Invitación ${parsed.code} creada correctamente.` };
 }
 
-export async function deleteInvitation(id: string) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+export async function deleteInvitation(id: string): Promise<{ error: string | null; success?: string }> {
+  const { supabase } = await requireAdmin();
 
-  if (!user) {
-    redirect('/login');
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+    return { error: 'Identificador de invitación no válido.' };
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('is_admin')
-    .eq('id', user.id)
-    .single();
-
-  if (!profile?.is_admin) {
-    redirect('/estudiante');
-  }
-
-  const { error } = await supabase.from('invitations').delete().eq('id', id);
+  const { data, error } = await supabase
+    .from('invitations')
+    .delete()
+    .eq('id', id)
+    .select('id')
+    .maybeSingle();
 
   if (error) {
-    return { error: error.message };
+    console.error('[invitations:delete]', { code: error.code, message: error.message });
+    return { error: 'No se pudo eliminar la invitación. Comprueba tus permisos e inténtalo de nuevo.' };
   }
+  if (!data) return { error: 'La invitación ya no existe o no está disponible.' };
 
-  return { error: null };
+  revalidatePath(INVITATIONS_PATH);
+  return { error: null, success: 'Invitación eliminada. La cuenta del estudiante no se modifica.' };
 }

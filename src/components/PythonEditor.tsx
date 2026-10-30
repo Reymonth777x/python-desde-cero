@@ -1,164 +1,116 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Editor from '@monaco-editor/react';
 import type { editor } from 'monaco-editor';
-import { usePythonWorker } from '@/lib/use-python-worker';
+import { usePythonWorker, type PythonTestCase } from '@/lib/use-python-worker';
 
-// Configura Monaco Editor para usar workers autohospedados desde /monaco/vs/
 if (typeof window !== 'undefined' && !window.MonacoEnvironment) {
-  window.MonacoEnvironment = {
-    baseUrl: '/monaco/vs/',
-  };
+  window.MonacoEnvironment = { baseUrl: '/monaco/vs/' };
 }
+
+export type PythonEditorExercise = {
+  id: string;
+  title: string;
+  statement: string;
+  hints: string[];
+  tests: PythonTestCase[];
+  difficulty: 'facil' | 'medio' | 'dificil';
+};
+
+type Props = {
+  defaultCode: string;
+  instructions: string;
+  storageKey?: string;
+  exercise?: PythonEditorExercise;
+};
 
 export default function PythonEditor({
   defaultCode,
   instructions,
-}: {
-  defaultCode: string;
-  instructions: string;
-}) {
+  storageKey = 'python-desde-cero:free-practice',
+  exercise,
+}: Props) {
   const [code, setCode] = useState(defaultCode);
   const [input, setInput] = useState('');
-  const [mobilePanel, setMobilePanel] = useState<'instructions' | 'editor' | 'output' | 'turtle'>('instructions');
-  const [editorRequested, setEditorRequested] = useState(false);
-  const [desktopLayout, setDesktopLayout] = useState(false);
-  const [turtleError, setTurtleError] = useState<string | null>(null);
-
+  const [loadedKey, setLoadedKey] = useState('');
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
-
   const {
-    workerState,
-    output,
-    error,
-    turtleCommands,
-    isRunning,
-    createWorker,
-    runCode: runWorkerCode,
-    stopWorker,
-  } = usePythonWorker({
-    onStatusChange: (status) => {
-      if (status === 'error') {
-        setMobilePanel('output');
-      }
-    },
-    onOutput: (out, err) => {
-      if (err) {
-        setMobilePanel('output');
-      }
-    },
-  });
+    workerState, output, error, turtleCommands, testResults, isRunning,
+    createWorker, runCode, runTests, stopWorker, clearTurtle,
+  } = usePythonWorker();
 
   useEffect(() => {
-    const desktopQuery = window.matchMedia('(min-width: 768px)');
-    const updateLayout = () => setDesktopLayout(desktopQuery.matches);
-    updateLayout();
-    desktopQuery.addEventListener('change', updateLayout);
+    setLoadedKey('');
+    try {
+      const saved = window.localStorage.getItem(storageKey);
+      setCode(saved ?? defaultCode);
+    } catch {
+      setCode(defaultCode);
+    }
+    setLoadedKey(storageKey);
+  }, [defaultCode, storageKey]);
 
-    return () => desktopQuery.removeEventListener('change', updateLayout);
-  }, []);
+  useEffect(() => {
+    if (loadedKey !== storageKey) return;
+    try {
+      window.localStorage.setItem(storageKey, code);
+    } catch {
+      // Storage may be unavailable in private or restricted browsing modes.
+    }
+  }, [code, loadedKey, storageKey]);
 
-  const runCode = useCallback(() => {
-    if (isRunning) return;
-    setMobilePanel('output');
-    const workerInput = input === '' ? [] : input.split(/\r?\n/).slice(0, 20);
-    runWorkerCode(code, workerInput);
-  }, [code, input, isRunning, runWorkerCode]);
+  function execute() {
+    runCode(code, input === '' ? [] : input.split(/\r?\n/).slice(0, 20));
+  }
 
-  const insertOnMobile = (text: string, cursorOffset = text.length) => {
-    const editorInstance = editorRef.current;
-    const model = editorInstance?.getModel();
-    const selection = editorInstance?.getSelection();
-    if (!editorInstance || !model || !selection) return;
+  function checkExercise() {
+    if (!exercise || isRunning) return;
+    runTests(code, exercise.tests);
+  }
 
-    const start = model.getOffsetAt(selection.getStartPosition());
-    editorInstance.executeEdits('mobile-code-toolbar', [{
-      range: selection,
-      text,
-      forceMoveMarkers: true,
-    }]);
-    editorInstance.setPosition(model.getPositionAt(start + cursorOffset));
-    editorInstance.focus();
-  };
+  function resetCode() {
+    setCode(defaultCode);
+    setInput('');
+    editorRef.current?.setValue(defaultCode);
+  }
+
+  const inputClass = 'mt-2 block min-h-20 w-full resize-y border border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 py-3 font-mono text-sm text-[var(--theme-ink)] outline-none focus:border-[var(--theme-accent)] focus:ring-1 focus:ring-[var(--theme-focus-ring)]';
 
   return (
-    <section className="w-full" aria-label="Espacio de práctica de Python">
-      <div role="tablist" aria-label="Paneles del laboratorio" className="mb-4 grid grid-cols-3 border-b border-[var(--theme-border)] md:hidden">
-        {([
-          ['instructions', 'Guía'],
-          ['editor', 'Código'],
-          ['output', 'Resultado'],
-          ['turtle', 'Gráficos'],
-        ] as const).map(([panel, label]) => (
-          <button
-            key={panel}
-            type="button"
-            role="tab"
-            id={`practice-tab-${panel}`}
-            aria-controls={`practice-panel-${panel}`}
-            aria-selected={mobilePanel === panel}
-            onClick={() => {
-              setMobilePanel(panel);
-              if (panel === 'editor') {
-                setEditorRequested(true);
-                if (workerState === 'idle') {
-                }
-              }
-            }}
-            className={`min-h-12 border-b-2 px-2 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] ${mobilePanel === panel ? 'border-[var(--theme-accent)] text-[var(--theme-accent)]' : 'border-transparent text-[var(--theme-muted)]'}`}
-          >
-            {label}
-          </button>
-        ))}
+    <section className="w-full space-y-6" aria-label="Laboratorio de Python">
+      <div className="border-l-2 border-[var(--theme-accent)] bg-[var(--theme-bg-secondary)] p-4 sm:p-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="font-serif text-xl">{exercise?.title ?? 'Espacio de código'}</h2>
+          <span className="text-xs text-[var(--theme-muted)]">
+            {exercise ? `Nivel ${exercise.difficulty}` : 'Práctica libre'}
+          </span>
+        </div>
+        <p className="mt-2 text-sm leading-7 text-[var(--theme-muted)]">{exercise?.statement ?? instructions}</p>
+        {exercise && exercise.hints.length > 0 && (
+          <details className="mt-3 text-sm">
+            <summary className="min-h-10 cursor-pointer font-semibold text-[var(--theme-accent)]">Ver pistas</summary>
+            <ul className="list-disc space-y-1 pl-5 pt-2 text-[var(--theme-muted)]">
+              {exercise.hints.map((hint) => <li key={hint}>{hint}</li>)}
+            </ul>
+          </details>
+        )}
       </div>
 
-      {workerState !== 'ready' && (
-        <p role="status" aria-live="polite" className="mb-4 flex min-h-11 items-center gap-2 text-sm text-[var(--theme-muted)]">
-          {workerState === 'loading' && <span aria-hidden="true" className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--theme-border)] border-t-[var(--theme-accent)] motion-reduce:animate-none" />}
-          {workerState === 'idle' ? 'Python se prepara al abrir el editor o iniciar la primera ejecución.' : workerState === 'loading' ? 'Preparando Python en este dispositivo. La primera carga puede tardar.' : 'El ejecutor necesita atención. Consulta el resultado para ver opciones.'}
-        </p>
-      )}
-
-      <div
-        id="practice-panel-instructions"
-        role="tabpanel"
-        aria-labelledby="practice-tab-instructions"
-        className={`${mobilePanel === 'instructions' ? 'block' : 'hidden'} md:hidden`}
-      >
-        <section className="border-l-2 border-[var(--theme-border-dark)] bg-[var(--theme-bg-secondary)] p-4 sm:p-5">
-          <h2 className="font-serif text-xl">Guía de práctica</h2>
-          <p className="mt-2 text-sm leading-6 text-[var(--theme-muted)]">{instructions}</p>
-          <button
-            type="button"
-            onClick={() => {
-              setMobilePanel('editor');
-              setEditorRequested(true);
-              if (workerState === 'idle') {
-              }
-            }}
-            className="mt-4 min-h-12 w-full bg-[var(--theme-accent)] px-5 py-3 text-sm font-semibold text-[var(--theme-ink-inverse)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"
-          >
-            Ir al editor
-          </button>
-        </section>
-      </div>
-
-      <div
-        id="practice-panel-editor"
-        role="tabpanel"
-        aria-labelledby="practice-tab-editor"
-        className={`${mobilePanel === 'editor' ? 'block' : 'hidden'} space-y-4 md:block`}
-      >
-        {(editorRequested || desktopLayout) && (
-          <>
-        <div className="h-[min(42svh,420px)] min-h-[280px] w-full overflow-hidden border border-[var(--theme-border)] bg-[var(--theme-surface)] sm:h-[460px]">
+      <div className="overflow-hidden border border-[var(--theme-border)] bg-[var(--theme-surface)]">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--theme-border)] px-3 py-2">
+          <span className="text-xs font-semibold text-[var(--theme-muted)]">EDITOR · PYTHON</span>
+          <span className="text-xs text-[var(--theme-muted)]">
+            {workerState === 'ready' ? 'Python preparado' : workerState === 'loading' ? 'Preparando Python…' : workerState === 'error' ? 'Necesita reinicio' : 'Carga al ejecutar'}
+          </span>
+        </div>
+        <div className="h-[min(55svh,540px)] min-h-[300px] w-full">
           <Editor
             height="100%"
             defaultLanguage="python"
             theme="vs"
-            onMount={(editorInstance) => { editorRef.current = editorInstance; }}
             value={code}
+            onMount={(instance) => { editorRef.current = instance; }}
             onChange={(value) => setCode(value ?? '')}
             options={{
               minimap: { enabled: false },
@@ -172,217 +124,95 @@ export default function PythonEditor({
             }}
           />
         </div>
+      </div>
 
-        <div aria-label="Teclas de Python para pantalla táctil" className="flex flex-wrap gap-2 md:hidden">
-          {[
-            { label: '()', accessible: 'Insertar par )ntesis', text: '()', cursor: 1 },
-            { label: '""', accessible: 'Insertar comillas', text: '""', cursor: 1 },
-            { label: ':', accessible: 'Insertar dos puntos', text: ':' },
-            { label: '=', accessible: 'Insertar signo igual', text: '=' },
-            { label: '+', accessible: 'Insertar signo más', text: '+' },
-            { label: '*', accessible: 'Insertar asterisco', text: '*' },
-            { label: 'Tab', accessible: 'Insertar sangría de cuatro espacios', text: '    ' },
-          ].map((key) => (
-            <button
-              key={key.accessible}
-              type="button"
-              aria-label={key.accessible}
-              onClick={() => insertOnMobile(key.text, key.cursor)}
-              className="min-h-11 min-w-11 border border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 font-mono text-base text-[var(--theme-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"
-            >
-              {key.label}
-            </button>
-          ))}
-        </div>
-
-        <label className="block text-base font-semibold text-[var(--theme-ink)] sm:text-sm">
-          Entrada para input() <span className="font-normal text-[var(--theme-muted)]">(una línea por solicitud)</span>
-          <textarea
-            value={input}
-            onChange={(event) => setInput(event.target.value)}
-            maxLength={10000}
-            rows={3}
-            placeholder="Escribe aquí las líneas que leerá tu programa"
-            className="mt-2 block min-h-20 w-full resize-y border border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 py-3 font-mono text-base font-normal text-[var(--theme-ink)] outline-none focus:border-[var(--theme-accent)] focus:ring-1 focus:ring-[var(--theme-focus-ring)] sm:text-sm"
-          />
-        </label>
-          </>
-        )}
-
-        <button
-          type="button"
-          onClick={runCode}
-          disabled={isRunning || workerState === 'loading'}
-          className="flex min-h-12 w-full items-center justify-center bg-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:text-sm"
-        >
-          {isRunning ? 'Ejecutando...' : workerState === 'loading' ? 'Preparando Python...' : 'Ejecutar código'}
+      <div className="flex flex-wrap gap-3">
+        <button type="button" onClick={execute} disabled={isRunning} className="min-h-12 bg-[var(--theme-accent)] px-5 py-3 text-sm font-semibold text-[var(--theme-ink-inverse)] hover:bg-[var(--theme-accent-dark)] disabled:cursor-not-allowed disabled:opacity-50">
+          {isRunning ? 'Ejecutando…' : 'Ejecutar código'}
         </button>
-
+        {exercise && (
+          <button type="button" onClick={checkExercise} disabled={isRunning} className="min-h-12 border border-[var(--theme-accent)] px-5 py-3 text-sm font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-bg-secondary)] disabled:cursor-not-allowed disabled:opacity-50">
+            {isRunning ? 'Comprobando…' : 'Comprobar ejercicio'}
+          </button>
+        )}
+        <button type="button" onClick={resetCode} disabled={isRunning} className="min-h-12 border border-[var(--theme-border)] px-4 py-3 text-sm font-semibold text-[var(--theme-muted)] hover:bg-[var(--theme-bg-secondary)] disabled:opacity-50">
+          Restaurar código inicial
+        </button>
         {workerState === 'error' && (
-          <button
-            type="button"
-            onClick={() => {
-              stopWorker();
-              createWorker();
-            }}
-            className="flex min-h-11 w-full items-center justify-center border border-[var(--theme-accent)] px-4 py-2 text-sm font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] sm:w-auto"
-          >
-            Reintentar carga
+          <button type="button" onClick={() => { stopWorker(); createWorker(); }} className="min-h-12 border border-[var(--theme-accent)] px-4 py-3 text-sm font-semibold text-[var(--theme-accent)]">
+            Volver a cargar Python
           </button>
         )}
       </div>
 
-      <div
-        id="practice-panel-output"
-        role="tabpanel"
-        aria-labelledby="practice-tab-output"
-        className={`${mobilePanel === 'output' ? 'block' : 'hidden'} mt-4 md:block`}
-      >
-        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-sm font-semibold text-[var(--theme-ink)]">Salida del programa</h2>
-          <span className="text-xs text-[var(--theme-muted)]">{isRunning ? 'Ejecución en curso' : workerState === 'ready' ? 'Ejecución local en el navegador' : 'Entorno Python'}</span>
+      <p className="text-xs leading-5 text-[var(--theme-muted)]">
+        El código se guarda automáticamente en este navegador. Ejecutar y comprobar ejercicios ocurre localmente; aprobar la evaluación de la lección es lo que registra el avance de la academia.
+      </p>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div>
+          <label htmlFor="python-input" className="block text-sm font-semibold text-[var(--theme-ink)]">
+            Datos para input() <span className="font-normal text-[var(--theme-muted)]">(una línea por entrada)</span>
+          </label>
+          <textarea id="python-input" value={input} onChange={(event) => setInput(event.target.value)} maxLength={10000} rows={3} placeholder="Por ejemplo: Ana&#10;25" className={inputClass} />
         </div>
-        <pre
-          aria-live="polite"
-          aria-atomic="true"
-          className="max-h-[42svh] min-h-28 overflow-auto whitespace-pre-wrap break-words border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] p-4 font-mono text-sm leading-6 text-[var(--theme-ink)] sm:max-h-64"
-        >
-          {output || (workerState === 'ready' ? '> Entorno listo. Ejecuta código para consultar el resultado.' : '> Preparando el entorno Python en el navegador...')}
-        </pre>
-        <button
-          type="button"
-          onClick={runCode}
-          disabled={isRunning || workerState === 'loading'}
-          className="mt-3 flex min-h-12 w-full items-center justify-center border border-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50 md:hidden"
-        >
-          {isRunning ? 'Ejecutando...' : 'Ejecutar de nuevo'}
-        </button>
-        {isRunning && (
-          <button
-            type="button"
-            onClick={stopWorker}
-            className="mt-3 flex min-h-12 w-full items-center justify-center border border-[var(--theme-border-dark)] px-5 py-3 text-base font-semibold text-[var(--theme-muted)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-border-dark)]"
-          >
-            Detener
-          </button>
-        )}
-        {workerState === 'error' && (
-          <button
-            type="button"
-            onClick={() => {
-            }}
-            className="mt-2 flex min-h-11 w-full items-center justify-center border border-[var(--theme-accent)] px-4 py-2 text-sm font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-surface)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] md:hidden"
-          >
-            Reintentar carga de Python
-          </button>
-        )}
+        <div>
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <h3 className="text-sm font-semibold text-[var(--theme-ink)]">Salida de Python</h3>
+            {isRunning && <span className="text-xs text-[var(--theme-muted)]">En ejecución…</span>}
+          </div>
+          <pre aria-live="polite" className="min-h-28 max-h-64 overflow-auto whitespace-pre-wrap break-words border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] p-4 font-mono text-sm leading-6 text-[var(--theme-ink)]">
+            {error ? `${output}${output ? '\n' : ''}Error: ${error}` : output || 'La salida aparecerá aquí cuando ejecutes el programa.'}
+          </pre>
+        </div>
       </div>
 
-      <div
-        id="practice-panel-turtle"
-        role="tabpanel"
-        aria-labelledby="practice-tab-turtle"
-        className={`${mobilePanel === 'turtle' ? 'block' : 'hidden'} mt-4 md:block`}
-      >
-        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-sm font-semibold text-[var(--theme-ink)]">Gráficos de Turtle</h2>
-          <span className="text-xs text-[var(--theme-muted)]">{turtleCommands.length > 0 ? `${turtleCommands.length} trazo(s) dibujado(s)` : 'Ejecuta código con Turtle para ver el dibujo'}</span>
+      {exercise && testResults.length > 0 && (
+        <section aria-live="polite" className="border border-[var(--theme-border)] p-4 sm:p-5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="font-semibold text-[var(--theme-ink)]">Pruebas del ejercicio</h3>
+            <span className="text-sm text-[var(--theme-muted)]">{testResults.filter((test) => test.passed).length} / {testResults.length} superadas</span>
+          </div>
+          <ol className="mt-3 space-y-3">
+            {testResults.map((test) => (
+              <li key={test.index} className="border-t border-[var(--theme-border)] pt-3 text-sm">
+                <p className={test.passed ? 'font-semibold text-[var(--theme-accent)]' : 'font-semibold text-[var(--theme-error)]'}>
+                  {test.passed ? 'Correcta' : 'Revisar'} · Prueba {test.index}
+                </p>
+                <p className="mt-1 text-[var(--theme-muted)]">Esperado: <code className="font-mono">{test.expected || '(sin salida)'}</code></p>
+                <p className="mt-1 text-[var(--theme-muted)]">Obtenido: <code className="font-mono">{test.actual || '(sin salida)'}</code></p>
+                {test.error && <p className="mt-1 text-[var(--theme-error)]">{test.error}</p>}
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
+      <section className="border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] p-4 sm:p-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="font-semibold text-[var(--theme-ink)]">Gráficos con Turtle</h3>
+          <button type="button" onClick={clearTurtle} disabled={turtleCommands.length === 0} className="min-h-10 text-xs font-semibold text-[var(--theme-accent)] underline underline-offset-4 disabled:opacity-50">
+            Limpiar gráfico
+          </button>
         </div>
-        {turtleError && (
-          <p className="mb-2 text-sm text-[var(--theme-error)] bg-[var(--theme-error-light)] border border-[var(--theme-error)] px-3 py-2 rounded">
-            {turtleError}
-          </p>
-        )}
-        <div className="flex flex-col items-center justify-center min-h-[200px] max-h-[600px] overflow-auto border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] rounded-lg">
+        <p className="mt-1 text-xs text-[var(--theme-muted)]">Los dibujos aparecen aquí después de ejecutar código que use Turtle.</p>
+        <div className="mt-3 flex min-h-48 max-h-[600px] items-center justify-center overflow-auto border border-[var(--theme-border)] bg-white">
           {turtleCommands.length === 0 ? (
-            <p className="text-sm text-[var(--theme-muted)] py-4">
-              Ejecuta código Python con la librería turtle para ver el dibujo aquí.
-            </p>
+            <span className="px-4 py-8 text-sm text-[var(--theme-muted)]">Aún no hay trazos que mostrar.</span>
           ) : (
-            <svg
-              className="w-full max-w-[600px] max-h-[500px]"
-              viewBox="-250 -250 500 500"
-              preserveAspectRatio="xMidYMid meet"
-            >
-              {turtleCommands.map((cmd, idx) => {
-                if (cmd.type === 'line') {
-                  return (
-                    <line
-                      key={`turtle-line-${idx}`}
-                      x1={cmd.x1!}
-                      y1={-cmd.y1!}
-                      x2={cmd.x2!}
-                      y2={-cmd.y2!}
-                      stroke={cmd.color ?? 'black'}
-                      strokeWidth={cmd.size ?? 1}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  );
-                }
-                if (cmd.type === 'dot') {
-                  return (
-                    <circle
-                      key={`turtle-dot-${idx}`}
-                      cx={cmd.x!}
-                      cy={-cmd.y!}
-                      r={(cmd.size ?? 2) / 2}
-                      fill={cmd.color ?? 'black'}
-                    />
-                  );
-                }
-                if (cmd.type === 'fill') {
-                  return (
-                    <polygon
-                      key={`turtle-fill-${idx}`}
-                      points={cmd.points?.map(([x, y]) => `${x},${-y}`).join(' ') ?? ''}
-                      fill={cmd.color ?? 'black'}
-                      fillOpacity="0.6"
-                    />
-                  );
-                }
-                if (cmd.type === 'write') {
-                  return (
-                    <text
-                      key={`turtle-write-${idx}`}
-                      x={cmd.x!}
-                      y={-cmd.y!}
-                      fill={cmd.color ?? 'black'}
-                      fontSize={12}
-                      fontFamily="monospace"
-                      textAnchor="start"
-                      dominantBaseline="middle"
-                    >
-                      {cmd.text}
-                    </text>
-                  );
-                if (cmd.type === "bgcolor") {
-                  return (
-                    <rect
-                      key={`turtle-bgcolor-${idx}`}
-                      x="-250"
-                      y="-250"
-                      width="500"
-                      height="500"
-                      fill={cmd.color ?? "white"}
-                    />
-                  );
-                }
-                }
+            <svg className="max-h-[500px] w-full max-w-[600px]" viewBox="-250 -250 500 500" preserveAspectRatio="xMidYMid meet">
+              {turtleCommands.map((command, index) => {
+                if (command.type === 'line') return <line key={index} x1={command.x1 ?? 0} y1={-(command.y1 ?? 0)} x2={command.x2 ?? 0} y2={-(command.y2 ?? 0)} stroke={command.color ?? 'black'} strokeWidth={command.size ?? 1} strokeLinecap="round" />;
+                if (command.type === 'dot') return <circle key={index} cx={command.x ?? 0} cy={-(command.y ?? 0)} r={(command.size ?? 2) / 2} fill={command.color ?? 'black'} />;
+                if (command.type === 'fill') return <polygon key={index} points={command.points?.map(([x, y]) => `${x},${-y}`).join(' ') ?? ''} fill={command.color ?? 'black'} fillOpacity="0.6" />;
+                if (command.type === 'write') return <text key={index} x={command.x ?? 0} y={-(command.y ?? 0)} fill={command.color ?? 'black'} fontSize={12} fontFamily="monospace">{command.text}</text>;
+                if (command.type === 'bgcolor') return <rect key={index} x="-250" y="-250" width="500" height="500" fill={command.color ?? 'white'} />;
                 return null;
               })}
             </svg>
           )}
         </div>
-        <button
-          type="button"
-          onClick={() => {}}
-          disabled={turtleCommands.length === 0}
-          className="mt-3 flex min-h-11 w-full items-center justify-center border border-[var(--theme-accent)] px-4 py-2 text-sm font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50 md:hidden"
-        >
-          Limpiar gráfico
-        </button>
-      </div>
+      </section>
     </section>
   );
 }

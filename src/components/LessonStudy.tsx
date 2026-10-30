@@ -6,14 +6,16 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, CheckCircle2, LogOut } from 'lucide-react';
 import { logout } from '@/app/login/actions';
 import { createClient } from '@/lib/supabase/client';
-import type { CourseLesson, QuizQuestion } from '@/lib/course';
+import type { CourseExercise, CourseLesson, QuizQuestion } from '@/lib/course';
 import { submitQuiz, type SubmitQuizResult } from '@/lib/server-quiz/submit-quiz.action';
 
 type ClientSafeQuizQuestion = Omit<QuizQuestion, 'answer' | 'explanation'>;
+type ClientSafeExercise = Omit<CourseExercise, 'solution'>;
 
 type Props = {
-  lesson: Omit<CourseLesson, 'questions'> & {
+  lesson: Omit<CourseLesson, 'questions' | 'exercise'> & {
     questions: ClientSafeQuizQuestion[];
+    exercise: ClientSafeExercise;
   };
   moduleId: string;
   moduleNumber: string;
@@ -123,7 +125,7 @@ export default function LessonStudy({
 
       if (serverResult.passed) {
         setCompleted(true);
-        setSavedScore(Math.max(initialScore, serverResult.score));
+        setSavedScore((current) => Math.max(current, serverResult.score));
         setFeedback('Evaluación aprobada y progreso guardado en tu cuenta.');
       } else {
         setFeedback('Aún no alcanzas el puntaje necesario. Revisa la retroalimentación y vuelve a intentarlo.');
@@ -202,7 +204,7 @@ export default function LessonStudy({
             <section aria-labelledby="exercise-title" className="border-l-2 border-[var(--theme-border-dark)] bg-[var(--theme-bg-secondary)] p-5 sm:p-6">
               <h2 id="exercise-title" className="font-serif text-xl">Práctica sugerida</h2>
               <p className="mt-3 text-sm leading-7 text-[var(--theme-muted)]">{lesson.exercise?.statement ?? ''}</p>
-              <Link href="/practica" className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">Abrir el laboratorio</Link>
+              <Link href={`/practica?moduleId=${moduleId}&lessonId=${lesson.id}`} className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">Abrir esta actividad en el laboratorio</Link>
             </section>
 
             <section aria-labelledby="quiz-title">

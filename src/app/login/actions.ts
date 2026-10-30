@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { resolveAuthCallbackUrl } from '@/lib/auth-callback-url';
 import { createClient } from '@/lib/supabase/server';
+import { parseOptionalInvitationCode } from '@/lib/invitation-code';
 
 export async function login(formData: FormData) {
   const email = String(formData.get('email') ?? '').trim();
@@ -49,6 +50,9 @@ export async function signup(formData: FormData) {
   const email = String(formData.get('email') ?? '').trim();
   const password = String(formData.get('password') ?? '');
   const captchaToken = String(formData.get('captchaToken') ?? '');
+  const invitation = parseOptionalInvitationCode(String(formData.get('invitation_code') ?? ''));
+
+  if (!invitation.ok) redirect('/login?error=invitation');
 
   if (!fullName || !email || !password) {
     redirect('/login?error=missing');
@@ -79,6 +83,7 @@ export async function signup(formData: FormData) {
     options: {
       data: {
         full_name: fullName,
+        ...(invitation.code ? { invitation_code: invitation.code } : {}),
       },
       emailRedirectTo,
       captchaToken: captchaToken || undefined,
@@ -86,7 +91,8 @@ export async function signup(formData: FormData) {
   });
 
   if (error) {
-      redirect('/login?error=signup');
+    const invitationError = /invitation.*(invalid|expired|used)|invitation is/i.test(error.message);
+    redirect(invitationError ? '/login?error=invitation' : '/login?error=signup');
   }
 
   if (data.session) {

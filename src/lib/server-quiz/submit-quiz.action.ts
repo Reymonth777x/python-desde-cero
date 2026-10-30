@@ -25,10 +25,10 @@ function parseAnswers(formData: FormData): number[] | null {
   }
   try {
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) {
+    if (!Array.isArray(parsed) || !parsed.every((answer) => Number.isSafeInteger(answer) && answer >= 0)) {
       return null;
     }
-    return parsed.filter((a): a is number => typeof a === 'number');
+    return parsed as number[];
   } catch {
     return null;
   }
@@ -149,20 +149,21 @@ export async function submitQuiz(
   );
 
   if (rpcError) {
-    return {
-      score,
-      passed,
-      correct,
-      total,
-      explanations,
-      completed: false,
-      error: rpcError.message,
-    };
+    console.error('[quiz-submit]', { moduleId, lessonId, code: rpcError.code, message: rpcError.message });
+    const message = rpcError.message.toLowerCase();
+    const safeMessage = message.includes('demasiados intentos')
+      ? 'Alcanzaste el límite temporal de intentos. Espera un minuto y vuelve a intentarlo.'
+      : message.includes('no autenticado')
+        ? 'Tu sesión no está activa. Inicia sesión nuevamente para guardar la evaluación.'
+        : 'No se pudo registrar el resultado en tu cuenta. Vuelve a intentarlo; no se ha confirmado el guardado.';
+    return { score, passed, correct, total, explanations, completed: false, error: safeMessage };
   }
 
-  const completed = Boolean(rpcResult?.completed);
-  const rpcScore = Number(rpcResult?.score ?? score);
   const rpcPassed = Boolean(rpcResult?.passed ?? passed);
+  // The deployed RPC returns `passed` but not `completed`; keep completion
+  // consistent with the confirmed server-side grading result.
+  const completed = Boolean(rpcResult?.completed ?? rpcPassed);
+  const rpcScore = Number(rpcResult?.score ?? score);
   const rpcCorrect = Number(rpcResult?.correct ?? correct);
   const rpcTotal = Number(rpcResult?.total ?? total);
 

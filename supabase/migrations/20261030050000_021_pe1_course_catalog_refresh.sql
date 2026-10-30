@@ -1,0 +1,51 @@
+-- Replace the active PE1 answer keys without changing historical module-5 data.
+-- v2 indexes match the displayed option order; no client-side option shuffle is used.
+DELETE FROM private.quiz_answer_key
+WHERE module_id IN ('module-1', 'module-2', 'module-3', 'module-4');
+
+INSERT INTO private.quiz_answer_key
+  (module_id, lesson_id, question_index, correct_option, option_count, correct_option_v2)
+VALUES
+  ('module-1', 'b1-l1', 0, 0, 4, 0),
+  ('module-1', 'b1-l2', 0, 0, 4, 0),
+  ('module-1', 'b1-l3', 0, 0, 4, 0),
+  ('module-1', 'b1-l4', 0, 0, 4, 0),
+  ('module-1', 'b1-l4', 1, 0, 4, 0),
+  ('module-1', 'b1-l4', 2, 0, 4, 0),
+  ('module-1', 'b1-l4', 3, 0, 4, 0),
+  ('module-1', 'b1-l4', 4, 0, 4, 0),
+  ('module-2', 'b2-l1', 0, 0, 4, 0),
+  ('module-2', 'b2-l2', 0, 0, 4, 0),
+  ('module-2', 'b2-l3', 0, 0, 4, 0),
+  ('module-2', 'b2-l4', 0, 0, 4, 0),
+  ('module-2', 'b2-l5', 0, 0, 4, 0),
+  ('module-2', 'b2-l6', 0, 0, 4, 0),
+  ('module-2', 'b2-l7', 0, 0, 4, 0),
+  ('module-2', 'b2-l7', 1, 0, 4, 0),
+  ('module-2', 'b2-l7', 2, 0, 4, 0),
+  ('module-2', 'b2-l7', 3, 0, 4, 0),
+  ('module-2', 'b2-l7', 4, 0, 4, 0),
+  ('module-3', 'b3-l1', 0, 0, 4, 0),
+  ('module-3', 'b3-l2', 0, 0, 4, 0),
+  ('module-3', 'b3-l3', 0, 0, 4, 0),
+  ('module-3', 'b3-l4', 0, 0, 4, 0),
+  ('module-3', 'b3-l5', 0, 0, 4, 0),
+  ('module-3', 'b3-l6', 0, 0, 4, 0),
+  ('module-3', 'b3-l7', 0, 0, 4, 0),
+  ('module-3', 'b3-l8', 0, 0, 4, 0),
+  ('module-3', 'b3-l8', 1, 0, 4, 0),
+  ('module-3', 'b3-l8', 2, 0, 4, 0),
+  ('module-3', 'b3-l8', 3, 0, 4, 0),
+  ('module-3', 'b3-l8', 4, 0, 4, 0),
+  ('module-4', 'b4-l1', 0, 0, 4, 0),
+  ('module-4', 'b4-l2', 0, 0, 4, 0),
+  ('module-4', 'b4-l3', 0, 0, 4, 0),
+  ('module-4', 'b4-l4', 0, 0, 4, 0),
+  ('module-4', 'b4-l5', 0, 0, 4, 0),
+  ('module-4', 'b4-l6', 0, 0, 4, 0),
+  ('module-4', 'b4-l7', 0, 0, 4, 0),
+  ('module-4', 'b4-l8', 0, 0, 4, 0),
+  ('module-4', 'b4-l8', 1, 0, 4, 0),
+  ('module-4', 'b4-l8', 2, 0, 4, 0),
+  ('module-4', 'b4-l8', 3, 0, 4, 0),
+  ('module-4', 'b4-l8', 4, 0, 4, 0);

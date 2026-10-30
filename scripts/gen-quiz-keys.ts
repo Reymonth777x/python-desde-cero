@@ -1,29 +1,31 @@
 import { courseModules } from '../src/lib/course';
 
-function generateQuizKeysSql(): string {
-  const lines: string[] = [
-    '-- Generado por scripts/gen-quiz-keys.ts desde src/lib/course.ts',
-    '-- NO EDITAR MANUALMENTE: regénere con `npx tsx scripts/gen-quiz-keys.ts`',
-    '',
-    'TRUNCATE TABLE private.quiz_keys RESTART IDENTITY CASCADE;',
-    '',
-  ];
+function sqlString(value: string): string {
+  return value.replace(/'/g, "''");
+}
 
+function generateQuizKeysSql(): string {
+  const rows: string[] = [];
   for (const courseModule of courseModules) {
     for (const lesson of courseModule.lessons) {
-      if (!lesson.questions || lesson.questions.length === 0) continue;
-
-      for (let qIndex = 0; qIndex < lesson.questions.length; qIndex++) {
-        const q = lesson.questions[qIndex];
-        lines.push(
-          `INSERT INTO private.quiz_keys (module_id, lesson_id, question_index, correct_index, options_count) VALUES ('${courseModule.id}', '${lesson.id}', ${qIndex}, ${q.answer}, ${q.options.length});`
+      lesson.questions.forEach((question, questionIndex) => {
+        rows.push(
+          `  ('${sqlString(courseModule.id)}', '${sqlString(lesson.id)}', ${questionIndex}, ${question.answer}, ${question.options.length}, ${question.answer})`,
         );
-      }
+      });
     }
   }
 
-  lines.push('');
-  return lines.join('\n');
+  return [
+    '-- Generated from src/lib/course.ts; review before applying.',
+    "DELETE FROM private.quiz_answer_key WHERE module_id IN ('module-1', 'module-2', 'module-3', 'module-4');",
+    '',
+    'INSERT INTO private.quiz_answer_key (module_id, lesson_id, question_index, correct_option, option_count, correct_option_v2)',
+    'VALUES',
+    rows.join(',\n'),
+    ';',
+    '',
+  ].join('\n');
 }
 
 console.log(generateQuizKeysSql());

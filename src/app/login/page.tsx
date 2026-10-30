@@ -17,6 +17,12 @@ const errors: Record<string, string> = {
   logout: 'No se pudo cerrar la sesión. Inténtalo de nuevo.',
   configuration: 'El registro no está configurado para este entorno.',
   signup: 'No se pudo crear la cuenta. Revisa tus datos e inténtalo de nuevo.',
+  invitation: 'El código de invitación no es válido, ya venció o ya fue utilizado. Verifícalo con quien te lo compartió.',
+};
+
+const messages: Record<string, string> = {
+  'check-email': 'Revisa tu correo para confirmar la cuenta antes de iniciar sesión.',
+  'signed-out': 'Has cerrado la sesión correctamente.',
 };
 
 const inputStyle =
@@ -54,10 +60,10 @@ export default function LoginPage({ searchParams }: Props) {
           <h1 className="mt-2 font-serif text-3xl leading-tight sm:text-4xl">{isSignup ? 'Únete a Python desde cero' : 'Bienvenido de vuelta'}</h1>
           <p className="mt-4 max-w-md leading-7 text-[var(--theme-muted)]">{isSignup ? 'Regístrate gratis para guardar tu progreso y acceder a todas las lecciones.' : 'Accede a tus lecciones, practica Python y guarda tus avances.'}</p>
           {params.error && (
-            <div role="alert" className="mt-6 max-w-md border-l-4 border-[var(--theme-error)] bg-[var(--theme-surface)] px-4 py-3 text-sm leading-6 text-[var(--theme-ink)]">{params.error}</div>
+            <div role="alert" className="mt-6 max-w-md border-l-4 border-[var(--theme-error)] bg-[var(--theme-surface)] px-4 py-3 text-sm leading-6 text-[var(--theme-ink)]">{errors[params.error] ?? params.error}</div>
           )}
           {params.message && (
-            <div role="status" className="mt-6 max-w-md border-l-4 border-[var(--theme-accent)] bg-[var(--theme-surface)] px-4 py-3 text-sm leading-6 text-[var(--theme-ink)]">{params.message}</div>
+            <div role="status" className="mt-6 max-w-md border-l-4 border-[var(--theme-accent)] bg-[var(--theme-surface)] px-4 py-3 text-sm leading-6 text-[var(--theme-ink)]">{messages[params.message] ?? params.message}</div>
           )}
           <div className="mt-8">
             <div className="flex -mx-1">
@@ -73,6 +79,11 @@ export default function LoginPage({ searchParams }: Props) {
                 <div>
                   <label htmlFor="signup-email" className="text-sm font-semibold">Correo electrónico</label>
                   <input id="signup-email" name="email" type="email" autoComplete="email" required className={inputStyle} />
+                </div>
+                <div>
+                  <label htmlFor="invitation-code" className="text-sm font-semibold">Código de invitación (opcional)</label>
+                  <input id="invitation-code" name="invitation_code" type="text" autoComplete="off" maxLength={32} pattern="[A-Za-z0-9]+(-[A-Za-z0-9]+)*" placeholder="PE1-EQUIPO-2026" className={inputStyle} />
+                  <p className="mt-2 text-xs text-[var(--theme-muted)]">Solo si recibiste un código del equipo. Puedes dejarlo vacío.</p>
                 </div>
                 <div>
                   <label htmlFor="signup-password" className="text-sm font-semibold">Contraseña</label>

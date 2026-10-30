@@ -4,23 +4,28 @@ import {
   courseModules,
   findCourseLesson,
   findCourseModule,
+  type CourseExercise,
   type CourseLesson,
   type QuizQuestion,
 } from '@/lib/course';
 import { createClient } from '@/lib/supabase/server';
 
 type ClientSafeQuizQuestion = Omit<QuizQuestion, 'answer' | 'explanation'>;
+type ClientSafeExercise = Omit<CourseExercise, 'solution'>;
 
 /**
  * Devuelve una copia de la lección sin los campos `answer` ni `explanation`
  * de cada pregunta. Así las respuestas correctas nunca viajan al cliente.
  * El cliente solo recibe prompt, options y el contenido visible de la lección.
  */
-function stripQuizAnswers(lesson: CourseLesson): Omit<CourseLesson, 'questions'> & {
+function stripQuizAnswers(lesson: CourseLesson): Omit<CourseLesson, 'questions' | 'exercise'> & {
   questions: ClientSafeQuizQuestion[];
+  exercise: ClientSafeExercise;
 } {
+  const { solution: _solution, ...safeExercise } = lesson.exercise;
   return {
     ...lesson,
+    exercise: safeExercise,
     questions: lesson.questions.map(({ prompt, options }) => ({ prompt, options })),
   };
 }
