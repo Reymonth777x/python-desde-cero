@@ -2469,11 +2469,11 @@ export const courseModules: CourseModule[] = [
             "prompt": "¿Qué muestra print(f\"Total: {precio:.2f}\") si precio = 1250.5?",
             "options": [
               "Total: 1250.5",
-              "Total: 1250.50",
               "Total: {precio:.2f}",
-              "Error: las f-strings no admiten decimales"
+              "Error: las f-strings no admiten decimales",
+              "Total: 1250.50"
             ],
-            "answer": 1,
+            "answer": 3,
             "explanation": "El formato :.2f muestra dos posiciones decimales, así que 1250.5 se presenta como 1250.50."
           },
           {
