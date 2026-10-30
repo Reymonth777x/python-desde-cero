@@ -76,6 +76,7 @@ describe('HomeProgressSummary', () => {
     const element = await HomeProgressSummary();
     const html = renderToStaticMarkup(element as React.ReactElement);
     expect(html).toContain('no se pudo consultar el avance');
+    expect(html).toContain('id="progreso"');
     expect(html).toContain('/academia');
   });
 });
