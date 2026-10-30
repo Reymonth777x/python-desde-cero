@@ -98,6 +98,31 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(algoritmo.options[algoritmo.answer]).toBe('Una secuencia finita y ordenada de pasos para resolver un problema');
   });
 
+  it('enseña Bubble Sort completo con dos bucles y un recorrido interior decreciente', () => {
+    const lesson = courseModules
+      .find((courseModule) => courseModule.id === 'module-3')!
+      .lessons.find((item) => item.id === 'b3-l7')!;
+    const completeExample = lesson.example.split('# Bubble sort completo')[1] ?? '';
+
+    expect(completeExample).toContain('for pasada in range(len(numeros_completos) - 1):');
+    expect(completeExample).toContain('for indice in range(len(numeros_completos) - 1 - pasada):');
+    expect(completeExample).toContain('temporal = numeros_completos[indice]');
+    expect(completeExample).not.toContain('.sort(');
+    expect(completeExample).not.toContain('sorted(');
+
+    expect(lesson.exampleOutput).toContain('Pasada 1: [2, 4, 1, 5]');
+    expect(lesson.exampleOutput).toContain('Pasada 2: [2, 1, 4, 5]');
+    expect(lesson.exampleOutput).toContain('Pasada 3: [1, 2, 4, 5]');
+    expect(lesson.exampleOutput).toContain('Resultado: [1, 2, 4, 5]');
+    expect(lesson.walkthrough.join(' ')).toContain('se acorta');
+    expect(lesson.exercise.statement).toContain('No uses sort() ni sorted()');
+    expect(lesson.exercise.starterCode).toContain('for indice in range(len(numeros) - 1 - pasada):');
+    expect(lesson.exercise.starterCode).toContain('print(numeros)');
+    expect(lesson.exercise.solution).toContain('for indice in range(len(numeros) - 1 - pasada):');
+    expect(lesson.exercise.solution).not.toContain('.sort(');
+    expect(lesson.exercise.solution).not.toContain('sorted(');
+  });
+
   it('mantiene los laboratorios integradores antes de las evaluaciones de módulo', () => {
     expect(courseModules[1].lessons.map((item) => item.id)).toEqual([
       'b2-l9',
