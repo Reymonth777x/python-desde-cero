@@ -24,7 +24,7 @@ La ruta de esta academia tiene cuatro módulos principales y 30 unidades, pero t
 
 El módulo 3 ahora sigue la secuencia oficial de prerequisitos: decisiones → ciclos → lógica/bit a bit → listas → ordenamiento → operaciones y aplicaciones avanzadas con listas → evaluación. La práctica con listas anidadas aparece después de dominar listas simples.
 
-El módulo 2 contiene literales, operadores, variables, comentarios, salida e interacción, pero aún requiere una pasada de alineación para incluir explícitamente “Hello, World!” como sección 2.1 y verificar que el orden y la numeración coincidan con la estructura oficial.
+El módulo 2 contiene literales, operadores, variables, comentarios, salida e interacción, pero aún requiere una pasada de alineación para incluir explícitamente “Hello, World!” como sección 2.1 y verificar que el orden y la numeración coincidan con la estructura oficial. Los laboratorios integradores de los módulos 2 y 4 se colocaron antes de sus evaluaciones; los módulos 2, 3 y 4 ahora terminan con su evaluación formal.
 
 ## Estado real del catálogo en la rama principal de trabajo
 
