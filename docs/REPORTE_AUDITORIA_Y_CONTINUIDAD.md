@@ -1,4 +1,4 @@
-﻿# REPORTE DE AUDITORIA Y CONTINUIDAD — Python desde Cero
+# REPORTE DE AUDITORIA Y CONTINUIDAD — Python desde Cero
 
 ## Estado del Proyecto
 
