@@ -3,7 +3,7 @@ import ThemeSelector from '@/components/ThemeSelector';
 import { ArrowRight, BookOpenCheck, Circle, Lock, LogOut } from 'lucide-react';
 import { logout } from '@/app/login/actions';
 import { courseCatalog } from '@/lib/course-catalog';
-import { canAccessLessonInSequence } from '@/lib/lesson-access';
+import { canAccessLessonInSequence, findFirstIncompleteLessonIndex } from '@/lib/lesson-access';
 
 export type ProgressRow = {
   module_id: string;
@@ -251,14 +251,20 @@ export default function AcademyDashboard({
                     );
 
                     if (!lessonUnlocked) {
+                      const firstIncompleteIndex = findFirstIncompleteLessonIndex(
+                        courseModule.id,
+                        courseModule.lessons.slice(0, lessonIndex),
+                        progressRows,
+                        progressUnavailable,
+                      );
                       const lockDescription = progressUnavailable
                         ? 'No se pudo consultar el progreso. Actualiza la página cuando se recupere la conexión.'
                         : !unlocked
                           ? prevAssessment
                             ? `Completa la evaluación del módulo ${prevModule.number} para desbloquear este módulo.`
                             : 'Completa el módulo anterior para desbloquear este módulo.'
-                          : lessonIndex > 0
-                            ? `Completa «${courseModule.lessons[lessonIndex - 1].title}» para desbloquear esta lección.`
+                          : firstIncompleteIndex >= 0
+                            ? `Completa «${courseModule.lessons[firstIncompleteIndex].title}» para desbloquear esta lección.`
                             : 'Esta lección estará disponible cuando podamos comprobar tu progreso.';
                       // Show lessons as locked, no links
                       return (
