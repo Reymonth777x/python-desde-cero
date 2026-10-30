@@ -37,7 +37,10 @@ export function resolvePythonRunnerOrigin(
       return url.origin;
     }
 
-    if (url.protocol !== 'https:' || !url.hostname.endsWith('.workers.dev')) return null;
+    if (
+      url.protocol !== 'https:' ||
+      !/^python-desdecero-runner\\.[a-z0-9-]+\\.workers\\.dev$/.test(url.hostname)
+    ) return null;
     return url.origin;
   } catch {
     return null;
