@@ -300,6 +300,8 @@ BEGIN
 END;
 $function$;
 
+-- The private evaluator owns SECURITY DEFINER and validates auth.uid().
+-- Both public RPCs are invoker wrappers; private schema is not exposed by the Data API.
 CREATE OR REPLACE FUNCTION public.submit_quiz_v2(
   p_module_id text,
   p_lesson_id text,
@@ -309,10 +311,11 @@ RETURNS jsonb
 LANGUAGE sql
 SET search_path = ''
 AS $function$
-  SELECT public.submit_quiz_v2(p_module_id,p_lesson_id,p_answers);
+  SELECT private.submit_quiz_authoritative_v2(p_module_id,p_lesson_id,p_answers);
 $function$;
 
 -- Backward-compatible function name; both routes use the authoritative v2 key.
+-- Backward-compatible invoker wrapper.
 CREATE OR REPLACE FUNCTION public.submit_quiz(
   p_module_id text,
   p_lesson_id text,
@@ -320,10 +323,9 @@ CREATE OR REPLACE FUNCTION public.submit_quiz(
 )
 RETURNS jsonb
 LANGUAGE sql
-SECURITY DEFINER
 SET search_path = ''
 AS $function$
-  SELECT private.submit_quiz_authoritative_v2(p_module_id,p_lesson_id,p_answers);
+  SELECT public.submit_quiz_v2(p_module_id,p_lesson_id,p_answers);
 $function$;
 
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
@@ -389,6 +391,7 @@ REVOKE ALL ON FUNCTION private.current_user_is_admin() FROM PUBLIC,anon;
 GRANT EXECUTE ON FUNCTION private.current_user_is_admin() TO authenticated;
 REVOKE ALL ON FUNCTION private.prevent_used_invitation_deletion() FROM PUBLIC,anon,authenticated;
 REVOKE ALL ON FUNCTION private.submit_quiz_authoritative_v2(text,text,integer[]) FROM PUBLIC,anon,authenticated;
+GRANT EXECUTE ON FUNCTION private.submit_quiz_authoritative_v2(text,text,integer[]) TO authenticated;
 REVOKE ALL ON FUNCTION public.handle_new_user() FROM PUBLIC,anon,authenticated;
 
 REVOKE ALL ON FUNCTION public.submit_quiz_v2(text,text,integer[]) FROM PUBLIC,anon;
