@@ -51,7 +51,7 @@ export default async function AdminPage() {
             Panel de administración
           </h1>
           <p className="mt-2 leading-7 text-[var(--theme-muted)]">
-            Gestión de usuarios, auditoría y configuración del sistema.
+            Gestiona códigos de invitación y revisa el acceso de nuevos estudiantes.
           </p>
 
           <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -65,22 +65,19 @@ export default async function AdminPage() {
               </Link>
             </div>
             <div className="bg-[var(--theme-surface)] border border-[var(--theme-border)] p-6 rounded-lg">
-              <h3 className="font-semibold text-[var(--theme-ink)] mb-3">Estado del sistema</h3>
+              <h3 className="font-semibold text-[var(--theme-ink)] mb-3">Otras funciones</h3>
               <p className="text-sm text-[var(--theme-muted)] mb-4">
-                Información general del panel de administración.
+                Esta versión del panel permite gestionar invitaciones. La administración de usuarios y la auditoría todavía no están disponibles.
               </p>
               <p className="text-xs text-[var(--theme-muted)]">
-                Las secciones de usuarios y auditoría se activarán próximamente.
+                Las funciones no disponibles no se muestran como herramientas operativas.
               </p>
             </div>
           </div>
 
-          <div className="mt-8 flex gap-4">
-            <Link href="/academia" className="flex-1 min-h-12 border border-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-accent)] text-center transition-colors hover:bg-[var(--theme-bg-secondary)]">
-              Mi ruta de aprendizaje
-            </Link>
-            <Link href="/academia" className="flex-1 min-h-12 border border-[var(--theme-border)] bg-[var(--theme-surface)] px-5 py-3 text-base font-semibold text-[var(--theme-ink)] text-center transition-colors hover:bg-[var(--theme-bg-secondary)]">
-              Academia
+          <div className="mt-8">
+            <Link href="/academia" className="inline-flex min-h-12 w-full items-center justify-center border border-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-accent)] transition-colors hover:bg-[var(--theme-bg-secondary)] sm:w-auto">
+              Volver a Academia
             </Link>
           </div>
         </div>
