@@ -13,6 +13,19 @@ La ruta principal sigue la estructura de Cisco Networking Academy — Python Ess
 
 PE1 no debe mezclarse con contenidos propios de Python Essentials 2. La alineación curricular no significa que esta plataforma sea Cisco ni que otorgue una certificación Cisco/PCEP.
 
+## Referencia oficial de alcance PE1
+
+La página oficial de Cisco Networking Academy consultada el 30-10-2026 describe cuatro módulos, 30 laboratorios prácticos, un proyecto final y una prueba final. El curso está diseñado para principiantes y estima unas 30 horas. La secuencia de módulos y secciones también está publicada allí.
+
+- Curso oficial y secciones: https://www.netacad.com/ja/courses/python-essentials-1?courseLang=en-US
+- Catálogo Cisco 2024 en español: https://www.netacad.com/sites/default/files/course-catalog-es.pdf
+
+La ruta de esta academia tiene cuatro módulos principales y 30 unidades, pero todavía no alcanza paridad académica completa: falta la evaluación formal del módulo 1, falta el examen final global y el proyecto final sigue dentro de la extensión opcional. No presentar la ruta como equivalente ni como preparación suficiente para PCEP hasta cerrar esos tres puntos y verificar las 30 prácticas.
+
+El módulo 3 ahora sigue la secuencia oficial de prerequisitos: decisiones → ciclos → lógica/bit a bit → listas → ordenamiento → operaciones y aplicaciones avanzadas con listas → evaluación. La práctica con listas anidadas aparece después de dominar listas simples.
+
+El módulo 2 contiene literales, operadores, variables, comentarios, salida e interacción, pero aún requiere una pasada de alineación para incluir explícitamente “Hello, World!” como sección 2.1 y verificar que el orden y la numeración coincidan con la estructura oficial.
+
 ## Estado real del catálogo en la rama principal de trabajo
 
 | Área | Estado en el código |
