@@ -149,3 +149,24 @@ test("Las páginas principales no generan desplazamiento horizontal en móvil", 
     }
   }
 });
+
+
+test("El formulario de acceso, registro y recuperación incluye Turnstile cuando está configurado", async ({ page }) => {
+  const testSiteKey = "1x00000000000000000000AA";
+
+  await page.goto("/login");
+  const loginWidget = page.getByTestId("turnstile-widget");
+  await expect(loginWidget).toBeVisible();
+  await expect(loginWidget).toHaveAttribute("data-sitekey", testSiteKey);
+  await expect(page.locator('input[name="captchaToken"]')).toHaveCount(1);
+
+  await page.getByRole("button", { name: "Crear cuenta" }).click();
+  const signupWidget = page.getByTestId("turnstile-widget");
+  await expect(signupWidget).toBeVisible();
+  await expect(signupWidget).toHaveAttribute("data-sitekey", testSiteKey);
+
+  await page.goto("/login/forgot-password");
+  const resetWidget = page.getByTestId("turnstile-widget");
+  await expect(resetWidget).toBeVisible();
+  await expect(resetWidget).toHaveAttribute("data-sitekey", testSiteKey);
+});
