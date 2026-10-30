@@ -15,6 +15,7 @@ type Props = {
   displayName: string;
   progressRows: ProgressRow[];
   progressUnavailable: boolean;
+  isAdmin: boolean;
 };
 
 /** Returns true if the module at moduleIndex is accessible given the progress rows. */
@@ -35,6 +36,7 @@ export default function AcademyDashboard({
   displayName,
   progressRows,
   progressUnavailable,
+  isAdmin,
 }: Props) {
   const completed = (moduleId: string, lessonId: string) =>
     progressRows.some(
@@ -90,6 +92,11 @@ export default function AcademyDashboard({
             <Link href="/practica" className="inline-flex min-h-11 items-center text-[var(--theme-accent)] underline underline-offset-4">
               Laboratorio
             </Link>
+            {isAdmin && (
+              <Link href="/admin" className="inline-flex min-h-11 items-center text-[var(--theme-accent)] underline underline-offset-4">
+                Administración
+              </Link>
+            )}
             <form action={logout}>
               <button type="submit" className="inline-flex min-h-11 items-center gap-2 text-[var(--theme-muted)] underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--theme-focus-ring)]">
                 <LogOut aria-hidden="true" size={16} />
