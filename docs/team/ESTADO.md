@@ -20,7 +20,7 @@
 ## Estado académico real
 
 - PE1 tiene cuatro módulos principales.
-- El catálogo tiene 30 unidades principales y cuatro unidades opcionales de extensión.
+- El catálogo tiene 30 unidades principales y cuatro unidades opcionales de extensión. Cisco describe PE1 con 30 laboratorios, un proyecto final y una prueba final; todavía falta paridad en módulo 1, proyecto final obligatorio y examen global.
 - El módulo 5 es opcional y está fuera del PE1; no se debe sumar al progreso ni presentarlo como módulo oficial.
 - Hay tres evaluaciones formales de módulo; falta la evaluación del módulo 1.
 - b1-l4 ahora es una vista previa breve del intérprete, no una lección de comentarios ni una evaluación. La explicación formal de print(), cadenas y comentarios se trasladó al contenido de módulo 2; falta la evaluación formal de módulo 1.
