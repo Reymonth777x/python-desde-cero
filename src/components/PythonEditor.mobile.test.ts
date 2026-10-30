@@ -18,7 +18,7 @@ describe('Flujo móvil del laboratorio', () => {
 
   it('mantiene ayudas táctiles y el campo de entrada de input()', () => {
     expect(source).toContain('Atajos para escribir en la pantalla táctil');
-    expect(source).toContain('grid grid-cols-7 gap-2');
+    expect(source).toContain('grid grid-cols-4 gap-2');
     expect(source).toContain('Datos que pide tu programa con input()');
     expect(source).toContain('Comprobar ejercicio');
   });
