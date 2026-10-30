@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { useTheme } from '@/app/theme-provider';
 import ThemeSelector from '@/components/ThemeSelector';
 import { ArrowRight, BookOpenCheck, Circle, Lock, LogOut } from 'lucide-react';
 import { logout } from '@/app/login/actions';
@@ -37,7 +36,6 @@ export default function AcademyDashboard({
   progressRows,
   progressUnavailable,
 }: Props) {
-  useTheme();
   const completed = (moduleId: string, lessonId: string) =>
     progressRows.some(
       (row) =>
@@ -79,7 +77,7 @@ export default function AcademyDashboard({
 
   const ctaHref = nextLesson
     ? `/academia/${nextLesson.courseModule.id}/${nextLesson.lesson.id}`
-    : '/academia/module-1/lesson-1';
+    : '/academia/module-1/b1-l1';
 
   return (
     <main className="min-h-screen bg-[var(--theme-bg)] text-[var(--theme-ink)]">
