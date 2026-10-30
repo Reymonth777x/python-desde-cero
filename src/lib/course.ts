@@ -1372,24 +1372,30 @@ export const courseModules: CourseModule[] = [
         "explanation": [
           "Las listas son mutables. append() añade al final, insert(posicion, valor) inserta en una posición, remove(valor) elimina la primera coincidencia y pop() elimina por índice y devuelve el elemento. Antes de eliminar o consultar, verifica que el elemento o índice exista.",
           "sort() ordena la lista original y no devuelve una lista nueva; sorted(lista) crea otra secuencia ordenada sin modificar la fuente. Ambos pueden recibir reverse=True para invertir el orden. Elige sort() cuando quieras modificar la colección y sorted() cuando necesites conservarla.",
-          "Bubble sort es un algoritmo didáctico que compara elementos vecinos y los intercambia cuando están desordenados. En cada pasada, un valor grande termina al final de la parte pendiente. No es eficiente para colecciones grandes, pero enseña a coordinar bucles, índices y comparaciones."
+          "Bubble sort es un algoritmo didáctico que compara elementos vecinos y los intercambia cuando están desordenados. En cada pasada completa, el mayor valor de la parte pendiente termina al final de esa parte. No es eficiente para colecciones grandes, pero ayuda a practicar índices y comparaciones.",
+          "Primero observa una sola pasada con [5, 2, 4]. Se compara 5 con 2; como 5 es mayor, se intercambian y la lista queda [2, 5, 4]. Después se compara 5 con 4 y queda [2, 4, 5]. El valor mayor ya llegó al final.",
+          "En el ejercicio, el bucle exterior repite las pasadas y el interior compara cada valor con el siguiente. range(len(numeros) - 1 - pasada) reduce el recorrido porque la parte final ya quedó ordenada. Usa indice + 1 solo mientras exista un vecino a la derecha.",
         ],
-        "example": "colores = [\"azul\", \"rojo\", \"verde\"]\ncolores.append(\"negro\")\ncolores.insert(1, \"blanco\")\nretirado = colores.pop()\ncolores.sort()\nprint(colores)\nprint(retirado)",
-        "exampleOutput": "['azul', 'blanco', 'rojo', 'verde']\nnegro",
+        "example": "colores = [\"azul\", \"rojo\", \"verde\"]\ncolores.append(\"negro\")\ncolores.insert(1, \"blanco\")\nretirado = colores.pop()\ncolores.sort()\nprint(colores)\nprint(retirado)\n\n# Una pasada de bubble sort\nnumeros = [5, 2, 4]\nfor indice in range(len(numeros) - 1):\n    if numeros[indice] > numeros[indice + 1]:\n        temporal = numeros[indice]\n        numeros[indice] = numeros[indice + 1]\n        numeros[indice + 1] = temporal\nprint(numeros)",
+        "exampleOutput": "['azul', 'blanco', 'rojo', 'verde']\nnegro\n[2, 4, 5]",
         "walkthrough": [
           "append() añade negro al final de la lista.",
           "insert(1, ...) coloca blanco en la segunda posición.",
-          "pop() retira y devuelve el último valor; sort() ordena los restantes."
+          "pop() retira y devuelve el último valor; sort() ordena los restantes.",
+          "En la pasada guiada se compara 5 con 2; el intercambio deja [2, 5, 4].",
+          "Después se compara 5 con 4 y queda [2, 4, 5]; el bucle exterior repetirá el recorrido en el ejercicio completo.",
         ],
         "commonMistakes": [
           "Esperar que sorted() modifique la lista original.",
-          "Confundir pop(), que devuelve un elemento, con remove(), que busca un valor."
+          "Confundir pop(), que devuelve un elemento, con remove(), que busca un valor.",
+          "Intercambiar dos valores sin guardar temporalmente uno de ellos.",
+          "Intentar comparar con indice + 1 cuando ya no existe un vecino a la derecha.",
         ],
         "exercise": {
           "id": "b3-e7",
           "title": "Ordenar con bubble sort",
           "statement": "Completa el ordenamiento por burbuja para ordenar [5, 2, 4, 1] de menor a mayor y muestra la lista final.",
-          "starterCode": "numeros = [5, 2, 4, 1]\nfor pasada in range(len(numeros)):\n    for indice in range(len(numeros) - 1 - pasada):\n        # compara e intercambia vecinos\n        pass\n",
+          "starterCode": "numeros = [5, 2, 4, 1]\nfor pasada in range(len(numeros) - 1):\n    for indice in range(len(numeros) - 1 - pasada):\n        # compara e intercambia vecinos\n        pass\n",
           "solution": "numeros = [5, 2, 4, 1]\nfor pasada in range(len(numeros)):\n    for indice in range(len(numeros) - 1 - pasada):\n        if numeros[indice] > numeros[indice + 1]:\n            temporal = numeros[indice]\n            numeros[indice] = numeros[indice + 1]\n            numeros[indice + 1] = temporal\nprint(numeros)",
           "tests": [
             {
@@ -1398,8 +1404,10 @@ export const courseModules: CourseModule[] = [
             }
           ],
           "hints": [
-            "Compara cada elemento con su vecino derecho.",
-            "Intercambia cuando el primero sea mayor, conservando temporalmente uno de los valores."
+            "El bucle interior compara numeros[indice] con numeros[indice + 1].",
+            "Intercambia solo cuando el valor de la izquierda sea mayor que el de la derecha.",
+            "Guarda el primer valor en temporal antes de sobrescribirlo.",
+            "La parte final ya ordenada se acorta en cada pasada mediante - pasada.",
           ],
           "difficulty": "medio",
           "xp": 20,
