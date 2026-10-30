@@ -23,7 +23,7 @@ export default async function HomeProgressSummary() {
 
   if (error) {
     return (
-      <div className="mt-6 max-w-xl border-l-2 border-[var(--theme-border)] px-4 py-3 text-sm text-[var(--theme-muted)]">
+      <div id="progreso" className="mt-6 max-w-xl border-l-2 border-[var(--theme-border)] px-4 py-3 text-sm text-[var(--theme-muted)]">
         Tu sesión está iniciada, pero no se pudo consultar el avance ahora.
         <Link href="/academia" className="ml-2 font-semibold text-[var(--theme-accent)] underline underline-offset-4">
           Abrir mi ruta
