@@ -3,11 +3,20 @@
 ## Estado comprobado el 30 de octubre de 2026
 
 - La variable pública `NEXT_PUBLIC_TURNSTILE_SITE_KEY` está disponible en GitHub Actions y el workflow la inyecta durante el build de Vinext.
-- El código publicado más reciente al corte del 30-10-2026 es `04604585d899173439f73c8a9d1975451e771200`; CI de `master` **41108215559** y despliegue Cloudflare **41108747917** terminaron correctamente. El Worker publicado tiene versión `522d1b30-13fd-4bed-aefa-8395986367c4`.
-- El log confirma que el Worker se compiló y publicó desde el mismo SHA que `master`, que la segunda comparación SHA pasó justo antes de publicar, y que el HTML de `/login` contiene `data-testid="turnstile-widget"`; `/muestra`, sitemap y `www` HTTP 308 también pasaron. El smoke test externo posterior leyó `/`, `/muestra`, `/login`, sitemap y comprobó `www` hacia el apex.
-- La lectura pública de `/muestra` confirmó la explicación guiada revisada en `b1-l1`–`b1-l3`. Esto confirma que el componente y la Sitekey pública llegaron al build/HTML. No demuestra que el script cliente haya cargado, que un usuario haya completado el desafío ni que Supabase Auth haya validado un token.
+- La publicación actual de `master` es el SHA `37db89ecb542a7a00abc0f55691872505146cd61`. CI de master [41129443835](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41129443835) y despliegue Cloudflare [41129901037](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41129901037) terminaron correctamente. El Worker principal tiene versión `dd3dc42c-b29b-4e86-8604-25f3a94ebab5`.
+- PR #89 conserva el correo de login al fallar Turnstile y permite reintentar el widget sin guardar la contraseña ni debilitar la verificación. PR #91 está integrado y publicó el runner Python separado: `https://python-desdecero-runner.pythondesdecero.workers.dev`, versión `d831ac62-d7d8-4afb-95fb-8b17ae363a88`.
+- El workflow validó las credenciales de Cloudflare sin imprimirlas, preparó y publicó los assets del runner, comprobó CSP y origen, compiló Vinext, comparó el SHA actual de `master` antes de publicar y verificó el dominio `python-desdecero.com` conectado al Worker.
+- El smoke test de producción verificó portada, `/muestra`, `/login` con widget Turnstile, sitemap y redirección `www` HTTP 308. Esto demuestra presencia del widget en el HTML, no que el desafío haya sido completado ni que Supabase Auth haya validado un token en un inicio de sesión real.
 - La Secret key privada de Turnstile y el estado de CAPTCHA protection no se pueden leer mediante la inspección del repositorio ni el estado básico del proyecto Supabase. Su configuración en Supabase Auth sigue pendiente de confirmación.
 - Tampoco se completó una prueba real de correo, registro o restablecimiento; estos puntos siguen abiertos.
+
+## Aislamiento del laboratorio Python en Cloudflare
+
+- El código alumno se ejecuta en el origen independiente `python-desdecero-runner.pythondesdecero.workers.dev`, separado de las cookies y del origen de la academia.
+- El iframe se comunica con su padre solo después de que el runner valida `event.source` y el origen permitido; después transfiere un `MessagePort` privado. El worker no acepta las respuestas por el canal global de mensajes.
+- El runner se publica como Worker de assets estáticos con una CSP propia; la CI y el workflow de publicación comprueban sus assets y encabezados. No procesa código Python en el servidor ni recibe claves de Supabase.
+- CI #91 incluyó E2E y build de Vinext. La publicación de producción comprobó archivos y CSP del runner; la ejecución manual interactiva en un navegador de producción sigue pendiente, aunque el smoke test de rutas públicas pasó.
+- No modificar CAPTCHA ni eliminar el desafío de producción para facilitar pruebas automatizadas.
 
 ## Separación de llaves
 
