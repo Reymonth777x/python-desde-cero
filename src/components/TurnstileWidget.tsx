@@ -10,7 +10,7 @@ type Props = {
 };
 
 export function TurnstileWidget({ siteKey, action = 'login' }: Props) {
-  const widgetRef = useRef<number | null>(null);
+  const widgetRef = useRef<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [captchaToken, setCaptchaToken] = useState('');
   const [isReady, setIsReady] = useState(
@@ -101,7 +101,7 @@ export function TurnstileWidget({ siteKey, action = 'login' }: Props) {
           setCaptchaToken('');
           setStatus('error');
         },
-      });
+      }) ?? null;
     } catch {
       queueMicrotask(() => setStatus('error'));
     }
