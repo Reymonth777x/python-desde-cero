@@ -159,6 +159,28 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(lesson('module-4', 'b4-l6').example).toContain('for producto in productos');
     expect(lesson('module-4', 'b4-l7').explanation.join(' ')).toContain('IndexError');
     expect(lesson('module-2', 'b2-l5').example).toContain('strip().title()');
+
+    expect(lesson('module-2', 'b2-l6').exercise.tests).toHaveLength(4);
+    expect(lesson('module-2', 'b2-l8').exercise.tests).toHaveLength(4);
+    expect(lesson('module-2', 'b2-l8').exercise.tests[2].input).toEqual([
+      '  cuaderno universitario  ',
+      '349.9',
+      '1',
+    ]);
+
+    const inventoryProject = lesson('module-4', 'b4-l10');
+    expect(inventoryProject.exercise.statement).toContain('acumula las cantidades');
+    expect(inventoryProject.exercise.solution).toContain('inventario.get(nombre, 0)');
+    expect(inventoryProject.exercise.tests).toHaveLength(5);
+    expect(inventoryProject.exercise.tests[1].input).toEqual([
+      '3',
+      'Lapiz',
+      '10',
+      'Cuaderno',
+      '3',
+      'Lapiz',
+      '2',
+    ]);
   });
 
   it('califica todas las respuestas y exige al menos 75 por ciento', () => {
