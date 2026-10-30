@@ -8,8 +8,20 @@ $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 Set-Location $projectRoot
 
 function Get-SupabaseLocalEnv {
-    $output = & supabase status --output env 2>&1
-    if ($LASTEXITCODE -ne 0) {
+    # Supabase CLI may write informational service-state messages to stderr
+    # even when "status" succeeds. Do not let PowerShell's Stop preference
+    # abort before we can inspect the command exit code and parse stdout.
+    $previousErrorActionPreference = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = 'Continue'
+        $output = & supabase status --output env 2>&1
+        $statusExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
+
+    if ($statusExitCode -ne 0) {
         throw "No se pudo leer el estado local de Supabase. Ejecuta: supabase status --help"
     }
 
@@ -33,7 +45,15 @@ function Get-SupabaseLocalEnv {
     if (-not $apiUrl) { $apiUrl = $values['SUPABASE_URL'] }
 
     $publishableKey = $values['PUBLISHABLE_KEY']
+    if (-not $publishableKey) { $publishableKey = $values['SUPABASE_PUBLISHABLE_KEY'] }
     if (-not $publishableKey) { $publishableKey = $values['ANON_KEY'] }
+    if (-not $publishableKey) { $publishableKey = $values['SUPABASE_ANON_KEY'] }
+
+    # Current Supabase CLI emits SECRET_KEY; older CLI versions emit SERVICE_ROLE_KEY.
+    $serviceRoleKey = $values['SERVICE_ROLE_KEY']
+    if (-not $serviceRoleKey) { $serviceRoleKey = $values['SUPABASE_SERVICE_ROLE_KEY'] }
+    if (-not $serviceRoleKey) { $serviceRoleKey = $values['SECRET_KEY'] }
+    if (-not $serviceRoleKey) { $serviceRoleKey = $values['SUPABASE_SECRET_KEY'] }
 
     if (-not $apiUrl -or -not $publishableKey) {
         $names = ($values.Keys | Sort-Object) -join ', '
@@ -43,7 +63,7 @@ function Get-SupabaseLocalEnv {
     return @{
         ApiUrl = $apiUrl
         PublishableKey = $publishableKey
-        ServiceRoleKey = $values['SERVICE_ROLE_KEY']
+        ServiceRoleKey = $serviceRoleKey
     }
 }
 
@@ -84,7 +104,7 @@ Write-Host 'Configuración de desarrollo creada para Supabase local (sin mostrar
 
 if (-not $SkipSeed) {
     if (-not $local.ServiceRoleKey) {
-        throw 'Supabase no devolvió SERVICE_ROLE_KEY; no se crearon usuarios. Comprueba supabase status --output env.'
+        throw 'Supabase no devolvió SERVICE_ROLE_KEY/SECRET_KEY; no se crearon usuarios. Comprueba supabase status --output env.'
     }
 
     $previousUrl = $env:SUPABASE_URL
