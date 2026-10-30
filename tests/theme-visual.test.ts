@@ -7,10 +7,11 @@ test.describe("Temas visuales — cada página × cada tema", () => {
   for (const theme of themes) {
     for (const route of routes) {
       test(`${route} en tema ${theme}`, async ({ page }) => {
-        await page.goto(route);
-        await page.evaluate((t) => {
-          document.documentElement.setAttribute("data-theme", t);
+        await page.addInitScript((selectedTheme) => {
+          localStorage.setItem("python-desde-cero-theme", selectedTheme);
         }, theme);
+        await page.goto(route);
+        await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
 
         // Esperar a que se apliquen los estilos
         await page.waitForTimeout(300);
@@ -46,11 +47,12 @@ test.describe("Temas visuales — cada página × cada tema", () => {
 test("Cada tema produce colores de fondo distintos", async ({ page }) => {
   const backgrounds: Record<string, string> = {};
   for (const theme of themes) {
-    await page.goto("/");
-    await page.evaluate((t) => {
-      document.documentElement.setAttribute("data-theme", t);
+    await page.addInitScript((selectedTheme) => {
+      localStorage.setItem("python-desde-cero-theme", selectedTheme);
     }, theme);
-    await page.waitForTimeout(300);
+    await page.goto("/");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+    await page.waitForTimeout(250); // Let the CSS transition settle before reading computed colors.
     backgrounds[theme] = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
   }
 
@@ -61,11 +63,12 @@ test("Cada tema produce colores de fondo distintos", async ({ page }) => {
 test("Cada tema produce colores de texto distintos", async ({ page }) => {
   const colors: Record<string, string> = {};
   for (const theme of themes) {
-    await page.goto("/");
-    await page.evaluate((t) => {
-      document.documentElement.setAttribute("data-theme", t);
+    await page.addInitScript((selectedTheme) => {
+      localStorage.setItem("python-desde-cero-theme", selectedTheme);
     }, theme);
-    await page.waitForTimeout(300);
+    await page.goto("/");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+    await page.waitForTimeout(250); // Let the CSS transition settle before reading computed colors.
     colors[theme] = await page.evaluate(() => getComputedStyle(document.body).color);
   }
 
@@ -79,13 +82,23 @@ test("Respetar prefers-reduced-motion", async ({ page }) => {
   await page.waitForTimeout(300);
 
   const animations = await page.evaluate(() => {
+    const seconds = (raw: string) => raw.split(",").map((part) => {
+      const value = part.trim();
+      const numeric = Number.parseFloat(value);
+      if (!Number.isFinite(numeric)) return 0;
+      return value.endsWith("ms") ? numeric / 1000 : numeric;
+    });
     const all = document.querySelectorAll("*");
-    let animated = 0;
+    let violations = 0;
     all.forEach((el) => {
       const cs = getComputedStyle(el);
-      if (cs.animation !== "none" || cs.transition !== "all 0s ease 0s") animated++;
+      const durations = [
+        ...seconds(cs.animationDuration),
+        ...seconds(cs.transitionDuration),
+      ];
+      if (durations.some((duration) => duration > 0.001)) violations++;
     });
-    return animated;
+    return violations;
   });
 
   expect(animations).toBe(0);

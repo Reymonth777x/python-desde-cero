@@ -6,36 +6,51 @@ function expectedKeysFromCourse(): string[] {
   const keys: string[] = [];
   for (const courseModule of courseModules) {
     for (const lesson of courseModule.lessons) {
-      if (!lesson.questions || lesson.questions.length === 0) continue;
       for (let i = 0; i < lesson.questions.length; i++) {
         const q = lesson.questions[i];
-        keys.push(
-          `'${courseModule.id}', '${lesson.id}', ${i}, ${q.answer}, ${q.options.length}`
-        );
+        keys.push(`'${courseModule.id}', '${lesson.id}', ${i}, ${q.answer}, ${q.options.length}`);
       }
     }
   }
   return keys.sort();
 }
 
-function keysFromMigrationSql(sql: string): string[] {
+function keysFromBalanceMigration(sql: string): string[] {
   const keys: string[] = [];
-  const insertRegex = /INSERT INTO private\.quiz_keys \(module_id, lesson_id, question_index, correct_index, options_count\) VALUES \(([^)]+)\);/g;
+  const rowRegex = /\('([^']+)',\s*'([^']+)',\s*(\d+),\s*(\d+),\s*(\d+)\)/g;
   let match: RegExpExecArray | null;
-  while ((match = insertRegex.exec(sql)) !== null) {
-    keys.push(match[1].trim());
+  while ((match = rowRegex.exec(sql)) !== null) {
+    keys.push(`'${match[1]}', '${match[2]}', ${match[3]}, ${match[4]}, 4`);
   }
   return keys.sort();
 }
 
-describe('quiz_keys drift detection', () => {
-  it('las claves SQL en la migración coinciden con src/lib/course.ts', () => {
+function keysFromPracticeMigration(sql: string): string[] {
+  const keys: string[] = [];
+  const rowRegex = /\('([^']+)',\s*'([^']+)',\s*(\d+),\s*(\d+),\s*(\d+),\s*(\d+)\)/g;
+  let match: RegExpExecArray | null;
+  while ((match = rowRegex.exec(sql)) !== null) {
+    keys.push("'" + match[1] + "', '" + match[2] + "', " + match[3] + ", " + match[6] + ", " + match[5]);
+  }
+  return keys.sort();
+}
+
+describe('quiz answer-key drift detection', () => {
+  it('las claves finales de la migración 020 coinciden con src/lib/course.ts', () => {
     const expected = expectedKeysFromCourse();
     const sql = readFileSync(
-      new URL('../../supabase/migrations/20261026100000_013_quiz_keys_and_submit_quiz.sql', import.meta.url),
+      new URL('../../supabase/migrations/20261029051953_020_balance_quiz_answer_positions_v2.sql', import.meta.url),
       'utf8',
     );
-    const actual = keysFromMigrationSql(sql);
+    const additionalSql = readFileSync(
+      new URL('../../supabase/migrations/20261030051205_add_three_core_integration_labs.sql', import.meta.url),
+      'utf8',
+    );
+    const actual = [...keysFromBalanceMigration(sql), ...keysFromPracticeMigration(additionalSql)].sort();
+    expect(sql).toContain('SET correct_option_v2 = mapping.correct_option_v2');
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION public.submit_quiz_v2');
+    expect(sql).not.toContain('SET correct_option = mapping.correct_option');
+    expect(actual).toHaveLength(expected.length);
     expect(actual).toEqual(expected);
   });
 });

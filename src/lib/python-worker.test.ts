@@ -7,15 +7,41 @@ type WorkerMessage = {
   status: 'ready' | 'init-error' | 'success' | 'error';
   output?: string;
   error?: string;
+  turtle_commands?: Array<{ type: string; color?: string; x1?: number; y1?: number; x2?: number; y2?: number }>;
 };
 
-function createWorkerHarness() {
+function createWorkerHarness({ withTurtle = false }: { withTurtle?: boolean } = {}) {
   const posted: WorkerMessage[] = [];
   let stdout: (message: string) => void = () => {};
   let stderr: (message: string) => void = () => {};
   let stdin = () => null as string | null;
 
+  const turtleCommandProxy = {
+    toJs: vi.fn((options: {
+      dict_converter: (entries: Iterable<[string, unknown]>) => unknown;
+      create_pyproxies: boolean;
+    }) => {
+      // Exercise the same dict converter passed by the worker.
+      options.dict_converter([['type', 'line']]);
+      return [
+        { type: 'line', x1: 0, y1: 0, x2: 25, y2: 40, color: 'lime' },
+      ];
+    }),
+    destroy: vi.fn(),
+  };
+  const getCommands = vi.fn(() => turtleCommandProxy);
+  const clearCommands = vi.fn();
+  const globals = {
+    set: vi.fn(),
+    get: vi.fn((name: string) => {
+      if (name === 'get_commands') return getCommands;
+      if (name === 'clear_commands') return clearCommands;
+      return undefined;
+    }),
+  };
+
   const pyodide = {
+    globals,
     setStdout: vi.fn((handler: { batched: (message: string) => void }) => {
       stdout = handler.batched;
     }),
@@ -51,12 +77,19 @@ function createWorkerHarness() {
   runInNewContext(workerSource, {
     self,
     importScripts: vi.fn(),
+    fetch: withTurtle
+      ? vi.fn(async () => ({
+          ok: true,
+          status: 200,
+          text: async () => '# turtle compatibility test fixture',
+        }))
+      : undefined,
     loadPyodide: vi.fn(async () => pyodide),
     setTimeout,
     clearTimeout,
   });
 
-  return { self, posted, pyodide };
+  return { self, posted, pyodide, turtleCommandProxy, getCommands };
 }
 
 describe('Python Web Worker', () => {
@@ -92,6 +125,30 @@ describe('Python Web Worker', () => {
     const cappedOutput = harness.posted.find((message) => message.id === 6)?.output ?? '';
     expect(cappedOutput.length).toBeLessThan(20100);
     expect(cappedOutput).toContain('Salida limitada');
+  });
+
+  it('convierte y libera los comandos Turtle antes de enviarlos a React', async () => {
+    const harness = createWorkerHarness({ withTurtle: true });
+
+    // La inicialización de Pyodide y la carga del módulo Turtle son asíncronas.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(harness.posted.some((message) => message.status === 'ready')).toBe(true);
+
+    await harness.self.onmessage?.({
+      data: { id: 8, code: 'draw-turtle', input: [] },
+    });
+
+    expect(harness.getCommands).toHaveBeenCalledOnce();
+    const conversionOptions = harness.turtleCommandProxy.toJs.mock.calls[0]?.[0];
+    expect(conversionOptions?.create_pyproxies).toBe(false);
+    expect(typeof conversionOptions?.dict_converter).toBe('function');
+    expect(
+      (conversionOptions?.dict_converter([['type', 'line']]) as { type: string }).type,
+    ).toBe('line');
+    expect(harness.turtleCommandProxy.destroy).toHaveBeenCalledOnce();
+    expect(harness.posted.find((message) => message.id === 8)?.turtle_commands).toEqual([
+      { type: 'line', x1: 0, y1: 0, x2: 25, y2: 40, color: 'lime' },
+    ]);
   });
 
   it('rechaza programas que superan el límite sin ejecutarlos', async () => {

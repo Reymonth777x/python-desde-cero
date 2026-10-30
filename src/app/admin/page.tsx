@@ -17,7 +17,7 @@ export default async function AdminPage() {
     .single();
 
   if (!profile?.is_admin) {
-    redirect('/estudiante');
+    redirect('/academia');
   }
 
   return (
@@ -35,8 +35,8 @@ export default async function AdminPage() {
           </Link>
 
           <div className="flex items-center gap-3">
-            <Link href="/estudiante" className="text-sm text-[var(--theme-muted)] hover:text-[var(--theme-accent)]">
-              Volver a mi panel
+            <Link href="/academia" className="text-sm text-[var(--theme-muted)] hover:text-[var(--theme-accent)]">
+              Volver a mi ruta de aprendizaje
             </Link>
             <span className="text-xs px-2 py-1 bg-[var(--theme-surface)] border border-[var(--theme-border)] rounded text-[var(--theme-muted)]">
               Administrador
@@ -56,28 +56,28 @@ export default async function AdminPage() {
 
           <div className="mt-8 grid gap-4 md:grid-cols-2">
             <div className="bg-[var(--theme-surface)] border border-[var(--theme-border)] p-6 rounded-lg">
-              <h3 className="font-semibold text-[var(--theme-ink)] mb-3">Usuarios</h3>
+              <h3 className="font-semibold text-[var(--theme-ink)] mb-3">Invitaciones</h3>
               <p className="text-sm text-[var(--theme-muted)] mb-4">
-                Revisa perfiles, roles y estado de cuenta de todos los estudiantes.
+                Gestiona códigos de invitación para nuevos estudiantes.
               </p>
-              <Link href="/admin/usuarios" className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--theme-accent)]">
-                Ver usuarios <span>→</span>
+              <Link href="/admin/invitaciones" className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--theme-accent)]">
+                Gestionar invitaciones <span>→</span>
               </Link>
             </div>
             <div className="bg-[var(--theme-surface)] border border-[var(--theme-border)] p-6 rounded-lg">
-              <h3 className="font-semibold text-[var(--theme-ink)] mb-3">Auditoría</h3>
+              <h3 className="font-semibold text-[var(--theme-ink)] mb-3">Estado del sistema</h3>
               <p className="text-sm text-[var(--theme-muted)] mb-4">
-                Registro de acciones sensibles en el sistema.
+                Información general del panel de administración.
               </p>
-              <Link href="/admin/auditoria" className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--theme-accent)]">
-                Ver auditoría <span>→</span>
-              </Link>
+              <p className="text-xs text-[var(--theme-muted)]">
+                Las secciones de usuarios y auditoría se activarán próximamente.
+              </p>
             </div>
           </div>
 
           <div className="mt-8 flex gap-4">
-            <Link href="/estudiante" className="flex-1 min-h-12 border border-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-accent)] text-center transition-colors hover:bg-[var(--theme-bg-secondary)]">
-              Mi panel de estudiante
+            <Link href="/academia" className="flex-1 min-h-12 border border-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-accent)] text-center transition-colors hover:bg-[var(--theme-bg-secondary)]">
+              Mi ruta de aprendizaje
             </Link>
             <Link href="/academia" className="flex-1 min-h-12 border border-[var(--theme-border)] bg-[var(--theme-surface)] px-5 py-3 text-base font-semibold text-[var(--theme-ink)] text-center transition-colors hover:bg-[var(--theme-bg-secondary)]">
               Academia

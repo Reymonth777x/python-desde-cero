@@ -1,17 +1,25 @@
 import PythonEditor from '@/components/PythonEditor';
-import LessonProgress from '@/components/LessonProgress';
 import { logout } from '@/app/login/actions';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 export default async function PracticaPage() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const { data: profile } = user
-    ? await supabase.from('profiles').select('is_admin').eq('id', user.id).maybeSingle()
-    : { data: null };
+
+  if (!user) {
+    redirect('/login');
+    return null;
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_admin')
+    .eq('id', user.id)
+    .maybeSingle();
 
   return (
     <main className="min-h-screen bg-[var(--theme-bg)] text-[var(--theme-ink)]">
@@ -40,14 +48,13 @@ export default async function PracticaPage() {
           Laboratorio de Python
         </h1>
         <p className="mb-8 mt-4 max-w-2xl text-sm leading-7 text-[var(--theme-muted)]">
-          Escribe código, ejecuta tus pruebas y guarda el progreso de tus lecciones.
+          Escribe código Python, ejecuta tus pruebas y observa el resultado. El avance de cada lección se guarda desde su evaluación en la academia.
         </p>
 
         <PythonEditor
           defaultCode={'precio = 1200\ncantidad = 3\ntotal = precio * cantidad\nprint(total)'}
           instructions="Edita el programa, pulsa Ejecutar y consulta la salida. Para probar input(), escribe una respuesta por línea en el campo de entrada antes de ejecutar. La ejecución tiene un límite de tiempo; si lo supera, el Worker se reinicia."
         />
-        <LessonProgress />
       </div>
     </main>
   );

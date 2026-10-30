@@ -1,96 +1,116 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Temas visuales', () => {
-  test('muestra el selector de temas y aplica los 2 temas', async ({ page }) => {
+  test('muestra el selector y aplica los temas Original y Oscuro', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'light' });
     await page.goto('/');
 
-    const selector = page.locator('[aria-label="Seleccionar tema visual"]');
-    await expect(selector).toBeVisible();
-
+    const selector = page.getByRole('button', { name: 'Seleccionar tema visual' });
     const html = page.locator('html');
+
+    await expect(selector).toBeVisible();
     await expect(html).toHaveAttribute('data-theme', 'original');
 
-    const nombres = ['Original', 'Oscuro'];
-    const valores = ['original', 'dark'];
+    await selector.click();
+    await page.getByRole('button', { name: /^Original/ }).click();
+    await expect(html).toHaveAttribute('data-theme', 'original');
 
-    for (let i = 0; i < nombres.length; i++) {
-      await selector.click();
-      const opcion = page.locator('div[class*="absolute right-0"]').locator(`button:has-text("${nombres[i]}")`);
-      await expect(opcion.first()).toBeVisible();
-      await opcion.first().click();
-      await expect(html).toHaveAttribute('data-theme', valores[i]);
-    }
+    await selector.click();
+    await page.getByRole('button', { name: /^Oscuro/ }).click();
+    await expect(html).toHaveAttribute('data-theme', 'dark');
+    await expect.poll(() => page.evaluate(() => localStorage.getItem('python-desde-cero-theme'))).toBe('dark');
   });
 
-  test('el tema persiste tras recargar la página', async ({ page }) => {
+  test('el tema elegido persiste tras recargar la página', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'light' });
     await page.goto('/');
 
-    const selector = page.locator('[aria-label="Seleccionar tema visual"]');
-    await selector.click();
-    await page.locator('div[class*="absolute right-0"]').locator('button:has-text("Oscuro")').first().click();
+    await page.getByRole('button', { name: 'Seleccionar tema visual' }).click();
+    await page.getByRole('button', { name: /^Oscuro/ }).click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect.poll(() => page.evaluate(() => localStorage.getItem('python-desde-cero-theme'))).toBe('dark');
   });
 });
 
 test.describe('Ejemplos de portada', () => {
-  test('los 6 ejemplos son seleccionables', async ({ page }) => {
+  const examples = [
+    { title: 'Árbol fractal', marker: 'def rama(n):' },
+    { title: 'Espiral geométrica', marker: 'range(200)' },
+    { title: 'Arte con círculos', marker: 'range(36)' },
+    { title: 'Visualización matemática', marker: 'math.radians(i)' },
+    { title: 'Contador ascendente', marker: 'range(1, 11)' },
+    { title: 'Cálculo de áreas', marker: 'def area_circulo(radio):' },
+  ];
+
+  test('los seis ejemplos reales son seleccionables y cargan su código', async ({ page }) => {
     await page.goto('/');
+    const lab = page.locator('#ejemplo');
+    const editor = lab.locator('textarea');
 
-    const nombres = [
-      'Árbol fractal',
-      'Espiral geométrica',
-      'Arte con círculos',
-      'Visualización matemática',
-      'Saludo interactivo',
-      'Reto de lógica',
-    ];
-
-    for (const nombre of nombres) {
-      const btn = page.locator(`button:has-text("${nombre}")`);
-      await expect(btn).toBeVisible();
+    await expect(lab).toBeVisible();
+    for (const example of examples) {
+      const button = lab.getByRole('button').filter({ hasText: example.title });
+      await expect(button, `No se encontró el ejemplo "${example.title}"`).toBeVisible();
+      await button.click();
+      await expect.poll(() => editor.inputValue()).toContain(example.marker);
     }
   });
 });
 
-test.describe('Turtle y fondo', () => {
-  test('SVG se renderiza tras ejecutar Árbol fractal', async ({ page }) => {
+  test('acepta el ejemplo Turtle con Screen, shape y done', async ({ page }) => {
     await page.goto('/');
 
-    await page.locator('button:has-text("Árbol fractal")').click();
+    const lab = page.locator('#ejemplo');
+    const editor = lab.getByRole('textbox', { name: 'Código Python' });
+    await editor.fill([
+      'import turtle',
+      'ventana = turtle.Screen()',
+      'ventana.title("Ejemplo con Turtle - Python")',
+      'ventana.bgcolor("white")',
+      't = turtle.Turtle()',
+      't.shape("turtle")',
+      't.color("blue")',
+      't.pensize(3)',
+      'for _ in range(4):',
+      '    t.forward(100)',
+      '    t.right(90)',
+      'turtle.done()',
+    ].join('\n'));
 
-    const ejecutar = page.locator('button:has-text("Ejecutar")');
+    const ejecutar = lab.getByRole('button', { name: 'Ejecutar', exact: true });
+    await ejecutar.click();
+
+    const canvas = lab.getByRole('img', { name: 'Resultado gráfico de Turtle' });
+    await expect(canvas).toBeVisible({ timeout: 90_000 });
+    await expect(canvas.locator('line')).toHaveCount(4);
+    await expect(canvas.locator('g[data-turtle-cursor="true"]')).toHaveCount(1);
+    await expect(ejecutar).toBeEnabled({ timeout: 90_000 });
+
+    await ejecutar.click();
+    await expect(canvas.locator('line')).toHaveCount(4);
+    await expect(canvas.locator('g[data-turtle-cursor="true"]')).toHaveCount(1);
+    await expect(ejecutar).toBeEnabled({ timeout: 90_000 });
+  });
+
+test.describe('Turtle y fondo', () => {
+  test('el ejemplo Árbol fractal ejecuta Python y dibuja el SVG', async ({ page }) => {
+    await page.goto('/');
+
+    const lab = page.locator('#ejemplo');
+    await lab.getByRole('button').filter({ hasText: 'Árbol fractal' }).click();
+
+    const ejecutar = lab.getByRole('button', { name: 'Ejecutar', exact: true });
     await expect(ejecutar).toBeVisible();
     await ejecutar.click();
 
-    await page.waitForTimeout(10000);
-
-    const svg = page.locator('svg');
-    await expect(svg).toBeVisible();
-
-    const rectNegro = page.locator('rect[fill="black"]');
-    await expect(rectNegro.first()).toBeVisible();
-
-    const lineasBlancas = page.locator('line[stroke="white"]');
-    const lineasVerdes = page.locator('line[stroke="lime"]');
-
-    const totalLineas = await lineasBlancas.count() + await lineasVerdes.count();
-    expect(totalLineas).toBeGreaterThan(0);
-
-    const limpiar = page.locator('button:has-text("Limpiar gráfico")');
-    if (await limpiar.isVisible()) {
-      await limpiar.click();
-      await page.waitForTimeout(1000);
-      const lineasDespues = await page.locator('line').count();
-      expect(lineasDespues).toBe(0);
-    }
-
-    await ejecutar.click();
-    await page.waitForTimeout(10000);
-    const svgDespues = page.locator('svg');
-    await expect(svgDespues).toBeVisible();
+    const canvas = lab.locator('svg');
+    await expect(canvas).toBeVisible({ timeout: 90_000 });
+    await expect(canvas.locator('rect[fill="black"]')).toBeVisible();
+    await expect(canvas.locator('line[stroke="white"], line[stroke="lime"]')).not.toHaveCount(0, { timeout: 90_000 });
+    await expect(ejecutar).toBeEnabled({ timeout: 90_000 });
   });
 });
 
@@ -99,17 +119,17 @@ test.describe('Interfaz móvil y escritorio', () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/');
 
-    const ancho = await page.evaluate(() => document.documentElement.scrollWidth);
-    expect(ancho).toBeLessThanOrEqual(395);
+    const width = await page.evaluate(() => document.documentElement.scrollWidth);
+    expect(width).toBeLessThanOrEqual(395);
   });
 
-  test('diseño escritorio renderiza componentes', async ({ page }) => {
+  test('diseño escritorio renderiza componentes principales', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/');
 
     await expect(page.locator('h1')).toBeVisible();
     await expect(page.locator('#ejemplo')).toBeVisible();
-    await expect(page.locator('[aria-label="Seleccionar tema visual"]')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Seleccionar tema visual' })).toBeVisible();
   });
 });
 
@@ -117,6 +137,24 @@ test.describe('Rutas de autenticación', () => {
   test('carga login', async ({ page }) => {
     await page.goto('/login');
     await expect(page.locator('h1')).toBeVisible();
+  });
+
+  test('separa las credenciales al cambiar entre Entrar y Crear cuenta', async ({ page }) => {
+    await page.goto('/login');
+
+    await page.locator('#login-email').fill('admin-prueba@example.test');
+    await page.locator('#login-password').fill('UnaClaveTemporal123!');
+    await page.getByRole('button', { name: 'Crear cuenta', exact: true }).click();
+
+    await expect(page.locator('#signup-email')).toHaveValue('');
+    await expect(page.locator('#signup-password')).toHaveValue('');
+
+    await page.locator('#signup-email').fill('estudiante-prueba@example.test');
+    await page.locator('#signup-password').fill('OtraClaveTemporal123!');
+    await page.getByRole('button', { name: 'Entrar', exact: true }).click();
+
+    await expect(page.locator('#login-email')).toHaveValue('');
+    await expect(page.locator('#login-password')).toHaveValue('');
   });
 
   test('carga forgot-password', async ({ page }) => {

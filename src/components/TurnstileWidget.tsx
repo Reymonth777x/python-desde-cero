@@ -1,16 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-export function TurnstileWidget({
-  siteKey,
-  onVerify,
-  onReset,
-}: {
-  siteKey: string;
-  onVerify?: (token: string) => void;
-  onReset?: () => void;
-}) {
+export function TurnstileWidget({ siteKey }: { siteKey: string }) {
   const widgetRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -45,7 +37,6 @@ export function TurnstileWidget({
       sitekey: siteKey,
       callback: (token: string) => {
         if (inputRef.current) inputRef.current.value = token;
-        onVerify?.(token);
       },
       action: 'login',
     });
@@ -56,29 +47,7 @@ export function TurnstileWidget({
         widgetRef.current = null;
       }
     };
-  }, [isReady, siteKey, onVerify]);
-
-  const reset = useCallback(() => {
-    if (widgetRef.current !== null && typeof window !== 'undefined' && window.turnstile) {
-      window.turnstile!.remove(widgetRef.current);
-      widgetRef.current = null;
-      if (inputRef.current) inputRef.current.value = '';
-      if (containerRef.current) {
-        widgetRef.current = window.turnstile!.render(
-          containerRef.current,
-          {
-            sitekey: siteKey,
-            callback: (token: string) => {
-              if (inputRef.current) inputRef.current.value = token;
-              onVerify?.(token);
-            },
-            action: 'login',
-          },
-        );
-      }
-      onReset?.();
-    }
-  }, [siteKey, onVerify, onReset]);
+  }, [isReady, siteKey]);
 
   return (
     <>

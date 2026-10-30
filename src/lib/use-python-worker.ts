@@ -11,7 +11,9 @@ type WorkerResponse = {
 };
 
 type TurtleCommand = {
-  type: 'line' | 'fill' | 'dot' | 'write' | 'bgcolor';
+  type: 'line' | 'fill' | 'dot' | 'write' | 'bgcolor' | 'cursor';
+  heading?: number;
+  shape?: string;
   x?: number;
   y?: number;
   x1?: number;
@@ -151,6 +153,10 @@ export function usePythonWorker({
     };
 
     worker.onerror = () => {
+      if (initializationTimeoutRef.current !== null) {
+        clearTimeout(initializationTimeoutRef.current);
+        initializationTimeoutRef.current = null;
+      }
       if (timeoutRef.current !== null) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
@@ -165,6 +171,18 @@ export function usePythonWorker({
     };
 
     workerRef.current = worker;
+    initializationTimeoutRef.current = setTimeout(() => {
+      if (workerRef.current !== worker) return;
+      worker.terminate();
+      workerRef.current = null;
+      pendingExecutionRef.current = null;
+      initializationTimeoutRef.current = null;
+      setWorkerState('error');
+      setError('La carga de Python tardó demasiado. Reintenta la carga.');
+      setIsRunning(false);
+      onStatusChange?.('error');
+    }, 60_000);
+
     executeRef.current = (w, request) => {
       const requestId = ++requestIdRef.current;
       startWatchdog();
@@ -185,14 +203,15 @@ export function usePythonWorker({
       setTurtleCommands([]);
       setError(null);
       setIsRunning(true);
-      setWorkerState('loading');
 
       const worker = workerRef.current;
       if (worker && workerState === 'ready') {
+        // El entorno sigue listo entre ejecuciones; no volver a bloquear el editor.
         executeRef.current(worker, { code, input });
         return;
       }
 
+      setWorkerState('loading');
       pendingExecutionRef.current = { code, input };
       setOutput('Preparando Python; la primera carga puede tardar un poco...');
       if (!worker) createWorker();

@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import Editor from '@monaco-editor/react';
+import Editor, { type Monaco } from '@monaco-editor/react';
 import type { editor } from 'monaco-editor';
 import { usePythonWorker } from '@/lib/use-python-worker';
+import { useTheme } from '@/app/theme-provider';
 
 // Configura Monaco Editor para usar workers autohospedados desde /monaco/vs/
 if (typeof window !== 'undefined' && !window.MonacoEnvironment) {
@@ -24,9 +25,9 @@ export default function PythonEditor({
   const [mobilePanel, setMobilePanel] = useState<'instructions' | 'editor' | 'output' | 'turtle'>('instructions');
   const [editorRequested, setEditorRequested] = useState(false);
   const [desktopLayout, setDesktopLayout] = useState(false);
-  const [turtleError, setTurtleError] = useState<string | null>(null);
-
+  const { resolvedTheme } = useTheme();
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const monacoRef = useRef<Monaco | null>(null);
 
   const {
     workerState,
@@ -59,6 +60,59 @@ export default function PythonEditor({
     return () => desktopQuery.removeEventListener('change', updateLayout);
   }, []);
 
+  const applyEditorTheme = useCallback((monaco: Monaco) => {
+    const styles = getComputedStyle(document.documentElement);
+    const readColor = (name: string, fallback: string) =>
+      styles.getPropertyValue(name).trim() || fallback;
+
+    monaco.editor.defineTheme('python-desde-cero', {
+      base: resolvedTheme === 'dark' ? 'vs-dark' : 'vs',
+      inherit: true,
+      rules: [
+        { token: 'comment', foreground: '72816F', fontStyle: 'italic' },
+        { token: 'keyword', foreground: resolvedTheme === 'dark' ? '8AB4F8' : '294936', fontStyle: 'bold' },
+        { token: 'string', foreground: resolvedTheme === 'dark' ? 'A5D6A7' : '8A4B27' },
+        { token: 'number', foreground: resolvedTheme === 'dark' ? 'D7A8F7' : '8054A1' },
+        { token: 'type.identifier', foreground: resolvedTheme === 'dark' ? '80CBC4' : '356B70' },
+      ],
+      colors: {
+        'editor.background': readColor('--theme-code-bg', '#ebe9df'),
+        'editor.foreground': readColor('--theme-ink', '#252b25'),
+        'editorLineNumber.foreground': readColor('--theme-muted', '#596259'),
+        'editorLineNumber.activeForeground': readColor('--theme-accent', '#294936'),
+        'editorCursor.foreground': readColor('--theme-accent', '#294936'),
+        'editor.selectionBackground': readColor('--theme-accent-light', '#dce5d8'),
+        'editor.inactiveSelectionBackground': readColor('--theme-bg-secondary', '#ebe9df'),
+        'editor.lineHighlightBackground': readColor('--theme-bg-secondary', '#ebe9df'),
+        'editorGutter.background': readColor('--theme-code-bg', '#ebe9df'),
+        'editorWidget.background': readColor('--theme-surface', '#ffffff'),
+        'editorWidget.border': readColor('--theme-border', '#9c865e'),
+        'editorSuggestWidget.background': readColor('--theme-surface', '#ffffff'),
+        'editorSuggestWidget.foreground': readColor('--theme-ink', '#252b25'),
+        'editorSuggestWidget.selectedBackground': readColor('--theme-bg-secondary', '#ebe9df'),
+      },
+    });
+    monaco.editor.setTheme('python-desde-cero');
+  }, [resolvedTheme]);
+
+  useEffect(() => {
+    const monaco = monacoRef.current;
+    if (!monaco) return;
+    const frame = window.requestAnimationFrame(() => applyEditorTheme(monaco));
+    return () => window.cancelAnimationFrame(frame);
+  }, [applyEditorTheme]);
+
+  const needsInput = /\binput\s*\(/.test(code);
+  const usesTurtle = /\b(?:import\s+turtle|from\s+turtle\s+import)\b/.test(code);
+  const mobilePanels: Array<{ id: 'instructions' | 'editor' | 'output' | 'turtle'; label: string }> = [
+    { id: 'instructions', label: 'Guía' },
+    { id: 'editor', label: 'Código' },
+    { id: 'output', label: 'Resultado' },
+    ...(usesTurtle ? [{ id: 'turtle' as const, label: 'Gráficos' }] : []),
+  ];
+
+  const activeMobilePanel = mobilePanel === 'turtle' && !usesTurtle ? 'editor' : mobilePanel;
+
   const runCode = useCallback(() => {
     if (isRunning) return;
     setMobilePanel('output');
@@ -84,29 +138,20 @@ export default function PythonEditor({
 
   return (
     <section className="w-full" aria-label="Espacio de práctica de Python">
-      <div role="tablist" aria-label="Paneles del laboratorio" className="mb-4 grid grid-cols-3 border-b border-[var(--theme-border)] md:hidden">
-        {([
-          ['instructions', 'Guía'],
-          ['editor', 'Código'],
-          ['output', 'Resultado'],
-          ['turtle', 'Gráficos'],
-        ] as const).map(([panel, label]) => (
+      <div role="tablist" aria-label="Paneles del laboratorio" className={`mb-4 grid ${usesTurtle ? "grid-cols-4" : "grid-cols-3"} border-b border-[var(--theme-border)] md:hidden`}>
+        {mobilePanels.map(({ id: panel, label }) => (
           <button
             key={panel}
             type="button"
             role="tab"
             id={`practice-tab-${panel}`}
             aria-controls={`practice-panel-${panel}`}
-            aria-selected={mobilePanel === panel}
+            aria-selected={activeMobilePanel === panel}
             onClick={() => {
               setMobilePanel(panel);
-              if (panel === 'editor') {
-                setEditorRequested(true);
-                if (workerState === 'idle') {
-                }
-              }
+              if (panel === 'editor') setEditorRequested(true);
             }}
-            className={`min-h-12 border-b-2 px-2 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] ${mobilePanel === panel ? 'border-[var(--theme-accent)] text-[var(--theme-accent)]' : 'border-transparent text-[var(--theme-muted)]'}`}
+            className={`min-h-12 border-b-2 px-2 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] ${activeMobilePanel === panel ? 'border-[var(--theme-accent)] text-[var(--theme-accent)]' : 'border-transparent text-[var(--theme-muted)]'}`}
           >
             {label}
           </button>
@@ -116,7 +161,7 @@ export default function PythonEditor({
       {workerState !== 'ready' && (
         <p role="status" aria-live="polite" className="mb-4 flex min-h-11 items-center gap-2 text-sm text-[var(--theme-muted)]">
           {workerState === 'loading' && <span aria-hidden="true" className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--theme-border)] border-t-[var(--theme-accent)] motion-reduce:animate-none" />}
-          {workerState === 'idle' ? 'Python se prepara al abrir el editor o iniciar la primera ejecución.' : workerState === 'loading' ? 'Preparando Python en este dispositivo. La primera carga puede tardar.' : 'El ejecutor necesita atención. Consulta el resultado para ver opciones.'}
+          {workerState === 'idle' ? 'Python se cargará al ejecutar tu primer programa; todavía no se ha iniciado.' : workerState === 'loading' ? 'Preparando Python en este dispositivo. La primera carga puede tardar.' : 'El ejecutor necesita atención. Consulta el resultado para ver opciones.'}
         </p>
       )}
 
@@ -124,7 +169,7 @@ export default function PythonEditor({
         id="practice-panel-instructions"
         role="tabpanel"
         aria-labelledby="practice-tab-instructions"
-        className={`${mobilePanel === 'instructions' ? 'block' : 'hidden'} md:hidden`}
+        className={`${activeMobilePanel === 'instructions' ? 'block' : 'hidden'} md:hidden`}
       >
         <section className="border-l-2 border-[var(--theme-border-dark)] bg-[var(--theme-bg-secondary)] p-4 sm:p-5">
           <h2 className="font-serif text-xl">Guía de práctica</h2>
@@ -134,8 +179,6 @@ export default function PythonEditor({
             onClick={() => {
               setMobilePanel('editor');
               setEditorRequested(true);
-              if (workerState === 'idle') {
-              }
             }}
             className="mt-4 min-h-12 w-full bg-[var(--theme-accent)] px-5 py-3 text-sm font-semibold text-[var(--theme-ink-inverse)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"
           >
@@ -148,16 +191,20 @@ export default function PythonEditor({
         id="practice-panel-editor"
         role="tabpanel"
         aria-labelledby="practice-tab-editor"
-        className={`${mobilePanel === 'editor' ? 'block' : 'hidden'} space-y-4 md:block`}
+        className={`${activeMobilePanel === 'editor' ? 'block' : 'hidden'} space-y-4 md:block`}
       >
         {(editorRequested || desktopLayout) && (
           <>
-        <div className="h-[min(42svh,420px)] min-h-[280px] w-full overflow-hidden border border-[var(--theme-border)] bg-[var(--theme-surface)] sm:h-[460px]">
+        <div className="h-[min(42svh,420px)] min-h-[280px] w-full overflow-hidden border border-[var(--theme-border)] bg-[var(--theme-code-bg)] sm:h-[460px]">
           <Editor
             height="100%"
             defaultLanguage="python"
-            theme="vs"
-            onMount={(editorInstance) => { editorRef.current = editorInstance; }}
+            theme="python-desde-cero"
+            onMount={(editorInstance, monaco) => {
+              editorRef.current = editorInstance;
+              monacoRef.current = monaco;
+              applyEditorTheme(monaco);
+            }}
             value={code}
             onChange={(value) => setCode(value ?? '')}
             options={{
@@ -175,7 +222,7 @@ export default function PythonEditor({
 
         <div aria-label="Teclas de Python para pantalla táctil" className="flex flex-wrap gap-2 md:hidden">
           {[
-            { label: '()', accessible: 'Insertar par )ntesis', text: '()', cursor: 1 },
+            { label: '()', accessible: 'Insertar paréntesis', text: '()', cursor: 1 },
             { label: '""', accessible: 'Insertar comillas', text: '""', cursor: 1 },
             { label: ':', accessible: 'Insertar dos puntos', text: ':' },
             { label: '=', accessible: 'Insertar signo igual', text: '=' },
@@ -195,7 +242,8 @@ export default function PythonEditor({
           ))}
         </div>
 
-        <label className="block text-base font-semibold text-[var(--theme-ink)] sm:text-sm">
+        {needsInput && (
+          <label className="block text-base font-semibold text-[var(--theme-ink)] sm:text-sm">
           Entrada para input() <span className="font-normal text-[var(--theme-muted)]">(una línea por solicitud)</span>
           <textarea
             value={input}
@@ -205,7 +253,8 @@ export default function PythonEditor({
             placeholder="Escribe aquí las líneas que leerá tu programa"
             className="mt-2 block min-h-20 w-full resize-y border border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 py-3 font-mono text-base font-normal text-[var(--theme-ink)] outline-none focus:border-[var(--theme-accent)] focus:ring-1 focus:ring-[var(--theme-focus-ring)] sm:text-sm"
           />
-        </label>
+          </label>
+        )}
           </>
         )}
 
@@ -236,7 +285,7 @@ export default function PythonEditor({
         id="practice-panel-output"
         role="tabpanel"
         aria-labelledby="practice-tab-output"
-        className={`${mobilePanel === 'output' ? 'block' : 'hidden'} mt-4 md:block`}
+        className={`${activeMobilePanel === 'output' ? 'block' : 'hidden'} mt-4 md:block`}
       >
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-semibold text-[var(--theme-ink)]">Salida del programa</h2>
@@ -247,7 +296,7 @@ export default function PythonEditor({
           aria-atomic="true"
           className="max-h-[42svh] min-h-28 overflow-auto whitespace-pre-wrap break-words border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] p-4 font-mono text-sm leading-6 text-[var(--theme-ink)] sm:max-h-64"
         >
-          {output || (workerState === 'ready' ? '> Entorno listo. Ejecuta código para consultar el resultado.' : '> Preparando el entorno Python en el navegador...')}
+          {error ? `Error de ejecución:\n${error}` : output || (workerState === 'ready' ? '> Entorno listo. Ejecuta código para consultar el resultado.' : workerState === 'idle' ? '> Pulsa Ejecutar para cargar Python por primera vez.' : '> Cargando Python en este dispositivo...')}
         </pre>
         <button
           type="button"
@@ -270,6 +319,8 @@ export default function PythonEditor({
           <button
             type="button"
             onClick={() => {
+              stopWorker();
+              createWorker();
             }}
             className="mt-2 flex min-h-11 w-full items-center justify-center border border-[var(--theme-accent)] px-4 py-2 text-sm font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-surface)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] md:hidden"
           >
@@ -278,21 +329,17 @@ export default function PythonEditor({
         )}
       </div>
 
+      {usesTurtle && (
       <div
         id="practice-panel-turtle"
         role="tabpanel"
         aria-labelledby="practice-tab-turtle"
-        className={`${mobilePanel === 'turtle' ? 'block' : 'hidden'} mt-4 md:block`}
+        className={`${activeMobilePanel === 'turtle' ? 'block' : 'hidden'} mt-4 md:block`}
       >
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-semibold text-[var(--theme-ink)]">Gráficos de Turtle</h2>
           <span className="text-xs text-[var(--theme-muted)]">{turtleCommands.length > 0 ? `${turtleCommands.length} trazo(s) dibujado(s)` : 'Ejecuta código con Turtle para ver el dibujo'}</span>
         </div>
-        {turtleError && (
-          <p className="mb-2 text-sm text-[var(--theme-error)] bg-[var(--theme-error-light)] border border-[var(--theme-error)] px-3 py-2 rounded">
-            {turtleError}
-          </p>
-        )}
         <div className="flex flex-col items-center justify-center min-h-[200px] max-h-[600px] overflow-auto border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] rounded-lg">
           {turtleCommands.length === 0 ? (
             <p className="text-sm text-[var(--theme-muted)] py-4">
@@ -356,7 +403,8 @@ export default function PythonEditor({
                       {cmd.text}
                     </text>
                   );
-                if (cmd.type === "bgcolor") {
+                }
+                if (cmd.type === 'bgcolor') {
                   return (
                     <rect
                       key={`turtle-bgcolor-${idx}`}
@@ -364,25 +412,40 @@ export default function PythonEditor({
                       y="-250"
                       width="500"
                       height="500"
-                      fill={cmd.color ?? "white"}
+                      fill={cmd.color ?? 'white'}
                     />
                   );
                 }
+                if (cmd.type === 'cursor') {
+                  return (
+                    <g
+                      data-turtle-cursor="true"
+                      key={`turtle-cursor-${idx}`}
+                      transform={`translate(${cmd.x ?? 0} ${-(cmd.y ?? 0)}) rotate(${-(cmd.heading ?? 0)})`}
+                    >
+                      {cmd.shape === 'turtle' ? (
+                        <>
+                          <ellipse cx="0" cy="0" rx="8" ry="5.5" fill={cmd.color ?? 'blue'} stroke="#17251d" strokeWidth="1" />
+                          <circle cx="10" cy="0" r="3.5" fill="#76a85d" stroke="#17251d" strokeWidth="0.8" />
+                          <circle cx="-5" cy="-6" r="2.7" fill="#76a85d" />
+                          <circle cx="4" cy="-6" r="2.7" fill="#76a85d" />
+                          <circle cx="-5" cy="6" r="2.7" fill="#76a85d" />
+                          <circle cx="4" cy="6" r="2.7" fill="#76a85d" />
+                          <path d="M-9 0 L-13 0" stroke="#17251d" strokeWidth="2" strokeLinecap="round" />
+                        </>
+                      ) : (
+                        <path d="M12 0 L-8 -6 L-5 0 L-8 6 Z" fill={cmd.color ?? 'blue'} stroke="#17251d" strokeWidth="1" />
+                      )}
+                    </g>
+                  );
                 }
                 return null;
               })}
             </svg>
           )}
         </div>
-        <button
-          type="button"
-          onClick={() => {}}
-          disabled={turtleCommands.length === 0}
-          className="mt-3 flex min-h-11 w-full items-center justify-center border border-[var(--theme-accent)] px-4 py-2 text-sm font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50 md:hidden"
-        >
-          Limpiar gráfico
-        </button>
       </div>
+      )}
     </section>
   );
 }

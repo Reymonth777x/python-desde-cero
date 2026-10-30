@@ -1,22 +1,25 @@
-﻿// Configuración de Cloudflare para vinext
-// Este archivo se usa para tipo de proyecto en Cloudflare Workers
-// El despliegue real se gestiona mediante wrangler.jsonc y vinext
+import { bindings, defineConfig, defineWorker } from "cf/config";
 
-export default {
-  name: "python-desdecero",
-  compatibility_date: "2026-10-26",
-  compatibility_flags: ["nodejs_compat"],
-  main: "vinext/server/fetch-handler",
-  assets: {
-    directory: "dist/client",
-    html_handling: "none",
-    not_found_handling: "none",
-    run_worker_first: [
-      "/*",
-      "!/_next/static/*",
-      "!/*/_next/static/*"
-    ]
-  },
-  images: { binding: "IMAGES" },
-  observability: { enabled: true }
-};
+export default defineConfig({
+  worker: defineWorker({
+    name: "python-desdecero",
+    entrypoint: "vinext/server/fetch-handler",
+    compatibilityDate: "2026-10-26",
+    compatibilityFlags: ["nodejs_compat"],
+    previewUrls: true,
+    assets: {
+      htmlHandling: "none",
+      notFoundHandling: "none",
+      runWorkerFirst: [
+        "/*",
+        "!/_next/static/*",
+        "!/*/_next/static/*",
+      ],
+    },
+    env: {
+      ASSETS: bindings.assets(),
+      IMAGES: bindings.images(),
+    },
+    observability: { enabled: true },
+  }),
+});

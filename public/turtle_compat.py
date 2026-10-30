@@ -1,8 +1,24 @@
 """Modulo de compatibilidad con Turtle para Pyodide en navegador."""
 
 import math
+import sys
 
-_commands = []
+MAX_TURTLE_COMMANDS = 5000
+
+
+class _TurtleCommandBuffer(list):
+    """Bound drawing memory so accidental loops cannot exhaust browser resources."""
+
+    def append(self, command):
+        if len(self) >= MAX_TURTLE_COMMANDS:
+            raise RuntimeError(
+                f"Se alcanzó el límite de {MAX_TURTLE_COMMANDS} comandos Turtle. "
+                "Reduce las repeticiones y vuelve a ejecutar el programa."
+            )
+        super().append(command)
+
+
+_commands = _TurtleCommandBuffer()
 _turtles = {}
 _current = None
 _screen = None
@@ -31,18 +47,20 @@ class Turtle:
     def __init__(self):
         self.x = 0.0
         self.y = 0.0
-        self.heading = 0.0
+        self._heading = 0.0
         self.pen_down = True
         self.pen_color = "black"
         self.fill_color = "black"
         self.pen_size = 1
-        self.speed = 6
+        self._speed = 6
         self.is_visible = True
+        self._shape = "classic"
         self.is_filling = False
         self.fill_points = []
+        _turtles[id(self)] = self
 
     def forward(self, distance):
-        rad = _radians(self.heading)
+        rad = _radians(self._heading)
         new_x = self.x + distance * math.cos(rad)
         new_y = self.y + distance * math.sin(rad)
         if self.pen_down:
@@ -62,10 +80,10 @@ class Turtle:
         self.forward(-distance)
 
     def left(self, angle):
-        self.heading = (self.heading + angle) % 360.0
+        self._heading = (self._heading + angle) % 360.0
 
     def right(self, angle):
-        self.heading = (self.heading - angle) % 360.0
+        self._heading = (self._heading - angle) % 360.0
     def goto(self, x, y=None):
         if y is None:
             self.x, self.y = float(x[0]), float(x[1])
@@ -123,8 +141,14 @@ class Turtle:
 
     def speed(self, speed=None):
         if speed is not None:
-            self.speed = float(speed)
-        return self.speed
+            self._speed = float(speed)
+        return self._speed
+
+    def shape(self, name=None):
+        """Match turtle.shape() without relying on a desktop drawing window."""
+        if name is not None:
+            self._shape = str(name)
+        return self._shape
 
     def hideturtle(self):
         self.is_visible = False
@@ -184,7 +208,7 @@ class Turtle:
                     "color": self.pen_color,
                     "size": self.pen_size,
                 })
-            rad = _radians(self.heading)
+            rad = _radians(self._heading)
             new_x = self.x + step_length * math.cos(rad)
             new_y = self.y + step_length * math.sin(rad)
             if self.pen_down:
@@ -211,10 +235,10 @@ class Turtle:
         return self.y
 
     def heading(self):
-        return self.heading
+        return self._heading
 
     def setheading(self, angle):
-        self.heading = float(angle) % 360.0
+        self._heading = float(angle) % 360.0
 
     def home(self):
         self.goto(0.0, 0.0)
@@ -229,7 +253,7 @@ class Turtle:
 
     def clear(self):
         global _commands
-        _commands = []
+        _commands = _TurtleCommandBuffer()
         self.home()
         self.pen_down = True
         self.pen_color = "black"
@@ -242,6 +266,7 @@ class Turtle:
 class Screen:
     def __init__(self):
         self.bgcolor_value = "white"
+        self.title_value = "Python Turtle"
 
     def bgcolor(self, color=None):
         global _screen_bgcolor
@@ -252,18 +277,20 @@ class Screen:
         return _screen_bgcolor
 
     def title(self, title=None):
-        return self.bgcolor_value
+        if title is not None:
+            self.title_value = str(title)
+        return self.title_value
 
     def done(self):
         pass
 
     def bye(self):
         global _commands
-        _commands = []
+        _commands = _TurtleCommandBuffer()
 
     def clearscreen(self):
         global _commands
-        _commands = []
+        _commands = _TurtleCommandBuffer()
 
     def reset(self):
         self.clearscreen()
@@ -328,6 +355,10 @@ def width(size=None):
 
 def speed(speed=None):
     return _get_turtle().speed(speed)
+
+
+def shape(name=None):
+    return _get_turtle().shape(name)
 
 
 def hideturtle():
@@ -407,12 +438,29 @@ def bgcolor(color=None):
 
 
 def get_commands():
-    return list(_commands)
+    commands = list(_commands)
+    # Turtle dibuja el cursor al terminar cada ejecución, no solo las líneas.
+    for current in _turtles.values():
+        if current.is_visible:
+            commands.append({
+                "type": "cursor",
+                "x": current.x,
+                "y": current.y,
+                "heading": current._heading,
+                "color": current.pen_color,
+                "shape": current._shape,
+            })
+    return commands
 
 
 def clear_commands():
-    global _commands
-    _commands = []
+    """Start a fresh drawing and release references to previous turtle instances."""
+    global _commands, _turtles, _current, _screen, _screen_bgcolor
+    _commands = _TurtleCommandBuffer()
+    _turtles = {}
+    _current = None
+    _screen = None
+    _screen_bgcolor = "white"
 
 
 def mainloop():
@@ -423,9 +471,7 @@ def exitonclick():
     pass
 
 
-def clear_commands():
-    global _commands
-    _commands = []
+
 
 # Registrar el módulo para que "import turtle as t" funcione
 sys.modules["turtle"] = sys.modules[__name__]

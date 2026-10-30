@@ -1,9 +1,8 @@
 import Link from 'next/link';
-import { useTheme } from '@/app/theme-provider';
 import ThemeSelector from '@/components/ThemeSelector';
 import { ArrowRight, BookOpenCheck, Circle, Lock, LogOut } from 'lucide-react';
 import { logout } from '@/app/login/actions';
-import { courseModules } from '@/lib/course';
+import { courseCatalog } from '@/lib/course-catalog';
 
 export type ProgressRow = {
   module_id: string;
@@ -16,12 +15,13 @@ type Props = {
   displayName: string;
   progressRows: ProgressRow[];
   progressUnavailable: boolean;
+  isAdmin: boolean;
 };
 
 /** Returns true if the module at moduleIndex is accessible given the progress rows. */
 function isModuleUnlocked(moduleIndex: number, progressRows: ProgressRow[]): boolean {
   if (moduleIndex === 0) return true;
-  const prevModule = courseModules[moduleIndex - 1];
+  const prevModule = courseCatalog[moduleIndex - 1];
   const assessment = prevModule?.lessons.find((l) => l.assessment);
   if (!assessment) return true; // no gate lesson — allow access
   return progressRows.some(
@@ -36,8 +36,8 @@ export default function AcademyDashboard({
   displayName,
   progressRows,
   progressUnavailable,
+  isAdmin,
 }: Props) {
-  useTheme();
   const completed = (moduleId: string, lessonId: string) =>
     progressRows.some(
       (row) =>
@@ -46,25 +46,38 @@ export default function AcademyDashboard({
         row.is_completed,
     );
 
-  const completedCount = courseModules.reduce(
+  const coreModules = courseCatalog.filter((courseModule) => !courseModule.optional);
+  const extensionModules = courseCatalog.filter((courseModule) => courseModule.optional);
+  const completedCount = coreModules.reduce(
     (total, courseModule) =>
-      total +
-      courseModule.lessons.filter((lesson) => completed(courseModule.id, lesson.id))
-        .length,
+      total + courseModule.lessons.filter((lesson) => completed(courseModule.id, lesson.id)).length,
     0,
   );
-  const lessonCount = courseModules.reduce(
+  const lessonCount = coreModules.reduce(
+    (total, courseModule) => total + courseModule.lessons.length,
+    0,
+  );
+  const extensionCompletedCount = extensionModules.reduce(
+    (total, courseModule) =>
+      total + courseModule.lessons.filter((lesson) => completed(courseModule.id, lesson.id)).length,
+    0,
+  );
+  const extensionLessonCount = extensionModules.reduce(
     (total, courseModule) => total + courseModule.lessons.length,
     0,
   );
 
-  // Find the next lesson the user has not yet completed, within an unlocked module
-  const nextLesson = courseModules
-    .flatMap((courseModule, moduleIndex) => {
+  // The four core modules form the completion path; the applied project is an optional extension.
+  const findNextLesson = (modules: typeof courseCatalog) => modules
+    .flatMap((courseModule) => {
+      const moduleIndex = courseCatalog.findIndex((item) => item.id === courseModule.id);
       if (!progressUnavailable && !isModuleUnlocked(moduleIndex, progressRows)) return [];
       return courseModule.lessons.map((lesson) => ({ courseModule, lesson }));
     })
     .find(({ courseModule, lesson }) => !completed(courseModule.id, lesson.id));
+
+  const coreComplete = !progressUnavailable && completedCount === lessonCount;
+  const nextLesson = findNextLesson(coreModules) ?? findNextLesson(extensionModules);
 
   const completionPercent = lessonCount > 0
     ? Math.round((completedCount / lessonCount) * 100)
@@ -73,13 +86,17 @@ export default function AcademyDashboard({
   const hasProgress = completedCount > 0;
   const ctaLabel = progressUnavailable
     ? 'Abrir primera lección'
-    : hasProgress
-      ? 'Continuar aprendiendo'
-      : 'Comenzar a aprender';
+    : coreComplete
+      ? extensionLessonCount > extensionCompletedCount
+        ? 'Explorar la extensión práctica'
+        : 'Repasar el curso principal'
+      : hasProgress
+        ? 'Continuar aprendiendo'
+        : 'Comenzar a aprender';
 
   const ctaHref = nextLesson
     ? `/academia/${nextLesson.courseModule.id}/${nextLesson.lesson.id}`
-    : '/academia/module-1/lesson-1';
+    : '/academia/module-1/b1-l1';
 
   return (
     <main className="min-h-screen bg-[var(--theme-bg)] text-[var(--theme-ink)]">
@@ -92,6 +109,11 @@ export default function AcademyDashboard({
             <Link href="/practica" className="inline-flex min-h-11 items-center text-[var(--theme-accent)] underline underline-offset-4">
               Laboratorio
             </Link>
+            {isAdmin && (
+              <Link href="/admin" className="inline-flex min-h-11 items-center text-[var(--theme-accent)] underline underline-offset-4">
+                Administración
+              </Link>
+            )}
             <form action={logout}>
               <button type="submit" className="inline-flex min-h-11 items-center gap-2 text-[var(--theme-muted)] underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--theme-focus-ring)]">
                 <LogOut aria-hidden="true" size={16} />
@@ -135,8 +157,13 @@ export default function AcademyDashboard({
         ) : (
           <section aria-label="Progreso general" className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
             <BookOpenCheck aria-hidden="true" className="text-[var(--theme-accent)]" size={18} />
-            <span className="font-semibold">{completedCount} de {lessonCount} actividades completadas</span>
+            <span className="font-semibold">{completedCount} de {lessonCount} lecciones del curso principal</span>
             <span className="text-[var(--theme-muted)]">({completionPercent}%)</span>
+            {extensionLessonCount > 0 && (
+              <span className="w-full text-xs text-[var(--theme-muted)]">
+                Extensión práctica opcional: {extensionCompletedCount} de {extensionLessonCount} actividades
+              </span>
+            )}
             <div className="h-2 w-full bg-[var(--theme-bg-secondary)] sm:max-w-sm" role="progressbar" aria-label="Porcentaje completado" aria-valuemin={0} aria-valuemax={100} aria-valuenow={completionPercent}>
               <div className="h-full bg-[var(--theme-accent)] transition-[width]" style={{ width: `${completionPercent}%` }} />
             </div>
@@ -145,7 +172,7 @@ export default function AcademyDashboard({
 
         {/* Module list */}
         <div className="mt-10 space-y-10">
-          {courseModules.map((courseModule, moduleIndex) => {
+          {courseCatalog.map((courseModule, moduleIndex) => {
             const unlocked = progressUnavailable || isModuleUnlocked(moduleIndex, progressRows);
             const moduleCompleted = courseModule.lessons.filter((lesson) =>
               completed(courseModule.id, lesson.id),
@@ -153,7 +180,7 @@ export default function AcademyDashboard({
             const percentage = Math.round(
               (moduleCompleted / courseModule.lessons.length) * 100,
             );
-            const prevModule = courseModules[moduleIndex - 1];
+            const prevModule = courseCatalog[moduleIndex - 1];
             const prevAssessment = prevModule?.lessons.find((l) => l.assessment);
 
             return (

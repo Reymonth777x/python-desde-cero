@@ -1,20 +1,16 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useState } from 'react';
 import type { FormEvent } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, CheckCircle2, LogOut } from 'lucide-react';
 import { logout } from '@/app/login/actions';
-import { createClient } from '@/lib/supabase/client';
-import type { CourseLesson, QuizQuestion } from '@/lib/course';
+import type { ClientSafeLesson } from '@/lib/course-types';
 import { submitQuiz, type SubmitQuizResult } from '@/lib/server-quiz/submit-quiz.action';
-
-type ClientSafeQuizQuestion = Omit<QuizQuestion, 'answer' | 'explanation'>;
+import PythonEditor from '@/components/PythonEditor';
 
 type Props = {
-  lesson: Omit<CourseLesson, 'questions'> & {
-    questions: ClientSafeQuizQuestion[];
-  };
+  lesson: ClientSafeLesson;
   moduleId: string;
   moduleNumber: string;
   moduleTitle: string;
@@ -38,55 +34,12 @@ export default function LessonStudy({
   previousHref,
   nextHref,
 }: Props) {
-  const supabase = useMemo(() => createClient(), []);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [result, setResult] = useState<SubmitQuizResult | null>(null);
   const [feedback, setFeedback] = useState('');
   const [saving, setSaving] = useState(false);
   const [completed, setCompleted] = useState(initialCompleted);
   const [savedScore, setSavedScore] = useState(initialScore);
-  const [sessionValid, setSessionValid] = useState(true);
-  const authGenerationRef = useRef(0);
-
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        const generation = ++authGenerationRef.current;
-        const matchesExpectedUser = session?.user.id === expectedUserId;
-        setSessionValid(matchesExpectedUser);
-        if (!matchesExpectedUser) {
-          setCompleted(false);
-          setSavedScore(0);
-          setFeedback('La sesión cambió. Vuelve a iniciar sesión para guardar tu avance.');
-          return;
-        }
-
-        Promise.resolve().then(async () => {
-          const { data, error } = await supabase
-            .from('progress')
-            .select('is_completed, best_score')
-            .eq('user_id', expectedUserId)
-            .eq('module_id', moduleId)
-            .eq('lesson_id', lesson.id)
-            .maybeSingle();
-
-          if (generation !== authGenerationRef.current) return;
-          if (error) {
-            setFeedback('No se pudo volver a consultar el progreso de esta cuenta.');
-            return;
-          }
-
-          setCompleted(data?.is_completed === true);
-          setSavedScore(Number(data?.best_score ?? 0));
-        });
-      },
-    );
-
-    return () => {
-      authGenerationRef.current += 1;
-      subscription.unsubscribe();
-    };
-  }, [expectedUserId, lesson.id, moduleId, supabase]);
 
   const answersJson = JSON.stringify(
     lesson.questions.map((_q, index) => answers[index] ?? -1)
@@ -94,7 +47,7 @@ export default function LessonStudy({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (saving || !sessionValid) return;
+    if (saving) return;
 
     if (lesson.questions.some((_question, index) => answers[index] === undefined)) {
       setFeedback('Responde todas las preguntas antes de comprobar la evaluación.');
@@ -108,6 +61,7 @@ export default function LessonStudy({
     const formData = new FormData();
     formData.set('moduleId', moduleId);
     formData.set('lessonId', lesson.id);
+    formData.set('expectedUserId', expectedUserId);
     formData.set('answers', answersJson);
 
     try {
@@ -123,7 +77,7 @@ export default function LessonStudy({
 
       if (serverResult.passed) {
         setCompleted(true);
-        setSavedScore(Math.max(initialScore, serverResult.score));
+        setSavedScore(Math.max(savedScore, serverResult.score));
         setFeedback('Evaluación aprobada y progreso guardado en tu cuenta.');
       } else {
         setFeedback('Aún no alcanzas el puntaje necesario. Revisa la retroalimentación y vuelve a intentarlo.');
@@ -167,12 +121,6 @@ export default function LessonStudy({
             No se pudo consultar el progreso anterior. La evaluación seguirá disponible y se intentará guardar al aprobarla.
           </p>
         )}
-        {!sessionValid && (
-          <p role="alert" className="mt-6 border-l-4 border-[var(--theme-error)] bg-[var(--theme-surface)] px-4 py-3 text-sm leading-6 text-[var(--theme-error)]">
-            Tu sesión ya no corresponde a esta cuenta. Vuelve a autenticarte antes de guardar.
-          </p>
-        )}
-
         <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem]">
           <article className="min-w-0 space-y-8">
             <section aria-labelledby="objectives-title">
@@ -196,13 +144,45 @@ export default function LessonStudy({
                   <span className="text-xs text-[var(--theme-muted)]">Código didáctico original</span>
                 </div>
                 <pre className="overflow-x-auto p-4 font-mono text-sm leading-7 text-[var(--theme-accent-dark)] sm:p-5"><code>{lesson.example}</code></pre>
+                <div className="border-t border-[var(--theme-border)] px-4 py-4 sm:px-5">
+                  <h3 className="text-xs font-bold tracking-[0.12em] text-[var(--theme-muted)]">SALIDA ESPERADA</h3>
+                  <pre className="mt-2 overflow-x-auto whitespace-pre-wrap rounded bg-[var(--theme-bg-secondary)] p-3 font-mono text-sm leading-6 text-[var(--theme-ink)]">{lesson.exampleOutput}</pre>
+                  <h3 className="mt-4 text-xs font-bold tracking-[0.12em] text-[var(--theme-muted)]">CÓMO FUNCIONA</h3>
+                  <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm leading-6 text-[var(--theme-muted)]">
+                    {lesson.walkthrough.map((step) => <li key={step}>{step}</li>)}
+                  </ol>
+                  <h3 className="mt-4 text-xs font-bold tracking-[0.12em] text-[var(--theme-muted)]">ERRORES FRECUENTES</h3>
+                  <ul className="mt-2 list-disc space-y-2 pl-5 text-sm leading-6 text-[var(--theme-muted)]">
+                    {lesson.commonMistakes.map((mistake) => <li key={mistake}>{mistake}</li>)}
+                  </ul>
+                </div>
               </div>
             </section>
 
-            <section aria-labelledby="exercise-title" className="border-l-2 border-[var(--theme-border-dark)] bg-[var(--theme-bg-secondary)] p-5 sm:p-6">
-              <h2 id="exercise-title" className="font-serif text-xl">Práctica sugerida</h2>
-              <p className="mt-3 text-sm leading-7 text-[var(--theme-muted)]">{lesson.exercise?.statement ?? ''}</p>
-              <Link href="/practica" className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">Abrir el laboratorio</Link>
+            <section aria-labelledby="exercise-title" className="space-y-4">
+              <div className="border-l-2 border-[var(--theme-border-dark)] bg-[var(--theme-bg-secondary)] p-5 sm:p-6">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <h2 id="exercise-title" className="font-serif text-xl">{lesson.exercise.title}</h2>
+                  <span className="text-xs font-semibold text-[var(--theme-muted)]">Nivel {lesson.exercise.difficulty} · {lesson.exercise.xp} XP · {lesson.estimatedMinutes} min</span>
+                </div>
+                <p className="mt-3 text-sm leading-7 text-[var(--theme-muted)]">{lesson.exercise.statement}</p>
+                <h3 className="mt-4 text-xs font-bold tracking-[0.12em] text-[var(--theme-muted)]">PISTA</h3>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-[var(--theme-muted)]">
+                  {lesson.exercise.hints.map((hint) => <li key={hint}>{hint}</li>)}
+                </ul>
+                {lesson.exercise.tests[0]?.expected && (
+                  <details className="mt-4 border-t border-[var(--theme-border)] pt-3">
+                    <summary className="min-h-10 cursor-pointer text-sm font-semibold text-[var(--theme-accent)]">Ver salida esperada cuando termines tu intento</summary>
+                    <pre className="mt-2 overflow-x-auto whitespace-pre-wrap rounded bg-[var(--theme-surface)] p-3 font-mono text-sm leading-6">{lesson.exercise.tests[0].expected}</pre>
+                    <p className="mt-2 text-xs leading-5 text-[var(--theme-muted)]">Compara tu ejecución con este resultado. La evaluación de conocimientos se comprueba y guarda por separado.</p>
+                  </details>
+                )}
+              </div>
+              <PythonEditor
+                defaultCode={lesson.exercise.starterCode || lesson.example}
+                instructions={lesson.exercise.statement}
+              />
+              <Link href="/practica" className="inline-flex min-h-11 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">Abrir el laboratorio completo</Link>
             </section>
 
             <section aria-labelledby="quiz-title">
@@ -237,7 +217,7 @@ export default function LessonStudy({
                                 setResult(null);
                                 setFeedback('');
                               }}
-                              disabled={saving || !sessionValid}
+                              disabled={saving}
                               className="mt-1 accent-[#294936]"
                             />
                             <span>{option}</span>
@@ -253,7 +233,7 @@ export default function LessonStudy({
                   </fieldset>
                 ))}
 
-                <button type="submit" disabled={saving || !sessionValid} className="min-h-12 bg-[var(--theme-accent)] px-5 py-3 text-sm font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50">
+                <button type="submit" disabled={saving} className="min-h-12 bg-[var(--theme-accent)] px-5 py-3 text-sm font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50">
                   {saving ? 'Guardando resultado…' : 'Comprobar respuestas'}
                 </button>
               </form>

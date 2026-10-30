@@ -4,32 +4,12 @@ import {
   courseModules,
   findCourseLesson,
   findCourseModule,
-  type CourseLesson,
-  type QuizQuestion,
 } from '@/lib/course';
+import { toClientLesson } from '@/lib/server-quiz/public-lesson';
 import { createClient } from '@/lib/supabase/server';
 
-type ClientSafeQuizQuestion = Omit<QuizQuestion, 'answer' | 'explanation'>;
-
-/**
- * Devuelve una copia de la lección sin los campos `answer` ni `explanation`
- * de cada pregunta. Así las respuestas correctas nunca viajan al cliente.
- * El cliente solo recibe prompt, options y el contenido visible de la lección.
- */
-function stripQuizAnswers(lesson: CourseLesson): Omit<CourseLesson, 'questions'> & {
-  questions: ClientSafeQuizQuestion[];
-} {
-  return {
-    ...lesson,
-    questions: lesson.questions.map(({ prompt, options }) => ({ prompt, options })),
-  };
-}
-
 type Props = {
-  params: Promise<{
-    moduleId: string;
-    lessonId: string;
-  }>;
+  params: Promise<{ moduleId: string; lessonId: string }>;
 };
 
 export default async function LessonPage({ params }: Props) {
@@ -37,9 +17,7 @@ export default async function LessonPage({ params }: Props) {
   const courseModule = findCourseModule(moduleId);
   const lesson = findCourseLesson(moduleId, lessonId);
 
-  if (!courseModule || !lesson) {
-    notFound();
-  }
+  if (!courseModule || !lesson) notFound();
 
   const moduleIndex = courseModules.findIndex((item) => item.id === courseModule.id);
   const lessonIndex = courseModule.lessons.findIndex((item) => item.id === lesson.id);
@@ -59,14 +37,12 @@ export default async function LessonPage({ params }: Props) {
   } = await supabase.auth.getUser();
 
   if (authError || !user) {
-    redirect('/login');
+    redirect(`/login?next=${encodeURIComponent(`/academia/${moduleId}/${lessonId}`)}`);
   }
 
-  // Server-side progression guard: modules after the first require the
-  // previous module's assessment lesson to be completed.
   if (moduleIndex > 0) {
     const prevModule = courseModules[moduleIndex - 1];
-    const assessmentLesson = prevModule.lessons.find((l) => l.assessment);
+    const assessmentLesson = prevModule.lessons.find((item) => item.assessment);
 
     if (assessmentLesson) {
       const { data: gate, error: gateError } = await supabase
@@ -77,10 +53,7 @@ export default async function LessonPage({ params }: Props) {
         .eq('lesson_id', assessmentLesson.id)
         .maybeSingle();
 
-      // Only block if we could reach the DB and the record is absent/incomplete.
-      if (!gateError && gate?.is_completed !== true) {
-        redirect('/academia');
-      }
+      if (gateError || gate?.is_completed !== true) redirect('/academia');
     }
   }
 
@@ -95,7 +68,7 @@ export default async function LessonPage({ params }: Props) {
   return (
     <LessonStudy
       key={`${courseModule.id}:${lesson.id}:${user.id}`}
-      lesson={stripQuizAnswers(lesson)}
+      lesson={toClientLesson(lesson)}
       moduleId={courseModule.id}
       moduleNumber={courseModule.number}
       moduleTitle={courseModule.title}

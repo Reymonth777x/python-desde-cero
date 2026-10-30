@@ -1,6 +1,14 @@
 'use client';
 
-import { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useSyncExternalStore,
+  useState,
+} from 'react';
 
 export type ThemeName =
   | 'original'
@@ -18,52 +26,84 @@ type ThemeContextValue = {
 };
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
-
 const THEME_KEY = 'python-desde-cero-theme';
+const THEME_CHANGE_EVENT = 'python-desde-cero-theme-change';
 
-function leerTemaGuardado(): ThemeName {
+function isThemeName(value: string | null): value is ThemeName {
+  return value === 'original' ||
+    value === 'dark' ||
+    value === 'dracula' ||
+    value === 'cyberpunk' ||
+    value === 'hacker' ||
+    value === 'rosa' ||
+    value === 'sistema';
+}
+
+function readStoredTheme(): ThemeName {
   if (typeof window === 'undefined') return 'sistema';
   try {
-    const guardado = localStorage.getItem(THEME_KEY);
-    if (
-      guardado === 'original' ||
-      guardado === 'dark' ||
-      guardado === 'dracula' ||
-      guardado === 'cyberpunk' ||
-      guardado === 'hacker' ||
-      guardado === 'rosa' ||
-      guardado === 'sistema'
-    ) {
-      return guardado;
-    }
+    const stored = window.localStorage.getItem(THEME_KEY);
+    return isThemeName(stored) ? stored : 'sistema';
   } catch {
-    // Ignorar errores de localStorage
+    return 'sistema';
   }
+}
+
+function subscribeToTheme(callback: () => void) {
+  if (typeof window === 'undefined') return () => {};
+
+  const onStorage = (event: StorageEvent) => {
+    if (event.key === THEME_KEY || event.key === null) callback();
+  };
+  window.addEventListener('storage', onStorage);
+  window.addEventListener(THEME_CHANGE_EVENT, callback);
+
+  return () => {
+    window.removeEventListener('storage', onStorage);
+    window.removeEventListener(THEME_CHANGE_EVENT, callback);
+  };
+}
+
+function getServerThemeSnapshot(): ThemeName {
+  // Must match the default HTML attributes during SSR and hydration.
   return 'sistema';
 }
 
-function resolverTemaSistema(): 'original' | 'dark' {
+function resolveSystemTheme(): 'original' | 'dark' {
   if (typeof window === 'undefined') return 'original';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark'
-    : 'original';
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'original';
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeName>(leerTemaGuardado);
+  const persistedTheme = useSyncExternalStore(
+    subscribeToTheme,
+    readStoredTheme,
+    getServerThemeSnapshot,
+  );
+  // Keep an immediate in-memory selection as well as the persisted snapshot.
+  // This makes a click update the UI synchronously; the subscription remains
+  // responsible for re-reading a saved theme on reload and across browser tabs.
+  const [themeOverride, setThemeOverride] = useState<ThemeName | null>(null);
+  const theme = themeOverride ?? persistedTheme;
 
   const resolvedTheme = useMemo(() => {
-    if (theme === 'sistema') return resolverTemaSistema();
-    return theme === 'dark' ? 'dark' : 'original';
+    if (theme === 'sistema') return resolveSystemTheme();
+    return ['dark', 'dracula', 'cyberpunk', 'hacker'].includes(theme) ? 'dark' : 'original';
   }, [theme]);
 
   const setTheme = useCallback((next: ThemeName) => {
-    setThemeState(next);
+    setThemeOverride(next);
+    const resolved = next === 'sistema'
+      ? resolveSystemTheme()
+      : (['dark', 'dracula', 'cyberpunk', 'hacker'].includes(next) ? 'dark' : 'original');
+    document.documentElement.setAttribute('data-theme', next === 'sistema' ? resolved : next);
+    document.documentElement.setAttribute('data-color-scheme', resolved);
     try {
-      localStorage.setItem(THEME_KEY, next);
+      window.localStorage.setItem(THEME_KEY, next);
     } catch {
-      // Silently ignore if localStorage is unavailable
+      // The current page still changes theme if localStorage is unavailable.
     }
+    window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
   }, []);
 
   useEffect(() => {
@@ -80,9 +120,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useTheme() {
-  const ctx = useContext(ThemeContext);
-  if (!ctx) {
+  const context = useContext(ThemeContext);
+  if (!context) {
     throw new Error('useTheme must be used within a ThemeProvider');
   }
-  return ctx;
+  return context;
 }

@@ -2,7 +2,9 @@
 
 A self-paced educational platform for learning Python programming from scratch, with an in-browser code editor, guided lessons, quizzes, and student progress tracking.
 
-**Live application:** https://python-desde-cero.pythondesdecero.workers.dev
+**Production domain:** https://python-desdecero.com
+
+The `workers.dev` address is the Cloudflare fallback; confirm the custom domain after each production release.
 
 ## Overview
 
@@ -31,7 +33,7 @@ The platform is organized into modules and lessons, each with learning objective
 | Backend / Auth / Database | Supabase (Auth, PostgreSQL, RLS) |
 | Code editor | Monaco Editor (`@monaco-editor/react`) |
 | Python execution | Pyodide in a Web Worker (`public/python-worker.js`) |
-| State management | Zustand |
+| State management | React hooks and local component state |
 | Testing | Vitest |
 | Deployment target | Cloudflare Workers (Vinext) |
 
@@ -41,38 +43,54 @@ The application follows Next.js App Router conventions:
 
 - **Server-side**: Supabase server client (`@supabase/ssr` with `server-only`) for Auth and database operations in Server Components and Server Actions
 - **Client-side**: Supabase browser client for interactive components; Monaco Editor and Pyodide Worker for Python execution
-- **Middleware**: Next.js middleware verifies Supabase session claims and redirects unauthenticated users from protected learning pages
+- **Proxy (`src/proxy.ts`)**: Next.js 16 verifies session claims, applies admin authorization to `/admin`, and generates a per-request CSP nonce
 - **Database**: `profiles`, `invitations`, and `progress` tables with RLS policies enforcing user-level row isolation
 
 ## Requirements
 
-- Node.js 20.9 or later
+- Node.js 24 (same major as CI)
 - npm (dependencies are locked in `package-lock.json`)
 - A Supabase project with Auth and PostgreSQL enabled
 
-## Setup
+## Local setup (Windows + Docker)
 
-1. Clone the repository and install dependencies:
+Use Node.js 24, npm and Docker Desktop. The local launcher downloads and runs a pinned Supabase CLI 2.121.0 through npx on first use; a global CLI installation is not required. It starts the local stack and seeds local test users, but deliberately does not run migration up, db reset, db push or supabase link: the repository and remote migration histories must be reconciled before applying migrations.
 
-```bash
-npm install
+1. Install dependencies once:
+
+```powershell
+npm ci
 ```
 
-2. Create a `.env.local` file in the project root with the following variables (values are **never** committed to Git):
+2. Open Docker Desktop and wait until its engine is running.
 
-```
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-supabase-publishable-key
-NEXT_PUBLIC_SITE_URL=https://your-site-domain.com
-```
+3. From the project root, run the local launcher:
 
-3. Start the development server:
-
-```bash
-npm run dev
+```powershell
+.\scripts\start-local.ps1
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+The launcher starts the Supabase stack in Docker, reads the local API URL and publishable key from `supabase status --output env`, writes an ignored `.env.development.local` for Next.js, creates three test accounts, and starts the app at [http://localhost:3000](http://localhost:3000). It does not run `supabase link`, `db push`, or `db reset`, and it does not connect the app to production.
+
+Open Supabase Studio at [http://localhost:54323](http://localhost:54323). The API and database ports are read from the CLI output; do not confuse the API port (commonly 54321) with the database port (commonly 54322).
+
+Test account passwords are stored only in `.local/dev-users.credentials.json`, which is ignored by Git. The seed creates two students for ownership/IDOR tests and one admin with `profiles.is_admin = true`. The current profile schema does not define a teacher role, so the seed does not pretend to create one.
+
+To start the app without resetting the local test passwords:
+
+```powershell
+.\scripts\start-local.ps1 -SkipSeed
+```
+
+To stop Next.js, press `Ctrl+C`. To stop the local Supabase containers when finished, run `npx --yes supabase@2.121.0 stop`; this preserves their data volumes.
+
+For a hosted Supabase development project instead of Docker, copy `.env.example` to `.env.local` and use that project's own URL and publishable key. Never put a service-role/secret key in a `NEXT_PUBLIC_` variable or commit it.
+
+## Contributing as a team
+
+This project is prepared for four individual contributors. Read [the four-partner onboarding guide](docs/team/GUIA-INICIO-4-SOCIOS.md) before changing production code. Each person uses their own GitHub account; never share passwords, personal tokens, service-role keys, or `.env.local`.
+
+Production deployments are gated by successful CI on `master`. Do not merge a pull request while any required check is failing. Canonical database migrations live under `supabase/migrations/`; reconcile the remote migration history before applying pending SQL.
 
 ## Available Scripts
 
@@ -84,6 +102,7 @@ npm run dev
 | `npm test` | Run Vitest unit tests |
 | `npm run typecheck` | Run TypeScript type checking |
 | `npm run lint` | Run ESLint |
+| `npm run check:release` | Run the complete local release verification sequence |
 
 ## Authentication and Supabase
 
