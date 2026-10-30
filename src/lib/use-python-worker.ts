@@ -44,7 +44,6 @@ export function usePythonWorker({
   const isRunningRef = useRef(false);
   const initializationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const executeRef = useRef<(request: ExecutionRequest) => void>(() => {});
   const callbacksRef = useRef({ onStatusChange, onOutput });
 
   const [workerState, setWorkerState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
@@ -167,7 +166,7 @@ export function usePythonWorker({
       const pending = pendingExecutionRef.current;
       if (pending) {
         pendingExecutionRef.current = null;
-        executeRef.current(pending);
+        executeRequest(pending);
       }
       return;
     }
@@ -218,7 +217,7 @@ export function usePythonWorker({
     setError(nextError);
     setTurtleCommands(nextCommands);
     callbacksRef.current.onOutput?.(nextOutput, nextError ?? undefined, nextCommands);
-  }, [clearExecutionTimeout, clearInitializationTimeout]);
+  }, [clearExecutionTimeout, clearInitializationTimeout, executeRequest]);
 
   useEffect(() => {
     return () => {
@@ -376,7 +375,7 @@ export function usePythonWorker({
     if (workerState === 'ready') {
       const pending = pendingExecutionRef.current;
       pendingExecutionRef.current = null;
-      if (pending) executeRef.current(pending);
+      if (pending) executeRequest(pending);
       return;
     }
 
