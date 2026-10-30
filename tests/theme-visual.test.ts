@@ -131,3 +131,21 @@ test("La paleta de temas móvil se adapta al ancho y no queda recortada", async 
     await expect(dialog).toHaveCount(0);
   }
 });
+
+test("Las páginas principales no generan desplazamiento horizontal en móvil", async ({ page }) => {
+  const routesToCheck = ["/", "/login", "/academia", "/practica"];
+  for (const width of [320, 360, 390]) {
+    await page.setViewportSize({ width, height: 740 });
+    for (const route of routesToCheck) {
+      await page.goto(route);
+      const widths = await page.evaluate(() => ({
+        viewport: document.documentElement.clientWidth,
+        document: document.documentElement.scrollWidth,
+        body: document.body.scrollWidth,
+      }));
+      expect(widths.document, `${route} desborda a ${width}px`).toBeLessThanOrEqual(width);
+      expect(widths.body, `${route} body desborda a ${width}px`).toBeLessThanOrEqual(width);
+      expect(widths.viewport).toBe(width);
+    }
+  }
+});
