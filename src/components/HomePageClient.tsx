@@ -296,7 +296,7 @@ export default function HomePageClient({ accountLinks, progressSummary }: HomePa
               </h2>
             </div>
             <p className="max-w-md text-sm leading-7 text-[var(--theme-muted)] sm:text-base">
-              El recorrido base sigue los cuatro módulos principales de Python Essentials 1. Al completarlo, puedes continuar con un proyecto aplicado opcional.
+              El recorrido base integra los cuatro módulos principales de Python Essentials 1, un proyecto final obligatorio y un examen global. Después puedes continuar con la extensión práctica opcional de archivos y persistencia.
             </p>
           </div>
 
