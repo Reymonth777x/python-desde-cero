@@ -1374,23 +1374,31 @@ export const courseModules: CourseModule[] = [
           "sort() ordena la lista original y no devuelve una lista nueva; sorted(lista) crea otra secuencia ordenada sin modificar la fuente. Ambos pueden recibir reverse=True para invertir el orden. Elige sort() cuando quieras modificar la colección y sorted() cuando necesites conservarla.",
           "Bubble sort es un algoritmo didáctico que compara elementos vecinos y los intercambia cuando están desordenados. En cada pasada, un valor grande termina al final de la parte pendiente. No es eficiente para colecciones grandes, pero enseña a coordinar bucles, índices y comparaciones."
         ],
-        "example": "colores = [\"azul\", \"rojo\", \"verde\"]\ncolores.append(\"negro\")\ncolores.insert(1, \"blanco\")\nretirado = colores.pop()\ncolores.sort()\nprint(colores)\nprint(retirado)",
-        "exampleOutput": "['azul', 'blanco', 'rojo', 'verde']\nnegro",
+        "example": "colores = [\"azul\", \"rojo\", \"verde\"]\ncolores.append(\"negro\")\ncolores.insert(1, \"blanco\")\nretirado = colores.pop()\ncolores.sort()\nprint(colores)\nprint(retirado)\n\n# Bubble sort manual: este bloque no usa sort() ni sorted().\nnumeros = [5, 2, 4, 1]\nfor pasada in range(len(numeros) - 1):\n    for indice in range(len(numeros) - 1 - pasada):\n        if numeros[indice] > numeros[indice + 1]:\n            temporal = numeros[indice]\n            numeros[indice] = numeros[indice + 1]\n            numeros[indice + 1] = temporal\n    print(f\"Pasada {pasada + 1}: {numeros}\")\nprint(\"Resultado:\", numeros)",
+        "exampleOutput": "['azul', 'blanco', 'rojo', 'verde']\nnegro\nPasada 1: [2, 4, 1, 5]\nPasada 2: [2, 1, 4, 5]\nPasada 3: [1, 2, 4, 5]\nResultado: [1, 2, 4, 5]",
         "walkthrough": [
-          "append() añade negro al final de la lista.",
-          "insert(1, ...) coloca blanco en la segunda posición.",
-          "pop() retira y devuelve el último valor; sort() ordena los restantes."
+          "append() agrega negro al final; insert(1, ...) coloca blanco en la segunda posición y pop() retira y devuelve el último elemento.",
+          "sort() modifica la lista de colores original. Es un método incorporado; no es la implementación manual de Bubble Sort.",
+          "Para ver una pasada de Bubble Sort, empieza con [5, 2, 4]: compara 5 con 2. Como 5 es mayor, intercambia los vecinos y la lista queda [2, 5, 4].",
+          "Compara después 5 con 4. Vuelve a intercambiar y queda [2, 4, 5]. Al terminar esta pasada, el número mayor ya está al final.",
+          "El bucle exterior repite las pasadas. Con n elementos bastan n - 1 pasadas, por eso usamos range(len(numeros) - 1).",
+          "El bucle interior compara vecinos hasta la parte que todavía no está ordenada. En cada pasada se acorta porque el mayor ya quedó en su lugar.",
+          "Cuando el valor izquierdo es mayor, guarda primero ese valor en temporal; luego mueve el derecho a la izquierda y temporal a la derecha."
         ],
         "commonMistakes": [
-          "Esperar que sorted() modifique la lista original.",
-          "Confundir pop(), que devuelve un elemento, con remove(), que busca un valor."
+          "Esperar que sorted() modifique la lista original; devuelve una lista nueva.",
+          "Confundir pop(), que devuelve un elemento, con remove(), que busca y elimina un valor.",
+          "Usar range(len(numeros)) en el bucle exterior: provoca una pasada adicional sin comparaciones.",
+          "Revisar toda la lista en cada pasada; el bucle interior debe acortarse porque el final ya quedó ordenado.",
+          "Sobrescribir un número antes de guardarlo en temporal y perder su valor durante el intercambio.",
+          "Usar sort() o sorted() dentro del ejercicio cuando se pide implementar Bubble Sort manualmente."
         ],
         "exercise": {
           "id": "b3-e7",
           "title": "Ordenar con bubble sort",
-          "statement": "Completa el ordenamiento por burbuja para ordenar [5, 2, 4, 1] de menor a mayor y muestra la lista final.",
-          "starterCode": "numeros = [5, 2, 4, 1]\nfor pasada in range(len(numeros)):\n    for indice in range(len(numeros) - 1 - pasada):\n        # compara e intercambia vecinos\n        pass\n",
-          "solution": "numeros = [5, 2, 4, 1]\nfor pasada in range(len(numeros)):\n    for indice in range(len(numeros) - 1 - pasada):\n        if numeros[indice] > numeros[indice + 1]:\n            temporal = numeros[indice]\n            numeros[indice] = numeros[indice + 1]\n            numeros[indice + 1] = temporal\nprint(numeros)",
+          "statement": "Completa el ordenamiento por burbuja para ordenar [5, 2, 4, 1] de menor a mayor. En cada pasada compara vecinos y mueve el mayor al final de la parte pendiente. No uses sort() ni sorted().",
+          "starterCode": "numeros = [5, 2, 4, 1]\nfor pasada in range(len(numeros) - 1):\n    for indice in range(len(numeros) - 1 - pasada):\n        # Compara numeros[indice] con su vecino derecho.\n        # Si están desordenados, intercámbialos usando temporal.\n        pass\nprint(numeros)",
+          "solution": "numeros = [5, 2, 4, 1]\nfor pasada in range(len(numeros) - 1):\n    for indice in range(len(numeros) - 1 - pasada):\n        if numeros[indice] > numeros[indice + 1]:\n            temporal = numeros[indice]\n            numeros[indice] = numeros[indice + 1]\n            numeros[indice + 1] = temporal\nprint(numeros)",
           "tests": [
             {
               "input": [],
@@ -1398,8 +1406,10 @@ export const courseModules: CourseModule[] = [
             }
           ],
           "hints": [
-            "Compara cada elemento con su vecino derecho.",
-            "Intercambia cuando el primero sea mayor, conservando temporalmente uno de los valores."
+            "El bucle exterior controla las pasadas. Si hay n elementos, necesitas como máximo n - 1.",
+            "En el bucle interior usa range(len(numeros) - 1 - pasada): al final de cada pasada queda un número más en su posición.",
+            "Compara numeros[indice] con numeros[indice + 1]. Solo intercambia si el de la izquierda es mayor.",
+            "Guarda el valor izquierdo en temporal antes de modificar las dos posiciones para no perderlo."
           ],
           "difficulty": "medio",
           "xp": 20,
