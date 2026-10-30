@@ -95,8 +95,8 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(lesson('module-3', 'b3-l6').example).toContain('edades[0]');
     expect(lesson('module-3', 'b3-l6').example).not.toContain('notas[0][1]');
     expect(lesson('module-3', 'b3-l6').explanation.join(' ')).toContain('listas unidimensionales');
-    expect(lesson('module-3', 'b3-l9').example).toContain('notas[0][1]');
-    expect(lesson('module-3', 'b3-l9').explanation.join(' ')).toContain('lista anidada');
+    expect(lesson('module-3', 'b3-l9').questions[0].prompt).toContain('notas[1][0]');
+    expect(lesson('module-3', 'b3-l9').explanation.join(' ')).toContain('lista de listas');
     expect(lesson('module-4', 'b4-l2').example).toContain('cantidad=1');
     expect(lesson('module-4', 'b4-l6').example).toContain('for producto in productos');
     expect(lesson('module-4', 'b4-l7').explanation.join(' ')).toContain('IndexError');
