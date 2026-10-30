@@ -19,9 +19,12 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(courseModules[4].optional).toBe(true);
     expect(courseModules[4].title).toContain('extensión práctica');
     expect(courseModules.slice(0, 4).map((courseModule) => courseModule.lessons.length)).toEqual([
-      4, 7, 8, 8,
+      4, 8, 9, 9,
     ]);
     expect(courseModules[4].lessons).toHaveLength(4);
+    expect(courseModules[1].lessons.at(-1)?.id).toBe('b2-l8');
+    expect(courseModules[2].lessons.at(-1)?.id).toBe('b3-l9');
+    expect(courseModules[3].lessons.at(-1)?.id).toBe('b4-l9');
   });
 
   it('asigna preguntas y ejemplos a cada actividad y mantiene ids únicos por módulo', () => {
@@ -52,8 +55,8 @@ describe('ruta de aprendizaje Python desde cero', () => {
     const prompts = lessons.flatMap((lesson) => lesson.questions.map((question) => question.prompt));
     const exerciseIds = lessons.map((lesson) => lesson.exercise.id);
 
-    expect(lessons).toHaveLength(31);
-    expect(courseModules.filter((courseModule) => !courseModule.optional).flatMap((courseModule) => courseModule.lessons)).toHaveLength(27);
+    expect(lessons).toHaveLength(34);
+    expect(courseModules.filter((courseModule) => !courseModule.optional).flatMap((courseModule) => courseModule.lessons)).toHaveLength(30);
     expect(new Set(exerciseIds).size).toBe(lessons.length);
     expect(new Set(prompts).size).toBe(prompts.length);
 
