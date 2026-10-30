@@ -1,9 +1,14 @@
 'use server';
 
-import { randomBytes } from 'node:crypto';
-
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+
+function generateInvitationCode() {
+  const bytes = crypto.getRandomValues(new Uint8Array(8));
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0'))
+    .join('')
+    .toUpperCase();
+}
 
 export async function listInvitations() {
   const supabase = await createClient();
@@ -46,7 +51,7 @@ export async function createInvitation(formData: FormData) {
   if (!profile?.is_admin) redirect('/academia');
 
   const submittedCode = String(formData.get('code') ?? '').trim().toUpperCase();
-  const code = submittedCode || randomBytes(8).toString('hex').toUpperCase();
+  const code = submittedCode || generateInvitationCode();
   const rawExpiresAt = String(formData.get('expires_at') ?? '').trim();
 
   if (!/^[A-F0-9]{16}$/.test(code)) {
