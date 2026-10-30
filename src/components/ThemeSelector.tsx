@@ -29,6 +29,7 @@ export default function ThemeSelector() {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const desktopPanelRef = useRef<HTMLDivElement>(null);
   const mobilePanelRef = useRef<HTMLElement>(null);
+  const mobileBackdropRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -39,18 +40,50 @@ export default function ThemeSelector() {
 
       if (
         selectorRef.current?.contains(target) ||
-        mobilePanelRef.current?.contains(target)
+        mobilePanelRef.current?.contains(target) ||
+        mobileBackdropRef.current?.contains(target)
       ) {
         return;
       }
 
       setIsOpen(false);
+      triggerRef.current?.focus();
     };
 
+    const isMobile = window.matchMedia('(max-width: 767px)').matches;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setIsOpen(false);
         triggerRef.current?.focus();
+        return;
+      }
+
+      if (!isMobile || event.key !== 'Tab') return;
+
+      const panel = mobilePanelRef.current;
+      if (!panel) return;
+
+      const focusable = Array.from(panel.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ));
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (!first || !last) {
+        event.preventDefault();
+        panel.focus();
+        return;
+      }
+
+      if (!panel.contains(document.activeElement)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
 
@@ -182,9 +215,17 @@ export default function ThemeSelector() {
 
       {isOpen && createPortal(
         <div
+          ref={mobileBackdropRef}
+          data-testid="theme-mobile-backdrop"
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-3 py-4 md:hidden"
           onPointerDown={(event) => {
-            if (event.target === event.currentTarget) setIsOpen(false);
+            if (event.target === event.currentTarget) {
+              // Keep the browser's pointer default from moving focus after we
+              // deliberately return it to the dialog's trigger.
+              event.preventDefault();
+              setIsOpen(false);
+              triggerRef.current?.focus();
+            }
           }}
         >
           <section
@@ -193,6 +234,7 @@ export default function ThemeSelector() {
             role="dialog"
             aria-modal="true"
             aria-labelledby={`theme-title-mobile-${id}`}
+            tabIndex={-1}
             className="flex w-full max-w-sm flex-col overflow-hidden rounded-xl border shadow-2xl"
             style={{
               maxHeight: 'min(82dvh, 36rem)',
@@ -215,7 +257,10 @@ export default function ThemeSelector() {
               </div>
               <button
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false);
+                  triggerRef.current?.focus();
+                }}
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-xl leading-none hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"
                 style={{ color: 'var(--theme-ink)' }}
                 aria-label="Cerrar selección de tema"
