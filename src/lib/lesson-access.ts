@@ -9,8 +9,8 @@ export type LessonReference = {
 };
 
 /**
- * A lesson can be opened when it is the first in its module or when the
- * immediately preceding lesson has been completed. If progress could not be
+ * A lesson can be opened when it is the first in its module or when every
+ * earlier lesson in that module has been completed. If progress could not be
  * loaded, fail closed and leave only the first lesson available.
  *
  * Completed lessons remain revisitable; callers should check the current
@@ -35,11 +35,12 @@ export function canAccessLessonInSequence(
     return true;
   }
 
-  const previousLesson = lessons[lessonIndex - 1];
-  return progressRows.some(
-    (row) =>
-      row.module_id === moduleId &&
-      row.lesson_id === previousLesson.id &&
-      row.is_completed,
+  return lessons.slice(0, lessonIndex).every((previousLesson) =>
+    progressRows.some(
+      (row) =>
+        row.module_id === moduleId &&
+        row.lesson_id === previousLesson.id &&
+        row.is_completed,
+    ),
   );
 }
