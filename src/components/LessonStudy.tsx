@@ -1,11 +1,10 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useState } from 'react';
 import type { FormEvent } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, CheckCircle2, LogOut } from 'lucide-react';
 import { logout } from '@/app/login/actions';
-import { createClient } from '@/lib/supabase/client';
 import type { CourseExercise, CourseLesson, QuizQuestion } from '@/lib/course';
 import { submitQuiz, type SubmitQuizResult } from '@/lib/server-quiz/submit-quiz.action';
 import PythonEditor from '@/components/PythonEditor';
@@ -41,55 +40,12 @@ export default function LessonStudy({
   previousHref,
   nextHref,
 }: Props) {
-  const supabase = useMemo(() => createClient(), []);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [result, setResult] = useState<SubmitQuizResult | null>(null);
   const [feedback, setFeedback] = useState('');
   const [saving, setSaving] = useState(false);
   const [completed, setCompleted] = useState(initialCompleted);
   const [savedScore, setSavedScore] = useState(initialScore);
-  const [sessionValid, setSessionValid] = useState(true);
-  const authGenerationRef = useRef(0);
-
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        const generation = ++authGenerationRef.current;
-        const matchesExpectedUser = session?.user.id === expectedUserId;
-        setSessionValid(matchesExpectedUser);
-        if (!matchesExpectedUser) {
-          setCompleted(false);
-          setSavedScore(0);
-          setFeedback('La sesión cambió. Vuelve a iniciar sesión para guardar tu avance.');
-          return;
-        }
-
-        Promise.resolve().then(async () => {
-          const { data, error } = await supabase
-            .from('progress')
-            .select('is_completed, best_score')
-            .eq('user_id', expectedUserId)
-            .eq('module_id', moduleId)
-            .eq('lesson_id', lesson.id)
-            .maybeSingle();
-
-          if (generation !== authGenerationRef.current) return;
-          if (error) {
-            setFeedback('No se pudo volver a consultar el progreso de esta cuenta.');
-            return;
-          }
-
-          setCompleted(data?.is_completed === true);
-          setSavedScore(Number(data?.best_score ?? 0));
-        });
-      },
-    );
-
-    return () => {
-      authGenerationRef.current += 1;
-      subscription.unsubscribe();
-    };
-  }, [expectedUserId, lesson.id, moduleId, supabase]);
 
   const answersJson = JSON.stringify(
     lesson.questions.map((_q, index) => answers[index] ?? -1)
@@ -97,7 +53,7 @@ export default function LessonStudy({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (saving || !sessionValid) return;
+    if (saving) return;
 
     if (lesson.questions.some((_question, index) => answers[index] === undefined)) {
       setFeedback('Responde todas las preguntas antes de comprobar la evaluación.');
@@ -111,6 +67,7 @@ export default function LessonStudy({
     const formData = new FormData();
     formData.set('moduleId', moduleId);
     formData.set('lessonId', lesson.id);
+    formData.set('expectedUserId', expectedUserId);
     formData.set('answers', answersJson);
 
     try {
@@ -170,12 +127,6 @@ export default function LessonStudy({
             No se pudo consultar el progreso anterior. La evaluación seguirá disponible y se intentará guardar al aprobarla.
           </p>
         )}
-        {!sessionValid && (
-          <p role="alert" className="mt-6 border-l-4 border-[var(--theme-error)] bg-[var(--theme-surface)] px-4 py-3 text-sm leading-6 text-[var(--theme-error)]">
-            Tu sesión ya no corresponde a esta cuenta. Vuelve a autenticarte antes de guardar.
-          </p>
-        )}
-
         <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem]">
           <article className="min-w-0 space-y-8">
             <section aria-labelledby="objectives-title">
@@ -272,7 +223,7 @@ export default function LessonStudy({
                                 setResult(null);
                                 setFeedback('');
                               }}
-                              disabled={saving || !sessionValid}
+                              disabled={saving}
                               className="mt-1 accent-[#294936]"
                             />
                             <span>{option}</span>
@@ -288,7 +239,7 @@ export default function LessonStudy({
                   </fieldset>
                 ))}
 
-                <button type="submit" disabled={saving || !sessionValid} className="min-h-12 bg-[var(--theme-accent)] px-5 py-3 text-sm font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50">
+                <button type="submit" disabled={saving} className="min-h-12 bg-[var(--theme-accent)] px-5 py-3 text-sm font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50">
                   {saving ? 'Guardando resultado…' : 'Comprobar respuestas'}
                 </button>
               </form>
