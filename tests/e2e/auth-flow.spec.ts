@@ -8,6 +8,17 @@ test.describe('Autenticacion y flujo de usuario', () => {
     await expect(page.locator('h1').first()).toBeVisible();
   });
 
+  test('La primera lección real puede probarse sin iniciar sesión', async ({ page }) => {
+    await page.goto('/muestra');
+
+    await expect(page).toHaveURL(/\\/muestra$/);
+    await expect(page.getByRole('heading', { name: 'Resolver problemas mediante algoritmos' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Tu código Python' })).toBeVisible();
+    await expect(page.getByTestId('python-editor-frame')).toBeVisible();
+    await expect(page.getByText(/Esta muestra no guarda código, respuestas ni progreso/)).toBeVisible();
+    await expect(page.getByText('¿Qué describe mejor un algoritmo?')).toHaveCount(0);
+  });
+
   test('Pagina de login carga con ambos formularios', async ({ page }) => {
     await page.goto('/login');
     await page.waitForLoadState('domcontentloaded');
