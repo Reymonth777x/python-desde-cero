@@ -241,6 +241,28 @@ jobs:
           printf 'CLOUDFLARE_ACCOUNT_ID=%s\n' "$account_id" >> "$GITHUB_ENV"
           echo "Account ID validado; el valor permanece oculto."
 
+      - name: Confirmar que master no avanzó durante el build
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          EXPECTED_MASTER_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+        run: |
+          set -euo pipefail
+          current_master_sha="$(curl --fail --silent --show-error \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/git/ref/heads/master" |
+            jq -r '.object.sha // empty')"
+          if [[ -z "$current_master_sha" ]]; then
+            echo "::error::No se pudo volver a verificar el HEAD actual de master antes de publicar."
+            exit 1
+          fi
+          if [[ "$EXPECTED_MASTER_SHA" != "$current_master_sha" ]]; then
+            echo "::error::Se cancela este deploy: master avanzó durante la compilación (${EXPECTED_MASTER_SHA:0:7} → ${current_master_sha:0:7}). No se publicará un Worker obsoleto."
+            exit 1
+          fi
+          echo "Revisión final confirmada: el build coincide con el HEAD actual de master."
+
       - name: Desplegar Worker
         run: npm run deploy:vinext
         env:
