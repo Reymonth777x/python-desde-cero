@@ -115,7 +115,7 @@ test("La paleta de temas cabe completa en una pantalla móvil", async ({ page })
 
   const panel = page.getByRole("region", { name: "Tema visual" });
   await expect(panel).toBeVisible();
-  await expect(panel.getByRole("button")).toHaveCount(7);
+  await expect(panel.locator('button[aria-pressed]')).toHaveCount(7);
 
   const bounds = await panel.boundingBox();
   expect(bounds).not.toBeNull();
