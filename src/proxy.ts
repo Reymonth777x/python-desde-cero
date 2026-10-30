@@ -103,7 +103,7 @@ export async function proxy(request: NextRequest) {
 
   if (claims && isGuestOnlyPage) {
     const url = request.nextUrl.clone();
-    url.pathname = '/estudiante';
+    url.pathname = '/academia';
     url.search = '';
     return redirectTo(url);
   }
@@ -127,7 +127,7 @@ export async function proxy(request: NextRequest) {
 
     if (profile?.is_admin !== true) {
       const url = request.nextUrl.clone();
-      url.pathname = '/estudiante';
+      url.pathname = '/academia';
       url.search = '';
       return redirectTo(url);
     }
