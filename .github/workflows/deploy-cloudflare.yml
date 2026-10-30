@@ -229,7 +229,7 @@ jobs:
           set -euo pipefail
           npx --yes wrangler@4.148.0 deploy --config wrangler.runner.jsonc 2>&1 | tee /tmp/python-runner-deploy.log
 
-          runner_origin="$(grep -Eo 'https://[^[:space:]]+\.workers\.dev' /tmp/python-runner-deploy.log | tail -n 1 | sed -E 's/[),]+$//')"
+          runner_origin="$(grep -Eo 'https://python-desdecero-runner\.[a-z0-9-]+\.workers\.dev' /tmp/python-runner-deploy.log | tail -n 1 | sed -E 's/[),]+$//')"
           if [[ -z "$runner_origin" ]]; then
             echo "::error::Wrangler no devolvió la URL workers.dev del ejecutor aislado."
             exit 1
