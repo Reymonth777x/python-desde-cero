@@ -163,10 +163,30 @@ jobs:
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
           NEXT_PUBLIC_SITE_URL: https://python-desdecero.com
 
-      - name: Comprobar la web publicada
+      - name: Verificar dominio personalizado conectado al Worker
         shell: bash
         run: |
+          set -euo pipefail
+          domains_json="$(curl --fail --silent --show-error \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains?hostname=python-desdecero.com")"
+          worker_service="$(jq -r '[.result[] | select(.hostname == "python-desdecero.com" and .enabled == true)][0].service // empty' <<< "$domains_json")"
+          if [[ "$worker_service" != "python-desdecero" ]]; then
+            echo "::error::El dominio personalizado no está conectado al Worker python-desdecero. Servicio detectado: ${worker_service:-ninguno}."
+            exit 1
+          fi
+          echo "Dominio personalizado verificado: python-desdecero.com -> python-desdecero."
+
+      - name: Comprobar la versión nueva en la web publicada
+        shell: bash
+        run: |
+          set -euo pipefail
           curl --fail --silent --show-error --location --retry 5 --retry-delay 3 --retry-all-errors \
-            https://python-desdecero.com/ -o /tmp/python-desde-cero-home.html
-          grep -qi "Python desde cero" /tmp/python-desde-cero-home.html
-          echo "La página pública respondió y contiene el título esperado."
+            "https://python-desdecero.com/?release=$GITHUB_SHA" -o /tmp/python-desde-cero-home.html
+          grep -Fqi "Entiende lo que haces" /tmp/python-desde-cero-home.html
+          grep -Fqi "Cuatro módulos principales" /tmp/python-desde-cero-home.html
+          if grep -Fqi "MÓDULOS 01 Y 02" /tmp/python-desde-cero-home.html; then
+            echo "::error::El dominio todavía está sirviendo la portada anterior."
+            exit 1
+          fi
+          echo "Dominio público sirve la nueva portada de cuatro módulos."
