@@ -307,10 +307,9 @@ CREATE OR REPLACE FUNCTION public.submit_quiz_v2(
 )
 RETURNS jsonb
 LANGUAGE sql
-SECURITY DEFINER
 SET search_path = ''
 AS $function$
-  SELECT private.submit_quiz_authoritative_v2(p_module_id,p_lesson_id,p_answers);
+  SELECT public.submit_quiz_v2(p_module_id,p_lesson_id,p_answers);
 $function$;
 
 -- Backward-compatible function name; both routes use the authoritative v2 key.
