@@ -1122,12 +1122,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "Si datos contiene el texto 8 12 4, ¿qué devuelve datos.split()?",
             "options": [
-              "El texto completo sin cambios",
               "Una lista con las cadenas 8, 12 y 4",
+              "El texto completo sin cambios",
               "Una lista con los números enteros 8, 12 y 4",
               "El número 12"
             ],
-            "answer": 1,
+            "answer": 0,
             "explanation": "split() separa el texto y devuelve una lista de cadenas; int() convierte cada elemento cuando necesitas operar con números."
           }
         ],
