@@ -10,11 +10,13 @@ Actualizado el 30 de octubre de 2026 tras comprobar `master`, CI, despliegue y l
 - [x] Simplificar la navegación: solo estudiante y administrador; retirar la ruta docente ficticia y el prototipo de cocina del árbol activo.
 - [x] Estructurar el PE1 obligatorio en cuatro módulos y 33 unidades, dejando el módulo 5 como extensión opcional.
 - [x] Añadir la evaluación formal del módulo 1, Hello, World! en 2.1, el proyecto final obligatorio y el examen global.
-- [x] Corregir la progresión de variables/conversiones, operadores bit a bit y Bubble Sort con pruebas de regresión.
+- [x] Corregir la progresión de variables/conversiones, operadores bit a bit, desplazamientos, Bubble Sort, listas de listas, manejo de excepciones y saltos de línea del ejemplo de listas con pruebas de regresión.
 - [x] Hacer que el calificador del servidor compruebe prerrequisitos, conserve las claves en esquema privado y no exponga aciertos por pregunta.
 - [x] Verificar en producción y DEV 67 claves v2 configuradas, sin claves faltantes en el catálogo vigente.
+- [x] Comparar las 67 posiciones `questions.answer` del catálogo con `correct_option_v2`: 67/67 coinciden en producción y DEV, sin filas faltantes, nulas ni índices desalineados.
+- [x] Corregir el vencimiento de invitaciones para interpretar `datetime-local` en el navegador, guardar un timestamp UTC explícito y mostrar la hora local del administrador (PR #66). CI y despliegue aprobados.
 - [x] Confirmar que las invitaciones utilizadas se conservan y que las no utilizadas pueden eliminarse.
-- [x] CI completo del HEAD `71fa854381f0507f6b0b16b8a6fbf2a0c2efaa15` (workflow `41049538535`) y despliegue del mismo SHA (workflow `41049961984`) completados correctamente.
+- [x] CI completo del HEAD `e758f9cf9da1aa647429669b112b7128ca9b126d` (workflow `41076396982`) y despliegue del mismo SHA (workflow `41076898388`) completados correctamente.
 - [x] Integrar PR #54: el workflow comparó el SHA del CI con el HEAD de `master` antes de compilar y volvió a comprobarlo inmediatamente antes del deploy; ambas validaciones pasaron en el release `71fa854`.
 - [x] Verificar en producción el hero `cambio.py`, la muestra pública `/muestra`, las cinco URLs del sitemap, el marcador Turnstile de `/login` y el redirect HTTP 308 de `www` al apex.
 
@@ -23,7 +25,10 @@ Actualizado el 30 de octubre de 2026 tras comprobar `master`, CI, despliegue y l
 - [x] Integrar PR #52: `b3-l9` guía el acceso a una fila, el bucle exterior y el bucle interior. CI aprobado; fusionada en `master`.
 - [x] Integrar PR #55: el número de pruebas del proyecto se obtiene de `lesson.exercise.tests.length`, coincidiendo con los seis casos del catálogo. CI aprobado; fusionada en `master`.
 - [x] Integrar PR #57: aclara la demostración de variables y `print()` en las lecciones iniciales sin convertirlas en teoría adelantada. CI aprobado; fusionada en `master`.
-- [x] Publicar en el release `71fa854...` los cambios de PR #52, #55 y #57; el HTML público de `/muestra` ya refleja el marco didáctico actualizado de `b1-l1`–`b1-l3`.
+- [x] Integrar PR #63: añade práctica de desplazamientos `<<`/`>>` a `b3-l2` y casos de `KeyError`, `ValueError`, `else` y `finally` a `b4-l7`.
+- [x] Integrar PR #65: corrige secuencias `\\n` literales en `b3-l6` (ejemplo, salida, código inicial y solución) y protege el formato con regresión.
+- [x] Integrar PR #66: interpreta vencimientos de invitaciones en zona horaria local, los almacena en UTC y muestra el instante en hora local.
+- [x] Publicar en el release `e758f9c...` las mejoras de curso y de invitaciones; el smoke test externo posterior confirmó `/`, `/muestra`, `/login`, sitemap de cinco URLs y `www` al dominio apex.
 - [ ] Verificar con sesión autenticada que las lecciones `b3-l9` y `b4-l10`, los seis casos del proyecto y los prerrequisitos se presentan y se completan correctamente.
 - [ ] Revisar de forma integral las 33 unidades obligatorias y los prerequisitos entre temas; retirar redundancias sin recortar el contenido necesario.
 - [ ] Ampliar prácticas con más entradas válidas, inválidas, límites y explicaciones de errores. Priorizar las unidades que aún tienen un solo caso de prueba.
@@ -58,8 +63,7 @@ Actualizado el 30 de octubre de 2026 tras comprobar `master`, CI, despliegue y l
 
 - [ ] Con cuenta administradora, crear y guardar un código automático.
 - [ ] Crear y guardar un código personalizado; confirmar normalización a mayúsculas y persistencia exacta.
-- [ ] Eliminar una invitación no utilizada.
-- [ ] Confirmar que una invitación usada no se puede eliminar y que la interfaz explica la conservación del historial.
+- [ ] Con cuenta administradora, confirmar en DEV que se puede eliminar una invitación no utilizada y que la usada se bloquea con un mensaje claro. La lógica y trigger tienen pruebas automatizadas; falta esta comprobación manual.
 - [ ] Con una cuenta de estudiante, confirmar que listar, crear o eliminar invitaciones está prohibido.
 
 ## 7. Supabase, staging y migraciones
@@ -71,9 +75,14 @@ Actualizado el 30 de octubre de 2026 tras comprobar `master`, CI, despliegue y l
 - [ ] No ejecutar `supabase db push`, `migration repair` ni `db reset` contra producción mientras persista la divergencia de timestamps. Las migraciones 024–027 ya están aplicadas en ambos entornos con versiones distintas; no repetirlas.
 - [ ] Revisar periódicamente los Security y Performance Advisors. No eliminar índices solo por avisos informativos sin medir la carga.
 
-## 8. Legal, privacidad y producto futuro
+## 8. Seguridad del repositorio y gobierno de GitHub
+
+- [ ] Decidir entre privatizar el repositorio o publicar una copia saneada que no contenga `questions.answer`, `questions.explanation`, `exercise.solution` ni `tests[].expected`. Issue #21; no reescribir historial ni cambiar visibilidad sin aprobación.
+- [ ] Proteger `master` desde GitHub Settings → Branches con PR obligatorio, una aprobación, conversaciones resueltas y checks `test-and-build` y `powershell-launcher`. La integración actual no tiene permiso para administrar la regla (HTTP 403); issue #23.
+
+## 9. Legal, privacidad y producto futuro
 
 - [ ] Completar revisión legal de privacidad, términos y cookies.
 - [ ] Definir criterios medibles del plan gratuito y posibles beneficios Pro antes de ofrecerlos.
 - [ ] Separar contenido y traducciones del código de interfaz cuando se inicie el inglés.
-- [ ] Mantener fuera del alcance de esta versión los juegos no publicados y Orilla, que es un proyecto futuro independiente.
+- [ ] Mantener el producto y el copy comercial limitados a las funciones realmente publicadas.
