@@ -33,7 +33,7 @@ export default function PythonEditor({
 }: Props) {
   const [code, setCode] = useState(defaultCode);
   const [input, setInput] = useState('');
-  const [loadedKey, setLoadedKey] = useState('');
+  const storageReadyRef = useRef(false);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const {
     workerState, output, error, turtleCommands, testResults, isRunning,
@@ -41,24 +41,30 @@ export default function PythonEditor({
   } = usePythonWorker();
 
   useEffect(() => {
-    setLoadedKey('');
-    try {
-      const saved = window.localStorage.getItem(storageKey);
-      setCode(saved ?? defaultCode);
-    } catch {
-      setCode(defaultCode);
-    }
-    setLoadedKey(storageKey);
+    storageReadyRef.current = false;
+    const frame = window.requestAnimationFrame(() => {
+      try {
+        const saved = window.localStorage.getItem(storageKey);
+        setCode(saved ?? defaultCode);
+      } catch {
+        setCode(defaultCode);
+      }
+      storageReadyRef.current = true;
+    });
+    return () => {
+      window.cancelAnimationFrame(frame);
+      storageReadyRef.current = false;
+    };
   }, [defaultCode, storageKey]);
 
   useEffect(() => {
-    if (loadedKey !== storageKey) return;
+    if (!storageReadyRef.current) return;
     try {
       window.localStorage.setItem(storageKey, code);
     } catch {
       // Storage may be unavailable in private or restricted browsing modes.
     }
-  }, [code, loadedKey, storageKey]);
+  }, [code, storageKey]);
 
   function execute() {
     runCode(code, input === '' ? [] : input.split(/\r?\n/).slice(0, 20));
