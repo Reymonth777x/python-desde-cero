@@ -16,7 +16,7 @@ Actualizado el 30 de octubre de 2026 tras comprobar `master`, CI, despliegue y l
 - [x] Comparar las 67 posiciones `questions.answer` del catálogo con `correct_option_v2`: 67/67 coinciden en producción y DEV, sin filas faltantes, nulas ni índices desalineados.
 - [x] Corregir el vencimiento de invitaciones para interpretar `datetime-local` en el navegador, guardar un timestamp UTC explícito y mostrar la hora local del administrador (PR #66). CI y despliegue aprobados.
 - [x] Confirmar que las invitaciones utilizadas se conservan y que las no utilizadas pueden eliminarse.
-- [x] CI completo del HEAD `e758f9cf9da1aa647429669b112b7128ca9b126d` (workflow `41076396982`) y despliegue del mismo SHA (workflow `41076898388`) completados correctamente.
+- [x] CI y despliegue del release funcional `e758f9cf9da1aa647429669b112b7128ca9b126d` (workflows `41076396982` y `41076898388`) completados correctamente. La actualización documental PR #67 (`10cc1b7`) también pasó CI `41092034385` y deploy `41092591412`; no modificó código de la aplicación.
 - [x] Integrar PR #54: el workflow comparó el SHA del CI con el HEAD de `master` antes de compilar y volvió a comprobarlo inmediatamente antes del deploy; ambas validaciones pasaron en el release `71fa854`.
 - [x] Verificar en producción el hero `cambio.py`, la muestra pública `/muestra`, las cinco URLs del sitemap, el marcador Turnstile de `/login` y el redirect HTTP 308 de `www` al apex.
 
