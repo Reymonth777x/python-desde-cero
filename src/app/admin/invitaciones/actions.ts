@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { normalizeInvitationCode } from '@/lib/invitation-code';
 
 function generateInvitationCode() {
   const bytes = crypto.getRandomValues(new Uint8Array(8));
@@ -50,13 +51,14 @@ export async function createInvitation(formData: FormData) {
 
   if (!profile?.is_admin) redirect('/academia');
 
-  const submittedCode = String(formData.get('code') ?? '').trim().toUpperCase();
-  const code = submittedCode || generateInvitationCode();
+  const submittedCode = String(formData.get('code') ?? '').trim();
+  const code = submittedCode ? normalizeInvitationCode(submittedCode) : generateInvitationCode();
   const rawExpiresAt = String(formData.get('expires_at') ?? '').trim();
 
-  if (!/^[A-F0-9]{16}$/.test(code)) {
-    return { error: 'El código debe tener 16 caracteres hexadecimales' };
+  if (!code) {
+    return { error: 'El código personalizado debe tener entre 8 y 32 caracteres: letras, números y guiones, sin guiones al inicio, al final ni repetidos.' };
   }
+
 
   const insertData: {
     code: string;

@@ -26,7 +26,7 @@ const FEEDBACK: Record<string, { ok: boolean; text: string }> = {
 function feedbackCode(error: string | null | undefined, success: string) {
   if (!error) return success;
   if (error.includes('Ya existe')) return 'duplicate';
-  if (error.includes('inválid') || error.includes('requerido') || error.includes('hexadecimales') || error.includes('futura')) return 'invalid';
+  if (error.includes('inválid') || error.includes('requerido') || error.includes('caracteres: letras') || error.includes('futura')) return 'invalid';
   return 'failed';
 }
 
@@ -92,9 +92,7 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
             Gestión de Invitaciones
           </h1>
           <p className='mt-2 leading-7 text-[var(--theme-muted)]'>
-            Crea códigos de un solo uso y compártelos directamente con los estudiantes. No se envían correos automáticamente.
-            El estudiante los introduce al crear su cuenta; al registrarse correctamente, el código queda marcado como usado.
-            Si no indicas una fecha, vence en siete días.
+            Crea un código para identificar a una persona invitada o a un grupo de difusión y compártelo directamente; no se envía por correo automáticamente. El registro sigue abierto aunque la persona no tenga código: la invitación es opcional y no concede permisos especiales. Si alguien la utiliza al crear su cuenta, queda marcada como usada y vinculada a ese registro. Los códigos sin fecha vencen en siete días.
           </p>
 
           {listError && (
@@ -125,11 +123,14 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
                     id='code'
                     name='code'
                     type='text'
-                    maxLength={16}
+                    placeholder='CURSO-2026'
+                    maxLength={32}
+                    minLength={8}
+                    pattern="[A-Za-z0-9-]{8,32}"
                     autoComplete='off'
                     className='mt-1 min-h-12 w-full border border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 py-3 text-base text-[var(--theme-ink)] outline-none focus:border-[var(--theme-accent)] focus:ring-1 focus:ring-[var(--theme-focus-ring)]'
                   />
-                  <p className='mt-2 text-xs text-[var(--theme-muted)]'>Déjalo vacío para generar un código seguro automáticamente.</p>
+                  <p className='mt-2 text-xs text-[var(--theme-muted)]'>Es opcional: déjalo vacío para generar uno aleatorio. Si lo personalizas, usa 8–32 letras, números o guiones; no se admiten guiones dobles.</p>
                 </div>
                 <div>
                   <label htmlFor='expires_at' className='block text-sm font-semibold text-[var(--theme-ink)] mb-1'>
@@ -182,13 +183,15 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
                         {inv.expires_at ? new Date(inv.expires_at).toLocaleDateString() : 'Sin expiración'}
                       </td>
                       <td className='border border-[var(--theme-border)] px-3 py-2'>
-                        {!inv.is_used && (
+                        {!inv.is_used ? (
                           <form action={handleDeleteInvitation} className='inline'>
                             <input type='hidden' name='id' value={inv.id} />
                             <button type='submit' className='text-xs text-[var(--theme-error)] hover:underline'>
                               Eliminar
                             </button>
                           </form>
+                        ) : (
+                          <span className='text-xs text-[var(--theme-muted)]' title='Se conserva por trazabilidad'>Registro conservado</span>
                         )}
                       </td>
                     </tr>

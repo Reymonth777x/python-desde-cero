@@ -1,49 +1,41 @@
 import { describe, expect, it } from 'vitest';
-import { parseOptionalInvitationCode } from './invitation-code';
+import { normalizeInvitationCode, parseOptionalInvitationCode } from './invitation-code';
 
-describe('código de invitación opcional', () => {
-  it('permite el registro público sin código', () => {
-    expect(parseOptionalInvitationCode('  ')).toEqual({
+describe('códigos de invitación', () => {
+  it('permite crear una cuenta sin invitación', () => {
+    expect(parseOptionalInvitationCode('  ')).toEqual({ ok: true, code: null });
+  });
+
+  it('normaliza un código personalizado legible', () => {
+    expect(parseOptionalInvitationCode('  curso-2026 ')).toEqual({
       ok: true,
-      code: null,
+      code: 'CURSO-2026',
     });
   });
 
-  it('normaliza y conserva un código de 16 caracteres hexadecimales', () => {
-    expect(parseOptionalInvitationCode(' 7ab93671edd3fb06 ')).toEqual({
+  it('conserva los códigos aleatorios de 16 caracteres', () => {
+    expect(parseOptionalInvitationCode('7ab93671edd3fb06')).toEqual({
       ok: true,
       code: '7AB93671EDD3FB06',
     });
   });
 
-  it('rechaza códigos proporcionados con un formato incorrecto', () => {
-    expect(parseOptionalInvitationCode('not-a-valid-code')).toEqual({
-      ok: false,
-    });
+  it('permite códigos de 8 a 32 caracteres con letras, números y guiones', () => {
+    expect(normalizeInvitationCode('AULA2026')).toBe('AULA2026');
+    expect(normalizeInvitationCode('EQUIPO-PYTHON-2026')).toBe('EQUIPO-PYTHON-2026');
+    expect(normalizeInvitationCode('GRUPO-ABCDEFGHIJKLMNO-2026')).toBe('GRUPO-ABCDEFGHIJKLMNO-2026');
   });
 
-  it('rechaza códigos con menos de 16 caracteres', () => {
-    expect(parseOptionalInvitationCode('7AB93671EDD3FB0')).toEqual({
-      ok: false,
-    });
+  it('rechaza códigos demasiado cortos, demasiado largos o con símbolos', () => {
+    expect(normalizeInvitationCode('ABC123')).toBeNull();
+    expect(normalizeInvitationCode('A'.repeat(33))).toBeNull();
+    expect(normalizeInvitationCode('CURSO_2026')).toBeNull();
+    expect(normalizeInvitationCode('CURSO--2026')).toBeNull();
+    expect(normalizeInvitationCode('-CURSO2026')).toBeNull();
+    expect(normalizeInvitationCode('CURSO2026-')).toBeNull();
   });
 
-  it('rechaza códigos con más de 16 caracteres', () => {
-    expect(parseOptionalInvitationCode('7AB93671EDD3FB06A')).toEqual({
-      ok: false,
-    });
-  });
-
-  it('rechaza códigos con caracteres no hexadecimales', () => {
-    expect(parseOptionalInvitationCode('7AB93671EDD3FB0G')).toEqual({
-      ok: false,
-    });
-  });
-
-  it('acepta una cadena vacía como ausencia de invitación', () => {
-    expect(parseOptionalInvitationCode('')).toEqual({
-      ok: true,
-      code: null,
-    });
+  it('acepta cadena vacía como ausencia de invitación', () => {
+    expect(parseOptionalInvitationCode('')).toEqual({ ok: true, code: null });
   });
 });

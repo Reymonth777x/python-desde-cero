@@ -31,6 +31,26 @@ const inputStyle =
 
 export default function LoginForm({ error, message, next = '' }: Props) {
   const [isSignup, setIsSignup] = useState(false);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [signupName, setSignupName] = useState('');
+  const [signupEmail, setSignupEmail] = useState('');
+  const [signupPassword, setSignupPassword] = useState('');
+  const [invitationCode, setInvitationCode] = useState('');
+
+  function showLogin() {
+    setSignupName('');
+    setSignupEmail('');
+    setSignupPassword('');
+    setInvitationCode('');
+    setIsSignup(false);
+  }
+
+  function showSignup() {
+    setLoginEmail('');
+    setLoginPassword('');
+    setIsSignup(true);
+  }
   const active = 'border-[var(--theme-accent)] text-[var(--theme-accent)]';
   const idle = 'border-transparent text-[var(--theme-muted)]';
   const loginBtnClass = isSignup ? idle : active;
@@ -77,7 +97,7 @@ export default function LoginForm({ error, message, next = '' }: Props) {
             <div className="flex -mx-1">
               <button
                 type="button"
-                onClick={() => setIsSignup(false)}
+                onClick={showLogin}
                 aria-pressed={!isSignup}
                 className={`flex-1 py-3 text-sm font-semibold transition-colors border-b-2 ${loginBtnClass}`}
               >
@@ -85,7 +105,7 @@ export default function LoginForm({ error, message, next = '' }: Props) {
               </button>
               <button
                 type="button"
-                onClick={() => setIsSignup(true)}
+                onClick={showSignup}
                 aria-pressed={isSignup}
                 className={`flex-1 py-3 text-sm font-semibold transition-colors border-b-2 ${signupBtnClass}`}
               >
@@ -97,15 +117,15 @@ export default function LoginForm({ error, message, next = '' }: Props) {
                 <input type="hidden" name="next" value={next} />
                 <div>
                   <label htmlFor="full-name" className="text-sm font-semibold">Nombre completo</label>
-                  <input id="full-name" name="full_name" type="text" autoComplete="name" maxLength={100} required className={inputStyle} />
+                  <input id="full-name" name="full_name" type="text" autoComplete="off" maxLength={100} value={signupName} onChange={(event) => setSignupName(event.target.value)} required className={inputStyle} />
                 </div>
                 <div>
                   <label htmlFor="signup-email" className="text-sm font-semibold">Correo electrónico</label>
-                  <input id="signup-email" name="email" type="email" autoComplete="email" required className={inputStyle} />
+                  <input id="signup-email" name="email" type="email" autoComplete="off" value={signupEmail} onChange={(event) => setSignupEmail(event.target.value)} required className={inputStyle} />
                 </div>
                 <div>
                   <label htmlFor="signup-password" className="text-sm font-semibold">Contraseña</label>
-                  <input id="signup-password" name="password" type="password" autoComplete="new-password" minLength={8} required className={inputStyle} />
+                  <input id="signup-password" name="password" type="password" autoComplete="new-password" minLength={8} value={signupPassword} onChange={(event) => setSignupPassword(event.target.value)} required className={inputStyle} />
                   <p className="mt-2 text-xs text-[var(--theme-muted)]">Mínimo 8 caracteres.</p>
                 </div>
                 <div>
@@ -116,12 +136,14 @@ export default function LoginForm({ error, message, next = '' }: Props) {
                     type="text"
                     inputMode="text"
                     autoComplete="off"
-                    maxLength={16}
-                    pattern="[A-Fa-f0-9]{16}"
-                    placeholder="16 caracteres"
+                    maxLength={32}
+                    pattern="[A-Za-z0-9-]{8,32}"
+                    placeholder="CURSO-2026"
+                    value={invitationCode}
+                    onChange={(event) => setInvitationCode(event.target.value)}
                     className={inputStyle}
                   />
-                  <p className="mt-2 text-xs text-[var(--theme-muted)]">Introduce el código de un solo uso que te compartió el administrador.</p>
+                  <p className="mt-2 text-xs text-[var(--theme-muted)]">Si recibiste un código, escríbelo aquí. El registro también está disponible sin invitación.</p>
                 </div>
                 {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
                   <TurnstileWidget siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} />
@@ -133,11 +155,11 @@ export default function LoginForm({ error, message, next = '' }: Props) {
                 <input type="hidden" name="next" value={next} />
                 <div>
                   <label htmlFor="login-email" className="text-sm font-semibold">Correo electrónico</label>
-                  <input id="login-email" name="email" type="email" autoComplete="email" required className={inputStyle} />
+                  <input id="login-email" name="email" type="email" autoComplete="username" value={loginEmail} onChange={(event) => setLoginEmail(event.target.value)} required className={inputStyle} />
                 </div>
                 <div>
                   <label htmlFor="login-password" className="text-sm font-semibold">Contraseña</label>
-                  <input id="login-password" name="password" type="password" autoComplete="current-password" required className={inputStyle} />
+                  <input id="login-password" name="password" type="password" autoComplete="current-password" value={loginPassword} onChange={(event) => setLoginPassword(event.target.value)} required className={inputStyle} />
                 </div>
                 {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
                   <TurnstileWidget siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} />
