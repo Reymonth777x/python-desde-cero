@@ -194,7 +194,7 @@ export default function LessonStudy({
                 <PythonEditor
                   defaultCode={lesson.exercise.starterCode || lesson.example}
                   instructions={lesson.exercise.statement}
-                  tests={lesson.finalProject ? lesson.exercise.tests : undefined}
+                  tests={lesson.exercise.tests}
                   onTestsComplete={lesson.finalProject ? (testResult: ExerciseTestResult) => setProjectTestsPassed(testResult.allPassed) : undefined}
                 />
                 <Link href="/practica" className="inline-flex min-h-11 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">Abrir el laboratorio completo</Link>
