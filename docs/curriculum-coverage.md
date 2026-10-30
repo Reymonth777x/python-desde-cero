@@ -43,7 +43,7 @@ El módulo 5 está marcado explícitamente como opcional. Ahora se concentra en 
 
 ### Medición inicial de calidad didáctica
 
-- Las 30 unidades principales tienen una práctica ejecutable.
+- El núcleo ahora contiene 32 unidades: 26 lecciones/laboratorios, cuatro evaluaciones de módulo, un proyecto final obligatorio y un examen global. El proyecto suma cinco casos de prueba; no se debe confundir el total de unidades con el objetivo de 30 laboratorios oficiales.
 - En la auditoría inicial, 29 de las 30 prácticas tenían un solo caso automático; la práctica b3-l6 se amplió a tres entradas (varios valores, un solo valor y valores negativos).
 - El catálogo principal contiene 39 preguntas conceptuales: la mayoría de las lecciones regulares solo tiene una pregunta.
 - Las evaluaciones de módulo tienen 6, 5, 3 y 3 preguntas. El examen global suma 12 preguntas; el proyecto final incluye cinco casos automáticos.
@@ -54,14 +54,11 @@ En el módulo 3 se corrigió la progresión: comparaciones y decisiones → whil
 
 ## Hallazgos que deben corregirse
 
-### 1. Módulo 1: falta el cierre evaluativo
+### 1. Módulo 1: evaluación formal incorporada en la rama
 
-El módulo 1 termina con b1-l4, ahora titulado “Primer contacto con un programa Python”. La unidad es una vista previa breve para comprobar que el intérprete ejecuta un programa; no es una evaluación formal del módulo 1.
+b1-l4 ahora es “Evaluación del módulo 1: fundamentos de programación”, con seis preguntas sobre algoritmo, código fuente, intérprete, IDE, errores de sintaxis y Python como lenguaje.
 
-**Corrección requerida:**
-- Cerrar el módulo 1 con una evaluación de fundamentos: algoritmo, programa, código fuente, intérprete, lenguaje Python, IDE e instalación/ejecución.
-- Mantener print() en b1-l4 solo como demostración de ejecución, sin enseñar su sintaxis en profundidad. La explicación formal de salida, cadenas y comentarios está en el módulo 2.
-- No declarar PE1 completo hasta que exista la evaluación del módulo 1 y se guarde el resultado correctamente.
+**Bloqueo de integración:** la migración 024 cambia la clave existente de b1-l4 de una a seis preguntas. El catálogo no debe desplegarse en producción hasta que esa migración se pruebe y se aplique de forma coordinada con el código.
 
 ### 2. Módulo 2: secuencia y límites de conceptos
 
@@ -116,37 +113,19 @@ Antes de publicar o considerar terminada una lección, debe cumplir lo siguiente
 - El proyecto final debe ser obligatorio para la finalización completa y evaluar análisis, diseño, implementación, pruebas y depuración.
 - Una calificación no debe otorgarse por ejecutar cualquier código ni por pulsar “completar”; debe corresponder a evidencias de aprendizaje.
 
-### Diseño propuesto del proyecto final obligatorio
+### Proyecto final obligatorio implementado en la rama
 
-**Proyecto: gestor de inventario de una tienda pequeña, ejecutado en memoria.** Se mantiene dentro de PE1: no requiere archivos, bases de datos, clases, paquetes externos ni conceptos de Python Essentials 2.
+b4-l10 requiere construir un gestor de inventario de consola con diccionarios, funciones, validación de nombres y cantidades, y manejo de ValueError. Incluye cinco casos automáticos: dos productos válidos, nombre vacío, cantidad cero y cantidad no numérica. El estudiante debe ejecutar las pruebas locales y aprobar cinco preguntas conceptuales con al menos 75%.
 
-Requisitos mínimos:
-- Mantener productos en una lista de diccionarios.
-- Mostrar un menú que se repita hasta elegir salir.
-- Agregar productos con nombre, precio y cantidad.
-- Buscar y actualizar productos; eliminar un producto cuando corresponda.
-- Calcular el valor total del inventario.
-- Separar responsabilidades en funciones con parámetros y valores de retorno.
-- Validar entradas, evitar precios o existencias negativas y manejar conversiones incorrectas con excepciones.
-- Probar los flujos principales y explicar al menos dos errores encontrados y corregidos.
+**Limitación deliberada:** la comparación de salidas se ejecuta en el navegador mediante el Worker de Python; no constituye una certificación ni una atestación inviolable del código ejecutado. La nota de las preguntas sí se calcula en el servidor a partir de las claves privadas una vez aplicada la migración 024.
 
-Rúbrica de 100 puntos:
-- Funcionalidad y requisitos: 30.
-- Uso correcto de listas y diccionarios: 20.
-- Diseño de funciones y alcance: 15.
-- Validación y manejo de excepciones: 15.
-- Pruebas y depuración: 10.
-- Claridad, nombres y formato del código: 10.
+### Examen final PE1 implementado en la rama
 
-Umbral recomendado: 75/100, con retroalimentación por criterio. El estudiante debe poder volver a entregar después de corregir.
-
-### Diseño propuesto del examen final PE1
-
-- 25 preguntas, con al menos cinco preguntas de integración entre módulos.
-- Combinar predicción de salida, lectura de código, detección de errores, selección de estructuras y razonamiento sobre casos límite.
-- Cubrir los cuatro módulos; no incluir archivos, POO, paquetes externos ni temas no enseñados.
-- Umbral recomendado: 75%.
-- Mostrar explicación por respuesta y un resumen por competencia, no solo una nota total.
+- b4-l11 contiene 12 preguntas sobre los cuatro módulos.
+- Combina tipos, operadores, entrada/salida, condiciones, ciclos, listas, bubble sort, funciones y excepciones.
+- No introduce archivos, POO ni paquetes externos como requisito de PE1.
+- Umbral de aprobación: 75%.
+- Las claves privadas de estas preguntas se añaden mediante la migración 024, aún pendiente de aplicar.
 
 
 ## Puerta de calidad antes de publicar
@@ -154,12 +133,12 @@ Umbral recomendado: 75/100, con retroalimentación por criterio. El estudiante d
 No marcar el curso como terminado hasta verificar:
 
 - [ ] Cuatro módulos PE1 y sus contenidos en el orden correcto.
-- [ ] Evaluación formal en cada uno de los cuatro módulos.
+- [x] Evaluación formal incluida en el código para los cuatro módulos (M1–M4); migración 024 aún pendiente.
 - [ ] Treinta prácticas diferenciadas, sin copiar el mismo enunciado cambiando solo nombres o números.
-- [ ] Un proyecto final PE1 y una evaluación global.
+- [x] Proyecto obligatorio y examen global incluidos en el código; migración 024 aún pendiente.
 - [ ] Las lecciones avanzadas tienen prerequisitos y ejemplos progresivos.
 - [ ] No hay claves de respuestas desincronizadas con las preguntas visibles.
-- [ ] Las pruebas de cada ejercicio se ejecutan en el mismo entorno que usa el estudiante.
+- [ ] Completar la matriz de pruebas de los ejercicios regulares con casos límite; el proyecto final ejecuta cinco casos en el Worker del estudiante.
 - [ ] Las evaluaciones se guardan, recuperan y aíslan por usuario.
 - [ ] La extensión opcional no altera el porcentaje ni el certificado de finalización PE1.
 - [ ] Revisión pedagógica completa en español antes de traducir el catálogo al inglés.
@@ -181,3 +160,15 @@ El contenido de esta plataforma debe ser original y didácticamente equivalente 
 - La migración 024 agrega/actualiza 23 claves privadas sin borrar filas ni modificar intentos o progreso.
 - **Bloqueo antes de producción:** la migración 024 no está aplicada. El remoto todavía contiene 44 claves; el nuevo catálogo espera 66. Probarla primero en una instancia de desarrollo y coordinar su aplicación antes de desplegar el nuevo código.
 - **Calidad pendiente:** la ruta principal aún debe completar el repaso de “Hello, World!” y la numeración de M2, y ampliar las prácticas regulares con casos límite y depuración.
+
+## Integración y estado real de la rama
+
+La evaluación de M1, el proyecto y el examen global ya están escritos en el catálogo de la rama. La migración 024 aporta 23 claves privadas (una clave de M1 actualizada y 22 nuevas) y debe dejar 66 claves para el catálogo actual. La base remota aún muestra 44 claves.
+
+No fusionar ni desplegar el cambio de catálogo hasta:
+1. Probar 024 en una instancia de desarrollo con esquema equivalente.
+2. Confirmar que la función `submit_quiz_v2` califica M1, el proyecto y el examen con las nuevas claves.
+3. Coordinar y aprobar la aplicación de la migración en producción.
+4. Repetir el CI y comprobar que el progreso y los intentos siguen aislados por usuario.
+
+El curso aún no debe anunciarse como equivalente a Cisco PE1 o como preparación suficiente para PCEP. Falta la revisión completa de la secuencia M2, incluida la posición y tratamiento explícitos de “Hello, World!”, y la ampliación de casos límite y retroalimentación de las prácticas regulares.
