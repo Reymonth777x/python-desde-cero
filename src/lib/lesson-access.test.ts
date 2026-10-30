@@ -1,7 +1,35 @@
 import { describe, expect, it } from 'vitest';
-import { canAccessLessonInSequence, findFirstIncompleteLessonIndex, type LessonProgressRecord } from './lesson-access';
+import {
+  canAccessLessonInSequence,
+  canAccessModule,
+  findFirstIncompleteLessonIndex,
+  type LessonProgressRecord,
+} from './lesson-access';
 
 const lessons = [{ id: 'b1-l1' }, { id: 'b1-l2' }, { id: 'b1-l3' }];
+
+describe('module access', () => {
+  it('always allows the first module', () => {
+    expect(canAccessModule(0, false, false)).toBe(true);
+  });
+
+  it('requires the previous assessment for a new student', () => {
+    expect(canAccessModule(1, false, false)).toBe(false);
+  });
+
+  it('unlocks a module after the previous assessment is complete', () => {
+    expect(canAccessModule(1, true, false)).toBe(true);
+  });
+
+  it('preserves access when the student already has progress in that module', () => {
+    expect(canAccessModule(1, false, true)).toBe(true);
+  });
+
+  it('rejects invalid module indexes', () => {
+    expect(canAccessModule(-1, true, true)).toBe(false);
+    expect(canAccessModule(1.5, true, true)).toBe(false);
+  });
+});
 
 describe('sequential lesson access', () => {
   it('allows the first lesson without previous progress', () => {

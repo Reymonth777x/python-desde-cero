@@ -3,7 +3,7 @@ import ThemeSelector from '@/components/ThemeSelector';
 import { ArrowRight, BookOpenCheck, Circle, Lock, LogOut } from 'lucide-react';
 import { logout } from '@/app/login/actions';
 import { courseCatalog } from '@/lib/course-catalog';
-import { canAccessLessonInSequence, findFirstIncompleteLessonIndex } from '@/lib/lesson-access';
+import { canAccessLessonInSequence, canAccessModule, findFirstIncompleteLessonIndex } from '@/lib/lesson-access';
 
 export type ProgressRow = {
   module_id: string;
@@ -19,20 +19,28 @@ type Props = {
   isAdmin: boolean;
 };
 
-/** Returns true if the module at moduleIndex is accessible given the progress rows. */
-function isModuleUnlocked(moduleIndex: number, progressRows: ProgressRow[]): boolean {
-  if (moduleIndex === 0) return true;
+/** Returns true if the previous assessment is complete or the student has historical progress in this module. */
+function isModuleUnlocked(moduleIndex: number, moduleId: string, progressRows: ProgressRow[]): boolean {
+  if (moduleIndex === 0) return canAccessModule(moduleIndex, false, false);
+
   const prevModule = courseCatalog[moduleIndex - 1];
   const requiredCompletion = prevModule
     ? [...prevModule.lessons].reverse().find((lesson) => lesson.finalAssessment || lesson.assessment)
     : undefined;
-  if (!prevModule || !requiredCompletion) return true; // no gate lesson — allow access
-  return progressRows.some(
+
+  if (!prevModule || !requiredCompletion) {
+    return canAccessModule(moduleIndex, true, false);
+  }
+
+  const hasPreviousAssessment = progressRows.some(
     (row) =>
       row.module_id === prevModule.id &&
       row.lesson_id === requiredCompletion.id &&
       row.is_completed,
   );
+  const hasExistingModuleProgress = progressRows.some((row) => row.module_id === moduleId);
+
+  return canAccessModule(moduleIndex, hasPreviousAssessment, hasExistingModuleProgress);
 }
 
 export default function AcademyDashboard({
@@ -76,7 +84,7 @@ export default function AcademyDashboard({
       const moduleIndex = courseCatalog.findIndex((item) => item.id === courseModule.id);
       const moduleUnlocked = progressUnavailable
         ? moduleIndex === 0
-        : isModuleUnlocked(moduleIndex, progressRows);
+        : isModuleUnlocked(moduleIndex, courseModule.id, progressRows);
       if (!moduleUnlocked) return [];
 
       return courseModule.lessons.map((lesson, lessonIndex) => ({
@@ -195,7 +203,7 @@ export default function AcademyDashboard({
           {courseCatalog.map((courseModule, moduleIndex) => {
             const unlocked = progressUnavailable
               ? moduleIndex === 0
-              : isModuleUnlocked(moduleIndex, progressRows);
+              : isModuleUnlocked(moduleIndex, courseModule.id, progressRows);
             const moduleCompleted = courseModule.lessons.filter((lesson) =>
               completed(courseModule.id, lesson.id),
             ).length;
