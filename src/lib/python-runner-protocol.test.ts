@@ -11,6 +11,15 @@ describe('origen del ejecutor Python', () => {
     ).toBe('https://python-desdecero-runner.account.workers.dev');
   });
 
+  it('rechaza otros Workers de workers.dev que no sean el runner dedicado', () => {
+    expect(
+      resolvePythonRunnerOrigin(
+        'https://another-worker.account.workers.dev',
+        'https://python-desdecero.com',
+      ),
+    ).toBeNull();
+  });
+
   it('acepta loopback HTTP para pruebas locales', () => {
     expect(
       resolvePythonRunnerOrigin('http://127.0.0.1:8788', 'http://localhost:3000'),
