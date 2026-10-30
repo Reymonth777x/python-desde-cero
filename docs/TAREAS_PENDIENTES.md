@@ -18,9 +18,9 @@ Actualizado el 30 de octubre de 2026 tras comprobar `master`, CI, despliegue y l
 
 ## 2. Trabajo de currículo en curso
 
-- [ ] Integrar PR #52 tras CI verde: guiar `b3-l9` desde consultar una fila hasta recorrer matrices con dos bucles.
-- [ ] Integrar PR #55 tras CI verde: obtener el número de pruebas del proyecto desde `lesson.exercise.tests.length`, no desde un texto fijo.
-- [ ] Revisar PR #53 (sintaxis guiada de la primera lección): su CI actual falla; corregirlo o cerrarlo sin integrar cambios no probados.
+- [x] Integrar PR #52: `b3-l9` guía el acceso a una fila, el bucle exterior y el bucle interior; CI de la PR aprobó. Está en `master` y pendiente de la publicación del HEAD `021f4cc...`.
+- [x] Integrar PR #55: el número de pruebas del proyecto se obtiene de `lesson.exercise.tests.length`, para coincidir con los seis casos del catálogo. CI aprobado; pendiente de publicación junto al nuevo HEAD.
+- [ ] Completar PR #57 (sintaxis guiada de la primera lección). La primera versión de ese cambio no pasó CI; la versión actual debe aprobar todas las pruebas antes de fusionarse.
 - [ ] Revisar de forma integral las 33 unidades obligatorias y los prerequisitos entre temas; retirar redundancias sin recortar el contenido necesario.
 - [ ] Ampliar prácticas con más entradas válidas, inválidas, límites y explicaciones de errores. Priorizar las unidades que aún tienen un solo caso de prueba.
 - [ ] Revisar la exactitud de las soluciones, la salida esperada, las pistas y la dificultad declarada en cada ejercicio.
