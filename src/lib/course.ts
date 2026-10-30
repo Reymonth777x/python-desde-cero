@@ -523,36 +523,40 @@ export const courseModules: CourseModule[] = [
           "Convertir valores con int(), float() y str()."
         ],
         "explanation": [
+          "Una variable es un nombre que permite guardar un valor para volver a utilizarlo. Por ejemplo, subtotal = 4500 asigna el número 4500 al nombre subtotal. Aquí basta con reconocer esa idea; más adelante se estudian con detalle los nombres y la actualización de variables.",
           "Python evalúa primero los paréntesis, luego potencias, multiplicaciones y divisiones, y después sumas y restas. Los paréntesis permiten expresar el orden deseado con claridad.",
-          "int() convierte una cadena numérica a entero; float() permite números decimales y str() transforma un valor en texto. int(\"doce\") falla porque la cadena no representa un entero válido.",
-          "Antes de combinar datos, identifica el tipo y la operación que necesitas. Utiliza números para calcular y cadenas para construir mensajes; las conversiones deben tener un propósito."
+          "int() convierte una cadena que representa un número entero; float() convierte texto numérico decimal y str() transforma un valor en texto. Por ejemplo, int(\"12\") produce 12 y float(\"2.5\") produce 2.5. int(\"doce\") falla porque esa palabra no representa un entero.",
+          "Las conversiones permiten combinar datos de tipos distintos de forma explícita. Utiliza int() o float() antes de calcular, y str() cuando necesites unir un número con un mensaje.",
+          "Antes de escribir una expresión, identifica qué valor guardas, qué tipo tiene y qué operación necesitas. Después comprueba el resultado con print().",
         ],
-        "example": "subtotal = 3 * (1200 + 300)\nprecio_texto = \"4500\"\nprecio = int(precio_texto)\nprint(subtotal)\nprint(precio + 500)",
-        "exampleOutput": "4500\n5000",
+        "example": "subtotal = 3 * (1200 + 300)\nprecio_texto = \"4500\"\nprecio = int(precio_texto)\nfactor = float(\"2.5\")\nmensaje = \"Precio: \" + str(precio)\nprint(subtotal)\nprint(precio + 500)\nprint(factor * 2)\nprint(mensaje)",
+        "exampleOutput": "4500\n5000\n5.0\nPrecio: 4500",
         "walkthrough": [
-          "Los paréntesis calculan primero 1200 + 300.",
-          "int() convierte el texto en entero.",
-          "El nuevo entero puede sumarse con 500."
+          "subtotal guarda un resultado; el signo igual asigna el valor al nombre de la izquierda.",
+          "Los paréntesis calculan primero 1200 + 300 y luego el resultado se multiplica por tres.",
+          "int() convierte el texto \"4500\" en un entero y permite sumarle 500.",
+          "float() convierte \"2.5\" en un decimal, mientras str() permite unir precio a un mensaje.",
+          "print() muestra cada resultado en el orden en que se ejecutan las instrucciones.",
         ],
         "commonMistakes": [
-          "Sumar un entero y una cadena sin convertir.",
-          "Suponer que int() convierte palabras."
+          "Sumar un entero y una cadena sin convertir uno de los valores.",
+          "Suponer que int() convierte palabras como \"doce\" en números.",
+          "Usar int() cuando se necesita conservar la parte decimal o olvidar str() al unir un número con texto.",
         ],
         "exercise": {
           "id": "b2-e4",
           "title": "Convertir un subtotal",
-          "statement": "Convierte \"1250\" a entero, multiplícalo por tres e imprime el subtotal.",
-          "starterCode": "precio_texto = \"1250\"\n",
-          "solution": "precio_texto = \"1250\"\nprecio = int(precio_texto)\nsubtotal = precio * 3\nprint(subtotal)",
+          "statement": "Convierte precio_texto = \"1250\" a entero y factor_texto = \"2.5\" a decimal. Calcula subtotal = precio * (factor + 0.5), crea un mensaje que incluya el subtotal y muestra el número y el mensaje.",
+          "starterCode": "precio_texto = \"1250\"\nfactor_texto = \"2.5\"\n",
+          "solution": "precio_texto = \"1250\"\nprecio = int(precio_texto)\nfactor_texto = \"2.5\"\nfactor = float(factor_texto)\nsubtotal = precio * (factor + 0.5)\nmensaje = \"Subtotal: \" + str(subtotal)\nprint(subtotal)\nprint(mensaje)",
           "tests": [
-            {
-              "input": [],
-              "expected": "3750"
-            }
+            {"input":[],"expected":"3750.0\nSubtotal: 3750.0"},
           ],
           "hints": [
-            "Utiliza int().",
-            "Multiplica el valor convertido por tres."
+            "Usa int(precio_texto) para convertir el precio a entero.",
+            "Usa float(factor_texto) para conservar el decimal.",
+            "Calcula factor + 0.5 entre paréntesis antes de multiplicar.",
+            "Convierte subtotal con str() antes de unirlo al mensaje.",
           ],
           "difficulty": "facil",
           "xp": 15,

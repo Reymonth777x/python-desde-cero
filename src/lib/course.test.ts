@@ -247,4 +247,19 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(lesson.exercise.hints).toHaveLength(4);
   });
 
+  it('presenta variables antes de usarlas y practica int, float y str en 2.3.1', () => {
+    const lesson = courseModules
+      .find((courseModule) => courseModule.id === 'module-2')!
+      .lessons.find((item) => item.id === 'b2-l4')!;
+
+    expect(lesson.explanation.join(' ')).toContain('Una variable es un nombre');
+    expect(lesson.explanation.join(' ')).toContain('float()');
+    expect(lesson.example).toContain('precio = int(precio_texto)');
+    expect(lesson.example).toContain('factor = float("2.5")');
+    expect(lesson.example).toContain('str(precio)');
+    expect(lesson.exercise.solution).toContain('int(precio_texto)');
+    expect(lesson.exercise.solution).toContain('float(factor_texto)');
+    expect(lesson.exercise.solution).toContain('str(subtotal)');
+    expect(lesson.exercise.tests[0].expected).toBe('3750.0\nSubtotal: 3750.0');
+});
 });
