@@ -166,9 +166,9 @@ No se incluyen credenciales SMTP, tokens ni claves API en este repositorio. La p
 
 ## Latest verified release
 
-- GitHub `master`: `d072f962d96a9e3deb1d5d2a7a4a8a83ebec4e21` (October 30, 2026).
-- CI: [run 41133763686](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41133763686) — passed, including 24 Vitest files, 168 Playwright tests, Next/Vinext builds and `npm audit` (0 vulnerabilities).
-- Cloudflare deployment: [run 41134083974](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41134083974) — passed. Main Worker version `e9fbc812-68fa-4617-b23e-f1057dc2a6f5`; isolated Python runner version `612bdbbc-a1ef-4579-96c6-692a8ae5bc7f`.
+- GitHub `master`: `f95231db81c6222263a698523f205e8fa7e3d23d` (October 30, 2026). This release refreshes CI tooling and operational documentation; the last application runtime changes are in `d072f962d96a9e3deb1d5d2a7a4a8a83ebec4e21`.
+- CI: [run 41140127258](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41140127258) — passed, including 24 Vitest files, 168 Playwright tests, Next/Vinext builds and `npm audit` (0 vulnerabilities).
+- Cloudflare deployment: [run 41140504102](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41140504102) — passed. Main Worker version `f67a7cca-49b3-4f11-ab4c-586ec970286e`; isolated Python runner version `e2235f5c-dfe5-4dd1-a529-e34aa607db70`.
 - Production smoke test verified `/`, `/muestra`, `/login` with the Turnstile widget, `sitemap.xml`, the custom domain association, and `www` → apex redirect (HTTP 308).
 
 ## Release and sync instructions for the team
