@@ -94,6 +94,30 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(algoritmo.options[algoritmo.answer]).toBe('Una secuencia finita y ordenada de pasos para resolver un problema');
   });
 
+  it('mantiene los laboratorios integradores antes de las evaluaciones de módulo', () => {
+    expect(courseModules[1].lessons.map((item) => item.id)).toEqual([
+      'b2-l1',
+      'b2-l2',
+      'b2-l3',
+      'b2-l4',
+      'b2-l5',
+      'b2-l6',
+      'b2-l8',
+      'b2-l7',
+    ]);
+    expect(courseModules[3].lessons.map((item) => item.id)).toEqual([
+      'b4-l1',
+      'b4-l2',
+      'b4-l3',
+      'b4-l4',
+      'b4-l5',
+      'b4-l6',
+      'b4-l7',
+      'b4-l9',
+      'b4-l8',
+    ]);
+  });
+
   it('mantiene el orden progresivo del módulo 3 antes de los ejercicios integradores y la evaluación', () => {
     expect(courseModules[2].lessons.map((item) => item.id)).toEqual([
       'b3-l1',
