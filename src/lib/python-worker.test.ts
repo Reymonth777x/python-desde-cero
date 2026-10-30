@@ -20,9 +20,13 @@ function createWorkerHarness({ withTurtle = false }: { withTurtle?: boolean } = 
     toJs: vi.fn((options: {
       dict_converter: (entries: Iterable<[string, unknown]>) => unknown;
       create_pyproxies: boolean;
-    }) => [
-      { type: 'line', x1: 0, y1: 0, x2: 25, y2: 40, color: 'lime' },
-    ]),
+    }) => {
+      // Exercise the same dict converter passed by the worker.
+      options.dict_converter([['type', 'line']]);
+      return [
+        { type: 'line', x1: 0, y1: 0, x2: 25, y2: 40, color: 'lime' },
+      ];
+    }),
     destroy: vi.fn(),
   };
   const getCommands = vi.fn(() => turtleCommandProxy);
