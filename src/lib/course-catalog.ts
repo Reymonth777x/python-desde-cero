@@ -57,14 +57,14 @@ export const courseCatalog: CourseCatalogModule[] = [
     "summary": "Representa datos, utiliza variables, construye expresiones, convierte valores y trabaja con entrada y salida.",
     "lessons": [
       {
-        "id": "b2-l1",
+        "id": "b2-l9",
         "section": "2.1",
-        "title": "Tipos de datos y literales"
+        "title": "Primer programa: Hello, World!"
       },
       {
-        "id": "b2-l2",
+        "id": "b2-l1",
         "section": "2.2",
-        "title": "Variables y nombres claros"
+        "title": "Tipos de datos y literales"
       },
       {
         "id": "b2-l3",
@@ -73,8 +73,13 @@ export const courseCatalog: CourseCatalogModule[] = [
       },
       {
         "id": "b2-l4",
-        "section": "2.4",
+        "section": "2.3.1",
         "title": "Prioridad y conversión de expresiones"
+      },
+      {
+        "id": "b2-l2",
+        "section": "2.4",
+        "title": "Variables y nombres claros"
       },
       {
         "id": "b2-l5",
@@ -243,7 +248,7 @@ export const courseCatalog: CourseCatalogModule[] = [
       {
         "id": "b5-l4",
         "section": "5.4",
-        "title": "Proyecto final: gestor de inventario en consola"
+        "title": "Extensión: guardar y recuperar un inventario en un archivo"
       }
     ],
     "optional": true
