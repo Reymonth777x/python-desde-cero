@@ -21,14 +21,14 @@ export const courseModules: CourseModule[] = [
         "explanation": [
           "Programar comienza por entender una necesidad y definir el resultado correcto. Un algoritmo es una secuencia finita y ordenada de pasos que permite resolver esa tarea; cada paso debe ser claro y comprobable.",
           "Un algoritmo puede escribirse con palabras, diagramas o pseudocódigo antes de convertirse en Python. Un programa traduce esos pasos a instrucciones de un lenguaje que el intérprete puede ejecutar siguiendo un orden definido.",
-          "Para calcular el cambio de una compra, identifica precio y pago como entradas, realiza la resta como proceso y muestra el resultado como salida. Separar estas etapas permite comprobar la lógica antes de escribir código."
+          "Para calcular el cambio de una compra, identifica precio y pago como entradas, realiza la resta como proceso y muestra el resultado como salida. En este primer ejemplo, precio, pago y cambio son nombres que ayudan a identificar los datos: se usan como demostración guiada, no como una explicación completa de las variables. La instrucción print() solo hace visible la salida; su uso formal como función se estudia en la lección 2.1. Separar estas etapas permite comprobar la lógica antes de escribir código."
         ],
         "example": "precio = 3200\npago = 5000\ncambio = pago - precio\nprint(cambio)",
         "exampleOutput": "1800",
         "walkthrough": [
-          "Entrada: precio = 3200 y pago = 5000.",
-          "Proceso: pago - precio calcula la diferencia.",
-          "Salida: print(cambio) muestra 1800."
+          "Entrada: precio = 3200 y pago = 5000 identifican las dos cantidades de la compra. Por ahora, interpreta esos nombres como etiquetas para reconocer cada dato.",
+          "Proceso: pago - precio calcula la diferencia y el resultado se asocia al nombre cambio.",
+          "Salida: print(cambio) muestra 1800. Aquí print() solo permite ver el resultado; su sintaxis se estudia formalmente en la lección 2.1."
         ],
         "commonMistakes": [
           "Cambiar el orden de la resta y obtener un resultado negativo.",
@@ -47,8 +47,8 @@ export const courseModules: CourseModule[] = [
             }
           ],
           "hints": [
-            "Identifica qué cantidad se resta de cuál.",
-            "Guarda el resultado antes de imprimirlo."
+            "Identifica qué cantidad se resta de cuál; todavía importa más seguir la lógica que memorizar la sintaxis.",
+            "Guarda el resultado con el nombre cambio y usa print(cambio) para observar la salida."
           ],
           "difficulty": "facil",
           "xp": 15,
@@ -93,14 +93,14 @@ export const courseModules: CourseModule[] = [
         "explanation": [
           "Un lenguaje de programación ofrece reglas para expresar instrucciones. El código fuente es el texto que las contiene y debe cumplir la sintaxis del lenguaje para que pueda procesarse.",
           "Python utiliza un intérprete que analiza y ejecuta el código. Un editor o IDE permite escribir y organizarlo; la consola presenta resultados y errores. Cada herramienta cumple una función diferente.",
-          "Esta academia usa Pyodide para ejecutar Python en el navegador mediante WebAssembly. En un equipo local puedes instalar Python y utilizar un editor; aunque cambie el entorno, las reglas del lenguaje y el razonamiento se mantienen."
+          "Esta academia usa Pyodide para ejecutar Python en el navegador mediante WebAssembly. En un equipo local puedes instalar Python y utilizar un editor; aunque cambie el entorno, las reglas del lenguaje y el razonamiento se mantienen. Los dos print() del ejemplo solo ilustran qué escribe el editor, qué ejecuta el intérprete y qué presenta la consola; no son todavía una lección formal sobre la sintaxis de print()."
         ],
         "example": "print(\"Escribo código en el editor\")\nprint(\"El intérprete ejecuta Python\")",
         "exampleOutput": "Escribo código en el editor\nEl intérprete ejecuta Python",
         "walkthrough": [
-          "El editor contiene las instrucciones.",
-          "El intérprete procesa el código.",
-          "La consola presenta la salida."
+          "El editor contiene dos instrucciones de ejemplo.",
+          "El intérprete procesa cada llamada print() en el orden escrito.",
+          "La consola presenta los dos mensajes. La función print() se estudia formalmente en la lección 2.1."
         ],
         "commonMistakes": [
           "Confundir el editor con el lenguaje.",
@@ -119,7 +119,7 @@ export const courseModules: CourseModule[] = [
             }
           ],
           "hints": [
-            "Escribe una llamada print() por mensaje.",
+            "Copia el patrón print(\"mensaje\") para mostrar cada idea; aquí se usa como demostración del flujo de ejecución.",
             "Mantén el texto entre comillas."
           ],
           "difficulty": "facil",
@@ -154,14 +154,14 @@ export const courseModules: CourseModule[] = [
         "explanation": [
           "Para programar necesitas un entorno que pueda ejecutar Python. En un equipo local normalmente instalas la distribución oficial y ejecutas archivos desde una terminal o un editor.",
           "Los archivos Python suelen utilizar la extensión .py. Desde una terminal puedes ejecutar un archivo con python nombre_archivo.py; en algunos sistemas el comando disponible es python3. python --version permite consultar la versión instalada.",
-          "El navegador de esta academia ya incluye Python mediante Pyodide, así que no necesitas instalarlo en tu dispositivo para completar las prácticas. Lo importante es comprobar que el intérprete responde y que puedes ejecutar instrucciones."
+          "El navegador de esta academia ya incluye Python mediante Pyodide, así que no necesitas instalarlo en tu dispositivo para completar las prácticas. Lo importante es comprobar que el intérprete responde y que puedes ejecutar instrucciones. La llamada print() funciona aquí como una prueba breve del entorno: muestra un mensaje para confirmar la ejecución; su sintaxis formal se estudia en la lección 2.1."
         ],
         "example": "print(\"Python está listo para ejecutar instrucciones\")",
         "exampleOutput": "Python está listo para ejecutar instrucciones",
         "walkthrough": [
-          "Escribe una llamada print() en el editor.",
+          "Escribe la llamada print() de ejemplo para que el programa tenga una salida visible.",
           "Pulsa Ejecutar para enviar el programa al intérprete.",
-          "Comprueba el mensaje en la consola."
+          "Comprueba el mensaje en la consola: esta es una prueba del entorno, no una evaluación de toda la sintaxis de Python."
         ],
         "commonMistakes": [
           "Confundir el editor con la instalación del intérprete.",
@@ -180,8 +180,8 @@ export const courseModules: CourseModule[] = [
             }
           ],
           "hints": [
-            "Utiliza print().",
-            "Escribe el mensaje como una cadena."
+            "Utiliza el patrón print(\"mensaje\") como prueba de ejecución; no necesitas instalar Python para esta actividad.",
+            "Escribe el mensaje como una cadena, entre comillas."
           ],
           "difficulty": "facil",
           "xp": 15,

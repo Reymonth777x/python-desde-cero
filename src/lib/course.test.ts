@@ -274,6 +274,27 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(lesson.commonMistakes.length).toBeGreaterThanOrEqual(4);
   });
 
+  it('presenta variables y print como demostraciones guiadas antes de su enseñanza formal', () => {
+    const lesson = (id: string) =>
+      courseModules.find((courseModule) => courseModule.id === 'module-1')!
+        .lessons.find((item) => item.id === id)!;
+
+    const algorithms = lesson('b1-l1');
+    expect(algorithms.explanation.join(' ')).toContain('demostración guiada');
+    expect(algorithms.explanation.join(' ')).toContain('se estudia en la lección 2.1');
+    expect(algorithms.walkthrough[0]).toContain('etiquetas');
+    expect(algorithms.exercise.hints.join(' ')).toContain('seguir la lógica');
+
+    const languages = lesson('b1-l2');
+    expect(languages.explanation.join(' ')).toContain('no son todavía una lección formal');
+    expect(languages.walkthrough[2]).toContain('lección 2.1');
+
+    const environment = lesson('b1-l3');
+    expect(environment.explanation.join(' ')).toContain('prueba breve del entorno');
+    expect(environment.walkthrough[2]).toContain('no una evaluación');
+    expect(environment.exercise.hints.join(' ')).toContain('no necesitas instalar Python');
+  });
+
   it('califica todas las respuestas y exige al menos 75 por ciento', () => {
     const questions = [
       { prompt: '1', options: ['a', 'b'], answer: 0, explanation: '' },
