@@ -23,12 +23,26 @@ export function TurnstileWidget({ siteKey, action = 'login' }: Props) {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // State initializers already reflect a script loaded before this component mounted.
-    if (window.turnstile) return;
+    // The script may finish loading between render and this effect, or while
+    // a previous widget instance was being replaced after a failed attempt.
+    if (window.turnstile) {
+      queueMicrotask(() => {
+        setIsReady(true);
+        setStatus('ready');
+      });
+      return;
+    }
 
-    const existingScript = document.querySelector<HTMLScriptElement>(
+    let existingScript = document.querySelector<HTMLScriptElement>(
       'script[data-turnstile-loader="true"]',
     );
+
+    // A failed script element does not emit another load/error event. Remove
+    // it so a remounted widget can make a genuine retry.
+    if (existingScript?.dataset.failed === 'true') {
+      existingScript.remove();
+      existingScript = null;
+    }
 
     const handleLoad = () => {
       if (window.turnstile) {
@@ -63,7 +77,10 @@ export function TurnstileWidget({ siteKey, action = 'login' }: Props) {
       script.dataset.loaded = 'true';
       handleLoad();
     };
-    script.onerror = handleError;
+    script.onerror = () => {
+      script.dataset.failed = 'true';
+      handleError();
+    };
     document.head.appendChild(script);
 
     return () => {
