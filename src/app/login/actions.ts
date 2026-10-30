@@ -7,14 +7,17 @@ import { createClient } from '@/lib/supabase/server';
 import { safeNext } from '@/lib/safe-next';
 import { parseOptionalInvitationCode } from '@/lib/invitation-code';
 
-export async function login(formData: FormData) {
+export type LoginActionState = { error?: 'missing' | 'captcha' | 'login'; attempt?: number };
+
+export async function login(_previousState: LoginActionState, formData: FormData): Promise<LoginActionState> {
+  const attempt = (_previousState.attempt ?? 0) + 1;
   const email = String(formData.get('email') ?? '').trim();
   const password = String(formData.get('password') ?? '');
   const captchaToken = String(formData.get('captchaToken') ?? '');
   const next = safeNext(formData.get('next'), '/academia');
-  if (!email || !password) redirect('/login?error=missing');
+  if (!email || !password) return { error: 'missing', attempt };
   if (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !captchaToken) {
-    redirect('/login?error=captcha');
+    return { error: 'captcha', attempt };
   }
 
   const supabase = await createClient();
@@ -25,11 +28,12 @@ export async function login(formData: FormData) {
   });
   if (error) {
     const authMessage = error.message.toLowerCase();
-    redirect(
-      authMessage.includes('captcha') || authMessage.includes('turnstile')
-        ? '/login?error=captcha'
-        : '/login?error=login',
-    );
+    return {
+      error: authMessage.includes('captcha') || authMessage.includes('turnstile')
+        ? 'captcha'
+        : 'login',
+      attempt,
+    };
   }
 
   revalidatePath('/', 'layout');

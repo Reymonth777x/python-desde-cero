@@ -54,14 +54,46 @@ describe('acciones de autenticación con Turnstile', () => {
   it('muestra un error de CAPTCHA claro en el inicio de sesión', async () => {
     const signIn = mockAuth('signInWithPassword');
 
-    await expect(login(form({
+    await expect(login({}, form({
       email: 'student@example.test',
       password: 'test-password',
       captchaToken: 'expired-token',
-    }))).rejects.toThrow('NEXT_REDIRECT:/login?error=captcha');
+    }))).resolves.toEqual({ error: 'captcha', attempt: 1 });
 
     expect(signIn).toHaveBeenCalledOnce();
   });
+
+  it('devuelve un error tipado sin redirigir cuando faltan credenciales', async () => {
+    await expect(login({}, form({ email: '', password: '' }))).resolves.toEqual({ error: 'missing', attempt: 1 });
+    expect(createClient).not.toHaveBeenCalled();
+  });
+
+  it('no contacta Supabase cuando no existe un token Turnstile', async () => {
+    await expect(login({}, form({
+      email: 'student@example.test',
+      password: 'test-password',
+    }))).resolves.toEqual({ error: 'captcha', attempt: 1 });
+
+    expect(createClient).not.toHaveBeenCalled();
+  });
+
+  it('devuelve un error de credenciales tipado y aumenta el contador de intento', async () => {
+    const signIn = mockAuth('signInWithPassword');
+    signIn.mockResolvedValueOnce({
+      data: { user: null, session: null },
+      error: { message: 'Invalid login credentials' },
+    });
+
+    await expect(login({ attempt: 1 }, form({
+      email: 'student@example.test',
+      password: 'wrong-password',
+      captchaToken: 'valid-shaped-test-token',
+    }))).resolves.toEqual({ error: 'login', attempt: 2 });
+
+    expect(signIn).toHaveBeenCalledOnce();
+  });
+
+
 
   it('muestra un error de CAPTCHA antes que el mensaje de invitación al registrar', async () => {
     const signUp = mockAuth('signUp');
