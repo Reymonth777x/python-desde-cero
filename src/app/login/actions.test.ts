@@ -54,13 +54,18 @@ describe('acciones de autenticación con Turnstile', () => {
   it('muestra un error de CAPTCHA claro en el inicio de sesión', async () => {
     const signIn = mockAuth('signInWithPassword');
 
-    await expect(login(form({
+    await expect(login({}, form({
       email: 'student@example.test',
       password: 'test-password',
       captchaToken: 'expired-token',
-    }))).rejects.toThrow('NEXT_REDIRECT:/login?error=captcha');
+    }))).resolves.toEqual({ error: 'captcha' });
 
     expect(signIn).toHaveBeenCalledOnce();
+  });
+
+  it('devuelve un error tipado sin redirigir cuando faltan credenciales', async () => {
+    await expect(login({}, form({ email: '', password: '' }))).resolves.toEqual({ error: 'missing' });
+    expect(createClient).not.toHaveBeenCalled();
   });
 
   it('muestra un error de CAPTCHA antes que el mensaje de invitación al registrar', async () => {
