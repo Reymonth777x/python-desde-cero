@@ -1,17 +1,17 @@
 # Preparación para producción — 30 de octubre de 2026
 
-**Último release funcional comprobado:** `5013d517ed95ad0eb189a5e016dec9ce1faf69ef` (30-10-2026)  
-**CI:** [41105688936](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41105688936) — success, ambos jobs  
-**Despliegue:** [41106258018](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41106258018) — success, job `deploy` ejecutado  
+**Última publicación confirmada antes de PR #84:** `5013d517ed95ad0eb189a5e016dec9ce1faf69ef`  
+**CI:** [41105688936](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41105688936) — success  
+**Despliegue:** [41106258018](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41106258018) — success  
 **Cloudflare Worker Version ID:** `37e9619d-770d-4d71-8df7-61bb1ac29c6d`  
-**Incluye:** PR #77, #78, #80, #81 y #82, además de los releases anteriores; PR #83 actualiza documentación de migraciones.  
-**Alcance:** GitHub, dominio público, Cloudflare Workers y dos proyectos Supabase. No se ejecutaron cambios de esquema nuevos en este release.
+**Cambio siguiente:** PR #84 está fusionado en `04604585d899173439f73c8a9d1975451e771200`; su CI de PR pasó, y el despliegue de ese SHA queda pendiente de verificación.  
+**Alcance:** GitHub, dominio público, Cloudflare Workers y dos proyectos Supabase. Se aplicó la función de acceso histórico en PROD/DEV sin modificar filas de alumnos.
 
 ## Dictamen
 
 **Publicado y comprobado técnicamente; todavía no aprobado como lanzamiento educativo completo.**
 
-El release `5013d51` pasó CI completo y despliegue Cloudflare. El smoke test de producción confirmó `/`, `/muestra`, `/login`, sitemap, marcador Turnstile, conexión del dominio al Worker y redirección `www` al dominio canónico. Esto no sustituye pruebas reales del recorrido autenticado, correo, Turnstile interactivo ni hardware móvil.
+El release `5013d51` pasó CI completo y despliegue Cloudflare. El smoke test confirmó `/`, `/muestra`, `/login`, sitemap, marcador Turnstile, conexión del dominio al Worker y redirección `www` al dominio canónico. PR #84 incorpora después la corrección de acceso histórico; aunque su CI de PR pasó, no se debe considerar publicado hasta verificar el CI y despliegue del nuevo SHA de `master`. Esto no sustituye pruebas reales del recorrido autenticado, correo, Turnstile interactivo ni hardware móvil.
 
 ## Sitio y capacidades publicadas
 
@@ -21,7 +21,7 @@ El release `5013d51` pasó CI completo y despliegue Cloudflare. El smoke test de
 - `/academia` y `/practica` requieren sesión. El modelo de autorización distingue estudiante y administrador; no hay panel docente.
 - El panel administrativo ofrece gestión de invitaciones; administración de usuarios y auditoría no están disponibles en esta versión.
 - PR #54 protege los despliegues frente a workflows obsoletos verificando el SHA antes y después de compilar. El despliegue del 30-10-2026 omitió ejecuciones obsoletas y publicó finalmente el HEAD actual.
-- PR #82 ejecuta las soluciones de referencia de todas las actividades de código con sus 52 casos declarados en procesos Python aislados; el examen conceptual final se excluye porque no requiere código adicional.
+- PR #82 ejecuta las soluciones de referencia de todas las actividades de código con 62 casos declarados en procesos Python aislados; el examen conceptual final se excluye porque no requiere código adicional.
 - PR #81 recupera el foco al activar el cierre del selector móvil. La suite Playwright comprueba el diálogo a 320, 360 y 390 px, su encaje en pantalla, el scroll interno y el foco de teclado. Aún falta validar en un teléfono físico.
 - El smoke test externo leyó `/`, `/muestra`, `/login`, `/sitemap.xml` y `www`. El workflow también comprobó el marcador Turnstile y el redirect HTTP 308.
 
