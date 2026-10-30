@@ -51,11 +51,11 @@ test.describe('Seguridad y ejecución real', () => {
 
     const example = page.locator('#ejemplo');
     await example.scrollIntoViewIfNeeded();
-    await example.locator('textarea').fill('import js\\nprint("WORKER_OK")\\nprint(js.self.location.origin)');
+    await example.locator('textarea').fill('import js\nprint("WORKER_OK")\nprint(js.self.location.origin)');
     await example.getByRole('button', { name: 'Ejecutar' }).click();
     await expect(example.locator('pre')).toContainText('WORKER_OK', { timeout: 60000 });
 
-    await expect(runnerFrame).toHaveAttribute('src', /127\\.0\\.0\\.1:8788/);
+    await expect(runnerFrame).toHaveAttribute('src', /127\.0\.0\.1:8788/);
     const sandboxOrigin = await runnerFrame.evaluate((element) => {
       const frame = element as HTMLIFrameElement;
       return new URL(frame.src).origin;
