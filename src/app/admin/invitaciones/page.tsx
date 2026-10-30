@@ -117,7 +117,7 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <div>
                   <label htmlFor='code' className='block text-sm font-semibold text-[var(--theme-ink)] mb-1'>
-                    Código (16 caracteres hexadecimales)
+                    Código personalizado (opcional)
                   </label>
                   <input
                     id='code'
@@ -126,12 +126,12 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
                     maxLength={16}
                     autoComplete='off'
                     className='mt-1 min-h-12 w-full border border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 py-3 text-base text-[var(--theme-ink)] outline-none focus:border-[var(--theme-accent)] focus:ring-1 focus:ring-[var(--theme-focus-ring)]'
-                    required
                   />
+                  <p className='mt-2 text-xs text-[var(--theme-muted)]'>Déjalo vacío para generar un código seguro automáticamente.</p>
                 </div>
                 <div>
                   <label htmlFor='expires_at' className='block text-sm font-semibold text-[var(--theme-ink)] mb-1'>
-                    Fecha de expiración (opcional)
+                    Fecha de expiración (opcional; por defecto 7 días)
                   </label>
                   <input
                     id='expires_at'
