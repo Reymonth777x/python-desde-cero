@@ -40,7 +40,7 @@ export default async function HomeProgressSummary() {
   const percent = TOTAL_LESSONS > 0 ? Math.round((completed / TOTAL_LESSONS) * 100) : 0;
 
   return (
-    <section aria-label="Tu progreso de aprendizaje" className="mt-6 max-w-xl border border-[var(--theme-border)] bg-[var(--theme-surface)] p-4">
+    <section id="progreso" aria-label="Tu progreso de aprendizaje" className="mt-6 max-w-xl border border-[var(--theme-border)] bg-[var(--theme-surface)] p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs font-bold tracking-[0.14em] text-[var(--theme-accent)]">TU PROGRESO</p>
         <p className="font-mono text-sm text-[var(--theme-ink)]">
