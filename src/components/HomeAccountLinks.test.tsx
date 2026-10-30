@@ -24,7 +24,7 @@ describe('HomeAccountLinks', () => {
     expect(element.type).toBe(Fragment);
 
     const children = (element.props as { children: ReactElement[] }).children;
-    expect((children[0].props as { href: string }).href).toBe('/academia');
+    expect((children[0].props as { href: string }).href).toBe('/#progreso');
     expect(children[1].type).toBe('form');
     expect((children[1].props as { action?: unknown }).action).toBeDefined();
   });
