@@ -149,7 +149,6 @@ export function usePythonWorker({
       callbacksRef.current.onStatusChange?.('error');
     }
   }, [clearExecutionTimeout, sendToRunner]);
-  executeRef.current = executeRequest;
 
   const handleRunnerMessage = useCallback((event: MessageEvent) => {
     // The MessagePort was transferred only after the iframe checked both
