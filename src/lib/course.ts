@@ -1460,26 +1460,33 @@ export const courseModules: CourseModule[] = [
           "Contar resultados que cumplen una condición."
         ],
         "explanation": [
-          "Una lista de listas permite organizar datos en filas y columnas. Por ejemplo, cada fila puede representar las notas de un estudiante y cada posición una evaluación. Los índices empiezan en cero: notas[1][0] consulta el primer valor de la segunda fila.",
-          "El primer bucle recorre las filas y el segundo recorre cada valor de la fila actual. Esta estructura permite calcular totales, promedios, máximos o cantidades que cumplen una condición sin escribir una instrucción diferente para cada celda.",
-          "Una condición dentro del bucle permite contar solo los datos que cumplen una regla. En este laboratorio se considera aprobada una nota mayor o igual a 70. Prueba también una matriz con filas de distinta longitud y comprueba cómo cambia el resultado."
+          "Una lista de listas organiza datos en filas y columnas. Por ejemplo, cada fila puede representar las notas de un estudiante y cada posición una evaluación. Los índices empiezan en cero: notas[1][0] consulta el primer valor de la segunda fila. Antes de usar dos índices, prueba a mostrar una fila completa con notas[0].",
+          "Empieza recorriendo solo las filas: for fila in notas. En cada repetición, fila representa una lista completa. Después añade un segundo recorrido dentro del primero: for nota in fila. Así visitas un valor individual antes de pasar a la siguiente fila.",
+          "Una condición dentro del bucle interior permite contar solo los datos que cumplen una regla. En este laboratorio se considera aprobada una nota mayor o igual a 70. Si se cumple, aumenta el contador en uno. La indentación importa: el segundo for y el if van dentro del bloque correcto.",
+          "Las filas no necesitan tener la misma longitud. El bucle interior visita los valores que realmente existen en cada fila. Prueba una tabla con una sola fila o con filas de distinta longitud y comprueba que el contador siga funcionando."
         ],
-        "example": "notas = [[80, 90], [65, 75]]\naprobadas = 0\nfor fila in notas:\n    for nota in fila:\n        if nota >= 70:\n            aprobadas += 1\nprint(aprobadas)",
-        "exampleOutput": "3",
+        "example": "notas = [[80, 90], [65, 75]]\n\n# Paso 1: consulta una fila completa\nprint(\"Primera fila:\", notas[0])\n\n# Paso 2: recorre las filas con un solo bucle\nfor fila in notas:\n    print(\"Fila actual:\", fila)\n\n# Paso 3: recorre cada nota dentro de cada fila\naprobadas = 0\nfor fila in notas:\n    for nota in fila:\n        print(\"Nota revisada:\", nota)\n        if nota >= 70:\n            aprobadas += 1\n\nprint(\"Total aprobadas:\", aprobadas)",
+        "exampleOutput": "Primera fila: [80, 90]\nFila actual: [80, 90]\nFila actual: [65, 75]\nNota revisada: 80\nNota revisada: 90\nNota revisada: 65\nNota revisada: 75\nTotal aprobadas: 3",
         "walkthrough": [
-          "notas contiene dos filas y cada fila contiene dos calificaciones.",
-          "El bucle exterior obtiene una fila; el interior examina cada nota.",
-          "La condición cuenta 80, 90 y 75 porque son mayores o iguales a 70."
+          "notas contiene dos filas. notas[0] devuelve la primera fila completa: [80, 90].",
+          "El primer for recorre la lista exterior. En la primera vuelta, fila representa [80, 90]; en la segunda, representa [65, 75].",
+          "El segundo for está indentado dentro del primero. Recorre un valor de la fila actual cada vez: primero 80, después 90, luego 65 y finalmente 75.",
+          "La condición nota >= 70 se comprueba para cada valor. 80, 90 y 75 cumplen la regla; 65 no.",
+          "Cuando la condición se cumple, aprobadas += 1 aumenta el contador. Al final, el programa muestra 3.",
+          "Si una fila contiene tres notas y otra contiene una, el segundo for se adapta a cada fila sin necesitar otro rango ni una longitud fija."
         ],
         "commonMistakes": [
-          "Recorrer solo la lista exterior y olvidar el segundo bucle.",
-          "Comparar una fila completa con 70 en lugar de comparar cada nota."
+          "Recorrer solo la lista exterior y olvidar el segundo bucle; así se obtiene una fila, no cada nota.",
+          "Comparar una fila completa con 70 en lugar de comparar cada valor individual.",
+          "Poner el segundo for al mismo nivel que el primero; debe ir indentado dentro del bucle exterior.",
+          "Aumentar aprobadas fuera del if; así contarías también las notas menores que 70.",
+          "Suponer que todas las filas deben tener la misma longitud."
         ],
         "exercise": {
           "id": "b3-e9",
           "title": "Contar las calificaciones aprobadas",
-          "statement": "Utiliza la matriz [[70, 85], [60, 95]] y dos bucles for para contar cuántas notas son mayores o iguales a 70. Imprime el total.",
-          "starterCode": "notas = [[70, 85], [60, 95]]\naprobadas = 0\n",
+          "statement": "Utiliza la matriz [[70, 85], [60, 95]] y dos bucles for para contar cuántas notas son mayores o iguales a 70. Imprime el total. Antes de contar, identifica que el primer bucle obtiene una fila y el segundo obtiene una nota de esa fila.",
+          "starterCode": "notas = [[70, 85], [60, 95]]\naprobadas = 0\n\nfor fila in notas:\n    # Dentro de este bloque, recorre cada nota de la fila.\n    pass\n\nprint(aprobadas)",
           "solution": "notas = [[70, 85], [60, 95]]\naprobadas = 0\nfor fila in notas:\n    for nota in fila:\n        if nota >= 70:\n            aprobadas += 1\nprint(aprobadas)",
           "tests": [
             {
@@ -1488,9 +1495,10 @@ export const courseModules: CourseModule[] = [
             }
           ],
           "hints": [
-            "El primer for recorre cada fila.",
-            "El segundo for recorre las notas de la fila actual.",
-            "Incrementa el contador solo cuando nota >= 70."
+            "El primer for ya obtiene una fila completa; observa qué contiene fila en cada vuelta.",
+            "Dentro del primer for, añade un segundo for que recorra cada nota de la fila actual: for nota in fila.",
+            "Dentro del segundo for, comprueba si nota >= 70.",
+            "Solo cuando la condición sea verdadera, aumenta aprobadas en uno con aprobadas += 1."
           ],
           "difficulty": "medio",
           "xp": 25,
