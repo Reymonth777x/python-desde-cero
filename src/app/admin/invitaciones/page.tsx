@@ -131,11 +131,12 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
                     placeholder='CURSO-2026'
                     maxLength={32}
                     minLength={8}
-                    pattern="[A-Za-z0-9-]{8,32}"
+                    aria-describedby='code-help'
+                    pattern="[A-Za-z0-9]+(-[A-Za-z0-9]+)*"
                     autoComplete='off'
                     className='mt-1 min-h-12 w-full border border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 py-3 text-base text-[var(--theme-ink)] outline-none focus:border-[var(--theme-accent)] focus:ring-1 focus:ring-[var(--theme-focus-ring)]'
                   />
-                  <p className='mt-2 text-xs text-[var(--theme-muted)]'>Ejemplo: EQUIPO-OCT-26. Si escribes un código de 8–32 letras, números o guiones, se guardará en la invitación. Si lo dejas vacío, se genera uno aleatorio.</p>
+                  <p id='code-help' className='mt-2 text-xs text-[var(--theme-muted)]'>Ejemplo: EQUIPO-OCT-26. Usa 8–32 caracteres con letras y números; los guiones van entre grupos, sin repetirse ni ir al principio o al final. El código escrito se guarda exactamente tras normalizarlo a mayúsculas. Si lo dejas vacío, se genera uno aleatorio.</p>
                 </div>
                 <div>
                   <label htmlFor='expires_at' className='block text-sm font-semibold text-[var(--theme-ink)] mb-1'>

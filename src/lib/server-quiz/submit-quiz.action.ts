@@ -1,7 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { getCorrectAnswers, getExplanations } from './quiz-answers.server';
+import { getExplanations, getQuestionCount } from './quiz-answers.server';
 
 export interface SubmitQuizResult {
   score: number;
@@ -25,6 +25,7 @@ const EMPTY_RESULT: SubmitQuizResult = {
 function friendlyQuizError(code: string | undefined, message: string | undefined): string {
   const m = (message ?? '').toLowerCase();
   if (m.includes('quiz_rate_limited')) return 'Hiciste demasiados intentos seguidos. Espera unos minutos y vuelve a intentarlo.';
+  if (m.includes('quiz_prerequisite_required')) return 'Completa y aprueba la evaluación o el proyecto anterior antes de continuar.';
   if (m.includes('quiz_auth_required') || code === 'PGRST301' || m.includes('jwt')) return 'Tu sesión expiró o ya no es válida. Vuelve a iniciar sesión.';
   if (m.includes('quiz_invalid')) return 'La evaluación no coincide con la versión activa del curso. Actualiza la página y vuelve a intentarlo.';
   if (code === 'PGRST202' || m.includes('could not find the function') || m.includes('schema cache')) return 'El guardado de evaluaciones no está sincronizado con la base de datos. La actualización debe revisarse antes de continuar.';
@@ -79,11 +80,9 @@ export async function submitQuiz(
     return { ...EMPTY_RESULT, error: 'La sesión cambió de cuenta. Recarga la lección antes de guardar el resultado.' };
   }
 
-  let correctAnswers: number[];
   let total: number;
   try {
-    correctAnswers = getCorrectAnswers(moduleId, lessonId);
-    total = correctAnswers.length;
+    total = getQuestionCount(moduleId, lessonId);
   } catch {
     return { ...EMPTY_RESULT, error: 'Lección no encontrada' };
   }

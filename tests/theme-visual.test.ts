@@ -10,6 +10,8 @@ test.describe("Temas visuales — cada página × cada tema", () => {
         await page.addInitScript((selectedTheme) => {
           localStorage.setItem("python-desde-cero-theme", selectedTheme);
         }, theme);
+        // Theme/layout tests do not depend on the external Turnstile network.
+        await page.route("https://challenges.cloudflare.com/**", (request) => request.abort());
         await page.goto(route);
         await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
 
@@ -102,4 +104,113 @@ test("Respetar prefers-reduced-motion", async ({ page }) => {
   });
 
   expect(animations).toBe(0);
+});
+
+test("La paleta de temas móvil se adapta al ancho y no queda recortada", async ({ page }) => {
+  for (const width of [320, 360, 390]) {
+    await page.setViewportSize({ width, height: 568 });
+    await page.goto("/");
+
+    const trigger = page.getByRole("button", { name: "Seleccionar tema visual" });
+    await expect(trigger).toBeVisible();
+    await trigger.click();
+
+    const dialog = page.getByRole("dialog", { name: "Tema visual" });
+    await expect(dialog).toBeVisible();
+
+    const bounds = await dialog.boundingBox();
+    expect(bounds).not.toBeNull();
+    expect(bounds!.x).toBeGreaterThanOrEqual(0);
+    expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width);
+    expect(bounds!.y).toBeGreaterThanOrEqual(0);
+    expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(568);
+
+    await expect(dialog.locator("[data-theme-options]")).toHaveCSS("overflow-y", "auto");
+    await expect(dialog.getByRole("button", { name: /Cyberpunk/ })).toBeVisible();
+    await dialog.getByRole("button", { name: /Cyberpunk/ }).click();
+
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "cyberpunk");
+    await expect(dialog).toHaveCount(0);
+  }
+});
+
+test("Las páginas principales no generan desplazamiento horizontal en móvil", async ({ page }) => {
+  const routesToCheck = ["/", "/login", "/academia", "/practica"];
+  for (const width of [320, 360, 390]) {
+    await page.setViewportSize({ width, height: 740 });
+    for (const route of routesToCheck) {
+      await page.goto(route);
+      const widths = await page.evaluate(() => ({
+        viewport: document.documentElement.clientWidth,
+        document: document.documentElement.scrollWidth,
+        body: document.body.scrollWidth,
+      }));
+      expect(widths.document, `${route} desborda a ${width}px`).toBeLessThanOrEqual(width);
+      expect(widths.body, `${route} body desborda a ${width}px`).toBeLessThanOrEqual(width);
+      expect(widths.viewport).toBe(width);
+    }
+  }
+});
+
+
+test("Turnstile entrega el token a acceso, registro y recuperación", async ({ page }) => {
+  const testSiteKey = "1x00000000000000000000AA";
+
+  await page.addInitScript(() => {
+    const testWindow = window as Window & {
+      __turnstileOptions?: Record<string, unknown>;
+      __turnstileResetCount?: number;
+    };
+    window.turnstile = {
+      render: (container, options) => {
+        testWindow.__turnstileOptions = options;
+        const mockFrame = document.createElement("div");
+        mockFrame.setAttribute("data-testid", "turnstile-mock-frame");
+        mockFrame.setAttribute("aria-label", "Turnstile test challenge");
+        mockFrame.style.width = "300px";
+        mockFrame.style.height = "65px";
+        container.appendChild(mockFrame);
+        return "test-widget-1";
+      },
+      remove: () => undefined,
+      reset: () => {
+        testWindow.__turnstileResetCount = (testWindow.__turnstileResetCount ?? 0) + 1;
+      },
+    };
+  });
+
+  const getAction = () => page.evaluate(() => {
+    const testWindow = window as Window & { __turnstileOptions?: Record<string, unknown> };
+    return testWindow.__turnstileOptions?.action;
+  });
+  const submitToken = (token: string) => page.evaluate((value) => {
+    const testWindow = window as Window & { __turnstileOptions?: Record<string, unknown> };
+    const callback = testWindow.__turnstileOptions?.callback;
+    if (typeof callback !== "function") return false;
+    (callback as (token: string) => void)(value);
+    return true;
+  }, token);
+  const widget = page.getByTestId("turnstile-widget");
+
+  await page.goto("/login");
+  await expect(widget).toBeVisible();
+  await expect(widget).toHaveAttribute("data-sitekey", testSiteKey);
+  await expect.poll(getAction).toBe("login");
+  await expect(page.locator('input[name="captchaToken"]')).toHaveCount(1);
+  expect(await submitToken("login-test-token")).toBe(true);
+  await expect(page.locator('input[name="captchaToken"]')).toHaveValue("login-test-token");
+
+  await page.getByRole("button", { name: "Crear cuenta" }).click();
+  await expect(widget).toBeVisible();
+  await expect(widget).toHaveAttribute("data-sitekey", testSiteKey);
+  await expect.poll(getAction).toBe("signup");
+  expect(await submitToken("signup-test-token")).toBe(true);
+  await expect(page.locator('input[name="captchaToken"]')).toHaveValue("signup-test-token");
+
+  await page.goto("/login/forgot-password");
+  await expect(widget).toBeVisible();
+  await expect(widget).toHaveAttribute("data-sitekey", testSiteKey);
+  await expect.poll(getAction).toBe("password-reset");
+  expect(await submitToken("reset-test-token")).toBe(true);
+  await expect(page.locator('input[name="captchaToken"]')).toHaveValue("reset-test-token");
 });

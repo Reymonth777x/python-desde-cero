@@ -272,7 +272,7 @@ export default function HomePageClient({ accountLinks, progressSummary }: HomePa
               </div>
               <div className="border-l border-[var(--theme-border)] px-3 sm:px-5">
                 <p className="font-mono text-2xl font-semibold tracking-tight text-[var(--theme-ink)]">{TOTAL_LESSONS.toString().padStart(2, '0')}</p>
-                <p className="mt-1 text-[10px] leading-4 text-[var(--theme-muted)] sm:text-xs">lecciones guiadas</p>
+                <p className="mt-1 text-[10px] leading-4 text-[var(--theme-muted)] sm:text-xs">unidades obligatorias</p>
               </div>
               <div className="border-l border-[var(--theme-border)] pl-3 sm:pl-5">
                 <p className="font-mono text-2xl font-semibold tracking-tight text-[var(--theme-ink)]">100%</p>
@@ -296,7 +296,7 @@ export default function HomePageClient({ accountLinks, progressSummary }: HomePa
               </h2>
             </div>
             <p className="max-w-md text-sm leading-7 text-[var(--theme-muted)] sm:text-base">
-              El recorrido base sigue los cuatro módulos principales de Python Essentials 1. Al completarlo, puedes continuar con un proyecto aplicado opcional.
+              El recorrido base integra los cuatro módulos principales de Python Essentials 1, un proyecto final obligatorio y un examen global. Después puedes continuar con la extensión práctica opcional de archivos y persistencia.
             </p>
           </div>
 

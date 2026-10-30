@@ -205,64 +205,121 @@ export const courseModules: CourseModule[] = [
       },
       {
         "id": "b1-l4",
-        "section": "1.3 práctica",
-        "title": "Primer contacto con un programa Python",
+        "section": "1.4",
+        "title": "Evaluación del módulo 1: fundamentos de programación",
         "objectives": [
-          "Reconocer que un programa es un conjunto ordenado de instrucciones.",
-          "Ejecutar un programa sencillo mediante el intérprete de Python.",
-          "Identificar la salida y el orden en que se ejecutan las instrucciones."
+          "Distinguir un problema, un algoritmo, un programa y el código fuente.",
+          "Explicar la función de Python y de su intérprete.",
+          "Reconocer qué aporta un editor o IDE.",
+          "Identificar errores básicos de sintaxis y ejecución."
         ],
         "explanation": [
-          "Un programa informático es un conjunto de instrucciones que una computadora puede ejecutar para realizar una tarea. El código fuente es el texto que escribe la persona programadora siguiendo las reglas de un lenguaje, en este caso Python.",
-          "El intérprete de Python lee el código y ejecuta sus instrucciones. Cuando una instrucción muestra un resultado, ese resultado aparece en la consola. En esta primera práctica solo comprobarás que el entorno puede ejecutar un programa; la sintaxis de print() se estudiará con detalle en el módulo 2.",
-          "Python ejecuta las instrucciones en orden, de arriba hacia abajo. Si encuentra una instrucción que no respeta la sintaxis, muestra un error y detiene esa ejecución. Aprender a observar el resultado y leer el mensaje de error es parte del trabajo de programar."
+          "Esta evaluación comprueba los fundamentos antes de trabajar con datos y operaciones. Un problema describe una necesidad; un algoritmo organiza pasos finitos y claros para resolverla; un programa expresa esos pasos en instrucciones que una computadora puede ejecutar.",
+          "El código fuente es el texto escrito en un lenguaje de programación. Python tiene reglas propias. El intérprete procesa el código y ejecuta sus instrucciones; si encuentra una instrucción que no respeta la sintaxis, informa un error para que puedas corregirla.",
+          "Un editor permite escribir y modificar el código. Un IDE reúne el editor y herramientas de apoyo, como ejecución y depuración. El editor, el intérprete y el programa no son lo mismo: cada uno cumple una función distinta."
         ],
-        "example": "print(\"Hola, Python\")",
+        "example": "programa = \"Hola, Python\"\nprint(programa)",
         "exampleOutput": "Hola, Python",
         "walkthrough": [
-          "El editor contiene una instrucción escrita en Python.",
-          "Al ejecutar el código, el intérprete procesa esa instrucción.",
-          "La consola muestra el texto que produjo el programa."
+          "La primera línea guarda el texto del mensaje en una variable.",
+          "La segunda línea usa print() para mostrar el valor en la consola.",
+          "El intérprete procesa las instrucciones en orden y produce el resultado."
         ],
         "commonMistakes": [
-          "Confundir el código fuente con el resultado que aparece en la consola.",
-          "Cambiar el texto sin conservar las comillas que delimitan una cadena."
+          "Confundir el código fuente con el resultado de la consola.",
+          "Pensar que un IDE es el lenguaje de programación.",
+          "Llamar algoritmo a pasos sin orden ni resultado definido."
         ],
         "exercise": {
           "id": "b1-e4",
-          "title": "Ejecuta tu primer mensaje",
-          "statement": "Modifica el mensaje para que el programa muestre Estoy listo para aprender Python.",
-          "starterCode": "print(\"Hola, Python\")",
-          "solution": "print(\"Estoy listo para aprender Python\")",
+          "title": "Describe entrada, proceso y salida",
+          "statement": "Escribe tres instrucciones print() que describan un pequeño programa: primero la entrada, después el proceso y finalmente la salida.",
+          "starterCode": "print(\"Entrada: dos números\")\n",
+          "solution": "print(\"Entrada: dos números\")\nprint(\"Proceso: sumarlos\")\nprint(\"Salida: mostrar el resultado\")",
           "tests": [
             {
               "input": [],
-              "expected": "Estoy listo para aprender Python"
+              "expected": "Entrada: dos números\nProceso: sumarlos\nSalida: mostrar el resultado"
             }
           ],
           "hints": [
-            "Ejecuta primero el ejemplo para comprobar que el entorno responde.",
-            "Cambia únicamente el texto entre comillas y vuelve a ejecutar."
+            "Usa una línea por etapa.",
+            "Mantén las instrucciones en orden."
           ],
           "difficulty": "facil",
-          "xp": 15,
-          "length": 5
+          "xp": 20,
+          "length": 10
         },
         "questions": [
           {
-            "prompt": "¿Qué describe mejor un programa informático?",
+            "prompt": "¿Qué condición permite reconocer un algoritmo bien definido?",
             "options": [
-              "Una parte física del computador",
-              "Un archivo que contiene únicamente imágenes",
-              "Una contraseña para iniciar sesión",
-              "Un conjunto de instrucciones que la computadora ejecuta"
+              "Un programa ya ejecutado",
+              "Una secuencia finita y ordenada de pasos para resolver un problema",
+              "Una computadora completa",
+              "Un lenguaje de marcado"
+            ],
+            "answer": 1,
+            "explanation": "Un algoritmo organiza una solución en pasos claros, ordenados y finitos."
+          },
+          {
+            "prompt": "¿Qué es el código fuente?",
+            "options": [
+              "El resultado de la consola",
+              "Una pieza física",
+              "El texto de instrucciones escrito en un lenguaje de programación",
+              "Una copia de seguridad"
+            ],
+            "answer": 2,
+            "explanation": "El código fuente es el conjunto de instrucciones que una persona escribe."
+          },
+          {
+            "prompt": "¿Cuál es el trabajo principal del intérprete de Python?",
+            "options": [
+              "Procesar y ejecutar las instrucciones del programa",
+              "Diseñar la interfaz",
+              "Guardar contraseñas",
+              "Convertir errores en respuestas correctas"
+            ],
+            "answer": 0,
+            "explanation": "El intérprete procesa el código Python y ejecuta sus instrucciones."
+          },
+          {
+            "prompt": "¿Qué herramienta suele reunir un editor y otras funciones de desarrollo?",
+            "options": [
+              "Una impresora",
+              "Un sistema de archivos",
+              "Un algoritmo",
+              "Un entorno de desarrollo integrado (IDE)"
             ],
             "answer": 3,
-            "explanation": "Un programa reúne instrucciones escritas en un lenguaje que el intérprete o el entorno de ejecución puede procesar."
+            "explanation": "Un IDE integra el editor y herramientas de apoyo como ejecución y depuración."
+          },
+          {
+            "prompt": "¿Qué indica normalmente un error de sintaxis?",
+            "options": [
+              "Que el computador no tiene pantalla",
+              "Que una instrucción no respeta las reglas del lenguaje",
+              "Que el programa terminó correctamente",
+              "Que el algoritmo tiene demasiados pasos"
+            ],
+            "answer": 1,
+            "explanation": "Un error de sintaxis aparece cuando el código no cumple las reglas del lenguaje."
+          },
+          {
+            "prompt": "¿Cuál afirmación describe correctamente a Python?",
+            "options": [
+              "Es una pieza física",
+              "Es un sistema operativo",
+              "Es un lenguaje de programación con reglas para expresar instrucciones",
+              "Es un editor de texto"
+            ],
+            "answer": 2,
+            "explanation": "Python es un lenguaje de programación para expresar instrucciones."
           }
         ],
-        "assessment": false,
-        "estimatedMinutes": 25
+        "assessment": true,
+        "estimatedMinutes": 30
       }
     ]
   },
@@ -273,8 +330,70 @@ export const courseModules: CourseModule[] = [
     "summary": "Representa datos, utiliza variables, construye expresiones, convierte valores y trabaja con entrada y salida.",
     "lessons": [
       {
-        "id": "b2-l1",
+        "id": "b2-l9",
         "section": "2.1",
+        "title": "Primer programa: Hello, World!",
+        "objectives": [
+          "Ejecutar una instrucción que muestre un mensaje en la consola.",
+          "Reconocer print() como una función integrada de Python.",
+          "Identificar el texto entre comillas como argumento de la función."
+        ],
+        "explanation": [
+          "Un programa puede empezar con una instrucción que muestre un mensaje. En Python, print() envía a la consola los valores que recibe. Prueba con un mensaje corto y observa exactamente qué aparece.",
+          "El nombre print identifica una función integrada. Los paréntesis indican que la estás llamando y el texto entre comillas es el argumento que le entregas. Las comillas delimitan una cadena; no aparecen en el resultado de la consola.",
+          "Una llamada a print() termina normalmente con un salto de línea. También puedes pasar varios valores separados por comas: Python los muestra separados por un espacio. En esta primera práctica basta con un mensaje; después podrás combinarlo con variables y datos."
+        ],
+        "example": "print(\"Hola, mundo\")\nprint(\"Estoy aprendiendo\", \"Python\")",
+        "exampleOutput": "Hola, mundo\nEstoy aprendiendo Python",
+        "walkthrough": [
+          "La primera llamada muestra la cadena Hola, mundo.",
+          "La segunda llamada recibe dos argumentos y los separa con un espacio.",
+          "Cada llamada escribe su resultado en una línea diferente."
+        ],
+        "commonMistakes": [
+          "Olvidar una de las comillas que delimitan el texto.",
+          "Escribir Print() con mayúscula: los nombres de las funciones distinguen mayúsculas y minúsculas.",
+          "Olvidar el paréntesis de cierre."
+        ],
+        "exercise": {
+          "id": "b2-e9",
+          "title": "Mostrar tu primer mensaje",
+          "statement": "Escribe un programa que muestre exactamente el mensaje Hola, mundo desde Python.",
+          "starterCode": "# muestra el mensaje solicitado\n",
+          "solution": "print(\"Hola, mundo desde Python\")",
+          "tests": [
+            {
+              "input": [],
+              "expected": "Hola, mundo desde Python"
+            }
+          ],
+          "hints": [
+            "Usa la función print().",
+            "Escribe el mensaje entre comillas y no agregues texto extra."
+          ],
+          "difficulty": "facil",
+          "xp": 10,
+          "length": 3
+        },
+        "questions": [
+          {
+            "prompt": "¿Qué hace print(\"Hola\") al ejecutarse?",
+            "options": [
+              "Guarda el texto en un archivo",
+              "Muestra Hola en la consola",
+              "Solicita que la persona escriba un dato",
+              "Crea una variable llamada Hola"
+            ],
+            "answer": 1,
+            "explanation": "print() muestra en la consola el valor que recibe. Las comillas delimitan la cadena y no forman parte del resultado mostrado."
+          }
+        ],
+        "assessment": false,
+        "estimatedMinutes": 20
+      },
+      {
+        "id": "b2-l1",
+        "section": "2.2",
         "title": "Tipos de datos y literales",
         "objectives": [
           "Reconocer int, float, str y bool.",
@@ -328,67 +447,6 @@ export const courseModules: CourseModule[] = [
             ],
             "answer": 2,
             "explanation": "Un número con parte decimal se representa normalmente mediante float."
-          }
-        ],
-        "assessment": false,
-        "estimatedMinutes": 40
-      },
-      {
-        "id": "b2-l2",
-        "section": "2.2",
-        "title": "Variables y nombres claros",
-        "objectives": [
-          "Crear variables mediante asignación.",
-          "Elegir identificadores válidos y descriptivos.",
-          "Actualizar una variable con su valor anterior."
-        ],
-        "explanation": [
-          "Una variable es un nombre asociado a un valor durante la ejecución. El signo igual realiza una asignación: Python evalúa el lado derecho y guarda el resultado en el nombre izquierdo.",
-          "Un identificador puede contener letras, números y guion bajo, pero no empezar con un número ni contener espacios. Nombres como precio_unitario y cantidad permiten entender mejor el programa.",
-          "Una variable puede cambiar: puntos = puntos + 5 calcula un nuevo valor y lo asigna de nuevo. puntos += 5 expresa la misma actualización de forma abreviada y se usa en contadores y acumuladores."
-        ],
-        "example": "puntos = 10\npuntos += 5\nproducto = \"Cuaderno\"\nprint(producto)\nprint(puntos)",
-        "exampleOutput": "Cuaderno\n15",
-        "walkthrough": [
-          "puntos comienza en diez y aumenta cinco.",
-          "producto conserva el texto.",
-          "La última línea muestra el valor actualizado."
-        ],
-        "commonMistakes": [
-          "Usar espacios en nombres de variables.",
-          "Confundir =, que asigna, con ==, que compara."
-        ],
-        "exercise": {
-          "id": "b2-e2",
-          "title": "Actualizar una cantidad",
-          "statement": "Crea stock = 12, suma cinco unidades con += e imprime el valor final.",
-          "starterCode": "stock = 12\n",
-          "solution": "stock = 12\nstock += 5\nprint(stock)",
-          "tests": [
-            {
-              "input": [],
-              "expected": "17"
-            }
-          ],
-          "hints": [
-            "Usa += para actualizar la variable.",
-            "Imprime después de asignar."
-          ],
-          "difficulty": "facil",
-          "xp": 15,
-          "length": 5
-        },
-        "questions": [
-          {
-            "prompt": "¿Qué hace total = total + 3?",
-            "options": [
-              "Compara total con 3",
-              "Calcula el valor anterior más 3 y lo asigna nuevamente a total",
-              "Crea una cadena llamada total",
-              "Elimina total"
-            ],
-            "answer": 1,
-            "explanation": "Python evalúa el lado derecho y asigna el nuevo resultado a total."
           }
         ],
         "assessment": false,
@@ -457,7 +515,7 @@ export const courseModules: CourseModule[] = [
       },
       {
         "id": "b2-l4",
-        "section": "2.4",
+        "section": "2.3.1",
         "title": "Prioridad y conversión de expresiones",
         "objectives": [
           "Aplicar la prioridad de operadores.",
@@ -511,6 +569,67 @@ export const courseModules: CourseModule[] = [
             ],
             "answer": 1,
             "explanation": "int() convierte una cadena que representa un entero en un valor int."
+          }
+        ],
+        "assessment": false,
+        "estimatedMinutes": 40
+      },
+      {
+        "id": "b2-l2",
+        "section": "2.4",
+        "title": "Variables y nombres claros",
+        "objectives": [
+          "Crear variables mediante asignación.",
+          "Elegir identificadores válidos y descriptivos.",
+          "Actualizar una variable con su valor anterior."
+        ],
+        "explanation": [
+          "Una variable es un nombre asociado a un valor durante la ejecución. El signo igual realiza una asignación: Python evalúa el lado derecho y guarda el resultado en el nombre izquierdo.",
+          "Un identificador puede contener letras, números y guion bajo, pero no empezar con un número ni contener espacios. Nombres como precio_unitario y cantidad permiten entender mejor el programa.",
+          "Una variable puede cambiar: puntos = puntos + 5 calcula un nuevo valor y lo asigna de nuevo. puntos += 5 expresa la misma actualización de forma abreviada y se usa en contadores y acumuladores."
+        ],
+        "example": "puntos = 10\npuntos += 5\nproducto = \"Cuaderno\"\nprint(producto)\nprint(puntos)",
+        "exampleOutput": "Cuaderno\n15",
+        "walkthrough": [
+          "puntos comienza en diez y aumenta cinco.",
+          "producto conserva el texto.",
+          "La última línea muestra el valor actualizado."
+        ],
+        "commonMistakes": [
+          "Usar espacios en nombres de variables.",
+          "Confundir =, que asigna, con ==, que compara."
+        ],
+        "exercise": {
+          "id": "b2-e2",
+          "title": "Actualizar una cantidad",
+          "statement": "Crea stock = 12, suma cinco unidades con += e imprime el valor final.",
+          "starterCode": "stock = 12\n",
+          "solution": "stock = 12\nstock += 5\nprint(stock)",
+          "tests": [
+            {
+              "input": [],
+              "expected": "17"
+            }
+          ],
+          "hints": [
+            "Usa += para actualizar la variable.",
+            "Imprime después de asignar."
+          ],
+          "difficulty": "facil",
+          "xp": 15,
+          "length": 5
+        },
+        "questions": [
+          {
+            "prompt": "¿Qué hace total = total + 3?",
+            "options": [
+              "Compara total con 3",
+              "Calcula el valor anterior más 3 y lo asigna nuevamente a total",
+              "Crea una cadena llamada total",
+              "Elimina total"
+            ],
+            "answer": 1,
+            "explanation": "Python evalúa el lado derecho y asigna el nuevo resultado a total."
           }
         ],
         "assessment": false,
@@ -615,9 +734,27 @@ export const courseModules: CourseModule[] = [
           "tests": [
             {
               "input": [
+                "0"
+              ],
+              "expected": "0"
+            },
+            {
+              "input": [
+                "1"
+              ],
+              "expected": "1500"
+            },
+            {
+              "input": [
                 "3"
               ],
               "expected": "4500"
+            },
+            {
+              "input": [
+                "5"
+              ],
+              "expected": "7500"
             }
           ],
           "hints": [
@@ -683,6 +820,30 @@ export const courseModules: CourseModule[] = [
                 "2"
               ],
               "expected": "Cuaderno: 2500.00 colones"
+            },
+            {
+              "input": [
+                "lapiz",
+                "0.5",
+                "4"
+              ],
+              "expected": "Lapiz: 2.00 colones"
+            },
+            {
+              "input": [
+                "  cuaderno universitario  ",
+                "349.9",
+                "1"
+              ],
+              "expected": "Cuaderno Universitario: 349.90 colones"
+            },
+            {
+              "input": [
+                "marcador",
+                "1200.25",
+                "3"
+              ],
+              "expected": "Marcador: 3600.75 colones"
             }
           ],
           "hints": [
@@ -1982,13 +2143,357 @@ export const courseModules: CourseModule[] = [
         "assessment": true,
         "estimatedMinutes": 45
       },
+      {
+        "id": "b4-l10",
+        "section": "4.9",
+        "title": "Proyecto final obligatorio: gestor de inventario",
+        "objectives": [
+          "Representar productos y cantidades con diccionarios.",
+          "Crear funciones que validen y actualicen registros.",
+          "Recorrer cantidades para calcular un total.",
+          "Manejar entradas inválidas y excepciones.",
+          "Ejecutar y superar seis pruebas automáticas."
+        ],
+        "explanation": [
+          "El proyecto integra las herramientas centrales del curso en un gestor de inventario de consola. Cada producto tiene un nombre y una cantidad. Un diccionario asocia cada nombre con su cantidad y permite actualizar un registro.",
+          "La función agregar_producto concentra las reglas: el nombre no puede estar vacío y la cantidad debe ser positiva. La función total_unidades recorre los valores y suma las cantidades. Separar ambas operaciones facilita revisar y reutilizar el código.",
+          "El programa recibe datos con input(), convierte la cantidad a entero y controla ValueError cuando la entrada no es numérica. Ejecuta seis casos de prueba y corrige el código hasta superarlos. La finalización se registra después de aprobar también la revisión conceptual."
+        ],
+        "example": "inventario = {\"Cuaderno\": 3}\n\ndef total_unidades(datos):\n    total = 0\n    for cantidad in datos.values():\n        total += cantidad\n    return total\n\nprint(\"Total:\", total_unidades(inventario))",
+        "exampleOutput": "Total: 3",
+        "walkthrough": [
+          "El diccionario guarda el nombre y la cantidad.",
+          "La función recorre los valores y suma las unidades.",
+          "return devuelve el total para mostrarlo."
+        ],
+        "commonMistakes": [
+          "Aceptar nombres vacíos o cantidades cero o negativas.",
+          "Usar print() cuando la función debe devolver el total con return.",
+          "No manejar ValueError al convertir texto no numérico."
+        ],
+        "exercise": {
+          "id": "b4-e10",
+          "title": "Construye y valida el gestor de inventario",
+          "statement": "Lee cuántos registros vas a agregar. Para cada uno, lee el nombre y la cantidad. Guarda cada producto en un diccionario, acumula las cantidades cuando el nombre se repite, rechaza nombres vacíos y cantidades no positivas o no numéricas, y al final muestra el total de unidades.",
+          "starterCode": "inventario = {}\n\ndef agregar_producto(inventario, nombre, cantidad):\n    # Limpia y valida el nombre y la cantidad.\n    # Si el producto existe, acumula las unidades.\n    return False\n\ndef total_unidades(inventario):\n    # Suma las cantidades guardadas.\n    return 0\n\nregistros = int(input())\nfor _ in range(registros):\n    nombre = input()\n    cantidad = int(input())\n    if agregar_producto(inventario, nombre, cantidad):\n        print(f\"{nombre.strip()}: {inventario[nombre.strip()]}\")\n    else:\n        print(\"Datos no válidos\")\n\nprint(\"Total:\", total_unidades(inventario))",
+          "solution": "inventario = {}\n\ndef agregar_producto(inventario, nombre, cantidad):\n    nombre = nombre.strip()\n    if not nombre or cantidad <= 0:\n        return False\n    inventario[nombre] = inventario.get(nombre, 0) + cantidad\n    return True\n\ndef total_unidades(inventario):\n    total = 0\n    for cantidad in inventario.values():\n        total += cantidad\n    return total\n\nregistros = int(input())\nfor _ in range(registros):\n    nombre = input()\n    try:\n        cantidad = int(input())\n    except ValueError:\n        print(\"Cantidad no válida\")\n        continue\n    if agregar_producto(inventario, nombre, cantidad):\n        print(f\"{nombre.strip()}: {inventario[nombre.strip()]}\")\n    else:\n        print(\"Datos no válidos\")\n\nprint(\"Total:\", total_unidades(inventario))",
+          "tests": [
+            {
+              "input": [
+                "1",
+                "Cuaderno",
+                "3"
+              ],
+              "expected": "Cuaderno: 3\nTotal: 3"
+            },
+            {
+              "input": [
+                "3",
+                "Lapiz",
+                "10",
+                "Cuaderno",
+                "3",
+                "Lapiz",
+                "2"
+              ],
+              "expected": "Lapiz: 10\nCuaderno: 3\nLapiz: 12\nTotal: 15"
+            },
+            {
+              "input": [
+                "1",
+                "",
+                "5"
+              ],
+              "expected": "Datos no válidos\nTotal: 0"
+            },
+            {
+              "input": [
+                "1",
+                "Cuaderno",
+                "0"
+              ],
+              "expected": "Datos no válidos\nTotal: 0"
+            },
+            {
+              "input": [
+                "1",
+                "Cuaderno",
+                "abc"
+              ],
+              "expected": "Cantidad no válida\nTotal: 0"
+            },
+            {
+              "input": [
+                "1",
+                "Cuaderno",
+                "-2"
+              ],
+              "expected": "Datos no válidos\nTotal: 0"
+            }
+          ],
+          "hints": [
+            "Normaliza el nombre con strip().",
+            "Usa get(nombre, 0) para acumular existencias.",
+            "Rechaza cantidades menores o iguales a cero.",
+            "Recorre inventario.values() para calcular el total.",
+            "Captura ValueError al convertir la cantidad."
+          ],
+          "difficulty": "dificil",
+          "xp": 100,
+          "length": 90
+        },
+        "questions": [
+          {
+            "prompt": "¿Qué estructura asocia cada nombre de producto con su cantidad?",
+            "options": [
+              "Una cadena",
+              "Una tupla sin nombres",
+              "Una lista de caracteres",
+              "Un diccionario"
+            ],
+            "answer": 3,
+            "explanation": "Un diccionario asocia claves con valores."
+          },
+          {
+            "prompt": "¿Qué responsabilidad debe reunir agregar_producto()?",
+            "options": [
+              "Dibujar el inventario",
+              "Validar los datos y actualizar el registro",
+              "Cerrar el intérprete",
+              "Convertir todo a texto"
+            ],
+            "answer": 1,
+            "explanation": "La función centraliza validación y actualización."
+          },
+          {
+            "prompt": "¿Qué condición evita guardar una entrada inválida?",
+            "options": [
+              "Aceptar cualquier valor",
+              "Permitir cantidades negativas",
+              "Rechazar nombre vacío o cantidad menor o igual a cero",
+              "Convertir el nombre en número"
+            ],
+            "answer": 2,
+            "explanation": "Un producto necesita nombre no vacío y cantidad positiva."
+          },
+          {
+            "prompt": "¿Por qué total_unidades() recorre inventario.values()?",
+            "options": [
+              "Porque necesita sumar las cantidades",
+              "Porque values() elimina productos",
+              "Porque ordena nombres",
+              "Porque no se pueden consultar claves"
+            ],
+            "answer": 0,
+            "explanation": "values() entrega las cantidades que se deben sumar."
+          },
+          {
+            "prompt": "¿Qué excepción debe capturarse si int() recibe el texto abc?",
+            "options": [
+              "IndexError",
+              "ValueError",
+              "KeyError",
+              "NameError"
+            ],
+            "answer": 1,
+            "explanation": "ValueError indica que el texto no representa un entero válido."
+          }
+        ],
+        "finalProject": true,
+        "estimatedMinutes": 90
+      },
+      {
+        "id": "b4-l11",
+        "section": "4.10",
+        "title": "Examen final de Python: integración de los cuatro módulos",
+        "objectives": [
+          "Comprobar programación, algoritmos, Python y ejecución.",
+          "Razonar sobre tipos de datos, operadores y entrada/salida.",
+          "Interpretar condiciones, ciclos, lógica y listas.",
+          "Reconocer funciones, tuplas, diccionarios y excepciones."
+        ],
+        "explanation": [
+          "Este examen integra los aprendizajes de los cuatro módulos. No introduce bibliotecas nuevas ni contenidos avanzados: comprueba que puedes interpretar instrucciones breves, reconocer resultados y elegir soluciones para problemas básicos.",
+          "Lee cada fragmento con atención. Sigue las instrucciones en el orden en que Python las ejecuta, identifica el tipo de cada dato y comprueba cómo cambian las variables. Cuando haya un ciclo, anota las iteraciones antes de elegir la salida.",
+          "Necesitas al menos 75% para aprobar. Si no alcanzas ese puntaje, revisa las lecciones y el proyecto final, identifica los temas difíciles y vuelve a intentarlo. El resultado queda asociado a tu cuenta mediante la calificación del servidor."
+        ],
+        "example": "valores = [3, 1, 2]\nvalores.sort()\nprint(valores)",
+        "exampleOutput": "[1, 2, 3]",
+        "walkthrough": [
+          "La lista contiene tres números en un orden inicial.",
+          "sort() organiza los elementos de menor a mayor.",
+          "print() muestra el contenido actualizado."
+        ],
+        "commonMistakes": [
+          "Responder por intuición sin seguir el orden de ejecución.",
+          "Confundir el valor de return con lo que se imprime.",
+          "Olvidar que input() produce texto y debe convertirse al operar con números."
+        ],
+        "exercise": {
+          "id": "b4-e11",
+          "title": "Lectura de código para el examen final",
+          "statement": "Lee el ejemplo y comprueba cómo cambia la lista después de llamar sort(). Este examen se responde en las preguntas; no necesita ejecutar código adicional.",
+          "starterCode": "",
+          "solution": "",
+          "tests": [
+            {
+              "input": [],
+              "expected": "[1, 2, 3]"
+            }
+          ],
+          "hints": [
+            "Sigue las instrucciones en orden.",
+            "sort() modifica la lista."
+          ],
+          "difficulty": "medio",
+          "xp": 50,
+          "length": 45
+        },
+        "questions": [
+          {
+            "prompt": "¿Qué característica debe cumplir un algoritmo?",
+            "options": [
+              "Tener pasos finitos, ordenados y comprensibles",
+              "Incluir una interfaz gráfica",
+              "Usar solo números",
+              "Ejecutarse sin computadora"
+            ],
+            "answer": 0,
+            "explanation": "Un algoritmo describe pasos finitos y ordenados."
+          },
+          {
+            "prompt": "¿Qué componente procesa y ejecuta un programa Python?",
+            "options": [
+              "El teclado",
+              "El sistema de archivos",
+              "El intérprete de Python",
+              "El monitor"
+            ],
+            "answer": 2,
+            "explanation": "El intérprete procesa las instrucciones Python."
+          },
+          {
+            "prompt": "¿Cuál es el tipo de dato de \"7\" y el de 7?",
+            "options": [
+              "Ambos int",
+              "\"7\" es str y 7 es int",
+              "\"7\" es float y 7 es str",
+              "Ambos booleanos"
+            ],
+            "answer": 1,
+            "explanation": "Las comillas indican texto; el número sin comillas es entero."
+          },
+          {
+            "prompt": "¿Qué resultado produce 5 // 2?",
+            "options": [
+              "2",
+              "2.5",
+              "1",
+              "3"
+            ],
+            "answer": 0,
+            "explanation": "La división entera devuelve la parte entera del cociente."
+          },
+          {
+            "prompt": "¿Qué devuelve input() antes de convertir el valor?",
+            "options": [
+              "Un diccionario",
+              "Un entero",
+              "Un booleano",
+              "Una cadena de texto"
+            ],
+            "answer": 3,
+            "explanation": "input() entrega texto aunque se escriban dígitos."
+          },
+          {
+            "prompt": "¿Qué resultado tiene 8 >= 8?",
+            "options": [
+              "8",
+              "False",
+              "True",
+              "None"
+            ],
+            "answer": 2,
+            "explanation": "La comparación es verdadera porque 8 es igual a 8."
+          },
+          {
+            "prompt": "¿Qué hace break dentro de un ciclo?",
+            "options": [
+              "Reinicia el intérprete",
+              "Termina el ciclo inmediatamente",
+              "Salta a la siguiente función",
+              "Convierte la variable a texto"
+            ],
+            "answer": 1,
+            "explanation": "break termina el ciclo que se está ejecutando."
+          },
+          {
+            "prompt": "¿Qué valores produce range(2, 5)?",
+            "options": [
+              "2, 3, 4",
+              "2, 3, 4, 5",
+              "1, 2, 3, 4, 5",
+              "3, 4, 5"
+            ],
+            "answer": 0,
+            "explanation": "El límite final no se incluye."
+          },
+          {
+            "prompt": "Si valores = [4, 8, 12], ¿qué obtiene valores[-1]?",
+            "options": [
+              "4",
+              "8",
+              "Un error siempre",
+              "12"
+            ],
+            "answer": 3,
+            "explanation": "El índice -1 consulta el último elemento."
+          },
+          {
+            "prompt": "¿Qué hace bubble sort?",
+            "options": [
+              "Convierte elementos en texto",
+              "Elimina repetidos",
+              "Compara vecinos e intercambia los que están desordenados",
+              "Agrupa elementos en un diccionario"
+            ],
+            "answer": 2,
+            "explanation": "Bubble sort compara elementos adyacentes e intercambia cuando corresponde."
+          },
+          {
+            "prompt": "¿Cuál es la diferencia entre print() y return?",
+            "options": [
+              "Ambos cierran la función",
+              "print() muestra información y return entrega un valor a quien llamó",
+              "return solo usa cadenas",
+              "print() devuelve siempre un número"
+            ],
+            "answer": 1,
+            "explanation": "print() muestra en la salida; return devuelve un valor."
+          },
+          {
+            "prompt": "¿Qué excepción puede producir int(\"abc\")?",
+            "options": [
+              "ValueError",
+              "IndexError",
+              "KeyError",
+              "TypeError"
+            ],
+            "answer": 0,
+            "explanation": "ValueError indica que el texto no representa un entero válido."
+          }
+        ],
+        "assessment": true,
+        "finalAssessment": true,
+        "estimatedMinutes": 45
+      }
    ]
   },
   {
     "id": "module-5",
     "number": "5",
-    "title": "Proyecto aplicado y consolidación (extensión práctica)",
-    "summary": "Ampliación opcional del curso: planifica, construye, prueba y mejora un gestor de inventario utilizando los cuatro módulos anteriores.",
+    "title": "Archivos y persistencia (extensión práctica)",
+    "summary": "Ampliación opcional posterior al curso: guarda, recupera y valida datos con archivos de texto.",
     "lessons": [
       {
         "id": "b5-l1",
@@ -2184,62 +2689,65 @@ export const courseModules: CourseModule[] = [
       {
         "id": "b5-l4",
         "section": "5.4",
-        "title": "Proyecto final: gestor de inventario en consola",
+        "title": "Extensión: guardar y recuperar un inventario en un archivo",
         "objectives": [
-          "Integrar entradas, decisiones, bucles, colecciones y funciones.",
-          "Separar las acciones de listar y agregar productos.",
-          "Comprobar el programa con más de un caso de prueba."
+          "Guardar registros en un archivo de texto.",
+          "Leer el archivo para recuperar productos guardados.",
+          "Separar cada nombre y cantidad mediante un formato sencillo."
         ],
         "explanation": [
-          "El proyecto final reúne las herramientas principales del curso en una aplicación de consola. Un inventario guarda registros con nombre y cantidad; el usuario puede consultar los productos, agregar existencias y salir del programa.",
-          "Para mantener el código entendible, separa las operaciones en funciones. Una función lista productos, otra agrega unidades y el bucle principal muestra el menú y decide qué acción ejecutar. Los datos se conservan en una lista de diccionarios durante esta sesión.",
-          "Un proyecto completo no necesita conceptos avanzados para ser útil. Su calidad depende de que resuelva bien el problema, valide entradas, maneje opciones no reconocidas y pueda explicarse. Una posible ampliación es guardar y recuperar los registros usando los archivos de la lección anterior."
+          "En el proyecto obligatorio el inventario existe mientras el programa está en ejecución. Un archivo permite conservar la información para consultarla después de cerrar el programa.",
+          "El modo w abre un archivo para escribir; el modo r abre para leer. La instrucción with administra el archivo y asegura que se cierre al salir del bloque.",
+          "Cada producto se guarda en una línea con formato nombre;cantidad. Al leer, split(';') separa los dos datos. Es una introducción a la persistencia con texto plano."
         ],
-        "example": "inventario = [{\"nombre\": \"Cuaderno\", \"cantidad\": 4}]\n\ndef mostrar_inventario():\n    for producto in inventario:\n        print(producto[\"nombre\"], producto[\"cantidad\"])\n\nmostrar_inventario()",
-        "exampleOutput": "Cuaderno 4",
+        "example": "productos = [(\"Cuaderno\", 4), (\"Lapiz\", 10)]\nwith open(\"inventario.txt\", \"w\", encoding=\"utf-8\") as archivo:\n    for nombre, cantidad in productos:\n        archivo.write(f\"{nombre};{cantidad}\\n\")\nwith open(\"inventario.txt\", \"r\", encoding=\"utf-8\") as archivo:\n    print(archivo.read(), end=\"\")",
+        "exampleOutput": "Cuaderno;4\nLapiz;10",
         "walkthrough": [
-          "La lista almacena registros como diccionarios.",
-          "mostrar_inventario() recorre los productos y presenta sus datos."
+          "La lista contiene productos y cantidades.",
+          "El archivo se abre en modo w y se escribe una línea por producto.",
+          "Luego se abre en modo r y se muestra el contenido."
         ],
         "commonMistakes": [
-          "Mezclar la lógica del menú con todos los cálculos dentro de un solo bloque extenso.",
-          "No comprobar qué ocurre cuando el usuario selecciona una opción que no existe."
+          "Abrir en modo w cuando se quería leer y reemplazar el contenido anterior.",
+          "No usar el mismo delimitador al guardar y recuperar.",
+          "No incluir encoding=\"utf-8\" al trabajar con nombres con tildes."
         ],
         "exercise": {
           "id": "b5-e4",
-          "title": "Construir el resumen del inventario",
-          "statement": "Crea la lista inventario con dos diccionarios que contengan nombre y cantidad. Recorre la lista e imprime cada nombre y cantidad separados por un espacio.",
-          "starterCode": "inventario = [\n    {\"nombre\": \"Cuaderno\", \"cantidad\": 4},\n    {\"nombre\": \"Lapiz\", \"cantidad\": 10}\n]\n",
-          "solution": "inventario = [\n    {\"nombre\": \"Cuaderno\", \"cantidad\": 4},\n    {\"nombre\": \"Lapiz\", \"cantidad\": 10}\n]\nfor producto in inventario:\n    print(producto[\"nombre\"], producto[\"cantidad\"])",
+          "title": "Persistir los productos en un archivo de texto",
+          "statement": "Guarda los dos productos en inventario.txt, uno por línea y con formato nombre;cantidad. Después lee el archivo e imprime su contenido.",
+          "starterCode": "productos = [(\"Cuaderno\", 4), (\"Lapiz\", 10)]\n",
+          "solution": "productos = [(\"Cuaderno\", 4), (\"Lapiz\", 10)]\nwith open(\"inventario.txt\", \"w\", encoding=\"utf-8\") as archivo:\n    for nombre, cantidad in productos:\n        archivo.write(f\"{nombre};{cantidad}\\n\")\nwith open(\"inventario.txt\", \"r\", encoding=\"utf-8\") as archivo:\n    print(archivo.read(), end=\"\")",
           "tests": [
             {
               "input": [],
-              "expected": "Cuaderno 4\nLapiz 10"
+              "expected": "Cuaderno;4\nLapiz;10"
             }
           ],
           "hints": [
-            "Usa un for para recorrer la lista.",
-            "Consulta nombre y cantidad en cada diccionario."
+            "Usa with open(..., \"w\", encoding=\"utf-8\") para escribir.",
+            "Recorre la lista y escribe una línea por producto.",
+            "Abre el mismo archivo con modo r y muestra su contenido."
           ],
           "difficulty": "medio",
           "xp": 30,
-          "length": 5
+          "length": 20
         },
         "questions": [
           {
-            "prompt": "¿Qué combinación representa mejor el proyecto de inventario del curso?",
+            "prompt": "¿Qué ventaja ofrece with open(...)?",
             "options": [
-              "Una cadena y una sola operación matemática",
-              "Un conjunto sin registros ni nombres",
-              "Una lista de diccionarios recorrida mediante funciones y decisiones",
-              "Una única variable global con el menú completo"
+              "Cierra el archivo automáticamente al salir del bloque",
+              "Convierte el archivo en un diccionario",
+              "Impide cualquier error",
+              "Siempre elimina los datos anteriores"
             ],
-            "answer": 2,
-            "explanation": "La lista de diccionarios permite guardar productos y propiedades; las funciones y decisiones organizan las operaciones."
+            "answer": 0,
+            "explanation": "with administra el recurso y cierra el archivo al salir del bloque."
           }
         ],
         "assessment": false,
-        "estimatedMinutes": 30
+        "estimatedMinutes": 25
       }
     ],
     "optional": true

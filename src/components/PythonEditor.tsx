@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Editor, { type Monaco } from '@monaco-editor/react';
 import type { editor } from 'monaco-editor';
 import { usePythonWorker } from '@/lib/use-python-worker';
+import { matchesExerciseOutput, type ExerciseTestResult } from '@/lib/exercise-output';
 import { useTheme } from '@/app/theme-provider';
 
 // Configura Monaco Editor para usar workers autohospedados desde /monaco/vs/
@@ -13,12 +14,20 @@ if (typeof window !== 'undefined' && !window.MonacoEnvironment) {
   };
 }
 
+type ExerciseTestCase = { input: string[]; expected: string };
+type TestProgress = { completed: number; passed: number; total: number };
+type TestBatch = { code: string; cases: ExerciseTestCase[]; index: number; passed: number };
+
 export default function PythonEditor({
   defaultCode,
   instructions,
+  tests,
+  onTestsComplete,
 }: {
   defaultCode: string;
   instructions: string;
+  tests?: ExerciseTestCase[];
+  onTestsComplete?: (result: ExerciseTestResult) => void;
 }) {
   const [code, setCode] = useState(defaultCode);
   const [input, setInput] = useState('');
@@ -28,6 +37,38 @@ export default function PythonEditor({
   const { resolvedTheme } = useTheme();
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<Monaco | null>(null);
+  const testBatchRef = useRef<TestBatch | null>(null);
+  const onTestsCompleteRef = useRef(onTestsComplete);
+  const [testProgress, setTestProgress] = useState<TestProgress | null>(null);
+  const [testResult, setTestResult] = useState<ExerciseTestResult | null>(null);
+  const [isTesting, setIsTesting] = useState(false);
+
+  useEffect(() => {
+    onTestsCompleteRef.current = onTestsComplete;
+  }, [onTestsComplete]);
+
+  const onWorkerOutput = useCallback((out: string, err?: string) => {
+    if (err) setMobilePanel('output');
+    const batch = testBatchRef.current;
+    if (!batch) return;
+
+    const passed = matchesExerciseOutput(out, batch.cases[batch.index].expected, err);
+    const completed = batch.index + 1;
+    const passedCount = batch.passed + Number(passed);
+    const total = batch.cases.length;
+    setTestProgress({ completed, passed: passedCount, total });
+
+    if (completed >= total) {
+      testBatchRef.current = null;
+      const result = { allPassed: passedCount === total, passed: passedCount, total };
+      setTestResult(result);
+      setIsTesting(false);
+      onTestsCompleteRef.current?.(result);
+      return;
+    }
+
+    testBatchRef.current = { ...batch, index: completed, passed: passedCount };
+  }, []);
 
   const {
     workerState,
@@ -44,11 +85,7 @@ export default function PythonEditor({
         setMobilePanel('output');
       }
     },
-    onOutput: (out, err) => {
-      if (err) {
-        setMobilePanel('output');
-      }
-    },
+    onOutput: onWorkerOutput,
   });
 
   useEffect(() => {
@@ -114,11 +151,59 @@ export default function PythonEditor({
   const activeMobilePanel = mobilePanel === 'turtle' && !usesTurtle ? 'editor' : mobilePanel;
 
   const runCode = useCallback(() => {
-    if (isRunning) return;
+    if (isRunning || testBatchRef.current) return;
     setMobilePanel('output');
+    if (tests?.length) {
+      const cases = tests.map((test) => ({ input: [...test.input], expected: test.expected }));
+      testBatchRef.current = { code, cases, index: 0, passed: 0 };
+      setTestProgress({ completed: 0, passed: 0, total: cases.length });
+      setTestResult(null);
+      setIsTesting(true);
+      onTestsCompleteRef.current?.({ allPassed: false, passed: 0, total: cases.length });
+      runWorkerCode(code, cases[0].input);
+      return;
+    }
     const workerInput = input === '' ? [] : input.split(/\r?\n/).slice(0, 20);
     runWorkerCode(code, workerInput);
-  }, [code, input, isRunning, runWorkerCode]);
+  }, [code, input, isRunning, runWorkerCode, tests]);
+
+  useEffect(() => {
+    const batch = testBatchRef.current;
+    if (!batch || workerState !== 'ready' || isRunning) return;
+    runWorkerCode(batch.code, batch.cases[batch.index].input);
+  }, [isRunning, runWorkerCode, testProgress, workerState]);
+
+  useEffect(() => {
+    if (workerState !== 'error') return;
+    const batch = testBatchRef.current;
+    if (!batch) return;
+    testBatchRef.current = null;
+    const result = { allPassed: false, passed: testProgress?.passed ?? 0, total: batch.cases.length };
+    setTestResult(result);
+    setIsTesting(false);
+    onTestsCompleteRef.current?.(result);
+  }, [testProgress, workerState]);
+
+  const invalidateTests = useCallback(() => {
+    if (!tests?.length) return;
+    testBatchRef.current = null;
+    setTestProgress(null);
+    setTestResult(null);
+    setIsTesting(false);
+    onTestsCompleteRef.current?.({ allPassed: false, passed: 0, total: tests.length });
+  }, [tests]);
+
+  const cancelExecution = useCallback(() => {
+    if (testBatchRef.current && tests?.length) {
+      testBatchRef.current = null;
+      setTestProgress(null);
+      setIsTesting(false);
+      const result = { allPassed: false, passed: testResult?.passed ?? 0, total: tests.length };
+      setTestResult(result);
+      onTestsCompleteRef.current?.(result);
+    }
+    stopWorker();
+  }, [stopWorker, testResult?.passed, tests]);
 
   const insertOnMobile = (text: string, cursorOffset = text.length) => {
     const editorInstance = editorRef.current;
@@ -206,7 +291,7 @@ export default function PythonEditor({
               applyEditorTheme(monaco);
             }}
             value={code}
-            onChange={(value) => setCode(value ?? '')}
+            onChange={(value) => { setCode(value ?? ''); invalidateTests(); }}
             options={{
               minimap: { enabled: false },
               fontSize: 16,
@@ -242,12 +327,12 @@ export default function PythonEditor({
           ))}
         </div>
 
-        {needsInput && (
+        {needsInput && !tests?.length && (
           <label className="block text-base font-semibold text-[var(--theme-ink)] sm:text-sm">
           Entrada para input() <span className="font-normal text-[var(--theme-muted)]">(una línea por solicitud)</span>
           <textarea
             value={input}
-            onChange={(event) => setInput(event.target.value)}
+            onChange={(event) => { setInput(event.target.value); invalidateTests(); }}
             maxLength={10000}
             rows={3}
             placeholder="Escribe aquí las líneas que leerá tu programa"
@@ -261,7 +346,7 @@ export default function PythonEditor({
         <button
           type="button"
           onClick={runCode}
-          disabled={isRunning || workerState === 'loading'}
+          disabled={isRunning || isTesting || workerState === 'loading'}
           className="flex min-h-12 w-full items-center justify-center bg-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:text-sm"
         >
           {isRunning ? 'Ejecutando...' : workerState === 'loading' ? 'Preparando Python...' : 'Ejecutar código'}
@@ -298,18 +383,31 @@ export default function PythonEditor({
         >
           {error ? `Error de ejecución:\n${error}` : output || (workerState === 'ready' ? '> Entorno listo. Ejecuta código para consultar el resultado.' : workerState === 'idle' ? '> Pulsa Ejecutar para cargar Python por primera vez.' : '> Cargando Python en este dispositivo...')}
         </pre>
+        {tests?.length ? (
+          <p role="status" aria-live="polite" className="mt-3 text-sm text-[var(--theme-muted)]">
+            {testResult
+              ? testResult.allPassed
+                ? `Pruebas superadas: ${testResult.passed} de ${testResult.total}.`
+                : `Pruebas superadas: ${testResult.passed} de ${testResult.total}. Revisa el código y vuelve a ejecutar.`
+              : testProgress
+                ? testProgress.completed < testProgress.total
+                  ? `Ejecutando prueba ${testProgress.completed + 1} de ${testProgress.total}…`
+                  : `Pruebas comprobadas: ${testProgress.completed} de ${testProgress.total}.`
+                : 'Ejecuta el código para comprobar todos los casos del proyecto.'}
+          </p>
+        ) : null}
         <button
           type="button"
           onClick={runCode}
           disabled={isRunning || workerState === 'loading'}
           className="mt-3 flex min-h-12 w-full items-center justify-center border border-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50 md:hidden"
         >
-          {isRunning ? 'Ejecutando...' : 'Ejecutar de nuevo'}
+          {isTesting ? 'Comprobando pruebas...' : isRunning ? 'Ejecutando...' : 'Ejecutar de nuevo'}
         </button>
         {isRunning && (
           <button
             type="button"
-            onClick={stopWorker}
+            onClick={cancelExecution}
             className="mt-3 flex min-h-12 w-full items-center justify-center border border-[var(--theme-border-dark)] px-5 py-3 text-base font-semibold text-[var(--theme-muted)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-border-dark)]"
           >
             Detener

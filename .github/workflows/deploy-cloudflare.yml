@@ -25,6 +25,7 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          RAW_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY || secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
           WORKFLOW_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
           WORKFLOW_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
         run: |
@@ -35,13 +36,26 @@ jobs:
             exit 0
           fi
 
-          if [[ -n "$CLOUDFLARE_API_TOKEN" && -n "$CLOUDFLARE_ACCOUNT_ID" ]]; then
-            echo "configured=true" >> "$GITHUB_OUTPUT"
-            echo "CI correcto y credenciales de despliegue disponibles."
-          else
+          site_key="$(printf '%s' "$RAW_TURNSTILE_SITE_KEY" | tr -d '[:space:]')"
+          if [[ -z "$CLOUDFLARE_API_TOKEN" || -z "$CLOUDFLARE_ACCOUNT_ID" ]]; then
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Despliegue omitido. Configura CLOUDFLARE_API_TOKEN y CLOUDFLARE_ACCOUNT_ID en GitHub Actions Secrets."
+            echo "::notice::Despliegue omitido. Faltan CLOUDFLARE_API_TOKEN o CLOUDFLARE_ACCOUNT_ID en GitHub Actions Secrets."
+            exit 0
           fi
+
+          if [[ ! "$site_key" =~ ^[A-Za-z0-9_-]{20,128}$ ]] ||
+             [[ "$site_key" == "1x00000000000000000000AA" ]] ||
+             [[ "$site_key" == "2x00000000000000000000AB" ]] ||
+             [[ "$site_key" == "1x00000000000000000000BB" ]] ||
+             [[ "$site_key" == "2x00000000000000000000BB" ]] ||
+             [[ "$site_key" == "3x00000000000000000000FF" ]]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::error::Despliegue omitido: falta una sitekey real de Cloudflare Turnstile. Define NEXT_PUBLIC_TURNSTILE_SITE_KEY como variable de GitHub Actions (o secreto heredado). No uses llaves de prueba en producción."
+            exit 0
+          fi
+
+          echo "configured=true" >> "$GITHUB_OUTPUT"
+          echo "CI correcto; credenciales y sitekey real disponibles (valores ocultos)."
 
   deploy:
     needs: check-credentials
@@ -68,6 +82,7 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
           NEXT_PUBLIC_SITE_URL: https://python-desdecero.com
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY || secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
 
       - name: Diagnosticar y normalizar credenciales de Cloudflare sin revelarlas
         shell: bash
@@ -140,6 +155,7 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
           NEXT_PUBLIC_SITE_URL: https://python-desdecero.com
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY || secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
 
       - name: Normalizar y validar Account ID sin exponerlo
         shell: bash
@@ -162,6 +178,7 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
           NEXT_PUBLIC_SITE_URL: https://python-desdecero.com
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY || secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
 
       - name: Verificar dominio personalizado conectado al Worker
         shell: bash

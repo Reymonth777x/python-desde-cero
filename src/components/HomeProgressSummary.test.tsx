@@ -36,7 +36,7 @@ describe('HomeProgressSummary', () => {
 
     const html = renderToStaticMarkup(element as ReactElement);
     expect(html).toContain('id="progreso"');
-    expect(html).toContain('1/30 lecciones');
+    expect(html).toContain('1/33 lecciones');
     expect(html).toContain('Extensión práctica opcional: 1/4 actividades');
     expect(eq).toHaveBeenCalledWith('user_id', 'student-1');
     expect(from).toHaveBeenCalledWith('progress');

@@ -2,12 +2,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/lib/supabase/server', () => ({ createClient: vi.fn() }));
 vi.mock('./quiz-answers.server', () => ({
-  getCorrectAnswers: vi.fn(() => [0]),
+  getQuestionCount: vi.fn(() => 1),
   getExplanations: vi.fn(() => ['La opción elegida es correcta.']),
 }));
 
 import { createClient } from '@/lib/supabase/server';
-import { getCorrectAnswers, getExplanations } from './quiz-answers.server';
+import { getExplanations, getQuestionCount } from './quiz-answers.server';
 import { submitQuiz } from './submit-quiz.action';
 
 function formData(expectedUserId = 'student-1', answers = [0]) {
@@ -50,7 +50,7 @@ function mockClient(options?: {
 describe('submitQuiz', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(getCorrectAnswers).mockReturnValue([0]);
+    vi.mocked(getQuestionCount).mockReturnValue(1);
     vi.mocked(getExplanations).mockReturnValue(['La opción elegida es correcta.']);
   });
 
@@ -114,6 +114,17 @@ describe('submitQuiz', () => {
     const result = await submitQuiz(null, formData());
 
     expect(result.error).toContain('demasiados intentos');
+  });
+
+  it('explica cuándo falta aprobar el requisito previo del curso', async () => {
+    mockClient({
+      rpcResult: null,
+      rpcError: { code: 'P0001', message: 'quiz_prerequisite_required' },
+    });
+
+    const result = await submitQuiz(null, formData());
+
+    expect(result.error).toContain('Completa y aprueba la evaluación o el proyecto anterior');
   });
 
   it('rechaza una cantidad de respuestas distinta a las preguntas', async () => {

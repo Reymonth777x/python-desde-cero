@@ -22,12 +22,14 @@ type Props = {
 function isModuleUnlocked(moduleIndex: number, progressRows: ProgressRow[]): boolean {
   if (moduleIndex === 0) return true;
   const prevModule = courseCatalog[moduleIndex - 1];
-  const assessment = prevModule?.lessons.find((l) => l.assessment);
-  if (!assessment) return true; // no gate lesson — allow access
+  const requiredCompletion = prevModule
+    ? [...prevModule.lessons].reverse().find((lesson) => lesson.finalAssessment || lesson.assessment)
+    : undefined;
+  if (!prevModule || !requiredCompletion) return true; // no gate lesson — allow access
   return progressRows.some(
     (row) =>
       row.module_id === prevModule.id &&
-      row.lesson_id === assessment.id &&
+      row.lesson_id === requiredCompletion.id &&
       row.is_completed,
   );
 }
@@ -181,7 +183,7 @@ export default function AcademyDashboard({
               (moduleCompleted / courseModule.lessons.length) * 100,
             );
             const prevModule = courseCatalog[moduleIndex - 1];
-            const prevAssessment = prevModule?.lessons.find((l) => l.assessment);
+            const prevAssessment = prevModule?.lessons.slice().reverse().find((l) => l.finalAssessment || l.assessment);
 
             return (
               <section key={courseModule.id} aria-labelledby={`${courseModule.id}-title`}>
@@ -226,7 +228,7 @@ export default function AcademyDashboard({
                             <span className="flex min-w-0 items-start gap-3">
                               <Lock aria-label="Bloqueada" className="mt-0.5 shrink-0 text-[var(--theme-muted)]" size={18} />
                               <span className="min-w-0">
-                                <span className="block text-xs font-semibold text-[var(--theme-muted)]">{lesson.section}{lesson.assessment ? ' · EVALUACIÓN' : ''}</span>
+                                <span className="block text-xs font-semibold text-[var(--theme-muted)]">{lesson.section}{lesson.finalProject ? ' · PROYECTO FINAL' : lesson.finalAssessment ? ' · EXAMEN FINAL' : lesson.assessment ? ' · EVALUACIÓN' : ''}</span>
                                 <span className="mt-1 block font-medium text-[var(--theme-ink)]">{lesson.title}</span>
                               </span>
                             </span>

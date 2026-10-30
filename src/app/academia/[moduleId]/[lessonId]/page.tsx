@@ -42,7 +42,7 @@ export default async function LessonPage({ params }: Props) {
 
   if (moduleIndex > 0) {
     const prevModule = courseModules[moduleIndex - 1];
-    const assessmentLesson = prevModule.lessons.find((item) => item.assessment);
+    const assessmentLesson = [...prevModule.lessons].reverse().find((item) => item.finalAssessment || item.assessment);
 
     if (assessmentLesson) {
       const { data: gate, error: gateError } = await supabase
@@ -54,6 +54,22 @@ export default async function LessonPage({ params }: Props) {
         .maybeSingle();
 
       if (gateError || gate?.is_completed !== true) redirect('/academia');
+    }
+  }
+
+  const requiredCurrentLessonId = lesson.finalProject ? 'b4-l8' : lesson.finalAssessment ? 'b4-l10' : null;
+
+  if (requiredCurrentLessonId) {
+    const { data: prerequisite, error: prerequisiteError } = await supabase
+      .from('progress')
+      .select('is_completed')
+      .eq('user_id', user.id)
+      .eq('module_id', courseModule.id)
+      .eq('lesson_id', requiredCurrentLessonId)
+      .maybeSingle();
+
+    if (prerequisiteError || prerequisite?.is_completed !== true) {
+      redirect(`/academia/${courseModule.id}/${requiredCurrentLessonId}`);
     }
   }
 

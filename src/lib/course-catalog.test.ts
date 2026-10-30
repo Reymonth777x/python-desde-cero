@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { courseModules } from './course';
 import { courseCatalog } from './course-catalog';
 
 describe('catálogo público del curso', () => {
@@ -7,14 +8,14 @@ describe('catálogo público del curso', () => {
     const extensions = courseCatalog.filter((courseModule) => courseModule.optional);
 
     expect(core).toHaveLength(4);
-    expect(core.reduce((total, courseModule) => total + courseModule.lessons.length, 0)).toBe(30);
+    expect(core.reduce((total, courseModule) => total + courseModule.lessons.length, 0)).toBe(33);
     expect(extensions).toHaveLength(1);
     expect(extensions[0].lessons).toHaveLength(4);
   });
 
   it('solo publica metadatos de navegación, nunca respuestas ni soluciones', () => {
     const allowedModuleKeys = new Set(['id', 'number', 'title', 'summary', 'lessons', 'optional']);
-    const allowedLessonKeys = new Set(['id', 'section', 'title', 'assessment']);
+    const allowedLessonKeys = new Set(['id', 'section', 'title', 'assessment', 'finalProject', 'finalAssessment']);
 
     for (const courseModule of courseCatalog) {
       for (const key of Object.keys(courseModule)) {
@@ -30,4 +31,32 @@ describe('catálogo público del curso', () => {
     const serialized = JSON.stringify(courseCatalog);
     expect(serialized).not.toMatch(/"answer"|"explanation"|"solution"|"starterCode"|"correct_option_v2"/);
   });
+
+  it('muestra M2 en el orden didáctico del contenido y no omite Hello, World!', () => {
+    const module2 = courseCatalog.find((courseModule) => courseModule.id === 'module-2');
+    expect(module2?.lessons.map(({ id, section }) => [id, section])).toEqual([
+      ['b2-l9', '2.1'],
+      ['b2-l1', '2.2'],
+      ['b2-l3', '2.3'],
+      ['b2-l4', '2.3.1'],
+      ['b2-l2', '2.4'],
+      ['b2-l5', '2.5'],
+      ['b2-l6', '2.6'],
+      ['b2-l8', '2.6 práctica'],
+      ['b2-l7', '2.7'],
+    ]);
+  });
+
+
+  it('mantiene el índice público exactamente alineado con el contenido del servidor', () => {
+    const publicLessons = courseCatalog.flatMap((courseModule) =>
+      courseModule.lessons.map(({ id, section, title }) => ({ id, section, title })),
+    );
+    const serverLessons = courseModules.flatMap((courseModule) =>
+      courseModule.lessons.map(({ id, section, title }) => ({ id, section, title })),
+    );
+
+    expect(publicLessons).toEqual(serverLessons);
+  });
+
 });

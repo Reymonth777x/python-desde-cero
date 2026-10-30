@@ -13,6 +13,9 @@ export async function login(formData: FormData) {
   const captchaToken = String(formData.get('captchaToken') ?? '');
   const next = safeNext(formData.get('next'), '/academia');
   if (!email || !password) redirect('/login?error=missing');
+  if (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !captchaToken) {
+    redirect('/login?error=captcha');
+  }
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({
@@ -20,7 +23,14 @@ export async function login(formData: FormData) {
     password,
     options: { captchaToken: captchaToken || undefined },
   });
-  if (error) redirect('/login?error=login');
+  if (error) {
+    const authMessage = error.message.toLowerCase();
+    redirect(
+      authMessage.includes('captcha') || authMessage.includes('turnstile')
+        ? '/login?error=captcha'
+        : '/login?error=login',
+    );
+  }
 
   revalidatePath('/', 'layout');
   redirect(next);
@@ -42,6 +52,9 @@ export async function signup(formData: FormData) {
   const parsedInvitation = parseOptionalInvitationCode(String(formData.get('invitation_code') ?? ''));
 
   if (!fullName || !email || !password) redirect('/login?error=missing');
+  if (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !captchaToken) {
+    redirect('/login?error=captcha');
+  }
   if (!parsedInvitation.ok) redirect('/login?error=invitation');
   if (fullName.length > 100 || email.length > 254) redirect('/login?error=missing');
   if (password.length < 8) redirect('/login?error=password');
@@ -65,7 +78,18 @@ export async function signup(formData: FormData) {
       captchaToken: captchaToken || undefined,
     },
   });
-  if (error) redirect(parsedInvitation.code ? '/login?error=invitation' : '/login?error=signup');
+  if (error) {
+    const authMessage = error.message.toLowerCase();
+    const captchaError = authMessage.includes('captcha') || authMessage.includes('turnstile');
+    const invitationError = /invitation.*(invalid|expired|used)|invitation is/i.test(error.message);
+    redirect(
+      captchaError
+        ? '/login?error=captcha'
+        : invitationError
+          ? '/login?error=invitation'
+          : '/login?error=signup',
+    );
+  }
 
   if (data.session) {
     revalidatePath('/', 'layout');
@@ -78,6 +102,9 @@ export async function requestPasswordReset(formData: FormData) {
   const email = String(formData.get('email') ?? '').trim();
   const captchaToken = String(formData.get('captchaToken') ?? '');
   if (!email || email.length > 254) redirect('/login/forgot-password?error=missing');
+  if (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !captchaToken) {
+    redirect('/login/forgot-password?error=captcha');
+  }
 
   const emailRedirectTo = resolveAuthCallbackUrl(
     process.env.NEXT_PUBLIC_SITE_URL,
@@ -87,10 +114,15 @@ export async function requestPasswordReset(formData: FormData) {
   if (!emailRedirectTo) redirect('/login/forgot-password?error=configuration');
 
   const supabase = await createClient();
-  await supabase.auth.resetPasswordForEmail(email, {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: emailRedirectTo,
     captchaToken: captchaToken || undefined,
   });
+  if (error && (error.message.toLowerCase().includes('captcha') || error.message.toLowerCase().includes('turnstile'))) {
+    redirect('/login/forgot-password?error=captcha');
+  }
+
+  // Keep a uniform response for non-CAPTCHA failures to avoid account enumeration.
   redirect('/login/forgot-password?message=sent');
 }
 

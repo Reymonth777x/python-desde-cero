@@ -8,6 +8,7 @@ import { logout } from '@/app/login/actions';
 import type { ClientSafeLesson } from '@/lib/course-types';
 import { submitQuiz, type SubmitQuizResult } from '@/lib/server-quiz/submit-quiz.action';
 import PythonEditor from '@/components/PythonEditor';
+import type { ExerciseTestResult } from '@/lib/exercise-output';
 
 type Props = {
   lesson: ClientSafeLesson;
@@ -40,6 +41,7 @@ export default function LessonStudy({
   const [saving, setSaving] = useState(false);
   const [completed, setCompleted] = useState(initialCompleted);
   const [savedScore, setSavedScore] = useState(initialScore);
+  const [projectTestsPassed, setProjectTestsPassed] = useState(false);
 
   const answersJson = JSON.stringify(
     lesson.questions.map((_q, index) => answers[index] ?? -1)
@@ -48,6 +50,11 @@ export default function LessonStudy({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (saving) return;
+
+    if (lesson.finalProject && !projectTestsPassed) {
+      setFeedback('Ejecuta el proyecto y supera las cinco pruebas automáticas antes de registrar su revisión.');
+      return;
+    }
 
     if (lesson.questions.some((_question, index) => answers[index] === undefined)) {
       setFeedback('Responde todas las preguntas antes de comprobar la evaluación.');
@@ -78,7 +85,7 @@ export default function LessonStudy({
       if (serverResult.passed) {
         setCompleted(true);
         setSavedScore(Math.max(savedScore, serverResult.score));
-        setFeedback('Evaluación aprobada y progreso guardado en tu cuenta.');
+        setFeedback(lesson.finalProject ? 'Pruebas locales superadas, revisión conceptual aprobada y progreso guardado.' : lesson.finalAssessment ? 'Examen final aprobado y progreso guardado en tu cuenta.' : 'Evaluación aprobada y progreso guardado en tu cuenta.');
       } else {
         setFeedback('Aún no alcanzas el puntaje necesario. Revisa la retroalimentación y vuelve a intentarlo.');
       }
@@ -159,37 +166,41 @@ export default function LessonStudy({
               </div>
             </section>
 
-            <section aria-labelledby="exercise-title" className="space-y-4">
-              <div className="border-l-2 border-[var(--theme-border-dark)] bg-[var(--theme-bg-secondary)] p-5 sm:p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <h2 id="exercise-title" className="font-serif text-xl">{lesson.exercise.title}</h2>
-                  <span className="text-xs font-semibold text-[var(--theme-muted)]">Nivel {lesson.exercise.difficulty} · {lesson.exercise.xp} XP · {lesson.estimatedMinutes} min</span>
+            {!lesson.finalAssessment && (
+              <section aria-labelledby="exercise-title" className="space-y-4">
+                <div className="border-l-2 border-[var(--theme-border-dark)] bg-[var(--theme-bg-secondary)] p-5 sm:p-6">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <h2 id="exercise-title" className="font-serif text-xl">{lesson.exercise.title}</h2>
+                    <span className="text-xs font-semibold text-[var(--theme-muted)]">Nivel {lesson.exercise.difficulty} · {lesson.exercise.xp} XP · {lesson.estimatedMinutes} min</span>
+                  </div>
+                  <p className="mt-3 text-sm leading-7 text-[var(--theme-muted)]">{lesson.exercise.statement}</p>
+                  <h3 className="mt-4 text-xs font-bold tracking-[0.12em] text-[var(--theme-muted)]">PISTA</h3>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-[var(--theme-muted)]">
+                    {lesson.exercise.hints.map((hint) => <li key={hint}>{hint}</li>)}
+                  </ul>
+                  {lesson.exercise.tests[0]?.expected && (
+                    <details className="mt-4 border-t border-[var(--theme-border)] pt-3">
+                      <summary className="min-h-10 cursor-pointer text-sm font-semibold text-[var(--theme-accent)]">Ver salida esperada cuando termines tu intento</summary>
+                      <pre className="mt-2 overflow-x-auto whitespace-pre-wrap rounded bg-[var(--theme-surface)] p-3 font-mono text-sm leading-6">{lesson.exercise.tests[0].expected}</pre>
+                      <p className="mt-2 text-xs leading-5 text-[var(--theme-muted)]">Compara tu ejecución con este resultado. La evaluación conceptual se comprueba y guarda por separado.</p>
+                    </details>
+                  )}
                 </div>
-                <p className="mt-3 text-sm leading-7 text-[var(--theme-muted)]">{lesson.exercise.statement}</p>
-                <h3 className="mt-4 text-xs font-bold tracking-[0.12em] text-[var(--theme-muted)]">PISTA</h3>
-                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-[var(--theme-muted)]">
-                  {lesson.exercise.hints.map((hint) => <li key={hint}>{hint}</li>)}
-                </ul>
-                {lesson.exercise.tests[0]?.expected && (
-                  <details className="mt-4 border-t border-[var(--theme-border)] pt-3">
-                    <summary className="min-h-10 cursor-pointer text-sm font-semibold text-[var(--theme-accent)]">Ver salida esperada cuando termines tu intento</summary>
-                    <pre className="mt-2 overflow-x-auto whitespace-pre-wrap rounded bg-[var(--theme-surface)] p-3 font-mono text-sm leading-6">{lesson.exercise.tests[0].expected}</pre>
-                    <p className="mt-2 text-xs leading-5 text-[var(--theme-muted)]">Compara tu ejecución con este resultado. La evaluación de conocimientos se comprueba y guarda por separado.</p>
-                  </details>
-                )}
-              </div>
-              <PythonEditor
-                defaultCode={lesson.exercise.starterCode || lesson.example}
-                instructions={lesson.exercise.statement}
-              />
-              <Link href="/practica" className="inline-flex min-h-11 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">Abrir el laboratorio completo</Link>
-            </section>
+                <PythonEditor
+                  defaultCode={lesson.exercise.starterCode || lesson.example}
+                  instructions={lesson.exercise.statement}
+                  tests={lesson.finalProject ? lesson.exercise.tests : undefined}
+                  onTestsComplete={lesson.finalProject ? (testResult: ExerciseTestResult) => setProjectTestsPassed(testResult.allPassed) : undefined}
+                />
+                <Link href="/practica" className="inline-flex min-h-11 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">Abrir el laboratorio completo</Link>
+              </section>
+            )}
 
             <section aria-labelledby="quiz-title">
               <div className="border-b border-[var(--theme-border)] pb-4">
-                <h2 id="quiz-title" className="font-serif text-2xl">{lesson.assessment ? 'Evaluación del módulo' : 'Comprueba lo aprendido'}</h2>
+                <h2 id="quiz-title" className="font-serif text-2xl">{lesson.finalAssessment ? 'Examen final PE1' : lesson.finalProject ? 'Revisión del proyecto final' : lesson.assessment ? 'Evaluación del módulo' : 'Comprueba lo aprendido'}</h2>
                 <p className="mt-2 text-sm leading-6 text-[var(--theme-muted)]">
-                  {lesson.assessment ? 'Necesitas al menos 75% para aprobar. Esta evaluación original es formativa y no sustituye una prueba oficial.' : 'Responde correctamente para registrar esta actividad como completada.'}
+                  {lesson.finalAssessment ? 'Este examen integra los cuatro módulos. Necesitas al menos 75% para aprobar. Es una evaluación formativa y no sustituye una certificación externa.' : lesson.finalProject ? 'La revisión conceptual se habilita cuando las cinco pruebas locales del proyecto pasan. Necesitas al menos 75% para registrar la actividad.' : lesson.assessment ? 'Necesitas al menos 75% para aprobar. Esta evaluación original es formativa y no sustituye una prueba oficial.' : 'Responde correctamente para registrar esta actividad como completada.'}
                 </p>
               </div>
 

@@ -28,6 +28,8 @@ export default async function ForgotPasswordPage({ searchParams }: Props) {
               ? 'La recuperación no está configurada para este entorno.'
               : params.error === 'confirmation'
                 ? 'El enlace expiró o no es válido. Solicita uno nuevo.'
+                : params.error === 'captcha'
+                  ? 'Completa la verificación de seguridad antes de continuar.'
                 : 'Escribe un correo electrónico válido para continuar.'}
           </p>
         )}
@@ -45,7 +47,7 @@ export default async function ForgotPasswordPage({ searchParams }: Props) {
           </div>
 
           {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-            <TurnstileWidget siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} />
+            <TurnstileWidget siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} action="password-reset" />
           )}
 
           <button type="submit" className="min-h-12 w-full bg-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-ink-inverse)] hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">
