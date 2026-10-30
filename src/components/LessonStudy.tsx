@@ -52,7 +52,7 @@ export default function LessonStudy({
     if (saving) return;
 
     if (lesson.finalProject && !projectTestsPassed) {
-      setFeedback('Ejecuta el proyecto y supera las cinco pruebas automáticas antes de registrar su revisión.');
+      setFeedback(`Ejecuta el proyecto y supera las ${lesson.exercise.tests.length} pruebas automáticas antes de registrar su revisión.`);
       return;
     }
 
@@ -200,7 +200,7 @@ export default function LessonStudy({
               <div className="border-b border-[var(--theme-border)] pb-4">
                 <h2 id="quiz-title" className="font-serif text-2xl">{lesson.finalAssessment ? 'Examen final PE1' : lesson.finalProject ? 'Revisión del proyecto final' : lesson.assessment ? 'Evaluación del módulo' : 'Comprueba lo aprendido'}</h2>
                 <p className="mt-2 text-sm leading-6 text-[var(--theme-muted)]">
-                  {lesson.finalAssessment ? 'Este examen integra los cuatro módulos. Necesitas al menos 75% para aprobar. Es una evaluación formativa y no sustituye una certificación externa.' : lesson.finalProject ? 'La revisión conceptual se habilita cuando las cinco pruebas locales del proyecto pasan. Necesitas al menos 75% para registrar la actividad.' : lesson.assessment ? 'Necesitas al menos 75% para aprobar. Esta evaluación original es formativa y no sustituye una prueba oficial.' : 'Responde correctamente para registrar esta actividad como completada.'}
+                  {lesson.finalAssessment ? 'Este examen integra los cuatro módulos. Necesitas al menos 75% para aprobar. Es una evaluación formativa y no sustituye una certificación externa.' : lesson.finalProject ? `La revisión conceptual se habilita cuando las ${lesson.exercise.tests.length} pruebas locales del proyecto pasan. Necesitas al menos 75% para registrar la actividad.` : lesson.assessment ? 'Necesitas al menos 75% para aprobar. Esta evaluación original es formativa y no sustituye una prueba oficial.' : 'Responde correctamente para registrar esta actividad como completada.'}
                 </p>
               </div>
 
