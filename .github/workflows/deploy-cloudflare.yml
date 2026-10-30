@@ -152,6 +152,7 @@ jobs:
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
           NEXT_PUBLIC_SITE_URL: https://python-desdecero.com
           NEXT_PUBLIC_PYTHON_RUNNER_ORIGIN: ${{ steps.isolated-runner.outputs.origin }}
+          NEXT_PUBLIC_PYTHON_RUNNER_ORIGIN: ${{ steps.isolated-runner.outputs.origin }}
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ needs.check-credentials.outputs.site_key }}
 
       - name: Diagnosticar y normalizar credenciales de Cloudflare sin revelarlas
@@ -250,12 +251,45 @@ jobs:
           echo "origin=$runner_origin" >> "$GITHUB_OUTPUT"
           echo "Ejecutor aislado publicado en $runner_origin (origen y CSP verificados)."
 
+      - name: Preparar assets del ejecutor Python aislado
+        run: npm run prepare:python-runner
+
+      - name: Publicar el origen aislado para Python
+        id: isolated-runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@4.148.0 deploy --config wrangler.runner.jsonc 2>&1 | tee /tmp/python-runner-deploy.log
+
+          runner_origin="$(grep -Eo 'https://[^[:space:]]+\.workers\.dev' /tmp/python-runner-deploy.log | tail -n 1 | sed -E 's/[),]+$//')"
+          if [[ -z "$runner_origin" ]]; then
+            echo "::error::Wrangler no devolvió la URL workers.dev del ejecutor aislado."
+            exit 1
+          fi
+
+          curl --fail --silent --show-error --location --retry 5 --retry-delay 2 --retry-all-errors \
+            "$runner_origin/" -o /tmp/python-runner-index.html
+          grep -Fq "runner-frame.js" /tmp/python-runner-index.html
+
+          curl --fail --silent --show-error --location --retry 5 --retry-delay 2 --retry-all-errors \
+            "$runner_origin/runner-frame.js" -o /tmp/python-runner-frame.js
+          grep -Fq "ALLOWED_PARENT_ORIGINS" /tmp/python-runner-frame.js
+
+          curl --fail --silent --show-error --dump-header /tmp/python-runner-worker-headers \
+            --output /dev/null "$runner_origin/python-worker.js"
+          grep -qi "content-security-policy:" /tmp/python-runner-worker-headers
+          grep -qi "connect-src 'self'" /tmp/python-runner-worker-headers
+
+          echo "origin=$runner_origin" >> "$GITHUB_OUTPUT"
+          echo "Ejecutor aislado publicado en $runner_origin (origen y CSP verificados)."
+
       - name: Compilar para Cloudflare Workers
         run: npm run build:vinext
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
           NEXT_PUBLIC_SITE_URL: https://python-desdecero.com
+          NEXT_PUBLIC_PYTHON_RUNNER_ORIGIN: ${{ steps.isolated-runner.outputs.origin }}
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ needs.check-credentials.outputs.site_key }}
 
       - name: Normalizar y validar Account ID sin exponerlo
@@ -301,6 +335,7 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://nuqydanbbgqcofcftshk.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_m2uv5ltBuTN1UQyo5meB-A_zoWCR-x6
           NEXT_PUBLIC_SITE_URL: https://python-desdecero.com
+          NEXT_PUBLIC_PYTHON_RUNNER_ORIGIN: ${{ steps.isolated-runner.outputs.origin }}
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ needs.check-credentials.outputs.site_key }}
 
       - name: Verificar dominio personalizado conectado al Worker
