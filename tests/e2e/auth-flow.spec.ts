@@ -11,7 +11,7 @@ test.describe('Autenticacion y flujo de usuario', () => {
   test('La primera lección real puede probarse sin iniciar sesión', async ({ page }) => {
     await page.goto('/muestra');
 
-    await expect(page).toHaveURL(/\\/muestra$/);
+    await expect(page).toHaveURL(new RegExp('/muestra$'));
     await expect(page.getByRole('heading', { name: 'Resolver problemas mediante algoritmos' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Tu código Python' })).toBeVisible();
     await expect(page.getByTestId('python-editor-frame')).toBeVisible();
