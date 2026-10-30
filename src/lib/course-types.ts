@@ -31,6 +31,8 @@ export type CourseLesson = {
   exercise: CourseExercise;
   questions: QuizQuestion[];
   assessment?: boolean;
+  finalProject?: boolean;
+  finalAssessment?: boolean;
   estimatedMinutes: number;
 };
 
