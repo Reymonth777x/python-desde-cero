@@ -122,3 +122,19 @@ Mientras exista esta divergencia, no ejecutar supabase db push, migration repair
 3. Probarlo contra una instancia de desarrollo; registrar el resultado.
 4. Para producción, aplicar el SQL en una ventana coordinada con el código compatible y verificar la fila en el historial remoto.
 5. Actualizar esta matriz. No copiar SQL de un chat a producción sin dejar el archivo versionado.
+
+
+## Verificación consolidada del catálogo y rama preview — 30-10-2026
+
+Consulta de solo lectura posterior a los despliegues del 30-10-2026:
+
+- Producción y DEV tienen las mismas 67 claves v2 del catálogo vigente: módulo 1 = 10, módulo 2 = 13, módulo 3 = 11, módulo 4 = 28 y módulo 5 opcional = 5.
+- En los cuatro módulos obligatorios hay 62 claves; las otras 5 pertenecen a la extensión opcional. No se detectaron filas con `correct_option_v2 IS NULL` en ese conjunto.
+- Producción confirma `public.submit_quiz_v2` como SECURITY INVOKER, sin permiso EXECUTE para `anon` y con permiso para `authenticated`. La función privada autoritativa es SECURITY DEFINER, valida `auth.uid()` y devuelve calificación agregada.
+- El trigger `invitations_prevent_used_deletion` está habilitado sobre `public.invitations`.
+
+### Rama preview fallida del proyecto de producción
+
+La consulta de `list_branches` al proyecto `nuqydanbbgqcofcftshk` devuelve una rama preview llamada `main`, ID `82612040-2379-41e3-8f76-100fadca6a2c`, con `status = MIGRATIONS_FAILED`. El proyecto separado `python-desde-cero-dev` (`fcwbkkivelsipqqrbpya`) está `ACTIVE_HEALTHY`; no confundir ambos recursos.
+
+No resetear, rebasar, fusionar ni eliminar la rama preview como solución rápida. Primero identificar qué migración falla, comparar su historial con producción y valorar si la rama puede repararse sin perder datos de preview. Esta incidencia no justifica ejecutar operaciones de migración en la base principal.
