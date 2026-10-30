@@ -19,19 +19,23 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(courseModules[4].optional).toBe(true);
     expect(courseModules[4].title).toContain('extensión práctica');
     expect(courseModules.slice(0, 4).map((courseModule) => courseModule.lessons.length)).toEqual([
-      4, 8, 9, 9,
+      4, 8, 9, 11,
     ]);
     expect(courseModules[4].lessons).toHaveLength(4);
     expect(courseModules[1].lessons.at(-1)?.id).toBe('b2-l7');
     expect(courseModules[2].lessons.at(-1)?.id).toBe('b3-l8');
-    expect(courseModules[3].lessons.at(-1)?.id).toBe('b4-l8');
+    expect(courseModules[3].lessons.at(-1)?.id).toBe('b4-l11');
     expect(courseModules[1].lessons.at(-1)?.assessment).toBe(true);
     expect(courseModules[2].lessons.at(-1)?.assessment).toBe(true);
     expect(courseModules[3].lessons.at(-1)?.assessment).toBe(true);
     expect(courseModules[1].lessons.at(-2)?.id).toBe('b2-l8');
     expect(courseModules[2].lessons.at(-2)?.id).toBe('b3-l9');
-    expect(courseModules[3].lessons.at(-2)?.id).toBe('b4-l9');
-    expect(courseModules[0].lessons.at(-1)?.assessment).toBe(false);
+    expect(courseModules[3].lessons.at(-4)?.id).toBe('b4-l9');
+    expect(courseModules[0].lessons.at(-1)?.assessment).toBe(true);
+    expect(courseModules[0].lessons.at(-1)?.questions).toHaveLength(6);
+    expect(courseModules[3].lessons.at(-2)?.finalProject).toBe(true);
+    expect(courseModules[3].lessons.at(-1)?.finalAssessment).toBe(true);
+    expect(courseModules[3].lessons.at(-1)?.questions).toHaveLength(12);
   });
 
   it('asigna preguntas y ejemplos a cada actividad y mantiene ids únicos por módulo', () => {
@@ -62,8 +66,8 @@ describe('ruta de aprendizaje Python desde cero', () => {
     const prompts = lessons.flatMap((lesson) => lesson.questions.map((question) => question.prompt));
     const exerciseIds = lessons.map((lesson) => lesson.exercise.id);
 
-    expect(lessons).toHaveLength(34);
-    expect(courseModules.filter((courseModule) => !courseModule.optional).flatMap((courseModule) => courseModule.lessons)).toHaveLength(30);
+    expect(lessons).toHaveLength(36);
+    expect(courseModules.filter((courseModule) => !courseModule.optional).flatMap((courseModule) => courseModule.lessons)).toHaveLength(32);
     expect(new Set(exerciseIds).size).toBe(lessons.length);
     expect(new Set(prompts).size).toBe(prompts.length);
 
@@ -115,6 +119,8 @@ describe('ruta de aprendizaje Python desde cero', () => {
       'b4-l7',
       'b4-l9',
       'b4-l8',
+      'b4-l10',
+      'b4-l11',
     ]);
   });
 
@@ -130,7 +136,7 @@ describe('ruta de aprendizaje Python desde cero', () => {
       'b3-l9',
       'b3-l8',
     ]);
-    expect(courseModules[0].lessons.find((item) => item.id === 'b1-l4')?.section).toBe('1.3 práctica');
+    expect(courseModules[0].lessons.find((item) => item.id === 'b1-l4')?.section).toBe('1.4');
   });
 
   it('incluye estructuras y herramientas necesarias para resolver problemas reales', () => {
