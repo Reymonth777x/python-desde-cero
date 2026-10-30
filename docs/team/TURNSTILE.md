@@ -3,7 +3,7 @@
 ## Estado comprobado el 30 de octubre de 2026
 
 - La variable pública `NEXT_PUBLIC_TURNSTILE_SITE_KEY` está disponible en GitHub Actions y el workflow la inyecta durante el build de Vinext.
-- El release funcional `e758f9cf9da1aa647429669b112b7128ca9b126d` se publicó correctamente en el workflow **41076898388**. La actualización documental PR #67 desplegó después el mismo bundle de aplicación en el workflow **41092591412** (HEAD `10cc1b7`); ambos jobs terminaron correctamente.
+- El código publicado más reciente al corte del 30-10-2026 es `04604585d899173439f73c8a9d1975451e771200`; CI de `master` **41108215559** y despliegue Cloudflare **41108747917** terminaron correctamente. El Worker publicado tiene versión `522d1b30-13fd-4bed-aefa-8395986367c4`.
 - El log confirma que el Worker se compiló y publicó desde el mismo SHA que `master`, que la segunda comparación SHA pasó justo antes de publicar, y que el HTML de `/login` contiene `data-testid="turnstile-widget"`; `/muestra`, sitemap y `www` HTTP 308 también pasaron. El smoke test externo posterior leyó `/`, `/muestra`, `/login`, sitemap y comprobó `www` hacia el apex.
 - La lectura pública de `/muestra` confirmó la explicación guiada revisada en `b1-l1`–`b1-l3`. Esto confirma que el componente y la Sitekey pública llegaron al build/HTML. No demuestra que el script cliente haya cargado, que un usuario haya completado el desafío ni que Supabase Auth haya validado un token.
 - La Secret key privada de Turnstile y el estado de CAPTCHA protection no se pueden leer mediante la inspección del repositorio ni el estado básico del proyecto Supabase. Su configuración en Supabase Auth sigue pendiente de confirmación.
