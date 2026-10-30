@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { courseModules } from './course';
 import { courseCatalog } from './course-catalog';
 
 describe('catálogo público del curso', () => {
@@ -44,6 +45,18 @@ describe('catálogo público del curso', () => {
       ['b2-l8', '2.6 práctica'],
       ['b2-l7', '2.7'],
     ]);
+  });
+
+
+  it('mantiene el índice público exactamente alineado con el contenido del servidor', () => {
+    const publicLessons = courseCatalog.flatMap((courseModule) =>
+      courseModule.lessons.map(({ id, section, title }) => ({ id, section, title })),
+    );
+    const serverLessons = courseModules.flatMap((courseModule) =>
+      courseModule.lessons.map(({ id, section, title }) => ({ id, section, title })),
+    );
+
+    expect(publicLessons).toEqual(serverLessons);
   });
 
 });
