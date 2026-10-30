@@ -5,6 +5,7 @@ on:
     workflows: ["CI"]
     types: [completed]
     branches: [master]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -28,12 +29,24 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           RAW_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY || secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
           WORKFLOW_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
-          WORKFLOW_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          WORKFLOW_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch || github.ref_name }}
         run: |
           set -euo pipefail
-          if [[ "$GITHUB_EVENT_NAME" != "workflow_run" || "$WORKFLOW_HEAD_BRANCH" != "master" || "$WORKFLOW_CONCLUSION" != "success" ]]; then
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_run" ]]; then
+            if [[ "$WORKFLOW_HEAD_BRANCH" != "master" || "$WORKFLOW_CONCLUSION" != "success" ]]; then
+              echo "configured=false" >> "$GITHUB_OUTPUT"
+              echo "::notice::Despliegue omitido: solo se publica master tras CI exitoso."
+              exit 0
+            fi
+          elif [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            if [[ "$GITHUB_REF_NAME" != "master" ]]; then
+              echo "configured=false" >> "$GITHUB_OUTPUT"
+              echo "::notice::Despliegue manual omitido: selecciona la rama master."
+              exit 0
+            fi
+          else
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Despliegue omitido: solo se publica el SHA de master tras CI exitoso."
+            echo "::notice::Despliegue omitido: evento no autorizado."
             exit 0
           fi
 
