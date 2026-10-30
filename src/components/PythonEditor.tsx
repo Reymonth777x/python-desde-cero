@@ -140,7 +140,7 @@ export default function PythonEditor({
 
   return (
     <section className="w-full" aria-label="Espacio de práctica de Python">
-      <div role="tablist" aria-label="Paneles del laboratorio" className="mb-4 grid grid-cols-4 border-b border-[var(--theme-border)] md:hidden">
+      <div role="tablist" aria-label="Paneles del laboratorio" className={`mb-4 grid ${usesTurtle ? "grid-cols-4" : "grid-cols-3"} border-b border-[var(--theme-border)] md:hidden`}>
         {mobilePanels.map(({ id: panel, label }) => (
           <button
             key={panel}

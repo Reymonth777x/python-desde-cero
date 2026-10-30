@@ -226,11 +226,11 @@ export default function LessonStudy({
                   {lesson.exercise.hints.map((hint) => <li key={hint}>{hint}</li>)}
                 </ul>
                 {lesson.exercise.tests[0]?.expected && (
-                  <div className="mt-4">
-                    <h3 className="text-xs font-bold tracking-[0.12em] text-[var(--theme-muted)]">RESULTADO QUE DEBES OBTENER</h3>
+                  <details className="mt-4 border-t border-[var(--theme-border)] pt-3">
+                    <summary className="min-h-10 cursor-pointer text-sm font-semibold text-[var(--theme-accent)]">Ver salida esperada cuando termines tu intento</summary>
                     <pre className="mt-2 overflow-x-auto whitespace-pre-wrap rounded bg-[var(--theme-surface)] p-3 font-mono text-sm leading-6">{lesson.exercise.tests[0].expected}</pre>
-                    <p className="mt-2 text-xs leading-5 text-[var(--theme-muted)]">Compara tu salida con este resultado. La comprobación del curso se registra por separado al aprobar las preguntas de conocimiento.</p>
-                  </div>
+                    <p className="mt-2 text-xs leading-5 text-[var(--theme-muted)]">Compara tu ejecución con este resultado. La evaluación de conocimientos se comprueba y guarda por separado.</p>
+                  </details>
                 )}
               </div>
               <PythonEditor

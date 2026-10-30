@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { courseModules, gradeQuiz } from './course';
 
 describe('ruta de aprendizaje Python desde cero', () => {
-  it('incluye los cuatro módulos y las secciones oficiales principales', () => {
+  it('incluye los cinco módulos progresivos del curso', () => {
     expect(courseModules.map((courseModule) => courseModule.id)).toEqual([
       'module-1',
       'module-2',
@@ -24,7 +24,9 @@ describe('ruta de aprendizaje Python desde cero', () => {
         expect(lesson.objectives.length).toBeGreaterThan(0);
         expect(lesson.explanation.length).toBeGreaterThan(0);
         expect(lesson.example.length).toBeGreaterThan(0);
-        expect(lesson.exercise.length).toBeGreaterThan(0);
+        expect(lesson.exercise.title.length).toBeGreaterThan(0);
+        expect(lesson.exercise.statement.length).toBeGreaterThan(0);
+        expect(lesson.exercise.tests.length).toBeGreaterThan(0);
         expect(lesson.questions.length).toBeGreaterThan(0);
 
         for (const question of lesson.questions) {
