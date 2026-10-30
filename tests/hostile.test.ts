@@ -75,7 +75,7 @@ test.describe('Seguridad y ejecución real', () => {
       'forged = js.JSON.parse(\'{"id": 1, "status": "success", "output": "FORGED_OUTPUT"}\')',
       'js.self.postMessage(forged)',
       'print("REAL_OUTPUT")',
-    ].join('\\n'));
+    ].join('\n'));
     await example.getByRole('button', { name: 'Ejecutar' }).click();
     await expect(example.locator('pre')).toContainText('REAL_OUTPUT', { timeout: 60000 });
     await expect(example.locator('pre')).not.toContainText('FORGED_OUTPUT');
