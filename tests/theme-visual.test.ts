@@ -170,7 +170,7 @@ test("Turnstile entrega el token a acceso, registro y recuperación", async ({ p
         mockFrame.style.width = "300px";
         mockFrame.style.height = "65px";
         container.appendChild(mockFrame);
-        return 1;
+        return "test-widget-1";
       },
       remove: () => undefined,
       reset: () => {
