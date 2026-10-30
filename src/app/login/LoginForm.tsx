@@ -137,7 +137,7 @@ export default function LoginForm({ error, message, next = '' }: Props) {
                     inputMode="text"
                     autoComplete="off"
                     maxLength={32}
-                    pattern="[A-Za-z0-9-]{8,32}"
+                    pattern="[A-Za-z0-9]+(-[A-Za-z0-9]+)*"
                     placeholder="CURSO-2026"
                     value={invitationCode}
                     onChange={(event) => setInvitationCode(event.target.value)}
@@ -146,7 +146,7 @@ export default function LoginForm({ error, message, next = '' }: Props) {
                   <p className="mt-2 text-xs text-[var(--theme-muted)]">Si recibiste un código, escríbelo aquí. El registro también está disponible sin invitación.</p>
                 </div>
                 {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-                  <TurnstileWidget siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} />
+                  <TurnstileWidget siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} action="signup" />
                 )}
                 <SubmitButton pendingText="Creando cuenta...">Crear cuenta</SubmitButton>
               </form>
@@ -162,7 +162,7 @@ export default function LoginForm({ error, message, next = '' }: Props) {
                   <input id="login-password" name="password" type="password" autoComplete="section-login current-password" value={loginPassword} onChange={(event) => setLoginPassword(event.target.value)} required className={inputStyle} />
                 </div>
                 {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-                  <TurnstileWidget siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} />
+                  <TurnstileWidget siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} action="login" />
                 )}
                 <SubmitButton pendingText="Entrando...">Continuar</SubmitButton>
               </form>
