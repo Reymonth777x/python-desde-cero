@@ -6,6 +6,8 @@ describe('safeNext', () => {
     expect(safeNext('/academia/module-1/b1-l1?from=login')).toBe('/academia/module-1/b1-l1?from=login');
     expect(safeNext('/practica')).toBe('/practica');
     expect(safeNext('/admin/invitaciones')).toBe('/admin/invitaciones');
+    expect(safeNext('/estudiante')).toBe('/academia');
+    expect(safeNext('/docente')).toBe('/academia');
   });
 
   it('rejects open redirects and malformed destinations', () => {
