@@ -882,69 +882,8 @@ export const courseModules: CourseModule[] = [
         "estimatedMinutes": 45
       },
       {
-        "id": "b3-l2",
-        "section": "3.2",
-        "title": "Operadores lógicos y operaciones bit a bit",
-        "objectives": [
-          "Combinar condiciones con and, or y not.",
-          "Diferenciar operadores lógicos y bit a bit.",
-          "Interpretar operaciones &, | y ^ sobre enteros."
-        ],
-        "explanation": [
-          "and exige que ambas condiciones sean verdaderas; or requiere que al menos una lo sea y not invierte un valor booleano. Estos operadores expresan reglas compuestas como comprobar que una cuenta esté activa y tenga saldo suficiente.",
-          "Los operadores bit a bit actúan sobre la representación binaria de los enteros: & realiza AND, | realiza OR, ^ XOR, ~ invierte bits y << o >> desplazan posiciones. No son equivalentes a and y or, que evalúan condiciones.",
-          "El número 5 se representa como 0101 y el 3 como 0011. La operación 5 & 3 conserva los bits que son uno en ambos operandos y produce 0001, que equivale a 1; estas operaciones se utilizan en máscaras, permisos y protocolos."
-        ],
-        "example": "activo = True\nsaldo = 1200\nprint(activo and saldo >= 1000)\nprint(not activo)\nprint(5 & 3)\nprint(5 | 3)",
-        "exampleOutput": "True\nFalse\n1\n7",
-        "walkthrough": [
-          "and combina dos condiciones.",
-          "not invierte True a False.",
-          "5 & 3 conserva bits comunes y 5 | 3 combina posiciones activas."
-        ],
-        "commonMistakes": [
-          "Usar & como sustituto automático de and.",
-          "Confundir | con or en cualquier contexto."
-        ],
-        "exercise": {
-          "id": "b3-e2",
-          "title": "Combinar condiciones",
-          "statement": "Crea edad = 22 y tiene_entrada = True. Imprime True si tiene edad suficiente y entrada.",
-          "starterCode": "edad = 22\ntiene_entrada = True\n",
-          "solution": "edad = 22\ntiene_entrada = True\nprint(edad >= 18 and tiene_entrada)",
-          "tests": [
-            {
-              "input": [],
-              "expected": "True"
-            }
-          ],
-          "hints": [
-            "Compara la edad con 18.",
-            "and exige que ambas condiciones sean verdaderas."
-          ],
-          "difficulty": "medio",
-          "xp": 20,
-          "length": 5
-        },
-        "questions": [
-          {
-            "prompt": "¿Qué diferencia principal existe entre and y &?",
-            "options": [
-              "and combina condiciones booleanas; & opera bit a bit sobre enteros",
-              "Son siempre el mismo operador",
-              "and suma bits y & compara cadenas",
-              "& solo sirve para repetir bucles"
-            ],
-            "answer": 0,
-            "explanation": "and se utiliza para condiciones; & combina bits de valores enteros."
-          }
-        ],
-        "assessment": false,
-        "estimatedMinutes": 45
-      },
-      {
         "id": "b3-l3",
-        "section": "3.3",
+        "section": "3.2",
         "title": "Decisiones con if, elif y else",
         "objectives": [
           "Construir condiciones con if.",
@@ -1005,7 +944,7 @@ export const courseModules: CourseModule[] = [
       },
       {
         "id": "b3-l4",
-        "section": "3.4",
+        "section": "3.3",
         "title": "Repetición condicional con while",
         "objectives": [
           "Explicar que while repite mientras la condición sea verdadera.",
@@ -1066,7 +1005,7 @@ export const courseModules: CourseModule[] = [
       },
       {
         "id": "b3-l5",
-        "section": "3.5",
+        "section": "3.4",
         "title": "Recorridos con for, range(), break y continue",
         "objectives": [
           "Recorrer secuencias mediante for.",
@@ -1127,68 +1066,77 @@ export const courseModules: CourseModule[] = [
       },
       {
         "id": "b3-l6",
-        "section": "3.6",
+        "section": "3.5",
         "title": "Listas: crear, consultar y recorrer",
         "objectives": [
-          "Crear listas y consultar elementos mediante índices y cortes.",
-          "Representar tablas sencillas mediante listas anidadas.",
-          "Recorrer una colección de una y dos dimensiones."
+          "Crear listas ordenadas y consultar elementos mediante índices.",
+          "Usar índices positivos, negativos y len() para conocer posiciones y tamaño.",
+          "Recorrer una lista con for y procesar cada elemento."
         ],
         "explanation": [
-          "Una lista agrupa varios valores y conserva el orden. Se escribe entre corchetes, permite añadir o quitar elementos y puede almacenar otros tipos de datos, incluidas más listas. len(lista) devuelve cuántos elementos contiene la lista exterior.",
-          "Los índices comienzan en cero y los negativos cuentan desde el final. En una lista anidada se utilizan dos índices: tabla[fila][columna]. Por ejemplo, notas[1][0] consulta el primer valor de la segunda fila. Esta estructura representa una tabla o matriz pequeña.",
-          "Un corte lista[inicio:fin] selecciona desde inicio hasta antes de fin. Para procesar una tabla se utilizan dos bucles: el exterior recorre cada fila y el interior recorre los valores de esa fila. Empieza con matrices pequeñas para no perder de vista qué índice estás consultando."
+          "Una lista guarda varios valores en un orden definido. Se escribe entre corchetes, por ejemplo edades = [18, 21, 19]. A diferencia de una cadena, una lista puede modificarse después de crearla: puedes añadir, cambiar o quitar elementos.",
+          "Los índices empiezan en cero: edades[0] consulta el primer elemento y edades[1] el segundo. Los índices negativos cuentan desde el final, así que edades[-1] consulta el último. len(edades) devuelve la cantidad de elementos.",
+          "Un bucle for puede recorrer los valores sin que tengas que calcular cada índice. Cuando los datos llegan como texto separado por espacios, split() crea una lista de cadenas; convierte cada valor con int() o float() antes de hacer operaciones numéricas."
         ],
-        "example": "notas = [[80, 90], [75, 85]]\nprint(notas[0][1])\nprint(notas[1][0])\n\nfor fila in notas:\n    print(fila)",
-        "exampleOutput": "90\n75\n[80, 90]\n[75, 85]",
+        "example": "edades = [18, 21, 19]\\nprint(edades[0])\\nprint(edades[-1])\\nprint(len(edades))\\nfor edad in edades:\\n    print(edad)",
+        "exampleOutput": "18\\n19\\n3\\n18\\n21\\n19",
         "walkthrough": [
-          "notas contiene dos listas; cada una representa una fila.",
-          "notas[0][1] accede a la segunda nota de la primera fila.",
-          "El bucle for recorre cada fila y la muestra completa."
+          "La lista edades contiene tres números y conserva su orden.",
+          "El índice 0 selecciona el primer elemento; -1 selecciona el último.",
+          "len() cuenta los elementos y for visita cada valor una vez."
         ],
         "commonMistakes": [
-          "Olvidar que los índices empiezan en cero.",
-          "Intercambiar el índice de fila y el de columna en una lista anidada."
+          "Intentar acceder a un índice que no existe, como edades[3] en una lista de tres elementos.",
+          "Confundir el índice con el valor almacenado en esa posición.",
+          "Sumar cadenas obtenidas con split() sin convertirlas primero a números."
         ],
         "exercise": {
           "id": "b3-e6",
-          "title": "Sumar una tabla de calificaciones",
-          "statement": "Con la matriz [[80, 90], [75, 85]], utiliza dos bucles for para sumar todas las calificaciones e imprime el total.",
-          "starterCode": "notas = [[80, 90], [75, 85]]\ntotal = 0\n",
-          "solution": "notas = [[80, 90], [75, 85]]\ntotal = 0\nfor fila in notas:\n    for nota in fila:\n        total += nota\nprint(total)",
+          "title": "Sumar números recibidos en una lista",
+          "statement": "Lee una línea con números separados por espacios, conviértelos a enteros, recórrelos con for y muestra la suma.",
+          "starterCode": "datos = input()\\nnumeros = datos.split()\\ntotal = 0\\n",
+          "solution": "datos = input()\\nnumeros = datos.split()\\ntotal = 0\\nfor texto in numeros:\\n    total += int(texto)\\nprint(total)",
           "tests": [
             {
-              "input": [],
-              "expected": "330"
+              "input": ["10 20 30"],
+              "expected": "60"
+            },
+            {
+              "input": ["5"],
+              "expected": "5"
+            },
+            {
+              "input": ["-2 7"],
+              "expected": "5"
             }
           ],
           "hints": [
-            "El primer for recorre cada fila.",
-            "El segundo for recorre las notas de la fila actual y las suma a total."
+            "split() convierte la línea de entrada en una lista de cadenas.",
+            "Recorre numeros con for y convierte cada texto con int() antes de sumarlo."
           ],
-          "difficulty": "medio",
+          "difficulty": "facil",
           "xp": 20,
           "length": 5
         },
         "questions": [
           {
-            "prompt": "¿Qué índice permite acceder al primer elemento de una lista?",
+            "prompt": "Si datos contiene el texto 8 12 4, ¿qué devuelve datos.split()?",
             "options": [
-              "0",
-              "1",
-              "-1",
-              "len(lista)"
+              "El texto completo sin cambios",
+              "Una lista con las cadenas 8, 12 y 4",
+              "Una lista con los números enteros 8, 12 y 4",
+              "El número 12"
             ],
-            "answer": 0,
-            "explanation": "Los índices de las listas comienzan en cero."
+            "answer": 1,
+            "explanation": "split() separa el texto y devuelve una lista de cadenas; int() convierte cada elemento cuando necesitas operar con números."
           }
         ],
         "assessment": false,
-        "estimatedMinutes": 45
+        "estimatedMinutes": 40
       },
       {
         "id": "b3-l7",
-        "section": "3.7",
+        "section": "3.6",
         "title": "Modificar, ordenar y procesar listas",
         "objectives": [
           "Añadir, insertar y eliminar elementos mediante métodos de lista.",
@@ -1242,6 +1190,67 @@ export const courseModules: CourseModule[] = [
             ],
             "answer": 0,
             "explanation": "sort() modifica la lista; sorted() devuelve una lista nueva."
+          }
+        ],
+        "assessment": false,
+        "estimatedMinutes": 45
+      },
+      {
+        "id": "b3-l2",
+        "section": "3.7",
+        "title": "Operadores lógicos y operaciones bit a bit",
+        "objectives": [
+          "Combinar condiciones con and, or y not.",
+          "Diferenciar operadores lógicos y bit a bit.",
+          "Interpretar operaciones &, | y ^ sobre enteros."
+        ],
+        "explanation": [
+          "and exige que ambas condiciones sean verdaderas; or requiere que al menos una lo sea y not invierte un valor booleano. Estos operadores expresan reglas compuestas como comprobar que una cuenta esté activa y tenga saldo suficiente.",
+          "Los operadores bit a bit actúan sobre la representación binaria de los enteros: & realiza AND, | realiza OR, ^ XOR, ~ invierte bits y << o >> desplazan posiciones. No son equivalentes a and y or, que evalúan condiciones.",
+          "El número 5 se representa como 0101 y el 3 como 0011. La operación 5 & 3 conserva los bits que son uno en ambos operandos y produce 0001, que equivale a 1; estas operaciones se utilizan en máscaras, permisos y protocolos."
+        ],
+        "example": "activo = True\nsaldo = 1200\nprint(activo and saldo >= 1000)\nprint(not activo)\nprint(5 & 3)\nprint(5 | 3)",
+        "exampleOutput": "True\nFalse\n1\n7",
+        "walkthrough": [
+          "and combina dos condiciones.",
+          "not invierte True a False.",
+          "5 & 3 conserva bits comunes y 5 | 3 combina posiciones activas."
+        ],
+        "commonMistakes": [
+          "Usar & como sustituto automático de and.",
+          "Confundir | con or en cualquier contexto."
+        ],
+        "exercise": {
+          "id": "b3-e2",
+          "title": "Combinar condiciones",
+          "statement": "Crea edad = 22 y tiene_entrada = True. Imprime True si tiene edad suficiente y entrada.",
+          "starterCode": "edad = 22\ntiene_entrada = True\n",
+          "solution": "edad = 22\ntiene_entrada = True\nprint(edad >= 18 and tiene_entrada)",
+          "tests": [
+            {
+              "input": [],
+              "expected": "True"
+            }
+          ],
+          "hints": [
+            "Compara la edad con 18.",
+            "and exige que ambas condiciones sean verdaderas."
+          ],
+          "difficulty": "medio",
+          "xp": 20,
+          "length": 5
+        },
+        "questions": [
+          {
+            "prompt": "¿Qué diferencia principal existe entre and y &?",
+            "options": [
+              "and combina condiciones booleanas; & opera bit a bit sobre enteros",
+              "Son siempre el mismo operador",
+              "and suma bits y & compara cadenas",
+              "& solo sirve para repetir bucles"
+            ],
+            "answer": 0,
+            "explanation": "and se utiliza para condiciones; & combina bits de valores enteros."
           }
         ],
         "assessment": false,
