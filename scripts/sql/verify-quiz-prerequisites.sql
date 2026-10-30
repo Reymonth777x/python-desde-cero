@@ -1,4 +1,4 @@
--- Manual regression check for migration 027.
+-- Manual regression check for migrations 027-028.
 -- Run against a database where migrations 024-027 are applied:
 --   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f scripts/sql/verify-quiz-prerequisites.sql
 -- Uses a synthetic auth.uid() and rolls the transaction back; no user, attempt or progress row is retained.
@@ -40,6 +40,12 @@ BEGIN
   END IF;
   IF v_definition NOT ILIKE '%quiz_prerequisite_required%' THEN
     RAISE EXCEPTION 'Prerequisite checks are missing from the private grader';
+  END IF;
+  IF v_definition NOT ILIKE '%existing_module_progress%' THEN
+    RAISE EXCEPTION 'Existing target-module progress must preserve access for returning students';
+  END IF;
+  IF v_definition NOT ILIKE '%existing_project_progress%' OR v_definition NOT ILIKE '%existing_exam_progress%' THEN
+    RAISE EXCEPTION 'Existing project and exam progress must also remain accessible';
   END IF;
 
   IF has_function_privilege('anon', 'public.submit_quiz_v2(text,text,integer[])', 'EXECUTE') THEN
