@@ -23,10 +23,10 @@ describe('HomeAccountLinks', () => {
     const element = (await HomeAccountLinks()) as ReactElement;
     expect(element.type).toBe(Fragment);
 
-    const children = element.props.children as ReactElement[];
-    expect(children[0].props.href).toBe('/academia');
+    const children = (element.props as { children: ReactElement[] }).children;
+    expect((children[0].props as { href: string }).href).toBe('/academia');
     expect(children[1].type).toBe('form');
-    expect(children[1].props.action).toBeDefined();
+    expect((children[1].props as { action?: unknown }).action).toBeDefined();
   });
 
   it('muestra iniciar sesión cuando no existe una sesión', async () => {
@@ -40,6 +40,6 @@ describe('HomeAccountLinks', () => {
     } as unknown as Awaited<ReturnType<typeof createClient>>);
 
     const element = (await HomeAccountLinks()) as ReactElement;
-    expect(element.props.href).toBe('/login');
+    expect((element.props as { href: string }).href).toBe('/login');
   });
 });
