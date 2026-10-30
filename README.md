@@ -4,7 +4,7 @@ A self-paced educational platform for learning Python programming from scratch, 
 
 **Production domain:** https://python-desdecero.com
 
-The `workers.dev` address is the Cloudflare fallback; confirm the custom domain after each production release.
+Python runs through a dedicated Cloudflare `workers.dev` runner origin, isolated from the academy's custom domain.
 
 ## Overview
 
@@ -15,7 +15,7 @@ The platform is organized into modules and lessons, each with learning objective
 ## Features
 
 - Structured course path — Modules and lessons covering Python fundamentals, with objectives, explanations, code examples, exercises, and quiz assessments
-- In-browser Python editor — Monaco Editor with Pyodide running in a dedicated Web Worker, so Python executes entirely in the browser without blocking the UI
+- In-browser Python editor — Monaco Editor with Pyodide in a dedicated Web Worker inside a sandboxed iframe hosted on a separate Cloudflare `workers.dev` origin
 - Student authentication — Registration, email confirmation, login, logout, and password reset via Supabase Auth
 - Progress tracking — Lesson completion and quiz scores stored per user, with module gating based on assessment results
 - Admin invitation management — Admin-only page for generating one-time invitation codes for student registration
@@ -32,7 +32,7 @@ The platform is organized into modules and lessons, each with learning objective
 | Styling | Tailwind CSS 3 |
 | Backend / Auth / Database | Supabase (Auth, PostgreSQL, RLS) |
 | Code editor | Monaco Editor (`@monaco-editor/react`) |
-| Python execution | Pyodide in a Web Worker (`public/python-worker.js`) |
+| Python execution | Pyodide Web Worker inside the isolated runner iframe (`runner/`, `public/python-worker.js`) |
 | State management | React hooks and local component state |
 | Testing | Vitest |
 | Deployment target | Cloudflare Workers (Vinext) |
@@ -42,7 +42,7 @@ The platform is organized into modules and lessons, each with learning objective
 The application follows Next.js App Router conventions:
 
 - **Server-side**: Supabase server client (`@supabase/ssr` with `server-only`) for Auth and database operations in Server Components and Server Actions
-- **Client-side**: Supabase browser client for interactive components; Monaco Editor and Pyodide Worker for Python execution
+- **Client-side**: Supabase browser client for interactive components; Monaco Editor communicates with the isolated runner iframe through a transferred `MessagePort`; Pyodide executes in a Web Worker on a separate origin
 - **Proxy (`src/proxy.ts`)**: Next.js 16 verifies session claims, applies admin authorization to `/admin`, and generates a per-request CSP nonce
 - **Database**: `profiles`, `invitations`, and `progress` tables with RLS policies enforcing user-level row isolation
 
@@ -90,7 +90,7 @@ For a hosted Supabase development project instead of Docker, copy `.env.example`
 
 This project is prepared for four individual contributors. Read [the four-partner onboarding guide](docs/team/GUIA-INICIO-4-SOCIOS.md) before changing production code. Each person uses their own GitHub account; never share passwords, personal tokens, service-role keys, or `.env.local`.
 
-Production deployments are gated by successful CI on `master`. Do not merge a pull request while any required check is failing. Canonical database migrations live under `supabase/migrations/`; reconcile the remote migration history before applying pending SQL.
+Production deployments run only after CI succeeds on `master` and the deployment workflow verifies that the tested SHA is still the current `master` HEAD. The branch is not yet protected by GitHub rules: review [issue #23](https://github.com/Reymonth777x/python-desde-cero/issues/23) before relying on mandatory PR approvals. Canonical database migrations live under `supabase/migrations/`; read [the migration status](docs/team/MIGRACIONES.md) and reconcile remote history before applying pending SQL.
 
 ## Available Scripts
 
@@ -124,30 +124,23 @@ Quiz grading is handled in `src/lib/course-grading.ts` with a 75% passing thresh
 
 ## Python Execution
 
-Python code runs in the browser via Pyodide, loaded through a dedicated Web Worker (`public/python-worker.js`). This keeps the main UI responsive during environment initialization and code execution. The worker enforces limits on code length, output size, input lines, and execution time.
+Student code runs in Pyodide inside a dedicated Web Worker created by the runner iframe on the separate origin `https://python-desdecero-runner.pythondesdecero.workers.dev`. The academy embeds that origin in a sandboxed iframe and transfers a private `MessagePort` only after the iframe validates the parent window and exact allowed origin. Python output and Turtle commands return through that port; the app bounds code/input/output sizes and stops executions that exceed the time limit. The runner's response CSP only permits the academy's production hostnames and explicit localhost development origins as parents. See [the runner implementation](runner/runner-frame.js) and [its protocol](src/lib/use-python-worker.ts).
 
 ## Security Notes
 
 - **Never commit `.env.local` or any file containing secret values.** These are excluded by `.gitignore`.
 - Supabase RLS policies are the final layer of data protection; migration files in `supabase/migrations/` define the schema and policies but must be reviewed and applied deliberately.
-- Migration files are stored in `supabase/migrations/` with timestamp prefixes (Supabase CLI convention). Historical copies under `src/app/supabase/migrations/` were retained as reference and not removed; they may be out of sync with the canonical folder.
-- The remote Supabase project migration state has not been independently inspected (Supabase CLI not available locally). Do not assume which migrations are applied remotely without verifying against the remote project.
+- Migration files are stored in `supabase/migrations/` with timestamp prefixes. The remote PROD and DEV migration histories were inspected on October 30, 2026; the repository contains documented timestamp/name drift and the Supabase Preview branch has failed migrations. Read [docs/team/MIGRACIONES.md](docs/team/MIGRACIONES.md). Do not run `db push`, `migration repair`, or `db reset` against a remote project until that reconciliation has an explicit plan.
 
-## Configuración de correo electrónico (plan gratuito de Supabase)
+## Correo de autenticación
 
-Supabase Auth envía correos de confirmación de registro y recuperación de contraseña. Para que funcionen en producción:
+Supabase Auth gestiona los mensajes de confirmación de registro y recuperación de contraseña. El dominio raíz `python-desdecero.com` ya aparece como **Autentificado** en el panel de Brevo y como **Con marca**, con `em` como subdominio de marca. Cloudflare contiene los dos CNAME DKIM, los tres CNAME de marca, la verificación de Brevo y DMARC (`p=none`). El propietario también generó una clave SMTP Standard; ese secreto no se guarda aquí.
 
-1. Configura las **URLs de callback** en el panel de Supabase Auth → URL Configuration:
-   - `https://python-desde-cero.pythondesdecero.workers.dev/auth/callback`
-   - `http://localhost:3000/auth/callback` (solo desarrollo)
-2. Configura un **proveedor SMTP** en Supabase Auth → SMTP Settings. Una opción gratuita es Brevo Free (300 envíos diarios):
-   - Crea tu propia cuenta en el proveedor
-   - Verifica la dirección del remitente y el dominio cuando corresponda
-   - Introduce las credenciales SMTP exclusivamente en el panel de Supabase
-   - Comprueba la entrega de correos con una cuenta de prueba real
-3. La protección de contraseñas filtradas (breached password detection) requiere plan Pro o superior de Supabase. En el plan gratuito, configura una longitud mínima adecuada (8 caracteres) desde los ajustes de Auth.
+La autenticación del dominio en Brevo no demuestra por sí sola que Supabase esté usando la clave SMTP ni que cada flujo de Auth se haya completado. El siguiente control operativo es confirmar el SMTP guardado en Supabase DEV/PROD y completar pruebas reales de registro, confirmación y recuperación con un buzón externo controlado. La dirección del remitente debe ser una dirección verificada en Brevo; no se debe asumir que el login SMTP es también el remitente.
 
-No se incluyen credenciales SMTP, tokens ni claves API en este repositorio.
+Para probar callbacks localmente, usa `http://localhost:3000/auth/callback` y añade el puerto alternativo real si Next.js arranca en `3001`. Para producción, la URL canónica de callback es `https://python-desdecero.com/auth/callback`.
+
+No se incluyen credenciales SMTP, tokens ni claves API en este repositorio. La protección de contraseñas filtradas de Supabase requiere plan Pro o superior; no se puede habilitar mediante SQL en el plan Free.
 
 ## Current Status
 
@@ -156,28 +149,50 @@ No se incluyen credenciales SMTP, tokens ni claves API en este repositorio.
 - Course modules 1–5 with lessons, examples, exercises, and quizzes
 - Authentication (register, login, logout, password reset) via Supabase Auth
 - Protected routes and middleware-based session verification
-- In-browser Python editor with Pyodide Web Worker
+- In-browser Python editor with a cross-origin isolated Pyodide runner
 - Student progress tracking and quiz score persistence
 - Admin invitation management page
 - PWA manifest
 - Security headers (CSP, X-Frame-Options, etc.)
-- Unit tests (20 tests across 4 files)
+- Automated quality suite: 24 Vitest test files, 168 Playwright E2E tests, TypeScript, ESLint, Next production build, Vinext/Cloudflare build, and course exercise verification (latest verified CI)
 
 ### Known Limitations
 
-- Email confirmation and password reset delivery depend on Supabase Auth email configuration, which has not been verified against a live provider
-- Row Level Security policies and table grants remote state has not been independently inspected (Supabase CLI not available locally)
-- Real-device mobile testing and physical device accessibility testing have not been performed
+- Brevo reports the domain as authenticated and branded. Its dashboard showed four transactional emails in the last seven days, 100% delivered and 0% hard bounce/blocked; that aggregate does not identify which messages came from Supabase Auth. The saved SMTP host/login and complete registration/reset flows still require a controlled end-to-end check.
+- PROD and DEV RLS/table grants have been inspected. Direct student INSERT/UPDATE/DELETE on `public.progress` is revoked; quiz submission and prerequisite checks run through the private authoritative function. See [docs/team/MIGRACIONES.md](docs/team/MIGRACIONES.md).
+- Supabase migration history still differs from local filenames/timestamps, and the Production Preview branch reports migration failure. Do not apply migrations automatically.
+- Real-device mobile and physical accessibility testing has not been completed.
+- `master` branch protection is not enabled yet, and the public repository exposes historical course assessment material in Git history; see [issues #23](https://github.com/Reymonth777x/python-desde-cero/issues/23) and [#21](https://github.com/Reymonth777x/python-desde-cero/issues/21).
 
-## Roadmap
+## Latest verified release
 
-| Status | Items |
-|--------|-------|
-| Completed | Course content, authentication, editor, progress tracking, admin invitations, security headers, unit tests |
-| Proposed | Additional course modules, student profile page, admin dashboard analytics, offline PWA support, real-device mobile testing |
+- GitHub `master`: `d072f962d96a9e3deb1d5d2a7a4a8a83ebec4e21` (October 30, 2026).
+- CI: [run 41133763686](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41133763686) — passed, including 24 Vitest files, 168 Playwright tests, Next/Vinext builds and `npm audit` (0 vulnerabilities).
+- Cloudflare deployment: [run 41134083974](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41134083974) — passed. Main Worker version `e9fbc812-68fa-4617-b23e-f1057dc2a6f5`; isolated Python runner version `612bdbbc-a1ef-4579-96c6-692a8ae5bc7f`.
+- Production smoke test verified `/`, `/muestra`, `/login` with the Turnstile widget, `sitemap.xml`, the custom domain association, and `www` → apex redirect (HTTP 308).
+
+## Release and sync instructions for the team
+
+From an existing checkout with no uncommitted changes:
+
+```powershell
+git switch master
+git pull --ff-only origin master
+npm ci
+```
+
+For a new machine:
+
+```powershell
+git clone https://github.com/Reymonth777x/python-desde-cero.git
+cd python-desde-cero
+npm ci
+```
+
+Each partner must keep their own `.env.local` and use the DEV Supabase project. Never copy production credentials or secrets between computers. If a local branch has uncommitted work, commit or stash it before syncing; do not overwrite another partner's changes.
 
 ## License
 
 No license has been applied yet. As of October 30, 2026, this GitHub repository is **public**; issue #21 tracks the owner's decision about keeping it public or moving internal development to a private repository. Public visibility allows anyone to inspect the source and its Git history, including historical course assessment material. The app's `server-only` boundaries protect runtime bundles, not the public Git repository. Do not port or reuse course content without confirming licensing terms.
 
-This project is independent educational material, created from scratch.
+This project is independent educational material. Confirm licensing before reusing external or course-provider materials.
