@@ -2371,8 +2371,8 @@ export const courseModules: CourseModule[] = [
   {
     "id": "module-5",
     "number": "5",
-    "title": "Proyecto aplicado y consolidación (extensión práctica)",
-    "summary": "Ampliación opcional del curso: planifica, construye, prueba y mejora un gestor de inventario utilizando los cuatro módulos anteriores.",
+    "title": "Archivos y persistencia (extensión práctica)",
+    "summary": "Ampliación opcional posterior al curso: guarda, recupera y valida datos con archivos de texto.",
     "lessons": [
       {
         "id": "b5-l1",
