@@ -15,6 +15,9 @@ El historial de Supabase para el proyecto `nuqydanbbgqcofcftshk` incluye, entre 
 - `20261028213732` — `018_lock_progress_writes_allow_invitation_delete`
 - `20261029042216` — `019_quiz_key_current_catalog_ids`
 - `20261029051953` — `020_balance_quiz_answer_positions_v2`
+- `20261030050000` — `scope_quiz_attempt_cleanup_to_current_user` (021)
+- `20261030050915` — `protect_redeemed_invitation_history` (022)
+- `20261030051205` — `add_three_core_integration_labs` (023)
 
 La salida consultada del historial remoto empieza por la entrada timestamp 004; no asumir que las primeras migraciones locales 001-003 están registradas con el mismo historial de CLI. El esquema remoto existe. Antes de cualquier `db push`, comparar tablas, funciones, políticas y migraciones línea por línea.
 
@@ -30,6 +33,19 @@ La migración agregó `private.quiz_answer_key.correct_option_v2` y publicó `pu
 - `anon` no puede ejecutar el RPC v2; `authenticated` sí.
 - El RPC usa `SECURITY DEFINER`, valida `auth.uid()`, registra intentos y actualiza `progress` al aprobar. Aplica un límite de 5 intentos por 5 minutos.
 
+## Migraciones 021–023 (ya aplicadas y verificadas en remoto)
+
+- **021 — 20261030050000:** reemplaza `private.submit_quiz_authoritative_v2` para que la limpieza de intentos con más de 30 días borre únicamente filas del usuario autenticado (`user_id = auth.uid()`). Mantiene el límite de 5 intentos por 5 minutos, la calificación, el umbral y el guardado de progreso.
+- **022 — 20261030050915:** crea el trigger `invitations_prevent_used_deletion`; impide borrar invitaciones ya utilizadas y conserva la posibilidad de eliminar invitaciones no utilizadas. El trigger existe en remoto.
+- **023 — 20261030051205:** registra las claves de evaluación de los laboratorios integradores `module-2/b2-l8`, `module-3/b3-l9` y `module-4/b4-l9`. Las tres claves están presentes en remoto.
+
+Verificación remota adicional del 30-10-2026:
+- El historial `supabase_migrations.schema_migrations` contiene las tres versiones y nombres anteriores.
+- El RPC `private.submit_quiz_authoritative_v2` contiene la limpieza acotada al usuario autenticado.
+- El trigger de protección de invitaciones utilizadas está instalado.
+- El catálogo vigente tiene 44 claves en 34 lecciones; 44/44 tienen `correct_option_v2`. Hay 43 claves históricas de IDs antiguos sin v2, fuera del catálogo vigente.
+
+**Conflicto de PR #8:** su archivo `20261030050000_021_pe1_course_catalog_refresh.sql` reutiliza la versión `20261030050000` con contenido y propósito distintos. Esa versión ya está aplicada en remoto como `scope_quiz_attempt_cleanup_to_current_user`. No fusionar ni aplicar la migración de PR #8. Revisar sus cambios de código y rescatar únicamente los que no dupliquen ni contradigan la ruta canónica.
 ## Otras migraciones
 
 - 018: revoca escritura directa de estudiantes en `progress` y concede DELETE de invitaciones sujeto a RLS; aparece en remoto.
