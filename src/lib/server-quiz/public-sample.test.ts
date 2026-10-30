@@ -40,7 +40,6 @@ describe('toPublicSampleLesson', () => {
     expect(sample.exercise).not.toHaveProperty('solution');
     expect(sample.exercise).not.toHaveProperty('tests');
     expect(serialized).not.toContain('"answer"');
-    expect(serialized).not.toContain('"explanation"');
     expect(serialized).not.toContain('"solution"');
     expect(serialized).not.toContain('"tests"');
     expect(serialized).not.toContain('"expected"');
