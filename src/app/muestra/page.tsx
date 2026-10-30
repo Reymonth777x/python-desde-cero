@@ -97,8 +97,8 @@ export default function PublicLessonPreviewPage() {
               </div>
 
               <PythonEditor
-                defaultCode={lesson.exercise.starterCode}
-                instructions={lesson.exercise.statement}
+                defaultCode={lesson.example}
+                instructions={'Ejecuta el ejemplo y luego modifícalo para resolver este reto: ' + lesson.exercise.statement}
               />
             </section>
           </article>
