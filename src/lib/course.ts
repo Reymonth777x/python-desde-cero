@@ -68,10 +68,10 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué representa un algoritmo?",
             "options": [
-              "Una secuencia ordenada de pasos para resolver una tarea",
               "Un tipo especial de variable",
               "Una instrucción exclusiva de Python",
-              "Un error que detiene el programa"
+              "Un error que detiene el programa",
+              "Una secuencia ordenada de pasos para resolver una tarea"
             ],
             "answer": 3,
             "explanation": "La opción correcta está en la posición configurada por el banco de evaluación: un algoritmo describe pasos ordenados para resolver un problema."
@@ -128,8 +128,8 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "Después de ejecutar cantidad = 4 y luego cantidad = cantidad + 2, ¿qué valor tiene cantidad?",
             "options": [
-              "4",
               "6",
+              "4",
               "42",
               "Error: una variable no puede cambiar"
             ],
@@ -188,9 +188,9 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué valor devuelve 17 % 5?",
             "options": [
-              "2",
               "3",
               "5",
+              "2",
               "3.4"
             ],
             "answer": 2,
@@ -436,9 +436,9 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "En una cadena if/elif/else, ¿qué sucede si dos condiciones podrían ser verdaderas?",
             "options": [
+              "Python ejecuta la primera condición verdadera y salta el resto",
               "Se ejecutan ambas",
               "Python elige la última",
-              "Python ejecuta la primera condición verdadera y salta el resto",
               "El programa siempre falla"
             ],
             "answer": 0,
@@ -556,10 +556,10 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué números produce range(3, 7)?",
             "options": [
-              "3, 4, 5, 6",
+              "3, 4, 5, 7",
               "3, 4, 5, 6, 7",
-              "0, 1, 2, 3, 4, 5, 6",
-              "4, 5, 6, 7"
+              "3, 4, 5, 6",
+              "2, 3, 4, 5"
             ],
             "answer": 2,
             "explanation": "El rango comienza en 3 y termina antes de 7: incluye 3, 4, 5 y 6."
@@ -687,8 +687,8 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué bloque se ejecuta si x es 4 en if x > 5 / elif x == 4 / else?",
             "options": [
-              "if",
               "elif",
+              "if",
               "else",
               "ninguno"
             ],
@@ -711,8 +711,8 @@ export const courseModules: CourseModule[] = [
             "options": [
               "continue",
               "pass",
-              "return siempre",
-              "break"
+              "break",
+              "return siempre"
             ],
             "answer": 2,
             "explanation": "break detiene el bucle que lo contiene más cerca."
@@ -720,10 +720,10 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué debe cambiar dentro de un while con contador para que pueda terminar?",
             "options": [
-              "La condición debe cambiar hasta ser falsa",
-              "El nombre del contador debe estar en mayúsculas",
-              "Hay que añadir otro while",
-              "print() debe ejecutarse dos veces"
+              "La condición nunca debe cambiar",
+              "Hay que cambiar el nombre",
+              "Debe ejecutarse print() dos veces",
+              "La condición debe cambiar hasta ser falsa"
             ],
             "answer": 3,
             "explanation": "Un bucle while termina cuando la condición se vuelve falsa; normalmente se actualiza su variable de control."
@@ -790,8 +790,8 @@ export const courseModules: CourseModule[] = [
             "options": [
               "1",
               "-1",
-              "0",
-              "len(lista)"
+              "len(lista)",
+              "0"
             ],
             "answer": 3,
             "explanation": "En Python los índices de lista comienzan en cero."
@@ -908,8 +908,8 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué devuelve split() cuando se aplica a una cadena?",
             "options": [
-              "Un número entero",
               "Una lista de partes de la cadena",
+              "Un número entero",
               "La misma cadena sin espacios",
               "Un valor booleano"
             ],
@@ -1028,8 +1028,8 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué estructura de Python permite consultar un dato mediante una clave descriptiva?",
             "options": [
-              "Una tupla",
               "Un diccionario",
+              "Una tupla",
               "Un rango",
               "Un comentario"
             ],
@@ -1088,9 +1088,9 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Cuál es una propiedad de los conjuntos (set)?",
             "options": [
+              "Sus elementos son únicos y no se garantiza su orden",
               "Permiten elementos duplicados en orden fijo",
               "Solo almacenan texto",
-              "Sus elementos son únicos y no se garantiza su orden",
               "Se accede a cada elemento mediante índices"
             ],
             "answer": 0,
@@ -1208,21 +1208,21 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "Si datos = [\"a\", \"b\", \"c\"], ¿qué devuelve datos[1]?",
             "options": [
+              "Una lista vacía",
+              "El valor None",
               "\"a\"",
-              "\"b\"",
-              "\"c\"",
-              "\"1\""
+              "\"b\""
             ],
-            "answer": 0,
+            "answer": 3,
             "explanation": "El índice 1 es la segunda posición de la lista."
           },
           {
             "prompt": "¿Qué hace diccionario.get(\"zona\", \"sin dato\") si la clave zona no existe?",
             "options": [
-              "Lanza siempre IndexError",
-              "Agrega zona automáticamente",
               "Devuelve \"sin dato\"",
-              "Devuelve la lista completa"
+              "Agrega zona automáticamente",
+              "Devuelve la lista completa",
+              "Lanza siempre IndexError"
             ],
             "answer": 0,
             "explanation": "get() devuelve el valor alternativo indicado cuando la clave no existe."
@@ -1230,12 +1230,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué estructura elimina duplicados al convertir una lista?",
             "options": [
+              "set()",
               "str()",
               "tuple()",
-              "dict()",
-              "set()"
+              "dict()"
             ],
-            "answer": 2,
+            "answer": 0,
             "explanation": "set() crea un conjunto y conserva una sola aparición de cada valor."
           }
         ],
@@ -1539,8 +1539,8 @@ export const courseModules: CourseModule[] = [
             "prompt": "¿Qué excepción se produce normalmente al intentar int(\"hola\")?",
             "options": [
               "IndexError",
-              "ValueError",
               "KeyError",
+              "ValueError",
               "FileNotFoundError"
             ],
             "answer": 2,
@@ -1599,9 +1599,9 @@ export const courseModules: CourseModule[] = [
             "prompt": "Después de escribir import math, ¿cómo se llama a la raíz cuadrada de 49?",
             "options": [
               "sqrt(49) sin prefijo siempre",
-              "math.sqrt(49)",
               "import.sqrt(49)",
-              "math = sqrt(49)"
+              "math = sqrt(49)",
+              "math.sqrt(49)"
             ],
             "answer": 3,
             "explanation": "Con import math se accede a la función mediante math.sqrt()."
@@ -1740,10 +1740,10 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué bloque maneja una conversión que produce ValueError?",
             "options": [
-              "except ValueError",
               "else ValueError",
               "finally ValueError",
-              "if ValueError"
+              "if ValueError",
+              "except ValueError"
             ],
             "answer": 3,
             "explanation": "La excepción se captura mediante un bloque except del tipo adecuado."
@@ -1879,8 +1879,8 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Por qué se recomienda with open(...) as archivo?",
             "options": [
-              "Porque hace que todos los archivos sean permanentes",
               "Porque cierra el archivo automáticamente al salir del bloque",
+              "Porque hace que todos los archivos sean permanentes",
               "Porque convierte el contenido a números",
               "Porque impide que ocurra cualquier excepción"
             ],

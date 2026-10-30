@@ -36,6 +36,25 @@ describe('ruta de aprendizaje Python desde cero', () => {
     }
   });
 
+  it('mantiene contenido progresivo, ejercicios únicos y preguntas sin repetir', () => {
+    const lessons = courseModules.flatMap((courseModule) => courseModule.lessons);
+    const prompts = lessons.flatMap((lesson) => lesson.questions.map((question) => question.prompt));
+    const exerciseIds = lessons.map((lesson) => lesson.exercise.id);
+
+    expect(lessons).toHaveLength(31);
+    expect(new Set(exerciseIds).size).toBe(lessons.length);
+    expect(new Set(prompts).size).toBe(prompts.length);
+
+    for (const lesson of lessons) {
+      expect(lesson.explanation.length).toBeGreaterThanOrEqual(3);
+      expect(lesson.explanation.every((paragraph) => paragraph.length >= 120)).toBe(true);
+      expect(lesson.exampleOutput.length).toBeGreaterThan(0);
+      expect(lesson.walkthrough.length).toBeGreaterThanOrEqual(2);
+      expect(lesson.commonMistakes.length).toBeGreaterThanOrEqual(2);
+      expect(lesson.exercise.tests.length).toBeGreaterThan(0);
+    }
+  });
+
   it('califica todas las respuestas y exige al menos 75 por ciento', () => {
     const questions = [
       { prompt: '1', options: ['a', 'b'], answer: 0, explanation: '' },
