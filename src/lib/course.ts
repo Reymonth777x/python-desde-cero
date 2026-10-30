@@ -1271,7 +1271,7 @@ export const courseModules: CourseModule[] = [
         "exercise": {
           "id": "b3-e2",
           "title": "Combinar condiciones y calcular bits",
-          "statement": "Crea edad = 22, tiene_entrada = True, permisos = 5 y solicitud = 3. Muestra si la persona puede entrar con and. Después calcula AND (&), OR (|) y XOR (^) entre los enteros, y desplaza permisos una posición a la izquierda y otra a la derecha. Muestra cada resultado en una línea distinta.",
+          "statement": "Crea edad = 22, tiene_entrada = True, permisos = 5 y solicitud = 3. Muestra si la persona puede entrar con and. Después calcula permisos & solicitud, permisos | solicitud y permisos ^ solicitud. También calcula permisos << 1 y permisos >> 1 para desplazar los bits una posición a la izquierda y otra a la derecha. Muestra cada resultado en una línea distinta.",
           "starterCode": "edad = 22\ntiene_entrada = True\npermisos = 5\nsolicitud = 3\n\n# Comprueba la condición con and.\n\n# Calcula AND (&), OR (|), XOR (^) y los dos desplazamientos.\n",
           "solution": "edad = 22\ntiene_entrada = True\npermisos = 5\nsolicitud = 3\nprint(edad >= 18 and tiene_entrada)\nprint(permisos & solicitud)\nprint(permisos | solicitud)\nprint(permisos ^ solicitud)\nprint(permisos << 1)\nprint(permisos >> 1)",
           "tests": [
