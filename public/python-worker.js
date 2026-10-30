@@ -18,6 +18,8 @@
     const MAX_TURTLE_COMMANDS = 5000;
 
     let responsePort = null;
+    const pendingMessages = [];
+    const MAX_PENDING_MESSAGES = 8;
     let runtimeStatus = "loading";
     let initializationError = "";
 
@@ -30,10 +32,14 @@
     function send(message) {
         if (responsePort) {
             responsePort.postMessage(message);
-        } else {
-            // Used only by the isolated worker's unit-test harness before a
-            // MessagePort is attached. The runner never consumes this channel.
-            self.postMessage(message);
+            return;
+        }
+
+        // Pyodide may finish loading before the runner transfers its private
+        // MessagePort. Queue only bootstrap messages; never send them through
+        // WorkerGlobalScope.postMessage, which untrusted Python can also call.
+        if (pendingMessages.length < MAX_PENDING_MESSAGES) {
+            pendingMessages.push(message);
         }
     }
 
@@ -209,8 +215,9 @@
             };
             responsePort.start?.();
 
-            if (runtimeStatus === "ready") send({ status: "ready" });
-            else if (runtimeStatus === "init-error") send({ status: "init-error", error: initializationError });
+            while (pendingMessages.length > 0) {
+                responsePort.postMessage(pendingMessages.shift());
+            }
         }
     };
 })();
