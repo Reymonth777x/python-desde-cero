@@ -10,8 +10,19 @@ export default async function HomeAccountLinks() {
   } = await supabase.auth.getUser();
 
   if (!error && user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .maybeSingle();
+
     return (
       <>
+        {profile?.is_admin === true && (
+          <Link href="/admin" className="inline-flex min-h-10 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">
+            Panel de administración
+          </Link>
+        )}
         <Link href="/#progreso" className="inline-flex min-h-10 items-center font-semibold text-[var(--theme-accent)] underline underline-offset-4">
           Mi progreso
         </Link>
