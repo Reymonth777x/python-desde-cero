@@ -58,13 +58,13 @@ describe('acciones de autenticación con Turnstile', () => {
       email: 'student@example.test',
       password: 'test-password',
       captchaToken: 'expired-token',
-    }))).resolves.toEqual({ error: 'captcha' });
+    }))).resolves.toEqual({ error: 'captcha', attempt: 1 });
 
     expect(signIn).toHaveBeenCalledOnce();
   });
 
   it('devuelve un error tipado sin redirigir cuando faltan credenciales', async () => {
-    await expect(login({}, form({ email: '', password: '' }))).resolves.toEqual({ error: 'missing' });
+    await expect(login({}, form({ email: '', password: '' }))).resolves.toEqual({ error: 'missing', attempt: 1 });
     expect(createClient).not.toHaveBeenCalled();
   });
 
