@@ -375,8 +375,8 @@ FOR ALL TO public
 USING (false) WITH CHECK (false);
 
 -- Explicit Data API grants: new public tables are not automatically granted to API roles.
-REVOKE ALL ON SCHEMA public FROM anon;
-GRANT USAGE ON SCHEMA public TO authenticated;
+REVOKE ALL ON SCHEMA public FROM PUBLIC, anon;
+GRANT USAGE ON SCHEMA public TO authenticated, service_role;
 
 REVOKE ALL ON TABLE public.profiles,public.invitations,public.progress FROM PUBLIC,anon,authenticated;
 GRANT SELECT ON TABLE public.profiles TO authenticated;
