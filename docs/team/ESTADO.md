@@ -35,6 +35,7 @@
 - Producción tiene 22 migraciones registradas; DEV tiene su propio historial. Las versiones 024–027 existen en ambos, pero con timestamps diferentes. La matriz exacta está en `docs/team/MIGRACIONES.md`.
 - Consultas SQL de solo lectura compararon las 67 tuplas del catálogo actual (62 obligatorias y 5 opcionales): producción y DEV tienen 67/67 claves v2 presentes y cero filas vigentes faltantes.
 - En producción existen otras 43 filas históricas con IDs antiguos lesson-* y correct_option_v2 NULL; no corresponden a las 67 tuplas del catálogo actual y se conservan mientras se reconcilia el historial. DEV contiene solo las 67 claves actuales. No borrar ni migrar esas filas automáticamente.
+- En producción, 29 de las 67 claves v2 tienen un índice distinto al campo histórico correct_option y 38 coinciden; en DEV, las 67 coinciden. El calificador actual usa correct_option_v2: no copiar ni reconstruir sus valores desde el campo legacy.
 - Ambos proyectos usan PostgreSQL 17.11.0.003 y pgcrypto 1.3. El Advisor de producción advierte que la protección de contraseñas filtradas está desactivada; DEV no muestra ese aviso.
 - `public.submit_quiz_v2` es `SECURITY INVOKER`: `anon` no tiene permiso de ejecución y `authenticated` sí. El calificador autoritativo vive en el esquema privado como `SECURITY DEFINER`, valida `auth.uid()` y devuelve calificación agregada.
 - El trigger `invitations_prevent_used_deletion` está activo. Las invitaciones usadas se conservan como historial; las no usadas pueden eliminarse.
