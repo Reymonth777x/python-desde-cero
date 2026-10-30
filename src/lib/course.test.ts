@@ -19,7 +19,7 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(courseModules[4].optional).toBe(true);
     expect(courseModules[4].title).toContain('extensión práctica');
     expect(courseModules.slice(0, 4).map((courseModule) => courseModule.lessons.length)).toEqual([
-      4, 8, 9, 11,
+      4, 9, 9, 11,
     ]);
     expect(courseModules[4].lessons).toHaveLength(4);
     expect(courseModules[1].lessons.at(-1)?.id).toBe('b2-l7');
@@ -66,8 +66,8 @@ describe('ruta de aprendizaje Python desde cero', () => {
     const prompts = lessons.flatMap((lesson) => lesson.questions.map((question) => question.prompt));
     const exerciseIds = lessons.map((lesson) => lesson.exercise.id);
 
-    expect(lessons).toHaveLength(36);
-    expect(courseModules.filter((courseModule) => !courseModule.optional).flatMap((courseModule) => courseModule.lessons)).toHaveLength(32);
+    expect(lessons).toHaveLength(37);
+    expect(courseModules.filter((courseModule) => !courseModule.optional).flatMap((courseModule) => courseModule.lessons)).toHaveLength(33);
     expect(new Set(exerciseIds).size).toBe(lessons.length);
     expect(new Set(prompts).size).toBe(prompts.length);
 
@@ -100,15 +100,21 @@ describe('ruta de aprendizaje Python desde cero', () => {
 
   it('mantiene los laboratorios integradores antes de las evaluaciones de módulo', () => {
     expect(courseModules[1].lessons.map((item) => item.id)).toEqual([
+      'b2-l9',
       'b2-l1',
-      'b2-l2',
       'b2-l3',
       'b2-l4',
+      'b2-l2',
       'b2-l5',
       'b2-l6',
       'b2-l8',
       'b2-l7',
     ]);
+    expect(courseModules[1].lessons[0]).toMatchObject({
+      id: 'b2-l9',
+      section: '2.1',
+      title: 'Primer programa: Hello, World!',
+    });
     expect(courseModules[3].lessons.map((item) => item.id)).toEqual([
       'b4-l1',
       'b4-l2',
