@@ -27,7 +27,7 @@ function keysFromBalanceMigration(sql: string): string[] {
 
 function keysFromPracticeMigration(sql: string): string[] {
   const keys: string[] = [];
-  const rowRegex = /\(\s*'([^']+)',\s*'([^']+)',\s*(\d+),\s*(\d+),\s*(\d+),\s*(\d+)\)/g;
+  const rowRegex = /\(\s*'([^']+)',\s*'([^']+)',\s*(\d+),\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/g;
   let match: RegExpExecArray | null;
   while ((match = rowRegex.exec(sql)) !== null) {
     keys.push("'" + match[1] + "', '" + match[2] + "', " + match[3] + ", " + match[6] + ", " + match[5]);
