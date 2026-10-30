@@ -5,12 +5,12 @@
 ## Repositorio y publicación
 
 - Repositorio: `Reymonth777x/python-desde-cero`; rama de producción: `master`.
-- Última publicación comprobada: HEAD de `master` `f95231db81c6222263a698523f205e8fa7e3d23d` (30-10-2026). La CI [41140127258](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41140127258) y el despliegue Cloudflare [41140504102](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41140504102) terminaron en `success`. El último cambio de runtime de la aplicación sigue siendo `d072f962d96a9e3deb1d5d2a7a4a8a83ebec4e21`; la publicación `f95231d` actualizó exclusivamente workflows y documentación operativa.
+- Última publicación comprobada: HEAD de `master` `8aa31984fefcc2ad5240ab5e49fbe83a3ce1b8fd` (30-10-2026). La CI [41141197873](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41141197873) y el despliegue Cloudflare [41141443928](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41141443928) terminaron en `success`. El commit `8aa3198` actualiza README y documentación operativa; el último cambio de runtime funcional de la aplicación sigue siendo `d072f962d96a9e3deb1d5d2a7a4a8a83ebec4e21`.
 - Cloudflare Worker principal Version ID actual: `f67a7cca-49b3-4f11-ab4c-586ec970286e`.
 - PR #91 integró el ejecutor Python de origen separado. Su Worker actual es `https://python-desdecero-runner.pythondesdecero.workers.dev`, versión `e2235f5c-dfe5-4dd1-a529-e34aa607db70`.
 - La release actual se validó con 24 archivos Vitest, 168 pruebas Playwright, TypeScript, ESLint, build Next, build Vinext y `npm audit` (0 vulnerabilidades).
 - El workflow de publicación comprobó el mismo SHA de `master` antes de desplegar, verificó el origen y CSP del runner, y confirmó que `python-desdecero.com` continúa conectado al Worker principal. El smoke test de producción confirmó portada, `/muestra`, `/login` con widget Turnstile, sitemap y redirección `www` HTTP 308.
-- La CI verificó **62 casos de 36 actividades de código**, **24 archivos de pruebas Vitest** y **168 pruebas Playwright E2E**. TypeScript, ESLint, build Next, build Vinext y `npm audit` finalizaron correctamente; la auditoría de dependencias encontró **0 vulnerabilidades**. Las pruebas E2E cubren el runner de origen distinto en CI; el despliegue comprobó los assets y CSP del runner real. Sigue pendiente una ejecución interactiva manual del runner desde un navegador real y una pasada en teléfonos físicos.
+- La CI verificó **62 casos de 36 actividades de código**, **24 archivos de pruebas Vitest** y **168 pruebas Playwright E2E**. TypeScript, ESLint, build Next, build Vinext y `npm audit` finalizaron correctamente; la auditoría de dependencias encontró **0 vulnerabilidades**. Las pruebas E2E cubren el runner de origen distinto en CI; el despliegue comprobó los assets y CSP del runner real. El propietario confirma que ya realizó satisfactoriamente la prueba interactiva en navegador, Turtle, límites/errores, Chrome, Firefox y teléfonos físicos (30-10-2026).
 - PR #84 conserva el acceso de estudiantes con progreso histórico, sin inventar calificaciones ni completar evaluaciones.
 - PR #43 está integrado: la navegación presenta Academia y Laboratorio; no anuncia un panel docente no implementado.
 
@@ -30,7 +30,7 @@
 - Los prerrequisitos se comprueban tanto en la navegación del servidor como dentro del calificador privado de Supabase: examen anterior de módulo, evaluación del módulo 3 antes del proyecto, y proyecto aprobado antes del examen final.
 - Mejoras pedagógicas ya integradas y publicadas: demostración inicial en `b1-l1`–`b1-l3` (PR #57), variables/conversiones en `b2-l4` (PR #41), operadores y desplazamientos bit a bit en `b3-l2` (PR #48 y #63), Bubble Sort en `b3-l7` (PR #45), matrices y bucles anidados en `b3-l9` (PR #52), contador de pruebas del proyecto (PR #55), saltos de línea en `b3-l6` (PR #65), cobertura de límites para decisiones y ciclos (PR #77) y práctica de `break`/`continue` (PR #80). El PR #82 ejecuta automáticamente las soluciones de código contra los casos declarados.
 - Las PR #52, #55, #57, #63, #65 y #66 siguen incluidas en producción. También se publicaron las PR #77, #78, #80, #81 y #82. El PR #81 devuelve el foco al activador al cerrar el diálogo de temas; las pruebas de navegador verifican el diálogo a 320, 360 y 390 px, su contención dentro del viewport, el desplazamiento vertical y el ciclo de foco. Esto no sustituye la pasada manual en un teléfono físico.
-- Sigue pendiente la revisión pedagógica integral de las 33 unidades (progresión, claridad, repeticiones y adecuación al nivel). La suite automatizada ejecuta 36 actividades de código contra 62 casos, pero la revisión humana del contenido sigue siendo necesaria.
+- El propietario confirma que completó la revisión humana de las 33 unidades obligatorias: progresión, claridad, repeticiones, adecuación al nivel, ejercicios y retroalimentación (30-10-2026). La suite automatizada además ejecuta 36 actividades de código contra 62 casos.
 
 ## Supabase y seguridad de evaluaciones
 
@@ -53,7 +53,7 @@
 - El propietario confirmó que generó una clave SMTP Standard. La vista general de Brevo aportada muestra 4 correos transaccionales enviados en los últimos 7 días, 100 % entregados, 0 % hard bounce y 0 % bloqueados. Es una estadística agregada que no identifica el flujo Auth correspondiente ni verifica un remitente individual.
 - La conexión de Supabase disponible no revela el host/login guardado en Authentication → SMTP Settings. No se regenera ni sustituye la clave SMTP a ciegas.
 - En PROD, GoTrue registró a las 21:12:07 UTC el cambio de `GOTRUE_RATE_LIMIT_EMAIL_SENT` de `2/1h` a `30`. En la ventana revisada se agruparon 4 solicitudes de recuperación HTTP 200, 3 eventos de registro HTTP 303, 4 solicitudes de recuperación HTTP 429 y 2 confirmaciones HTTP 429. Un rechazo especificó un cooldown de 17 segundos. HTTP 200/303 confirma que Auth aceptó/procesó solicitudes, no que el servidor receptor haya entregado el correo. DEV no mostró eventos coincidentes en esa ventana.
-- Para cerrar esta parte falta correlacionar con un buzón externo controlado: registro + confirmación + inicio de sesión, y recuperación + cambio de contraseña. Revisar después los registros individuales de Brevo y los encabezados SPF/DKIM/DMARC. El estado detallado está en `docs/team/BREVO-SMTP.md` y `docs/team/TURNSTILE.md`.
+- El propietario confirma que registro, confirmación de correo, inicio/cierre de sesión, recuperación y cambio de contraseña funcionan correctamente (30-10-2026). Se conserva la nota de que la conexión administrativa no permite leer el host/login SMTP guardados ni los recibos individuales de Brevo; no cambiar DNS ni credenciales por inferencia. El estado técnico está en `docs/team/BREVO-SMTP.md` y `docs/team/TURNSTILE.md`.
 - La organización Supabase está en plan Free. El Advisor de producción reporta `auth_leaked_password_protection` desactivado; Supabase requiere Pro o superior para habilitarlo. No puede corregirse mediante SQL en el plan actual; conservar la longitud mínima de contraseña configurada y reevaluar solo si se aprueba un cambio de plan.
 
 ## Riesgos de repositorio y gobierno
@@ -63,15 +63,13 @@
 
 ## Bloqueos y próximos pasos
 
-1. Con una sesión autenticada, verificar que las lecciones `b3-l6`, `b3-l9` y `b4-l10` cargan la versión publicada, que los ejemplos y las seis pruebas del proyecto se ejecutan y que los prerrequisitos se respetan.
-2. Completar pruebas manuales de Auth/Turnstile con un buzón controlado, incluyendo registro, confirmación, login, logout y recuperación de contraseña, sin compartir contraseñas ni Secret keys.
-3. Probar evaluaciones y progreso con dos estudiantes y un administrador; comprobar que un intento no aprobado no completa la unidad y que la mejor nota persiste después del cierre de sesión.
-4. Protección de contraseñas filtradas: el Advisor la reporta desactivada, pero la organización está en plan Free y Supabase exige Pro o superior. No es una tarea ejecutable con el plan actual; mantener longitud mínima de ocho caracteres y reevaluar solo si se decide actualizar.
-5. Confirmar en Supabase Auth que SMTP personalizado está guardado en DEV y PROD con el remitente verificado y luego ejecutar los flujos de registro/confirmación y recuperación/cambio de contraseña con un buzón controlado. Correlacionar los resultados con los registros transaccionales de Brevo; no volver a modificar DNS salvo que el panel identifique un registro faltante concreto.
-6. Probar Pyodide, Worker, Turtle y timeouts en Chrome y Firefox y hacer una pasada en móviles físicos. Los E2E emulados no sustituyen estas pruebas.
-7. Revisar en español las 33 unidades obligatorias, retirar repeticiones y ampliar prácticas con casos límite.
-8. Reconciliar migraciones locales/DEV/producción y resolver de forma controlada la rama preview fallida antes de cualquier operación de esquema.
-9. Completar revisión legal de privacidad, términos y cookies.
+1. Activar protección de `master` con PR obligatorio, al menos una aprobación, conversaciones resueltas y los checks `test-and-build` y `powershell-launcher` (issue #23). La rama se comprobó sin protección el 30-10-2026.
+2. Decidir la visibilidad del repositorio. El propietario debe decidir si permanece público o pasa a privado; no cambiarla ni reescribir el historial sin autorización explícita (issue #21).
+3. Diagnosticar la rama Preview fallida desde sus logs y elaborar un inventario de migraciones locales/DEV/PROD. No ejecutar `db push`, `migration repair`, `db reset`, reset/rebase/merge ni borrar la rama Preview hasta disponer de reconciliación, respaldo y plan de reversión.
+4. Probar evaluaciones y progreso con dos estudiantes y un administrador; comprobar que un intento no aprobado no completa la unidad y que la mejor nota persiste después del cierre de sesión.
+5. Protección de contraseñas filtradas: el Advisor la reporta desactivada, pero la organización está en plan Free y Supabase exige Pro o superior. No es una tarea ejecutable con el plan actual; mantener longitud mínima de ocho caracteres y reevaluar solo si se decide actualizar.
+6. Completar revisión legal de privacidad, términos, cookies, retención y derechos de las personas usuarias con asesoría adecuada para Costa Rica.
+7. Confirmar manualmente el estado de la rama Preview y de las migraciones con evidencia de solo lectura; documentar cualquier diferencia antes de proponer una modificación.
 
 ## Regla operativa
 
