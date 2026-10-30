@@ -101,7 +101,7 @@
 ### Creados:
 - docs/team/ESTADO.md
 - docs/team/DECISIONES.md
-- docs/team/AUDITORIA-CHATGPT.md
+- docs/security-audit.md
 - docs/team/MIGRACIONES.md
 - src/app/robots.ts
 - src/app/sitemap.ts
