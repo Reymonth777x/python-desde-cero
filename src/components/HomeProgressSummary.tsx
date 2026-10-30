@@ -1,107 +1,63 @@
-'use client';
-
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
 import { courseModules } from '@/lib/course';
-import { createClient } from '@/lib/supabase/client';
-
-type State =
-  | { status: 'loading' }
-  | { status: 'guest' }
-  | { status: 'error' }
-  | { status: 'member'; completed: number; total: number; extensionCompleted: number; extensionTotal: number };
+import { createClient } from '@/lib/supabase/server';
 
 const CORE_MODULES = courseModules.filter((courseModule) => !courseModule.optional);
 const EXTENSION_MODULES = courseModules.filter((courseModule) => courseModule.optional);
 const TOTAL_LESSONS = CORE_MODULES.reduce((sum, courseModule) => sum + courseModule.lessons.length, 0);
 const TOTAL_EXTENSION_LESSONS = EXTENSION_MODULES.reduce((sum, courseModule) => sum + courseModule.lessons.length, 0);
 
-export default function HomeProgressSummary() {
-  const supabase = useMemo(() => createClient(), []);
-  const [state, setState] = useState<State>({ status: 'loading' });
+export default async function HomeProgressSummary() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
 
-  useEffect(() => {
-    let active = true;
+  if (authError || !user) return null;
 
-    async function loadProgress(userId: string) {
-      const { data, error } = await supabase
-        .from('progress')
-        .select('module_id, is_completed')
-        .eq('user_id', userId);
+  const { data, error } = await supabase
+    .from('progress')
+    .select('module_id, is_completed')
+    .eq('user_id', user.id);
 
-      if (!active) return;
-      if (error) {
-        setState({ status: 'error' });
-        return;
-      }
-
-      const completedRows = (data ?? []).filter((row) => row.is_completed === true);
-      const coreIds = new Set(CORE_MODULES.map((courseModule) => courseModule.id));
-      const extensionIds = new Set(EXTENSION_MODULES.map((courseModule) => courseModule.id));
-      const completed = completedRows.filter((row) => coreIds.has(row.module_id)).length;
-      const extensionCompleted = completedRows.filter((row) => extensionIds.has(row.module_id)).length;
-      setState({
-        status: 'member',
-        completed,
-        total: TOTAL_LESSONS,
-        extensionCompleted,
-        extensionTotal: TOTAL_EXTENSION_LESSONS,
-      });
-    }
-
-    supabase.auth.getUser().then(({ data, error }) => {
-      if (!active) return;
-      if (error || !data.user) {
-        setState({ status: 'guest' });
-        return;
-      }
-      void loadProgress(data.user.id);
-    }).catch(() => {
-      if (active) setState({ status: 'guest' });
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!active) return;
-      if (session?.user) {
-        void loadProgress(session.user.id);
-      } else {
-        setState({ status: 'guest' });
-      }
-    });
-
-    return () => {
-      active = false;
-      subscription.unsubscribe();
-    };
-  }, [supabase]);
-
-  if (state.status === 'loading' || state.status === 'guest') return null;
-
-  if (state.status === 'error') {
+  if (error) {
     return (
       <div className="mt-6 max-w-xl border-l-2 border-[var(--theme-border)] px-4 py-3 text-sm text-[var(--theme-muted)]">
         Tu sesión está iniciada, pero no se pudo consultar el avance ahora.
-        <Link href="/academia" className="ml-2 font-semibold text-[var(--theme-accent)] underline underline-offset-4">Abrir mi ruta</Link>
+        <Link href="/academia" className="ml-2 font-semibold text-[var(--theme-accent)] underline underline-offset-4">
+          Abrir mi ruta
+        </Link>
       </div>
     );
   }
 
-  const percent = state.total > 0 ? Math.round((state.completed / state.total) * 100) : 0;
+  const completedRows = (data ?? []).filter((row) => row.is_completed === true);
+  const coreIds = new Set(CORE_MODULES.map((courseModule) => courseModule.id));
+  const extensionIds = new Set(EXTENSION_MODULES.map((courseModule) => courseModule.id));
+  const completed = completedRows.filter((row) => coreIds.has(row.module_id)).length;
+  const extensionCompleted = completedRows.filter((row) => extensionIds.has(row.module_id)).length;
+  const percent = TOTAL_LESSONS > 0 ? Math.round((completed / TOTAL_LESSONS) * 100) : 0;
+
   return (
     <section aria-label="Tu progreso de aprendizaje" className="mt-6 max-w-xl border border-[var(--theme-border)] bg-[var(--theme-surface)] p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs font-bold tracking-[0.14em] text-[var(--theme-accent)]">TU PROGRESO</p>
-        <p className="font-mono text-sm text-[var(--theme-ink)]">{state.completed}/{state.total} lecciones · {percent}%</p>
+        <p className="font-mono text-sm text-[var(--theme-ink)]">
+          {completed}/{TOTAL_LESSONS} lecciones · {percent}%
+        </p>
       </div>
       <div className="mt-3 h-2 w-full bg-[var(--theme-bg-secondary)]" role="progressbar" aria-label="Progreso del curso" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent}>
-        <div className="h-full bg-[var(--theme-accent)] transition-[width]" style={{ width: `${percent}%` }} />
+        <div className="h-full bg-[var(--theme-accent)] transition-[width]" style={{ width: percent + '%' }} />
       </div>
-      {state.extensionTotal > 0 && (
+      {TOTAL_EXTENSION_LESSONS > 0 && (
         <p className="mt-3 text-xs text-[var(--theme-muted)]">
-          Extensión práctica opcional: {state.extensionCompleted}/{state.extensionTotal} actividades
+          Extensión práctica opcional: {extensionCompleted}/{TOTAL_EXTENSION_LESSONS} actividades
         </p>
       )}
-      <Link href="/academia" className="mt-3 inline-flex min-h-10 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">Continuar aprendiendo</Link>
+      <Link href="/academia" className="mt-3 inline-flex min-h-10 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">
+        Continuar aprendiendo
+      </Link>
     </section>
   );
 }
