@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import InvitationCodeCopy from "@/components/InvitationCodeCopy";
+import InvitationExpiryInput from "@/components/InvitationExpiryInput";
 import { listInvitations, createInvitation, deleteInvitation } from "./actions";
 
 type InvitationRow = {
@@ -139,15 +140,10 @@ export default async function InvitacionesPage({ searchParams }: PageProps) {
                   <p id='code-help' className='mt-2 text-xs text-[var(--theme-muted)]'>Ejemplo: EQUIPO-OCT-26. Usa 8–32 caracteres con letras y números; los guiones van entre grupos, sin repetirse ni ir al principio o al final. El código escrito se guarda exactamente tras normalizarlo a mayúsculas. Si lo dejas vacío, se genera uno aleatorio.</p>
                 </div>
                 <div>
-                  <label htmlFor='expires_at' className='block text-sm font-semibold text-[var(--theme-ink)] mb-1'>
+                  <label htmlFor='expires_at_local' className='block text-sm font-semibold text-[var(--theme-ink)] mb-1'>
                     Fecha de expiración (opcional; por defecto 7 días)
                   </label>
-                  <input
-                    id='expires_at'
-                    name='expires_at'
-                    type='datetime-local'
-                    className='mt-1 min-h-12 w-full border border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 py-3 text-base text-[var(--theme-ink)] outline-none focus:border-[var(--theme-accent)] focus:ring-1 focus:ring-[var(--theme-focus-ring)]'
-                  />
+                  <InvitationExpiryInput />
                 </div>
               </div>
               <button type='submit' className='min-h-12 w-full bg-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-ink-inverse)] hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]'>
