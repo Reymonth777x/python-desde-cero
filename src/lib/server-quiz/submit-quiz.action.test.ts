@@ -74,6 +74,19 @@ describe('submitQuiz', () => {
     });
   });
 
+  it('rechaza el envío si falta la identidad esperada de la lección', async () => {
+    const { rpc } = mockClient({ userId: 'student-1' });
+    const data = new FormData();
+    data.set('moduleId', 'module-1');
+    data.set('lessonId', 'b1-l1');
+    data.set('answers', JSON.stringify([0]));
+
+    const result = await submitQuiz(null, data);
+
+    expect(result.error).toContain('No se pudo validar la sesión');
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
   it('rechaza el envío si la sesión cambió a otra cuenta', async () => {
     const { rpc } = mockClient({ userId: 'student-2' });
 
