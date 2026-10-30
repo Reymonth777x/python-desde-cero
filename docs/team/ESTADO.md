@@ -5,9 +5,9 @@
 ## Repositorio y publicación
 
 - Repositorio: `Reymonth777x/python-desde-cero`; rama de producción: `master`.
-- HEAD actual de `master`: `71fa854381f0507f6b0b16b8a6fbf2a0c2efaa15` (incluye PR #43, #52, #54, #55 y #57). El CI de este HEAD sigue en curso en el workflow [41049538535](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41049538535); no declarar sus cambios pedagógicos publicados hasta verificar su despliegue.
-- Última publicación de contenido comprobada: SHA `2940723e3a37a6556770169d0ae692e6bab2d943`, workflow [41048515179](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41048515179). El intento asociado al merge más reciente, workflow [41049629114](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41049629114), omitió el deploy porque el CI upstream terminó `cancelled`; no hubo publicación de un SHA no aprobado.
-- El CI del contenido publicado terminó correctamente en el workflow [41048172812](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41048172812). La fuente `master` es posterior a ese release y requiere CI y deploy propios.
+- HEAD actual de `master`: `71fa854381f0507f6b0b16b8a6fbf2a0c2efaa15` (incluye PR #43, #52, #54, #55 y #57). El CI de ese SHA terminó correctamente en el workflow [41049538535](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41049538535).
+- Última publicación comprobada: SHA `71fa854381f0507f6b0b16b8a6fbf2a0c2efaa15`, workflow [41049961984](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41049961984). El deploy hizo checkout del mismo SHA que `master`, confirmó que el HEAD no avanzó durante el build y pasó las comprobaciones HTTP posteriores.
+- El bundle publicado incluye PR #52 (`b3-l9`, matrices y bucles anidados), PR #55 (contador de seis casos del proyecto) y PR #57 (marco didáctico inicial de `b1-l1`–`b1-l3`). La lectura pública confirma el texto introductorio actualizado en `/muestra`; las pantallas de lecciones autenticadas todavía necesitan verificación con cuentas reales.
 - El smoke test público confirmó portada nueva, `/muestra`, `/sitemap.xml`, marcador Turnstile en `/login` y respuesta HTTP 308 desde `www.python-desdecero.com` al dominio principal.
 - PR #43 está integrado. Se retiró el prototipo de cocina del código activo sin borrar su historial Git; Orilla sigue fuera del alcance de esta versión.
 
@@ -26,7 +26,7 @@
 - El examen final PE1 es `b4-l11`, con doce preguntas y mínimo de 75%.
 - Los prerrequisitos se comprueban tanto en la navegación del servidor como dentro del calificador privado de Supabase: examen anterior de módulo, evaluación del módulo 3 antes del proyecto, y proyecto aprobado antes del examen final.
 - Mejoras pedagógicas ya integradas en `master`: demostración inicial más clara en `b1-l1`–`b1-l3` (PR #57), conversiones y variables en `b2-l4`, operadores bit a bit en `b3-l2`, Bubble Sort guiado en `b3-l7`, matrices y bucles anidados paso a paso en `b3-l9` (PR #52) y contador del proyecto final derivado de los seis casos reales (PR #55).
-- Las PR #52, #55 y #57 están fusionadas en `master` HEAD `4f5cface...`; su CI y posterior despliegue siguen pendientes. La producción todavía sirve el HEAD anterior `2940723...`.
+- Las PR #52, #55 y #57 están fusionadas y publicadas en producción dentro del HEAD `71fa854...`. La verificación de la experiencia autenticada de las lecciones y el progreso con cuentas reales sigue pendiente.
 - La revisión integral de las 33 unidades y la ampliación de cobertura para ejercicios con entradas límite siguen pendientes.
 
 ## Supabase y seguridad de evaluaciones
