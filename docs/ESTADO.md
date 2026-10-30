@@ -1,8 +1,9 @@
 # Estado del proyecto — Python desde Cero
 
-**HEAD publicado:** `e758f9cf9da1aa647429669b112b7128ca9b126d`  
+**Último release funcional publicado:** `e758f9cf9da1aa647429669b112b7128ca9b126d`  
 **CI:** [41076396982 — success](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41076396982)  
-**Despliegue:** [41076898388 — success](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41076898388)
+**Despliegue:** [41076898388 — success](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41076898388)  
+La documentación posterior se actualizó en PR #67 (`10cc1b7`) con CI [41092034385](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41092034385) y deploy [41092591412](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41092591412), ambos exitosos y sin cambios funcionales.
 
 Este archivo es un índice de la referencia operativa:
 
