@@ -35,26 +35,26 @@ jobs:
           if [[ "$GITHUB_EVENT_NAME" == "workflow_run" ]]; then
             if [[ "$WORKFLOW_HEAD_BRANCH" != "master" || "$WORKFLOW_CONCLUSION" != "success" ]]; then
               echo "configured=false" >> "$GITHUB_OUTPUT"
-              echo "::notice::Despliegue omitido: solo se publica master tras CI exitoso."
-              exit 0
+              echo "::error::No se publica: el CI de master no terminó correctamente. Revisa la ejecución de CI y vuelve a publicar tras un resultado exitoso."
+              exit 1
             fi
           elif [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
             if [[ "$GITHUB_REF_NAME" != "master" ]]; then
               echo "configured=false" >> "$GITHUB_OUTPUT"
-              echo "::notice::Despliegue manual omitido: selecciona la rama master."
-              exit 0
+              echo "::error::Despliegue manual rechazado: selecciona la rama master."
+              exit 1
             fi
           else
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Despliegue omitido: evento no autorizado."
-            exit 0
+            echo "::error::Despliegue rechazado: evento no autorizado."
+            exit 1
           fi
 
           site_key="$(printf '%s' "$RAW_TURNSTILE_SITE_KEY" | tr -d '[:space:]')"
           if [[ -z "$CLOUDFLARE_API_TOKEN" || -z "$CLOUDFLARE_ACCOUNT_ID" ]]; then
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Despliegue omitido. Faltan CLOUDFLARE_API_TOKEN o CLOUDFLARE_ACCOUNT_ID en GitHub Actions Secrets."
-            exit 0
+            echo "::error::No se publica: faltan CLOUDFLARE_API_TOKEN o CLOUDFLARE_ACCOUNT_ID en GitHub Actions Secrets."
+            exit 1
           fi
 
           is_real_site_key() {
@@ -95,8 +95,8 @@ jobs:
 
           if ! is_real_site_key "$site_key"; then
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::error::Despliegue omitido: no se encontró una Sitekey real única para python-desdecero.com. Define NEXT_PUBLIC_TURNSTILE_SITE_KEY en GitHub Actions Variables. No uses llaves de prueba."
-            exit 0
+            echo "::error::No se publica: no se encontró una Sitekey real única para python-desdecero.com. Define NEXT_PUBLIC_TURNSTILE_SITE_KEY en GitHub Actions Variables. No uses llaves de prueba."
+            exit 1
           fi
 
           # A Turnstile sitekey is public and is required by the browser build.
