@@ -89,12 +89,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Para qué sirve el intérprete de Python?",
             "options": [
-              "Para ejecutar instrucciones Python",
               "Para diseñar piezas de computadora",
+              "Para ejecutar instrucciones Python",
               "Para crear una conexión Wi-Fi",
               "Para cambiar el tamaño de la pantalla"
             ],
-            "answer": 0,
+            "answer": 1,
             "explanation": "El intérprete ejecuta el código Python."
           }
         ]
@@ -133,12 +133,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Cuál es la fuente oficial para descargar Python?",
             "options": [
-              "python.org",
               "python-free-downloads.example",
               "Una página de juegos",
+              "python.org",
               "El editor de texto"
             ],
-            "answer": 0,
+            "answer": 2,
             "explanation": "Python se distribuye desde python.org."
           }
         ]
@@ -177,12 +177,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué es un algoritmo?",
             "options": [
-              "Una secuencia ordenada de pasos para resolver una tarea",
               "Un tipo de monitor",
               "Un error de teclado",
-              "Un lenguaje exclusivo para páginas web"
+              "Un lenguaje exclusivo para páginas web",
+              "Una secuencia ordenada de pasos para resolver una tarea"
             ],
-            "answer": 0,
+            "answer": 3,
             "explanation": "Un algoritmo describe pasos ordenados para alcanzar un resultado."
           },
           {
@@ -199,34 +199,34 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué hace el intérprete?",
             "options": [
-              "Ejecuta el código Python",
               "Limpia la memoria del monitor",
+              "Ejecuta el código Python",
               "Crea contraseñas",
               "Convierte el teclado en pantalla"
             ],
-            "answer": 0,
+            "answer": 1,
             "explanation": "El intérprete ejecuta las instrucciones escritas en Python."
           },
           {
             "prompt": "¿Qué extensión suele tener un archivo Python?",
             "options": [
-              ".py",
               ".jpg",
               ".mp3",
+              ".py",
               ".html"
             ],
-            "answer": 0,
+            "answer": 2,
             "explanation": "Los archivos de código Python suelen usar la extensión .py."
           },
           {
             "prompt": "¿Qué muestra print(\"Hola\")?",
             "options": [
-              "Hola",
               "print Hola",
               "\"Hola\" con comillas siempre",
-              "No muestra nada"
+              "No muestra nada",
+              "Hola"
             ],
-            "answer": 0,
+            "answer": 3,
             "explanation": "print() muestra el contenido indicado."
           }
         ],
@@ -274,12 +274,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué función muestra información en pantalla?",
             "options": [
-              "print()",
               "input()",
+              "print()",
               "type()",
               "int()"
             ],
-            "answer": 0,
+            "answer": 1,
             "explanation": "print() muestra información en la salida."
           }
         ]
@@ -318,12 +318,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué tipo de dato es \"25\"?",
             "options": [
-              "str",
               "int",
               "float",
+              "str",
               "bool"
             ],
-            "answer": 0,
+            "answer": 2,
             "explanation": "Al estar entre comillas, 25 es una cadena de texto."
           }
         ]
@@ -362,12 +362,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Cuánto vale 3 + 2 * 4 en Python?",
             "options": [
-              "11",
               "20",
               "14",
-              "24"
+              "24",
+              "11"
             ],
-            "answer": 0,
+            "answer": 3,
             "explanation": "La multiplicación se realiza antes que la suma: 3 + 8 = 11."
           }
         ]
@@ -450,12 +450,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué símbolo inicia un comentario de una línea?",
             "options": [
-              "#",
               "//",
+              "#",
               "<!--",
               "**"
             ],
-            "answer": 0,
+            "answer": 1,
             "explanation": "En Python, # inicia un comentario de una línea."
           }
         ]
@@ -496,12 +496,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué tipo de dato devuelve input()?",
             "options": [
-              "str",
               "int",
               "float",
+              "str",
               "bool"
             ],
-            "answer": 0,
+            "answer": 2,
             "explanation": "input() devuelve texto. Para usar un número debes convertirlo."
           }
         ]
@@ -543,12 +543,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué muestra print(2 + 3)?",
             "options": [
-              "5",
               "23",
               "2 + 3",
-              "6"
+              "6",
+              "5"
             ],
-            "answer": 0,
+            "answer": 3,
             "explanation": "La suma de 2 y 3 es 5."
           },
           {
@@ -565,34 +565,34 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué instrucción asigna 7 a x?",
             "options": [
-              "x = 7",
               "7 == x",
+              "x = 7",
               "x + 7",
               "int(x)"
             ],
-            "answer": 0,
+            "answer": 1,
             "explanation": "La asignación coloca el valor a la derecha del signo =."
           },
           {
             "prompt": "¿Qué símbolo inicia un comentario?",
             "options": [
-              "#",
               "&",
               "$",
+              "#",
               "@"
             ],
-            "answer": 0,
+            "answer": 2,
             "explanation": "El símbolo # inicia comentarios."
           },
           {
             "prompt": "¿Qué debes hacer con input() para sumar la entrada como entero?",
             "options": [
-              "Convertirla con int()",
               "Convertirla con print()",
               "Usar #",
-              "Quitar los paréntesis"
+              "Quitar los paréntesis",
+              "Convertirla con int()"
             ],
-            "answer": 0,
+            "answer": 3,
             "explanation": "input() devuelve str y debe convertirse con int() para sumar como entero."
           }
         ],
@@ -640,12 +640,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué valor produce la expresión 5 > 3?",
             "options": [
-              "True",
               "False",
               "5",
+              "True",
               "3"
             ],
-            "answer": 0,
+            "answer": 2,
             "explanation": "5 es mayor que 3, por lo que la comparación es True."
           }
         ]
@@ -684,12 +684,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Cuántas veces se ejecuta for x in range(4)?",
             "options": [
-              "4",
               "3",
               "5",
-              "1"
+              "1",
+              "4"
             ],
-            "answer": 0,
+            "answer": 3,
             "explanation": "range(4) genera 0, 1, 2 y 3: cuatro valores."
           }
         ]
@@ -772,12 +772,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué índice corresponde al primer elemento de una lista?",
             "options": [
-              "0",
               "1",
+              "0",
               "-0.5",
               "Depende del tamaño"
             ],
-            "answer": 0,
+            "answer": 1,
             "explanation": "En Python, los índices de lista comienzan en 0."
           }
         ]
@@ -816,12 +816,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué hace bubble sort cuando encuentra dos vecinos fuera de orden?",
             "options": [
-              "Los intercambia",
               "Borra la lista",
               "Convierte ambos en texto",
+              "Los intercambia",
               "Detiene Python"
             ],
-            "answer": 0,
+            "answer": 2,
             "explanation": "El ordenamiento burbuja intercambia los elementos vecinos que están fuera de orden."
           }
         ]
@@ -860,12 +860,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué devuelve len([10, 20, 30])?",
             "options": [
-              "3",
               "2",
               "30",
-              "60"
+              "60",
+              "3"
             ],
-            "answer": 0,
+            "answer": 3,
             "explanation": "La lista contiene tres elementos."
           }
         ]
@@ -948,34 +948,34 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué produce 10 == 10?",
             "options": [
-              "True",
               "False",
+              "True",
               "10",
               "Error"
             ],
-            "answer": 0,
+            "answer": 1,
             "explanation": "Los valores son iguales."
           },
           {
             "prompt": "¿Qué hace else?",
             "options": [
-              "Ejecuta el bloque cuando la condición if no se cumple",
               "Repite siempre",
               "Declara una lista",
+              "Ejecuta el bloque cuando la condición if no se cumple",
               "Convierte texto en número"
             ],
-            "answer": 0,
+            "answer": 2,
             "explanation": "else ofrece el bloque alternativo."
           },
           {
             "prompt": "¿Qué valores produce range(2)?",
             "options": [
-              "0 y 1",
               "1 y 2",
               "0, 1 y 2",
-              "2 y 3"
+              "2 y 3",
+              "0 y 1"
             ],
-            "answer": 0,
+            "answer": 3,
             "explanation": "range(2) genera 0 y 1."
           },
           {
@@ -992,12 +992,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué valor consulta matriz[1][0] en [[2, 3], [4, 5]]?",
             "options": [
-              "4",
               "2",
+              "4",
               "3",
               "5"
             ],
-            "answer": 0,
+            "answer": 1,
             "explanation": "El índice [1] selecciona la segunda fila y [0] el primer elemento."
           }
         ],
@@ -1045,12 +1045,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué palabra inicia la definición de una función?",
             "options": [
-              "def",
               "if",
               "for",
-              "return"
+              "return",
+              "def"
             ],
-            "answer": 0,
+            "answer": 3,
             "explanation": "def se utiliza para definir una función."
           }
         ]
@@ -1133,12 +1133,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué hace return?",
             "options": [
-              "Devuelve un resultado desde la función",
               "Muestra siempre el texto en pantalla",
+              "Devuelve un resultado desde la función",
               "Crea un bucle",
               "Importa otro archivo"
             ],
-            "answer": 0,
+            "answer": 1,
             "explanation": "return entrega un valor al código que llamó la función."
           }
         ]
@@ -1177,12 +1177,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Dónde existe una variable local creada dentro de una función?",
             "options": [
-              "Dentro de esa función",
               "En todos los archivos siempre",
               "Solo en el teclado",
+              "Dentro de esa función",
               "En la base de datos"
             ],
-            "answer": 0,
+            "answer": 2,
             "explanation": "Una variable local se utiliza dentro de la función donde se define."
           }
         ]
@@ -1221,12 +1221,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Cómo se separan varios parámetros en una definición?",
             "options": [
-              "Con comas",
               "Con puntos",
               "Con barras",
-              "Con dos puntos entre cada nombre"
+              "Con dos puntos entre cada nombre",
+              "Con comas"
             ],
-            "answer": 0,
+            "answer": 3,
             "explanation": "Los parámetros se separan con comas."
           }
         ]
@@ -1309,12 +1309,12 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué bloque se ejecuta cuando ocurre la excepción indicada?",
             "options": [
-              "except",
               "try siempre después",
+              "except",
               "def",
               "return"
             ],
-            "answer": 0,
+            "answer": 1,
             "explanation": "except permite manejar una excepción."
           }
         ]
@@ -1353,23 +1353,23 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Qué palabra se usa para definir una función?",
             "options": [
-              "def",
               "while",
               "except",
+              "def",
               "class"
             ],
-            "answer": 0,
+            "answer": 2,
             "explanation": "def define funciones."
           },
           {
             "prompt": "¿Qué diferencia a return de print()?",
             "options": [
-              "return devuelve un valor; print() lo muestra",
               "Son exactamente iguales",
               "print() crea una función",
-              "return solo funciona en listas"
+              "return solo funciona en listas",
+              "return devuelve un valor; print() lo muestra"
             ],
-            "answer": 0,
+            "answer": 3,
             "explanation": "return devuelve un dato; print() lo escribe en la salida."
           },
           {
@@ -1386,23 +1386,23 @@ export const courseModules: CourseModule[] = [
           {
             "prompt": "¿Cómo se obtiene el valor asociado a la clave nombre?",
             "options": [
-              "persona[\"nombre\"]",
               "persona.nombre()",
+              "persona[\"nombre\"]",
               "persona(nombre)",
               "persona->nombre"
             ],
-            "answer": 0,
+            "answer": 1,
             "explanation": "Los diccionarios se consultan usando la clave entre corchetes."
           },
           {
             "prompt": "¿Qué excepción suele producir int(\"hola\")?",
             "options": [
-              "ValueError",
               "IndexError",
               "KeyError",
+              "ValueError",
               "NameError"
             ],
-            "answer": 0,
+            "answer": 2,
             "explanation": "ValueError aparece cuando el texto no representa un entero válido."
           }
         ],
