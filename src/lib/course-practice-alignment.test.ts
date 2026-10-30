@@ -77,9 +77,9 @@ describe('course practice alignment', () => {
     expect(exercise.solution).toContain('while contador <= limite:');
     expect(exercise.solution).toContain('contador += 1');
     expect(exercise.tests).toEqual([
+      { input: ['1'], expected: '1' },
       { input: ['-2'], expected: '' },
       { input: ['0'], expected: '' },
-      { input: ['1'], expected: '1' },
       { input: ['5'], expected: ['1', '2', '3', '4', '5'].join(String.fromCharCode(10)) },
     ]);
   });
