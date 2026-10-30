@@ -1,84 +1,76 @@
 # Tareas pendientes de configuración, calidad y operación
 
-Este documento reemplaza la lista anterior. No ejecutar pasos de producción hasta completar las verificaciones indicadas.
+Actualizado el 30 de octubre de 2026 tras comprobar el repositorio, CI, publicación y los dos proyectos Supabase. Los elementos ya integrados se distinguen de las verificaciones que aún requieren cuentas reales, hardware o reconciliación de base de datos.
 
-## 1. Entorno local
+## 1. Completado y verificado en código/producción
 
-- [ ] Instalar Node.js 24, npm y Docker Desktop.
-- [ ] Desde la raíz del repositorio, ejecutar en PowerShell: .\scripts\start-local.ps1.
-- [ ] El lanzador usa Supabase CLI 2.121.0 mediante npx; no requiere instalación global.
-- [ ] Consultar las cuentas de prueba en .local/dev-users.credentials.json.
-- [ ] Usar únicamente URLs loopback para el seed de desarrollo.
-- [ ] Si faltan tablas o el seed falla por esquema, detenerse y reportar el error. No ejecutar db reset para ocultar el problema.
+- [x] Publicar la portada actual en `python-desdecero.com`; verificar el Worker y el dominio personalizado.
+- [x] Publicar `/muestra`, añadirla al sitemap y comprobar la muestra pública sin claves, soluciones ni progreso privado.
+- [x] Verificar el marcador Turnstile en el HTML de `/login` y la redirección HTTP 308 de `www` al dominio apex.
+- [x] Simplificar navegación: estudiante y administrador; retirar la ruta docente ficticia y el prototipo de cocina del árbol activo.
+- [x] Estructurar PE1 en cuatro módulos obligatorios y 33 unidades, con módulo 5 separado como extensión opcional.
+- [x] Incorporar evaluación formal del módulo 1, Hello, World! en 2.1, proyecto final obligatorio y examen global PE1.
+- [x] Corregir progresión de variables/conversiones, operadores bit a bit y Bubble Sort.
+- [x] Integrar la mejora de matrices y bucles anidados paso a paso en `b3-l9` (PR #52).
+- [x] Integrar la aclaración pedagógica de las primeras lecciones `b1-l1`–`b1-l3` (PR #57).
+- [x] Hacer que el contador de pruebas del proyecto final derive de `lesson.exercise.tests.length` (PR #55; seis casos en el catálogo).
+- [x] Proteger prerrequisitos del curso en el servidor y en el calificador privado de Supabase.
+- [x] Verificar 67 claves v2 (62 obligatorias y 5 opcionales), sin claves faltantes en el catálogo vigente.
+- [x] Confirmar que las invitaciones usadas se conservan y las no usadas pueden eliminarse.
+- [x] Integrar protección contra despliegues obsoletos de Cloudflare (PR #54): verificación del SHA antes del build y otra comprobación justo antes de publicar.
+- [x] CI completo y despliegue del HEAD `2940723e3a37a6556770169d0ae692e6bab2d943` completados correctamente.
 
-## 2. Migraciones y Supabase
+## 2. Publicación pendiente del HEAD actual
 
-- [ ] Resolver la divergencia entre supabase/migrations y el historial remoto descrita en docs/team/MIGRACIONES.md.
-- [ ] Recuperar en Git las migraciones exactas que ya están aplicadas en remoto.
-- [ ] Revisar las variantes locales no aplicadas y decidir cuáles se archivan o se convierten en migraciones nuevas.
-- [ ] Reconciliar 001–003 con el historial remoto solo con evidencia del esquema existente.
-- [ ] Crear cada migración nueva con Supabase CLI: npx --yes supabase@2.121.0 migration new nombre_descriptivo.
-- [ ] Probar migraciones en una base local limpia y otra con datos preservados.
-- [ ] Preparar backup y rollback antes de cualquier cambio en staging o producción.
-- [ ] No ejecutar supabase db push, migration repair ni db reset contra producción hasta aprobación y reconciliación.
+- [ ] Completar el CI del HEAD actual `71fa854381f0507f6b0b16b8a6fbf2a0c2efaa15` (workflow 41049538535).
+- [ ] Confirmar que el job `deploy` se ejecuta y termina correctamente para ese mismo SHA.
+- [ ] Tras publicar, verificar en producción las mejoras de las primeras lecciones, `b3-l9` y el texto dinámico de seis pruebas del proyecto final.
+- [ ] Si un `workflow_run` se omite porque el CI upstream fue cancelado, esperar el CI del HEAD más reciente. No confundir el estado general `success` de un workflow con un job `deploy` realmente ejecutado.
 
-## 3. Academia y calidad del curso PE1
+## 3. Evaluaciones y progreso real
 
-- [ ] Completar la evaluación formal del módulo 1 y alinearla con la sección 1.4 de Cisco PE1.
-- [ ] Mantener print() en b1-l4 solo como demostración de ejecución y verificar que la explicación formal de salida, cadenas y comentarios permanezca en el módulo 2.
-- [ ] Crear evaluación final global de PE1, basada en los cuatro módulos y con preguntas de lectura, depuración y aplicación.
-- [ ] Convertir el proyecto final en requisito de graduación del PE1 y diseñar su rúbrica de evaluación.
-- [ ] Revisar las 30 unidades principales para eliminar explicaciones repetidas, asegurar prerequisitos y alinear la sección 2.1 Hello World y la numeración del módulo 2.
-- [ ] Ampliar prácticas con casos límite, entradas inválidas y retroalimentación explicativa.
-- [ ] Mantener la extensión de archivos claramente fuera del PE1 principal.
-- [ ] Revisar todo el contenido en español antes de traducirlo al inglés.
+- [ ] Probar con dos estudiantes distintos que el servidor calcula la nota y el cliente no puede modificar la clave.
+- [ ] Confirmar que una evaluación no aprobada no marca la unidad como completada.
+- [ ] Aprobar una evaluación y confirmar que la mejor nota y el estado se conservan tras cerrar sesión y volver a entrar.
+- [ ] Confirmar que el progreso de la portada coincide con el panel Academia.
+- [ ] Verificar la secuencia del módulo 4: completar `b4-l8`, ejecutar y aprobar las seis pruebas del proyecto `b4-l10`, superar su revisión conceptual y luego aprobar `b4-l11`.
+- [ ] Diseñar una rúbrica explícita para revisar el código del proyecto final. El sitio emite una evaluación formativa, no una certificación externa.
 
-## 4. Evaluaciones y progreso
+## 4. Autenticación, CAPTCHA y correo
 
-- [ ] Probar envío de evaluación con dos estudiantes distintos.
-- [ ] Confirmar que el servidor calcula la nota y que el estudiante no puede modificar la clave.
-- [ ] Confirmar que una respuesta incorrecta no marca la lección como completada.
-- [ ] Confirmar que la mejor nota y el estado completado se conservan tras cerrar sesión y volver a entrar.
-- [ ] Confirmar que el progreso de la portada coincide con el panel de Academia.
+- [ ] Completar registro, confirmación, login, logout y recuperación/cambio de contraseña en el dominio final con un buzón de prueba controlado.
+- [ ] Completar interactivamente el desafío Turnstile y comprobar que Supabase Auth acepta el token. La presencia del widget en el HTML no demuestra la validación del secreto.
+- [ ] Confirmar permisos de estudiante y administrador y las rutas protegidas con ambas cuentas.
+- [ ] Activar la protección contra contraseñas filtradas en Supabase Auth (Advisor la reportó desactivada).
+- [ ] Verificar SMTP, SPF, DKIM, DMARC, plantillas y URLs de redirección.
 
-## 5. Laboratorio de Python
+## 5. Laboratorio y experiencia de dispositivo
 
-- [ ] Probar carga inicial de Pyodide en Chrome y Firefox.
-- [ ] Probar print(), input(), conversiones, errores de sintaxis y timeout.
-- [ ] Probar Turtle: fondo, color, grosor, posición, orientación, formas, clear(), reset() y ocultar/mostrar tortuga.
-- [ ] Probar programas largos y confirmar que el Worker se reinicia si se agota el tiempo.
-- [ ] Verificar que el laboratorio completo y la demostración de portada no prometen capacidades distintas.
+- [ ] Probar la carga de Pyodide en Chrome y Firefox.
+- [ ] Probar `print()`, `input()`, conversiones, errores de sintaxis, programas largos y timeout/reinicio del Worker.
+- [ ] Probar Turtle: fondo, color, grosor, posición, orientación, formas, `clear()`, `reset()` y ocultar/mostrar tortuga.
+- [ ] Hacer una pasada en móviles físicos con paleta de temas, editor, teclado táctil, salida y navegación. Playwright emulado no reemplaza hardware real.
 
 ## 6. Invitaciones y administración
 
-- [ ] Crear un código automático y comprobar que queda guardado.
-- [ ] Crear un código personalizado y comprobar que se guarda exactamente como se escribió tras normalizarlo.
+- [ ] Con cuenta administradora, crear y guardar un código automático.
+- [ ] Crear y guardar un código personalizado; confirmar normalización a mayúsculas y persistencia.
 - [ ] Eliminar una invitación no utilizada.
-- [ ] Confirmar que una invitación utilizada no se puede eliminar y que la interfaz explica por qué.
-- [ ] Probar permisos con administrador y estudiante; el estudiante no puede listar, crear ni eliminar invitaciones.
+- [ ] Confirmar que una invitación usada no se puede eliminar y que la interfaz explica la conservación del historial.
+- [ ] Con cuenta de estudiante, confirmar que listar, crear o eliminar invitaciones está prohibido.
 
-## 7. Autenticación y navegación
+## 7. Supabase, staging y migraciones
 
-- [ ] Probar registro, confirmación de correo, inicio, cierre y recuperación de contraseña.
-- [ ] Verificar que los campos de registro e inicio no se mezclan ni por estado ni por autocompletado.
-- [ ] Confirmar que una sesión de administrador no aparece como desconectada en la portada.
-- [ ] Confirmar que Academia, Mi progreso y Acceso del estudiante tienen destinos y estados claros.
-- [ ] Probar rutas protegidas con usuario anónimo, estudiante y administrador.
+- [ ] Reconciliar archivos locales e historiales remotos de producción y DEV; ver `docs/team/MIGRACIONES.md`.
+- [ ] Recuperar/versionar las migraciones exactas que faltan en Git y retirar variantes obsoletas sin reescribir versiones ya aplicadas.
+- [ ] Investigar la rama preview `main` del proyecto de producción con estado `MIGRATIONS_FAILED` (ID `82612040-2379-41e3-8f76-100fadca6a2c`). No resetearla, rebasarla, fusionarla ni borrarla como atajo.
+- [ ] Probar futuras migraciones en una base local limpia y otra con datos preservados; preparar respaldo y rollback.
+- [ ] No ejecutar `supabase db push`, `migration repair` ni `db reset` en producción mientras persista la divergencia de timestamps. Las migraciones 024–027 ya están aplicadas en ambos entornos con versiones distintas; no repetirlas.
+- [ ] Revisar Security y Performance Advisors. No eliminar índices por avisos informativos sin medir carga real.
 
-## 8. Seguridad, correo y despliegue
+## 8. Legal, privacidad y producto futuro
 
-- [ ] Configurar Turnstile y validar CSP en producción antes de activarlo.
-- [ ] Configurar SMTP, SPF, DKIM y DMARC.
-- [ ] Revisar plantillas de correo, URL de redirección y dominio verificado.
-- [ ] Ejecutar CI completo: Vitest, TypeScript, ESLint, build Next, E2E y build Vinext.
-- [ ] Desplegar primero en staging, validar y después publicar en producción.
-- [ ] Verificar dominio, robots, sitemap, cabeceras, cookies y rutas después del despliegue.
-- [ ] Obtener revisión legal de privacidad, términos y cookies.
-
-## 9. Preparación para inglés y servicios Pro
-
-- [ ] Separar contenido y traducciones del código de interfaz.
-- [ ] No traducir automáticamente ejemplos de código ni nombres de funciones Python.
-- [ ] Definir criterios de finalización y evidencias de aprendizaje para el plan gratuito.
-- [ ] Diseñar beneficios Pro medibles: proyectos revisados, rutas extendidas, seguimiento docente o certificados internos con rúbricas verificables.
-- [ ] No prometer certificaciones externas que la plataforma no emite.
+- [ ] Completar revisión legal de privacidad, términos y cookies.
+- [ ] Definir criterios medibles del plan gratuito y posibles beneficios Pro antes de ofrecerlos.
+- [ ] Separar contenido y traducciones del código de interfaz cuando se inicie el inglés.
+- [ ] Mantener fuera del alcance de esta versión los juegos no publicados y Orilla, que es un proyecto futuro independiente.
