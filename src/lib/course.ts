@@ -1239,40 +1239,52 @@ export const courseModules: CourseModule[] = [
         "title": "Operadores lógicos y operaciones bit a bit",
         "objectives": [
           "Combinar condiciones con and, or y not.",
-          "Diferenciar operadores lógicos y bit a bit.",
-          "Interpretar operaciones &, | y ^ sobre enteros."
+          "Diferenciar los operadores lógicos de los operadores bit a bit.",
+          "Calcular operaciones AND (&), OR (|) y XOR (^) sobre enteros.",
+          "Interpretar desplazamientos de bits con << y >>."
         ],
         "explanation": [
-          "and exige que ambas condiciones sean verdaderas; or requiere que al menos una lo sea y not invierte un valor booleano. Estos operadores expresan reglas compuestas como comprobar que una cuenta esté activa y tenga saldo suficiente.",
-          "Los operadores bit a bit actúan sobre la representación binaria de los enteros: & realiza AND, | realiza OR, ^ XOR, ~ invierte bits y << o >> desplazan posiciones. No son equivalentes a and y or, que evalúan condiciones.",
-          "El número 5 se representa como 0101 y el 3 como 0011. La operación 5 & 3 conserva los bits que son uno en ambos operandos y produce 0001, que equivale a 1; estas operaciones se utilizan en máscaras, permisos y protocolos."
+          "and exige que ambas condiciones sean verdaderas; or requiere que al menos una lo sea y not invierte un valor booleano. Estos operadores expresan reglas compuestas, como comprobar que una cuenta esté activa y tenga saldo suficiente.",
+          "Los operadores bit a bit trabajan con los bits de números enteros. Aunque sus símbolos se parecen a los operadores lógicos, no hacen lo mismo: and, or y not evalúan condiciones; &, |, ^, ~, << y >> modifican o comparan posiciones binarias.",
+          "Para practicar, escribe 5 como 0101 y 3 como 0011. Con &: solo queda 1 donde ambos tienen 1, por eso 0101 & 0011 = 0001 (1). Con |: queda 1 donde al menos uno tiene 1, por eso el resultado es 0111 (7). Con ^: queda 1 donde los bits son distintos, por eso el resultado es 0110 (6).",
+          "Los desplazamientos mueven las posiciones binarias: 5 << 1 desplaza los bits una posición a la izquierda y produce 10; 5 >> 1 los mueve una posición a la derecha y produce 2. El operador ~ invierte los bits; en Python, ~5 produce -6. Se presenta aquí como lectura y no se exige en el ejercicio."
         ],
-        "example": "activo = True\nsaldo = 1200\nprint(activo and saldo >= 1000)\nprint(not activo)\nprint(5 & 3)\nprint(5 | 3)",
-        "exampleOutput": "True\nFalse\n1\n7",
+        "example": "activo = True\nsaldo = 1200\n\n# Operadores logicos: evalúan condiciones\nprint(activo and saldo >= 1000)\nprint(not activo)\n\n# Operadores bit a bit: trabajan con enteros\nprint(5 & 3)   # AND: 0001 -> 1\nprint(5 | 3)   # OR:  0111 -> 7\nprint(5 ^ 3)   # XOR: 0110 -> 6\nprint(5 << 1)  # Desplazar a la izquierda -> 10\nprint(5 >> 1)  # Desplazar a la derecha -> 2\nprint(~5)      # Invertir bits -> -6",
+        "exampleOutput": "True\nFalse\n1\n7\n6\n10\n2\n-6",
         "walkthrough": [
-          "and combina dos condiciones.",
-          "not invierte True a False.",
-          "5 & 3 conserva bits comunes y 5 | 3 combina posiciones activas."
+          "and combina las dos condiciones: activo debe ser True y el saldo debe alcanzar 1000.",
+          "not invierte el booleano. Como activo vale True, not activo muestra False.",
+          "Alinea los bits: 5 = 0101 y 3 = 0011. Cada columna representa una posición.",
+          "AND (&) conserva una posición solo cuando los dos bits son 1: 0101 & 0011 = 0001, que vale 1.",
+          "OR (|) conserva una posición cuando uno o ambos bits son 1: 0101 | 0011 = 0111, que vale 7.",
+          "XOR (^) conserva una posición cuando los bits son distintos: 0101 ^ 0011 = 0110, que vale 6.",
+          "El desplazamiento << 1 mueve los bits una posición a la izquierda (5 pasa a 10); >> 1 los mueve a la derecha (5 pasa a 2).",
+          "~ invierte los bits; en Python ~5 da -6. Lo observas en el ejemplo, pero no se pide calcularlo en el ejercicio inicial."
         ],
         "commonMistakes": [
-          "Usar & como sustituto automático de and.",
-          "Confundir | con or en cualquier contexto."
+          "Usar & como sustituto automático de and: uno opera bits de enteros y el otro combina condiciones.",
+          "Confundir | con or: sus símbolos se parecen, pero sus operandos y resultados no son equivalentes.",
+          "En XOR (^), pensar que basta con que uno de los bits sea 1; cuando ambos son 1, el resultado de esa posición es 0.",
+          "Leer 0101 como un número decimal; en este ejemplo es la escritura binaria de 5.",
+          "Olvidar que un desplazamiento mueve posiciones binarias y no compara dos condiciones."
         ],
         "exercise": {
           "id": "b3-e2",
-          "title": "Combinar condiciones",
-          "statement": "Crea edad = 22 y tiene_entrada = True. Imprime True si tiene edad suficiente y entrada.",
-          "starterCode": "edad = 22\ntiene_entrada = True\n",
-          "solution": "edad = 22\ntiene_entrada = True\nprint(edad >= 18 and tiene_entrada)",
+          "title": "Combinar condiciones y calcular bits",
+          "statement": "Crea edad = 22, tiene_entrada = True, permisos = 5 y solicitud = 3. Muestra primero si la persona puede entrar usando and. Después calcula permisos & solicitud, permisos | solicitud y permisos ^ solicitud, cada uno en una línea distinta.",
+          "starterCode": "edad = 22\ntiene_entrada = True\npermisos = 5\nsolicitud = 3\n\n# Comprueba la condición con and.\n\n# Calcula AND (&), OR (|) y XOR (^) entre los enteros.\n",
+          "solution": "edad = 22\ntiene_entrada = True\npermisos = 5\nsolicitud = 3\nprint(edad >= 18 and tiene_entrada)\nprint(permisos & solicitud)\nprint(permisos | solicitud)\nprint(permisos ^ solicitud)",
           "tests": [
             {
               "input": [],
-              "expected": "True"
+              "expected": "True\n1\n7\n6"
             }
           ],
           "hints": [
-            "Compara la edad con 18.",
-            "and exige que ambas condiciones sean verdaderas."
+            "La condición lógica se escribe edad >= 18 and tiene_entrada.",
+            "Usa permisos & solicitud para conservar los bits que están activos en ambos enteros.",
+            "Usa permisos | solicitud para combinar las posiciones activas.",
+            "Usa permisos ^ solicitud para conservar las posiciones donde los bits son distintos."
           ],
           "difficulty": "medio",
           "xp": 20,
