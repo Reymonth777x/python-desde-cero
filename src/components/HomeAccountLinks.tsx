@@ -12,7 +12,7 @@ export default async function HomeAccountLinks() {
   if (!error && user) {
     return (
       <>
-        <Link href="/academia" className="inline-flex min-h-10 items-center font-semibold text-[var(--theme-accent)] underline underline-offset-4">
+        <Link href="/#progreso" className="inline-flex min-h-10 items-center font-semibold text-[var(--theme-accent)] underline underline-offset-4">
           Mi progreso
         </Link>
         <form action={logout}>
