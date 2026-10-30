@@ -23,7 +23,14 @@ export async function login(formData: FormData) {
     password,
     options: { captchaToken: captchaToken || undefined },
   });
-  if (error) redirect('/login?error=login');
+  if (error) {
+    const authMessage = error.message.toLowerCase();
+    redirect(
+      authMessage.includes('captcha') || authMessage.includes('turnstile')
+        ? '/login?error=captcha'
+        : '/login?error=login',
+    );
+  }
 
   revalidatePath('/', 'layout');
   redirect(next);
@@ -71,7 +78,18 @@ export async function signup(formData: FormData) {
       captchaToken: captchaToken || undefined,
     },
   });
-  if (error) redirect(parsedInvitation.code ? '/login?error=invitation' : '/login?error=signup');
+  if (error) {
+    const authMessage = error.message.toLowerCase();
+    const captchaError = authMessage.includes('captcha') || authMessage.includes('turnstile');
+    const invitationError = /invitation.*(invalid|expired|used)|invitation is/i.test(error.message);
+    redirect(
+      captchaError
+        ? '/login?error=captcha'
+        : invitationError
+          ? '/login?error=invitation'
+          : '/login?error=signup',
+    );
+  }
 
   if (data.session) {
     revalidatePath('/', 'layout');
@@ -96,10 +114,15 @@ export async function requestPasswordReset(formData: FormData) {
   if (!emailRedirectTo) redirect('/login/forgot-password?error=configuration');
 
   const supabase = await createClient();
-  await supabase.auth.resetPasswordForEmail(email, {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: emailRedirectTo,
     captchaToken: captchaToken || undefined,
   });
+  if (error && (error.message.toLowerCase().includes('captcha') || error.message.toLowerCase().includes('turnstile'))) {
+    redirect('/login/forgot-password?error=captcha');
+  }
+
+  // Keep a uniform response for non-CAPTCHA failures to avoid account enumeration.
   redirect('/login/forgot-password?message=sent');
 }
 
