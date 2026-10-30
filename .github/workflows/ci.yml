@@ -36,6 +36,7 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: https://fcwbkkivelsipqqrbpya.supabase.co
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_3IhM0Ck1_EW84Lo8-u9mzg_DRorCBIE
       NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      NEXT_PUBLIC_PYTHON_RUNNER_ORIGIN: http://127.0.0.1:8788
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
 
     steps:
@@ -50,6 +51,12 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Prepare the isolated Python runner assets
+        run: npm run prepare:python-runner
+
+      - name: Validate the isolated runner Worker configuration
+        run: npx --yes wrangler@4.148.0 deploy --config wrangler.runner.jsonc --dry-run
 
       - name: Verify every course exercise solution with isolated Python runs
         run: python3 scripts/verify-course-exercises.py

@@ -39,6 +39,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 /dist/
+/runner-public/
 .vinext/
 .cloudflare/
 

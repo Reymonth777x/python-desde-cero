@@ -44,6 +44,43 @@ test.describe('Seguridad y ejecución real', () => {
     await expect(example.locator('pre')).toContainText('WORKER_OK', { timeout: 60000 });
   });
 
+  test('el editor ejecuta Python desde un origen distinto y no desde el dominio de la academia', async ({ page }) => {
+    await page.goto('/');
+    const runnerFrame = page.locator('iframe[title="Entorno de ejecución Python aislado"]');
+    const appOrigin = await page.evaluate(() => window.location.origin);
+
+    const example = page.locator('#ejemplo');
+    await example.scrollIntoViewIfNeeded();
+    await example.locator('textarea').fill('import js\nprint("WORKER_OK")\nprint(js.self.location.origin)');
+    await example.getByRole('button', { name: 'Ejecutar' }).click();
+    await expect(example.locator('pre')).toContainText('WORKER_OK', { timeout: 60000 });
+
+    await expect(runnerFrame).toHaveAttribute('src', /127\.0\.0\.1:8788/);
+    const sandboxOrigin = await runnerFrame.evaluate((element) => {
+      const frame = element as HTMLIFrameElement;
+      return new URL(frame.src).origin;
+    });
+    expect(sandboxOrigin).toBe('http://127.0.0.1:8788');
+    expect(sandboxOrigin).not.toBe(appOrigin);
+    await expect(example.locator('pre')).toContainText(sandboxOrigin, { timeout: 60000 });
+    await expect(example.locator('pre')).not.toContainText(appOrigin);
+  });
+
+  test('ignora mensajes globales falsificados desde Python y solo acepta el canal privado', async ({ page }) => {
+    await page.goto('/');
+    const example = page.locator('#ejemplo');
+    await example.scrollIntoViewIfNeeded();
+    await example.locator('textarea').fill([
+      'import js',
+      'forged = js.JSON.parse(\'{"id": 1, "status": "success", "output": "FORGED_OUTPUT"}\')',
+      'js.self.postMessage(forged)',
+      'print("REAL_OUTPUT")',
+    ].join('\n'));
+    await example.getByRole('button', { name: 'Ejecutar' }).click();
+    await expect(example.locator('pre')).toContainText('REAL_OUTPUT', { timeout: 60000 });
+    await expect(example.locator('pre')).not.toContainText('FORGED_OUTPUT');
+  });
+
   test('el Worker limita la salida visible de programas grandes', async ({ page }) => {
     await page.goto('/');
     const example = page.locator('#ejemplo');

@@ -33,6 +33,9 @@ export default function PortadaLab({
     turtleCommands,
     isRunning,
     runCode: runWorkerCode,
+    sandboxFrameRef,
+    handleSandboxFrameLoad,
+    handleSandboxFrameError,
   } = usePythonWorker();
 
   const runCode = useCallback(() => {
@@ -63,6 +66,18 @@ export default function PortadaLab({
       aria-label="Laboratorio de Python"
       className="overflow-hidden border border-[var(--theme-border)] bg-[var(--theme-surface)] shadow-[6px_7px_0_var(--theme-shadow)]"
     >
+      <iframe
+        ref={sandboxFrameRef}
+        onLoad={handleSandboxFrameLoad}
+        onError={handleSandboxFrameError}
+        title="Entorno de ejecución Python aislado"
+        aria-hidden="true"
+        tabIndex={-1}
+        sandbox="allow-scripts allow-same-origin"
+        referrerPolicy="no-referrer"
+        loading="eager"
+        className="pointer-events-none absolute -left-[10000px] top-0 h-px w-px overflow-hidden border-0 opacity-0"
+      />
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] px-4 py-3">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5" aria-hidden="true">
