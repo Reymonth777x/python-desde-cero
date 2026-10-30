@@ -7,14 +7,14 @@ describe('catálogo público del curso', () => {
     const extensions = courseCatalog.filter((courseModule) => courseModule.optional);
 
     expect(core).toHaveLength(4);
-    expect(core.reduce((total, courseModule) => total + courseModule.lessons.length, 0)).toBe(30);
+    expect(core.reduce((total, courseModule) => total + courseModule.lessons.length, 0)).toBe(32);
     expect(extensions).toHaveLength(1);
     expect(extensions[0].lessons).toHaveLength(4);
   });
 
   it('solo publica metadatos de navegación, nunca respuestas ni soluciones', () => {
     const allowedModuleKeys = new Set(['id', 'number', 'title', 'summary', 'lessons', 'optional']);
-    const allowedLessonKeys = new Set(['id', 'section', 'title', 'assessment']);
+    const allowedLessonKeys = new Set(['id', 'section', 'title', 'assessment', 'finalProject', 'finalAssessment']);
 
     for (const courseModule of courseCatalog) {
       for (const key of Object.keys(courseModule)) {
