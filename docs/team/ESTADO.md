@@ -25,9 +25,9 @@
 - El proyecto final obligatorio es `b4-l10` (gestor de inventario). Incluye seis casos automáticos de ejecución y una revisión conceptual que requiere al menos 75%.
 - El examen final PE1 es `b4-l11`, con doce preguntas y mínimo de 75%.
 - Los prerrequisitos se comprueban tanto en la navegación del servidor como dentro del calificador privado de Supabase: examen anterior de módulo, evaluación del módulo 3 antes del proyecto, y proyecto aprobado antes del examen final.
-- Mejoras pedagógicas ya integradas y publicadas: demostración inicial más clara en `b1-l1`–`b1-l3` (PR #57), conversiones y variables en `b2-l4` (PR #41), operadores y desplazamientos bit a bit en `b3-l2` (PR #48 y #63), Bubble Sort guiado en `b3-l7` (PR #45), matrices y bucles anidados en `b3-l9` (PR #52), contador real de pruebas del proyecto (PR #55), y corrección de saltos de línea en `b3-l6` (PR #65).
+- Mejoras pedagógicas ya integradas y publicadas: demostración inicial en `b1-l1`–`b1-l3` (PR #57), variables/conversiones en `b2-l4` (PR #41), operadores y desplazamientos bit a bit en `b3-l2` (PR #48 y #63), Bubble Sort en `b3-l7` (PR #45), matrices y bucles anidados en `b3-l9` (PR #52), contador de pruebas del proyecto (PR #55), saltos de línea en `b3-l6` (PR #65), cobertura de límites para decisiones y ciclos (PR #77) y práctica de `break`/`continue` (PR #80). El PR #82 ejecuta automáticamente las soluciones de código contra los casos declarados.
 - Las PR #52, #55, #57, #63, #65 y #66 siguen incluidas en producción. También se publicaron las PR #77, #78, #80, #81 y #82. El PR #81 devuelve el foco al activador al cerrar el diálogo de temas; las pruebas de navegador verifican el diálogo a 320, 360 y 390 px, su contención dentro del viewport, el desplazamiento vertical y el ciclo de foco. Esto no sustituye la pasada manual en un teléfono físico.
-- La revisión integral de las 33 unidades y la ampliación de cobertura para ejercicios con entradas límite siguen pendientes.
+- Sigue pendiente la revisión pedagógica integral de las 33 unidades (progresión, claridad, repeticiones y adecuación al nivel). La suite automatizada ya ejecuta las 36 actividades de código contra 52 casos declarados, pero la revisión humana del contenido y la ampliación de casos límite específicos todavía deben completarse.
 
 ## Supabase y seguridad de evaluaciones
 
