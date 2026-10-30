@@ -228,4 +228,23 @@ describe('ruta de aprendizaje Python desde cero', () => {
     expect(result.passed).toBe(true);
     expect(result.score).toBe(100);
   });
+
+  it('guía bubble sort con una pasada manual antes del ejercicio completo', () => {
+    const lesson = courseModules
+      .find((courseModule) => courseModule.id === 'module-3')!
+      .lessons.find((item) => item.id === 'b3-l7')!;
+    const explanation = lesson.explanation.join(' ');
+    const onePass = lesson.example.split('# Una pasada de bubble sort\\n')[1] ?? '';
+
+    expect(explanation).toContain('una sola pasada');
+    expect(explanation).toContain('range(len(numeros) - 1 - pasada)');
+    expect(onePass).toContain('for indice in range(len(numeros) - 1):');
+    expect(onePass).toContain('if numeros[indice] > numeros[indice + 1]:');
+    expect(onePass).not.toContain('.sort()');
+    expect(onePass).not.toContain('sorted(');
+    expect(lesson.exampleOutput).toContain('[2, 4, 5]');
+    expect(lesson.exercise.starterCode).toContain('for pasada in range(len(numeros) - 1):');
+    expect(lesson.exercise.hints).toHaveLength(4);
+  });
+
 });
