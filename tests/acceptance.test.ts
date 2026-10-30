@@ -60,6 +60,35 @@ test.describe('Ejemplos de portada', () => {
   });
 });
 
+  test('acepta el ejemplo Turtle con Screen, shape y done', async ({ page }) => {
+    await page.goto('/');
+
+    const lab = page.locator('#ejemplo');
+    const editor = lab.getByRole('textbox', { name: 'Código Python' });
+    await editor.fill([
+      'import turtle',
+      'ventana = turtle.Screen()',
+      'ventana.title("Ejemplo con Turtle - Python")',
+      'ventana.bgcolor("white")',
+      't = turtle.Turtle()',
+      't.shape("turtle")',
+      't.color("blue")',
+      't.pensize(3)',
+      'for _ in range(4):',
+      '    t.forward(100)',
+      '    t.right(90)',
+      'turtle.done()',
+    ].join('\\n'));
+
+    const ejecutar = lab.getByRole('button', { name: 'Ejecutar', exact: true });
+    await ejecutar.click();
+
+    const canvas = lab.getByRole('img', { name: 'Resultado gráfico de Turtle' });
+    await expect(canvas).toBeVisible({ timeout: 90_000 });
+    await expect(canvas.locator('line')).toHaveCount(4);
+    await expect(ejecutar).toBeEnabled({ timeout: 90_000 });
+  });
+
 test.describe('Turtle y fondo', () => {
   test('el ejemplo Árbol fractal ejecuta Python y dibuja el SVG', async ({ page }) => {
     await page.goto('/');
