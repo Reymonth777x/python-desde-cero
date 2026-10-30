@@ -12,7 +12,7 @@ type Props = {
 export function TurnstileWidget({ siteKey, action = 'login' }: Props) {
   const widgetRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [captchaToken, setCaptchaToken] = useState('');
   const [isReady, setIsReady] = useState(
     () => typeof window !== 'undefined' && Boolean(window.turnstile),
   );
@@ -87,18 +87,18 @@ export function TurnstileWidget({ siteKey, action = 'login' }: Props) {
         sitekey: siteKey,
         action,
         callback: (token: string) => {
-          if (inputRef.current) inputRef.current.value = token;
+          setCaptchaToken(token);
           setStatus('verified');
         },
         'expired-callback': () => {
-          if (inputRef.current) inputRef.current.value = '';
+          setCaptchaToken('');
           setStatus('expired');
           if (widgetRef.current !== null) {
             window.turnstile?.reset(widgetRef.current);
           }
         },
         'error-callback': () => {
-          if (inputRef.current) inputRef.current.value = '';
+          setCaptchaToken('');
           setStatus('error');
         },
       });
@@ -139,10 +139,10 @@ export function TurnstileWidget({ siteKey, action = 'login' }: Props) {
         </p>
       )}
       <input
-        ref={inputRef}
         type="hidden"
         name="captchaToken"
-        defaultValue=""
+        value={captchaToken}
+        readOnly
       />
     </div>
   );
