@@ -45,7 +45,6 @@ export function usePythonWorker({
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const executeRef = useRef<(request: ExecutionRequest) => void>(() => {});
   const callbacksRef = useRef({ onStatusChange, onOutput });
-  callbacksRef.current = { onStatusChange, onOutput };
 
   const [workerState, setWorkerState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [output, setOutput] = useState('');
@@ -57,7 +56,13 @@ export function usePythonWorker({
     process.env.NEXT_PUBLIC_PYTHON_RUNNER_ORIGIN,
     typeof window === 'undefined' ? '' : window.location.origin,
   );
-  runnerOriginRef.current = configuredRunnerOrigin;
+  useEffect(() => {
+    callbacksRef.current = { onStatusChange, onOutput };
+  }, [onStatusChange, onOutput]);
+
+  useEffect(() => {
+    runnerOriginRef.current = configuredRunnerOrigin;
+  }, [configuredRunnerOrigin]);
 
   const clearInitializationTimeout = useCallback(() => {
     if (initializationTimeoutRef.current !== null) {
