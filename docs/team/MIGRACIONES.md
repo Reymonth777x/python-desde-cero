@@ -147,3 +147,17 @@ Consulta de solo lectura posterior al despliegue del 30-10-2026:
 La consulta de `list_branches` al proyecto `nuqydanbbgqcofcftshk` devuelve una rama preview llamada `main`, ID `82612040-2379-41e3-8f76-100fadca6a2c`, con `status = MIGRATIONS_FAILED` y `preview_project_status = ACTIVE_HEALTHY`. El proyecto separado `python-desde-cero-dev` (`fcwbkkivelsipqqrbpya`) está `ACTIVE_HEALTHY`; no confundir ambos recursos.
 
 No resetear, rebasar, fusionar ni eliminar la rama preview como solución rápida. Primero identificar qué migración falla, comparar su historial con producción y valorar si la rama puede repararse sin perder datos de preview. Esta incidencia no justifica ejecutar operaciones de migración en la base principal.
+
+
+## 028 — Retirar el RPC de evaluación heredado (30-10-2026)
+
+La auditoría encontró que producción conservaba `public.submit_quiz` y `private.submit_quiz_authoritative` con `EXECUTE` para `authenticated`. Esa ruta antigua usaba `correct_option` (índice histórico), devolvía el arreglo `answerCorrect` y no aplicaba los prerrequisitos añadidos al calificador v2. Como 29 de las 67 claves actuales tienen un índice distinto entre legacy y v2, un estudiante podía intentar el RPC heredado directamente en lugar de usar el flujo actual.
+
+- Archivo canónico: `supabase/migrations/20261030174256_revoke_legacy_quiz_rpc_execution.sql`.
+- Producción registra `20261030174256`; DEV registra `20261030174245`. El nombre y el SQL son iguales; Supabase asignó timestamps distintos por entorno.
+- La migración revoca `EXECUTE` de `PUBLIC`, `anon`, `authenticated` y `service_role` sobre el calificador heredado y su wrapper público, si existen.
+- No elimina las definiciones, claves antiguas, intentos, invitaciones ni progreso. En DEV, donde la función privada heredada no existe y `public.submit_quiz` ya reenvía a v2, no se revoca el wrapper vigente.
+- Verificación de solo lectura posterior: las dos funciones heredadas en producción ya no son ejecutables por `anon`, `authenticated`, `service_role` ni `PUBLIC`; `public.submit_quiz_v2` y `private.submit_quiz_authoritative_v2` siguen disponibles para authenticated. Los conteos de datos se mantienen: 10 perfiles, 2 invitaciones, 22 progresos, 16 intentos y 110 filas de claves históricas/actuales.
+- Verificador repetible: `scripts/sql/verify-legacy-quiz-rpc-closed.sql`.
+
+No volver a conceder `EXECUTE` a la ruta heredada. La aplicación usa `submit_quiz_v2` exclusivamente.
