@@ -28,6 +28,17 @@ PE1 no debe mezclarse con contenidos propios de Python Essentials 2. La alineaci
 
 El módulo 5 está marcado explícitamente como opcional. Incluye lectura/escritura de archivos y un gestor de inventario. Es una extensión posterior al PE1, no un quinto módulo oficial ni un requisito para completar la ruta principal. No se debe sumar al porcentaje de finalización PE1.
 
+### Medición inicial de calidad didáctica
+
+- Las 30 unidades principales tienen una práctica ejecutable.
+- En la auditoría inicial, 29 de las 30 prácticas tenían un solo caso automático; la práctica b3-l6 se amplió a tres entradas (varios valores, un solo valor y valores negativos).
+- El catálogo principal contiene 39 preguntas conceptuales: la mayoría de las lecciones regulares solo tiene una pregunta.
+- Las tres evaluaciones formales actuales tienen 5, 3 y 3 preguntas respectivamente; el módulo 1 no tiene una evaluación formal.
+- Esto no alcanza todavía el estándar de calidad definido abajo. Las prácticas restantes necesitan casos límite adecuados a cada objetivo y las evaluaciones requieren más preguntas de lectura, razonamiento y depuración.
+
+En el módulo 3 se corrigió la progresión: comparaciones → decisiones → while → for → listas simples → modificación/ordenamiento → operadores lógicos y bit a bit → evaluación → laboratorio integrador. La primera lección de listas ahora trabaja listas unidimensionales; las listas anidadas quedan para el laboratorio integrador, después de practicar índices y recorridos.
+
+
 ## Hallazgos que deben corregirse
 
 ### 1. Módulo 1: falta el cierre evaluativo
