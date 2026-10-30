@@ -1,5 +1,7 @@
 'use server';
 
+import { randomBytes } from 'node:crypto';
+
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 
@@ -14,7 +16,7 @@ export async function listInvitations() {
     .eq('id', user.id)
     .single();
 
-  if (!profile?.is_admin) redirect('/estudiante');
+  if (!profile?.is_admin) redirect('/academia');
 
   const { data: invitations, error } = await supabase
     .from('invitations')
@@ -43,10 +45,10 @@ export async function createInvitation(formData: FormData) {
 
   if (!profile?.is_admin) redirect('/estudiante');
 
-  const code = String(formData.get('code') ?? '').trim().toUpperCase();
+  const submittedCode = String(formData.get('code') ?? '').trim().toUpperCase();
+  const code = submittedCode || randomBytes(8).toString('hex').toUpperCase();
   const rawExpiresAt = String(formData.get('expires_at') ?? '').trim();
 
-  if (!code) return { error: 'El código de invitación es requerido' };
   if (!/^[A-F0-9]{16}$/.test(code)) {
     return { error: 'El código debe tener 16 caracteres hexadecimales' };
   }
@@ -56,12 +58,13 @@ export async function createInvitation(formData: FormData) {
     is_used: boolean;
     used_by: null;
     created_by: string;
-    expires_at?: string;
+    expires_at: string;
   } = {
     code,
     is_used: false,
     used_by: null,
     created_by: user.id,
+    expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
   };
 
   if (rawExpiresAt) {
