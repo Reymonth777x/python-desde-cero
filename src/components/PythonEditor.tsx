@@ -41,6 +41,7 @@ export default function PythonEditor({
   const onTestsCompleteRef = useRef(onTestsComplete);
   const [testProgress, setTestProgress] = useState<TestProgress | null>(null);
   const [testResult, setTestResult] = useState<ExerciseTestResult | null>(null);
+  const [isTesting, setIsTesting] = useState(false);
 
   useEffect(() => {
     onTestsCompleteRef.current = onTestsComplete;
@@ -61,6 +62,7 @@ export default function PythonEditor({
       testBatchRef.current = null;
       const result = { allPassed: passedCount === total, passed: passedCount, total };
       setTestResult(result);
+      setIsTesting(false);
       onTestsCompleteRef.current?.(result);
       return;
     }
@@ -156,6 +158,7 @@ export default function PythonEditor({
       testBatchRef.current = { code, cases, index: 0, passed: 0 };
       setTestProgress({ completed: 0, passed: 0, total: cases.length });
       setTestResult(null);
+      setIsTesting(true);
       onTestsCompleteRef.current?.({ allPassed: false, passed: 0, total: cases.length });
       runWorkerCode(code, cases[0].input);
       return;
@@ -177,6 +180,7 @@ export default function PythonEditor({
     testBatchRef.current = null;
     const result = { allPassed: false, passed: testProgress?.passed ?? 0, total: batch.cases.length };
     setTestResult(result);
+    setIsTesting(false);
     onTestsCompleteRef.current?.(result);
   }, [testProgress, workerState]);
 
@@ -185,6 +189,7 @@ export default function PythonEditor({
     testBatchRef.current = null;
     setTestProgress(null);
     setTestResult(null);
+    setIsTesting(false);
     onTestsCompleteRef.current?.({ allPassed: false, passed: 0, total: tests.length });
   }, [tests]);
 
@@ -192,6 +197,7 @@ export default function PythonEditor({
     if (testBatchRef.current && tests?.length) {
       testBatchRef.current = null;
       setTestProgress(null);
+      setIsTesting(false);
       const result = { allPassed: false, passed: testResult?.passed ?? 0, total: tests.length };
       setTestResult(result);
       onTestsCompleteRef.current?.(result);
@@ -340,7 +346,7 @@ export default function PythonEditor({
         <button
           type="button"
           onClick={runCode}
-          disabled={isRunning || workerState === 'loading'}
+          disabled={isRunning || isTesting || workerState === 'loading'}
           className="flex min-h-12 w-full items-center justify-center bg-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:text-sm"
         >
           {isRunning ? 'Ejecutando...' : workerState === 'loading' ? 'Preparando Python...' : 'Ejecutar código'}
@@ -396,7 +402,7 @@ export default function PythonEditor({
           disabled={isRunning || workerState === 'loading'}
           className="mt-3 flex min-h-12 w-full items-center justify-center border border-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50 md:hidden"
         >
-          {isRunning ? 'Ejecutando...' : 'Ejecutar de nuevo'}
+          {isTesting ? 'Comprobando pruebas...' : isRunning ? 'Ejecutando...' : 'Ejecutar de nuevo'}
         </button>
         {isRunning && (
           <button
