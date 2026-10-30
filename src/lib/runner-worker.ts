@@ -16,35 +16,37 @@ type RunnerResponse =
     }
   | { status: 'error'; id: number; error: string };
 
-// El Web Worker solo existe en el navegador. Se crea al importar el módulo
-// (API imperativa del navegador, fuera del ciclo de render de React) para que
-// el componente de React no tenga que mutar valores del render ni llamar a
-// setState dentro del cuerpo de un efecto.
 let worker: Worker | null = null;
 let initError: string | null = null;
 let onRunnerMessage: ((data: RunnerResponse) => void) | null = null;
 
-if (typeof window !== 'undefined') {
+function ensureRunnerWorker(): Worker | null {
+  if (typeof window === 'undefined') return null;
+  if (worker) return worker;
+
   try {
     worker = new Worker('/python-worker.js');
-    worker.onmessage = (event: MessageEvent<RunnerResponse>) => {
-      onRunnerMessage?.(event.data);
-    };
-  } catch (err) {
-    initError = err instanceof Error ? err.message : 'No se pudo iniciar el ejecutor';
+    worker.onmessage = (event: MessageEvent<RunnerResponse>) => onRunnerMessage?.(event.data);
+    initError = null;
+  } catch (error) {
+    initError = error instanceof Error ? error.message : 'No se pudo iniciar el ejecutor';
+    worker = null;
   }
+  return worker;
 }
 
+if (typeof window !== 'undefined') ensureRunnerWorker();
+
 export function getRunnerWorker(): { worker: Worker | null; error: string | null } {
-  return { worker, error: initError };
+  return { worker: ensureRunnerWorker(), error: initError };
 }
 
 export function setRunnerMessageHandler(handler: (data: RunnerResponse) => void) {
   onRunnerMessage = handler;
 }
 
-export function postToRunner(msg: RunnerMessage) {
-  worker?.postMessage(msg);
+export function postToRunner(message: RunnerMessage) {
+  ensureRunnerWorker()?.postMessage(message);
 }
 
 export function terminateRunnerWorker() {

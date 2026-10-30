@@ -5,7 +5,8 @@ import { describe, expect, it, vi } from 'vitest';
 type TestResult = { index: number; expected: string; actual: string; passed: boolean; error?: string };
 type WorkerMessage = {
   id?: number;
-  status: 'ready' | 'init-error' | 'success' | 'error';
+  status: 'ready' | 'init-error' | 'success' | 'error' | 'result';
+  resultStatus?: 'success' | 'error';
   output?: string;
   error?: string;
   test_results?: TestResult[];
@@ -112,6 +113,25 @@ describe('Python Web Worker', () => {
         { index: 1, expected: 'Ada', passed: true },
         { index: 2, expected: 'Lin', passed: true },
       ],
+    });
+  });
+
+  it('re-emite readiness al recibir init del runner aislado', async () => {
+    const harness = createWorkerHarness();
+    await harness.self.onmessage?.({ data: { type: 'init' } });
+    expect(harness.posted.some((message) => message.status === 'ready')).toBe(true);
+  });
+
+  it('mantiene el protocolo antiguo del runner aislado', async () => {
+    const harness = createWorkerHarness();
+    await harness.self.onmessage?.({
+      data: { type: 'run', id: 12, code: 'print("Runner listo")', input: [] },
+    });
+
+    expect(harness.posted.find((message) => message.id === 12)).toMatchObject({
+      status: 'result',
+      resultStatus: 'success',
+      output: 'Runner listo\n',
     });
   });
 

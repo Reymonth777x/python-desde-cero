@@ -39,16 +39,39 @@ async function setupRunner(page: Page): Promise<RunnerHarness> {
   await page.exposeFunction('getMsgs', () => msgs);
   await page.evaluate(() => {
     window.addEventListener('message', (e) => {
-      (window as unknown as { collect: (m: unknown) => void }).collect(e.data);
+      const message = e.data as { status?: string } | null;
+      if (message && ['result', 'error', 'init-error'].includes(message.status ?? '')) {
+        (window as unknown as { collect: (m: unknown) => void }).collect(message);
+      }
     });
   });
   await page.evaluate(() => new Promise<void>((res) => {
     const ifr = document.createElement('iframe');
-    ifr.src = '/python-runner'; ifr.sandbox = 'allow-scripts';
-    ifr.style.display = 'none'; document.body.appendChild(ifr);
-    const h = (e: MessageEvent) => { if (e.data?.type === 'ready') { window.removeEventListener('message', h); res(); } };
+    ifr.sandbox = 'allow-scripts';
+    ifr.style.display = 'none';
+
+    let initInterval: ReturnType<typeof setInterval> | null = null;
+    const sendInit = () => ifr.contentWindow?.postMessage({ type: 'init' }, '*');
+    const h = (e: MessageEvent) => {
+      if (e.data?.status === 'ready') {
+        window.removeEventListener('message', h);
+        if (initInterval !== null) clearInterval(initInterval);
+        res();
+      }
+    };
+
     window.addEventListener('message', h);
-    setTimeout(() => { window.removeEventListener('message', h); res(); }, 15000);
+    ifr.addEventListener('load', () => {
+      sendInit();
+      initInterval = setInterval(sendInit, 250);
+    });
+    ifr.src = '/python-runner';
+    document.body.appendChild(ifr);
+    setTimeout(() => {
+      window.removeEventListener('message', h);
+      if (initInterval !== null) clearInterval(initInterval);
+      res();
+    }, 15000);
   }));
   const run = (code: string, input: string[] = []) => {
     page.evaluate(
@@ -56,7 +79,7 @@ async function setupRunner(page: Page): Promise<RunnerHarness> {
         const ifrs = document.querySelectorAll('iframe[src="/python-runner"]');
         const ifr = ifrs[ifrs.length - 1] as HTMLIFrameElement | null;
         if (ifr?.contentWindow) {
-          ifr.contentWindow.postMessage({ type: 'run', code: c, input: i }, window.location.origin);
+          ifr.contentWindow.postMessage({ type: 'run', code: c, input: i }, '*');
         }
       },
       { c: code, i: input },

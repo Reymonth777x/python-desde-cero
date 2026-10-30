@@ -6,10 +6,8 @@ const MAX_INPUT_LINES = 20;
 const MAX_INPUT_LINE_LENGTH = 1000;
 const MAX_TEST_CASES = 10;
 
-let pyodideReadyPromise = loadPyodide({ indexURL: "/pyodide/0.29.5/full/" });
 let turtleLoaded = false;
-
-pyodideReadyPromise
+let pyodideReadyPromise = loadPyodide({ indexURL: "/pyodide/0.29.5/full/" })
   .then(async (pyodide) => {
     try {
       const response = await fetch("/turtle_compat.py");
@@ -20,11 +18,15 @@ pyodideReadyPromise
       console.warn("No se pudo cargar el módulo Turtle:", error);
     }
     self.postMessage({ status: "ready" });
-  })
-  .catch((error) => self.postMessage({
+    return pyodide;
+  });
+
+pyodideReadyPromise.catch((error) => {
+  self.postMessage({
     status: "init-error",
     error: error?.message || "No se pudo cargar Pyodide.",
-  }));
+  });
+});
 
 function normalized(value) {
   return String(value ?? "").replace(/\r\n/g, "\n").trimEnd();
@@ -78,13 +80,33 @@ async function readTurtleCommands(pyodide) {
 }
 
 self.onmessage = async (event) => {
-  const { id, code, input, tests } = event.data ?? {};
+  const request = event.data ?? {};
+  const legacyRunnerRequest = request.type === "run";
+
+  // The isolated /python-runner iframe uses { type: "init" | "run" }.
+  // The Academy editor uses the direct { code, input, tests } protocol.
+  if (request.type === "init") {
+    try {
+      await pyodideReadyPromise;
+      self.postMessage({ status: "ready" });
+    } catch (error) {
+      self.postMessage({ status: "init-error", error: error?.message || "No se pudo cargar Pyodide." });
+    }
+    return;
+  }
+
+  const { id, code, input, tests } = request;
+  const sendRequestError = (message) => {
+    if (legacyRunnerRequest) self.postMessage({ status: "error", id, error: message });
+    else self.postMessage({ id, status: "error", error: message });
+  };
+
   if (typeof code !== "string") {
-    self.postMessage({ id, status: "error", error: "El código recibido no es válido." });
+    sendRequestError("El código recibido no es válido.");
     return;
   }
   if (code.length > MAX_CODE_LENGTH) {
-    self.postMessage({ id, status: "error", error: `El programa supera el límite de ${MAX_CODE_LENGTH} caracteres.` });
+    sendRequestError(`El programa supera el límite de ${MAX_CODE_LENGTH} caracteres.`);
     return;
   }
 
@@ -131,14 +153,28 @@ self.onmessage = async (event) => {
     const turtleCommands = await readTurtleCommands(pyodide);
     let output = result.output;
     if (result.truncated) output += "\n[Salida limitada para proteger el navegador.]";
-    self.postMessage({
-      id,
-      status: result.error ? "error" : "success",
-      output,
-      error: result.error || undefined,
-      turtle_commands: turtleCommands,
-    });
+
+    if (legacyRunnerRequest) {
+      self.postMessage({
+        status: "result",
+        id,
+        resultStatus: result.error ? "error" : "success",
+        output,
+        ...(result.error ? { error: result.error } : {}),
+        turtle_commands: turtleCommands,
+      });
+    } else {
+      self.postMessage({
+        id,
+        status: result.error ? "error" : "success",
+        output,
+        error: result.error || undefined,
+        turtle_commands: turtleCommands,
+      });
+    }
   } catch (error) {
-    self.postMessage({ id, status: "error", error: error?.message || String(error) });
+    const message = error?.message || String(error);
+    if (legacyRunnerRequest) self.postMessage({ status: "error", id, error: message });
+    else self.postMessage({ id, status: "error", error: message });
   }
 };
