@@ -2466,15 +2466,15 @@ export const courseModules: CourseModule[] = [
             "explanation": "La división entera devuelve la parte entera del cociente."
           },
           {
-            "prompt": "¿Qué devuelve input() antes de convertir el valor?",
+            "prompt": "¿Qué muestra print(f\"Total: {precio:.2f}\") si precio = 1250.5?",
             "options": [
-              "Un diccionario",
-              "Un entero",
-              "Un booleano",
-              "Una cadena de texto"
+              "Total: 1250.5",
+              "Total: 1250.50",
+              "Total: {precio:.2f}",
+              "Error: las f-strings no admiten decimales"
             ],
-            "answer": 3,
-            "explanation": "input() entrega texto aunque se escriban dígitos."
+            "answer": 1,
+            "explanation": "El formato :.2f muestra dos posiciones decimales, así que 1250.5 se presenta como 1250.50."
           },
           {
             "prompt": "¿Qué resultado tiene 8 >= 8?",
