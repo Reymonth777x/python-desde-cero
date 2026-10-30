@@ -41,10 +41,15 @@ test.describe('Autenticacion y flujo de usuario', () => {
     await expect(page).toHaveURL(/.*\/login/);
   });
 
-  test('Login conserva el correo y limpia la contraseña cuando falta el token de Turnstile', async ({ page }) => {
-    await page.route('https://challenges.cloudflare.com/turnstile/**', (route) => route.abort());
+  test('Login conserva el correo, limpia la contraseña y reintenta Turnstile si no carga', async ({ page }) => {
+    let widgetRequests = 0;
+    await page.route('https://challenges.cloudflare.com/turnstile/**', async (route) => {
+      widgetRequests += 1;
+      await route.abort();
+    });
     await page.goto('/login');
 
+    await expect(page.getByText(/No se pudo cargar la verificación/)).toBeVisible();
     await page.getByLabel('Correo electrónico').fill('captcha-test@example.test');
     await page.getByLabel('Contraseña').fill('temporary-password');
 
@@ -53,6 +58,7 @@ test.describe('Autenticacion y flujo de usuario', () => {
     await expect(page.getByRole('alert').filter({ hasText: /conservamos tu correo/ })).toBeVisible();
     await expect(page.getByLabel('Correo electrónico')).toHaveValue('captcha-test@example.test');
     await expect(page.getByLabel('Contraseña')).toHaveValue('');
+    await expect.poll(() => widgetRequests).toBeGreaterThanOrEqual(2);
   });
 
   test('Mensaje de error se muestra tras inicio de sesion fallido', async ({ page }) => {
