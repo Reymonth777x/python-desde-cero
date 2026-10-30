@@ -48,8 +48,8 @@
 
 ## Bloqueos y próximos pasos
 
-1. Esperar CI verde y publicación del HEAD `4f5cface...`; confirmar en producción que `b3-l9`, los ejemplos introductorios y el texto del proyecto final corresponden a esa versión.
-2. Verificar el primer deploy exitoso del HEAD `71fa854` y confirmar en el log que ambas comparaciones SHA del workflow anti-stale pasan; comprobar después el hero `cambio.py`, la muestra, sitemap, Turnstile y `www` 308.
+1. Verificar con una cuenta autenticada que el alumno ve la versión desplegada de `b3-l9` y el proyecto `b4-l10` con sus seis casos y prerrequisitos; confirmar que la nota y el progreso sobreviven al cierre de sesión.
+2. Mantener la verificación anti-stale en futuros despliegues. En el release `71fa854`, las comparaciones SHA antes y después del build pasaron junto con la portada `cambio.py`, `/muestra`, sitemap, marcador Turnstile y `www` HTTP 308.
 3. Completar pruebas manuales de Auth/Turnstile con un buzón controlado, sin compartir contraseñas ni Secret keys.
 4. Probar evaluación, progreso y prerrequisitos con dos estudiantes y un administrador; verificar que una evaluación no aprobada no complete la unidad y que los resultados sobrevivan al cierre de sesión.
 5. Activar la protección de contraseñas filtradas en Supabase Auth; el Advisor de Auth la reportó desactivada.
