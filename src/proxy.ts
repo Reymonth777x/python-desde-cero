@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const LEARNING_PREFIXES = ['/practica', '/academia', '/estudiante', '/docente'];
+const LEARNING_PREFIXES = ['/practica', '/academia'];
 
 function matchesPrefix(pathname: string, prefix: string) {
   return pathname === prefix || pathname.startsWith(`${prefix}/`);
