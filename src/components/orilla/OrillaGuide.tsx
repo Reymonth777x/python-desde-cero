@@ -73,7 +73,7 @@ export default function OrillaGuide({ chapterId, ayuda, verbos, builtins, onUseE
             <div className="flex items-center justify-between border-b border-white/10 px-3 py-2"><span className="text-[0.63rem] font-bold tracking-[0.15em] text-[#84cbb8]">EJEMPLO PEQUEÑO</span><span className="text-[0.62rem] text-[#83a9b2]">PYTHON</span></div>
             <pre className="overflow-x-auto p-3 font-mono text-[0.78rem] leading-6 text-[#d8f7e9]"><code>{leccion.ejemplo}</code></pre>
           </div>
-          <details className="rounded-xl border border-[#b6d1c4] bg-white/60 p-3 dark:border-[#315b50] dark:bg-black/10">
+          <details className="rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] p-3">
             <summary className="min-h-10 cursor-pointer py-2 text-sm font-semibold">🧠 Comprueba lo que aprendiste</summary>
             <p className="mt-2 text-sm font-semibold">{leccion.pregunta}</p>
             <details className="mt-2 rounded-lg bg-[var(--theme-surface)] p-2">
@@ -89,8 +89,8 @@ export default function OrillaGuide({ chapterId, ayuda, verbos, builtins, onUseE
           <p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-[var(--theme-accent)]">Una pista para avanzar</p>
           <p className="mt-1 text-sm leading-6 text-[var(--theme-ink)]">{guia.pista}</p>
         </div>
-        <div className="rounded-2xl border border-[#d6bd83] bg-[#fff8e7] p-3 text-[#4b3a1c] dark:border-[#68532e] dark:bg-[#302719] dark:text-[#f5e7c6] sm:p-4">
-          <p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-[#896321] dark:text-[#f0ca78]">✨ Desafío de curiosidad</p>
+        <div className="rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-warning-light)] p-3 text-[var(--theme-ink)] sm:p-4">
+          <p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-[var(--theme-warning)]">✨ Desafío de curiosidad</p>
           <p className="mt-1 text-sm leading-6">{leccion.reto}</p>
           <p className="mt-1 text-xs opacity-75">Es opcional: sirve para practicar un poco más, sin bloquear tu avance.</p>
         </div>
