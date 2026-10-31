@@ -78,19 +78,15 @@ export default function PortadaLab({
         loading="eager"
         className="pointer-events-none absolute -left-[10000px] top-0 h-px w-px overflow-hidden border-0 opacity-0"
       />
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] px-4 py-3">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5" aria-hidden="true">
-            <span className="h-2.5 w-2.5 rounded-full bg-[var(--theme-error)]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[var(--theme-warning)]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[var(--theme-success)]" />
-          </div>
-          <span className="font-mono text-[10px] font-semibold tracking-[0.15em] text-[var(--theme-muted)]">
-            PYTHON DESDE CERO / LAB
-          </span>
+      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] px-4 py-4">
+        <div className="min-w-0">
+          <h2 className="text-base font-semibold text-[var(--theme-ink)]">Laboratorio de Python</h2>
+          <p className="mt-1 text-sm leading-5 text-[var(--theme-muted)]">
+            Escribe un programa, ejecútalo y observa qué sucede.
+          </p>
         </div>
-        <span className="inline-flex items-center gap-2 font-mono text-[10px] text-[var(--theme-muted)]" role="status" aria-live="polite">
-          <span className={`h-1.5 w-1.5 rounded-full ${workerState === 'ready' ? 'bg-[var(--theme-success)]' : workerState === 'error' ? 'bg-[var(--theme-error)]' : 'bg-[var(--theme-warning)]'}`} />
+        <span className="inline-flex min-h-9 shrink-0 items-center gap-2 text-xs text-[var(--theme-muted)]" role="status" aria-live="polite">
+          <span className={`h-2 w-2 rounded-full ${workerState === 'ready' ? 'bg-[var(--theme-success)]' : workerState === 'error' ? 'bg-[var(--theme-error)]' : 'bg-[var(--theme-warning)]'}`} />
           {statusLabel}
         </span>
       </header>
@@ -98,7 +94,7 @@ export default function PortadaLab({
       <div className="grid min-w-0 lg:grid-cols-2">
         <div className="flex min-w-0 flex-col border-b border-[var(--theme-border)] lg:border-b-0 lg:border-r">
           <div className="flex items-center justify-between border-b border-[var(--theme-border)] px-4 py-3">
-            <h3 className="text-xs font-semibold text-[var(--theme-ink)]">01 / Editor</h3>
+            <h3 className="text-sm font-semibold text-[var(--theme-ink)]">Código</h3>
             <span className="font-mono text-[10px] text-[var(--theme-muted)]">.py</span>
           </div>
 
@@ -115,21 +111,21 @@ export default function PortadaLab({
           />
 
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--theme-border)] bg-[var(--theme-bg)] px-4 py-3">
-            <p className="text-[10px] text-[var(--theme-muted)]">Edita el ejemplo y ejecútalo.</p>
+            <p className="text-sm leading-5 text-[var(--theme-muted)]">Edita el ejemplo y pulsa Ejecutar para ver el resultado.</p>
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setCode(defaultCode)}
-                className="inline-flex min-h-10 items-center border border-[var(--theme-border)] px-3 text-xs font-semibold text-[var(--theme-muted)] transition-colors hover:bg-[var(--theme-bg-secondary)] hover:text-[var(--theme-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"
+                className="inline-flex min-h-12 items-center justify-center border border-[var(--theme-border)] px-4 text-sm font-semibold text-[var(--theme-muted)] transition-colors hover:bg-[var(--theme-bg-secondary)] hover:text-[var(--theme-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"
               >
-                Restaurar
+                Restaurar ejemplo
               </button>
               <button
                 type="button"
                 aria-label="Ejecutar"
                 onClick={runCode}
                 disabled={isRunning || workerState === 'loading'}
-                className="inline-flex min-h-10 items-center gap-2 bg-[var(--theme-accent)] px-4 text-xs font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex min-h-12 items-center justify-center gap-2 bg-[var(--theme-accent)] px-5 text-sm font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isRunning ? 'Ejecutando...' : 'Ejecutar'}
                 <span aria-hidden="true">↗</span>
@@ -140,9 +136,9 @@ export default function PortadaLab({
 
         <div className="flex min-w-0 flex-col">
           <div className="flex items-center justify-between border-b border-[var(--theme-border)] px-4 py-3">
-            <h3 className="text-xs font-semibold text-[var(--theme-ink)]">02 / Resultado</h3>
+            <h3 className="text-sm font-semibold text-[var(--theme-ink)]">Resultado</h3>
             <span className="font-mono text-[10px] text-[var(--theme-muted)]">
-              {turtleCommands.length > 0 ? `${turtleCommands.length} comandos gráficos` : 'SALIDA'}
+              {turtleCommands.length > 0 ? `${turtleCommands.length} comandos gráficos` : 'Salida'}
             </span>
           </div>
 
@@ -247,7 +243,7 @@ export default function PortadaLab({
                 })}
               </svg>
               <span className="absolute bottom-3 right-3 bg-[#101b16]/80 px-2 py-1 font-mono text-[9px] tracking-[0.12em] text-[#d6e7d1]">
-                TURTLE / SVG
+                Dibujo de Python
               </span>
             </div>
           ) : (
@@ -263,15 +259,15 @@ export default function PortadaLab({
           )}
 
           <div className="border-t border-[var(--theme-border)] bg-[var(--theme-bg-secondary)]">
-            <div className="flex items-center justify-between border-b border-[var(--theme-border)] px-4 py-2">
-              <span className="font-mono text-[10px] tracking-[0.12em] text-[var(--theme-muted)]">CONSOLA</span>
-              <span className="font-mono text-[10px] text-[var(--theme-muted)]">LOCAL / PYODIDE</span>
+            <div className="border-b border-[var(--theme-border)] px-4 py-3">
+              <h4 className="text-sm font-semibold text-[var(--theme-ink)]">Salida de texto</h4>
             </div>
             <pre
               aria-label="Salida del programa"
               aria-live="polite"
               aria-atomic="true"
-              className="max-h-36 min-h-[76px] overflow-auto whitespace-pre-wrap break-words px-4 py-3 font-mono text-xs leading-5 text-[var(--theme-ink)]"
+              role={error ? 'alert' : 'status'}
+              className={`max-h-36 min-h-[76px] overflow-auto whitespace-pre-wrap break-words px-4 py-3 font-mono text-sm leading-6 ${error ? 'text-[var(--theme-error)]' : 'text-[var(--theme-ink)]'}`}
             >
               {resultText}
             </pre>
