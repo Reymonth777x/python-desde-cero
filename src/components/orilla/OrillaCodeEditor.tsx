@@ -21,6 +21,12 @@ type Props = {
 };
 
 type Plantilla = { nombre: string; codigo: string; cursor: number };
+type PlantillaMetodo = Plantilla & { descripcion: string };
+
+const METODOS: Record<string, PlantillaMetodo> = {
+  append: { nombre: 'append', codigo: 'tallas.append(valor)', cursor: 'tallas.append('.length, descripcion: 'Añade un valor al final de la lista.' },
+  get: { nombre: 'get', codigo: 'ficha.get("clave")', cursor: 'ficha.get("'.length, descripcion: 'Busca una clave del diccionario y devuelve su valor.' },
+};
 
 const BLOQUES: Record<string, Plantilla> = {
   if: { nombre: 'if', codigo: 'if condicion:\n    ', cursor: 3 },
@@ -172,6 +178,20 @@ export default function OrillaCodeEditor({ value, onChange, verbos, builtins, co
               </button>
             ))}
           </div>
+          {metodos.length > 0 && (
+            <div className="border-t border-[var(--theme-border)] pt-2">
+              <p className="mb-2 text-xs font-semibold text-[var(--theme-muted)]">Métodos de tus datos</p>
+              <div className="flex flex-wrap gap-2">
+                {metodos.map((metodo) => (
+                  <button key={metodo.nombre} type="button" title={metodo.descripcion} onClick={() => insertar(metodo.codigo, metodo.cursor)}
+                    className="min-h-10 rounded-xl border border-[var(--theme-accent)]/50 px-3 font-mono text-xs font-semibold text-[var(--theme-accent)] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">
+                    {metodo.nombre === 'append' ? 'tallas.append(valor)' : 'ficha.get("clave")'}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-2 text-xs leading-5 text-[var(--theme-muted)]">Son ejemplos de escritura: cambia tallas, ficha, valor o clave por los nombres de tu programa.</p>
+            </div>
+          )}
           {estructuras.length > 0 && (
             <div className="border-t border-[var(--theme-border)] pt-2">
               <p className="mb-2 text-xs font-semibold text-[var(--theme-muted)]">Bloques de Python</p>
