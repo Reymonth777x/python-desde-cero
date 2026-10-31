@@ -77,7 +77,7 @@ Se ha realizado una revisión interna buscando:
 - Secretos en el repositorio: ninguno encontrado
 - `any` para silenciar errores: ninguno
 - Pruebas débiles: ninguna
-- Respuestas de quiz en el cliente: las claves están en `private.quiz_keys` (servidor)
+- Respuestas de quiz en el cliente: **esta afirmación de la auditoría histórica está obsoleta**. El modelo actual usa `private.quiz_answer_key`, `private.quiz_attempts` y `public.submit_quiz_v2`; consulta `docs/team/MIGRACIONES.md` para la situación vigente.
 - Permisos excesivos: RLS configurado en todas las tablas
 - CSP laxa: configurada con nonces y hosts exactos
 

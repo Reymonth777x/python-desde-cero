@@ -22,3 +22,7 @@ Estas variantes locales no están registradas en PROD ni DEV. Sus objetos caract
 Las tablas y columnas que estas migraciones crearían no existen en PROD ni DEV y una búsqueda del código activo no encontró consumidores. Se conservan aquí para una futura implementación deliberada, pero no se deben crear en las bases conectadas como parte de la publicación actual.
 
 El archivo `20261026083730_005_public_signup_optional_invitation.sql` se mantiene en la secuencia activa porque el alta opcional de invitación forma parte del flujo vigente y su función remota se verificó en ambos proyectos.
+
+## Generador antiguo de claves retirado
+
+El archivo `scripts/gen-quiz-keys.ts` fue eliminado porque generaba un `TRUNCATE ... CASCADE` contra `private.quiz_keys`, objeto de una variante histórica no aplicada en PROD/DEV. El modelo activo es `private.quiz_answer_key` / `private.quiz_attempts`; las claves del curso se deben cambiar mediante migraciones versionadas, comparadas con `correct_option_v2` y revisadas antes de aplicar. No restaurar el generador ni ejecutar las migraciones archivadas.
