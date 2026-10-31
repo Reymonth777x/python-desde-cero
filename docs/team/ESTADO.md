@@ -1,13 +1,13 @@
-# Estado operativo — 30 de octubre de 2026
+# Estado operativo — 31 de octubre de 2026
 
-> Este documento describe el estado comprobado de `master`, producción y Supabase. Los informes en `docs/informes/` son históricos y no sustituyen esta referencia.
+> Este documento describe el estado comprobado de `master`, producción y Supabase al 31-10-2026. Las pruebas manuales se identifican como confirmación del propietario; no se presentan como telemetría independiente.
 
 ## Repositorio y publicación
 
 - Repositorio: `Reymonth777x/python-desde-cero`; rama de producción: `master`.
-- Última publicación comprobada: HEAD de `master` `8aa31984fefcc2ad5240ab5e49fbe83a3ce1b8fd` (30-10-2026). La CI [41141197873](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41141197873) y el despliegue Cloudflare [41141443928](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41141443928) terminaron en `success`. El commit `8aa3198` actualiza README y documentación operativa; el último cambio de runtime funcional de la aplicación sigue siendo `d072f962d96a9e3deb1d5d2a7a4a8a83ebec4e21`.
-- Cloudflare Worker principal Version ID actual: `f67a7cca-49b3-4f11-ab4c-586ec970286e`.
-- PR #91 integró el ejecutor Python de origen separado. Su Worker actual es `https://python-desdecero-runner.pythondesdecero.workers.dev`, versión `e2235f5c-dfe5-4dd1-a529-e34aa607db70`.
+- Última publicación comprobada: HEAD de `master` `38533eae71f60e899949f567c30f15c99c3cbe65` (31-10-2026). La CI [41150277769](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41150277769) y el despliegue Cloudflare [41150633694](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41150633694) terminaron en `success` sobre el mismo SHA. El último cambio de runtime funcional sigue siendo `d072f962d96a9e3deb1d5d2a7a4a8a83ebec4e21`; los commits posteriores actualizan workflows/documentación.
+- Cloudflare Worker principal Version ID actual: `7b625566-1987-4f2c-9875-c369ed584e13`.
+- PR #91 integró el ejecutor Python de origen separado. Su Worker actual es `https://python-desdecero-runner.pythondesdecero.workers.dev`, versión `8cb973f4-fde5-4cce-ab25-7dba6a09ad25`.
 - La release actual se validó con 24 archivos Vitest, 168 pruebas Playwright, TypeScript, ESLint, build Next, build Vinext y `npm audit` (0 vulnerabilidades).
 - El workflow de publicación comprobó el mismo SHA de `master` antes de desplegar, verificó el origen y CSP del runner, y confirmó que `python-desdecero.com` continúa conectado al Worker principal. El smoke test de producción confirmó portada, `/muestra`, `/login` con widget Turnstile, sitemap y redirección `www` HTTP 308.
 - La CI verificó **62 casos de 36 actividades de código**, **24 archivos de pruebas Vitest** y **168 pruebas Playwright E2E**. TypeScript, ESLint, build Next, build Vinext y `npm audit` finalizaron correctamente; la auditoría de dependencias encontró **0 vulnerabilidades**. Las pruebas E2E cubren el runner de origen distinto en CI; el despliegue comprobó los assets y CSP del runner real. El propietario confirma que ya realizó satisfactoriamente la prueba interactiva en navegador, Turtle, límites/errores, Chrome, Firefox y teléfonos físicos (30-10-2026).
@@ -59,7 +59,7 @@
 ## Riesgos de repositorio y gobierno
 
 - El repositorio sigue siendo público y el código versionado contiene respuestas, explicaciones y soluciones de ejercicios. No es una filtración de credenciales, pero expone material evaluativo. La decisión de privatizarlo o mantener una copia pública saneada sigue abierta en el issue #21; no cambiar visibilidad ni reescribir historial sin decisión del propietario.
-- `master` sigue sin branch protection (`protected: false`). La integración de GitHub devuelve 403 al administrar esa configuración; el propietario debe activarla desde Settings → Branches. Seguimiento: issue #23.
+- `master` sigue sin branch protection (`protected: false`). La consulta de solo lectura confirma que los checks obligatorios no están configurados. La conexión GitHub disponible no permite administrar esta configuración; requiere una sesión propietaria con permisos de Settings. Seguimiento: issue #23.
 
 ## Bloqueos y próximos pasos
 
