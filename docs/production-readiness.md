@@ -1,16 +1,17 @@
-# Preparación para producción — 30 de octubre de 2026
+# Preparación para producción — corte del 31 de octubre de 2026
 
-**Última publicación comprobada:** `04604585d899173439f73c8a9d1975451e771200` (30-10-2026)  
-**CI de master:** [41108215559](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41108215559) — success  
-**Despliegue Cloudflare:** [41108747917](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41108747917) — success, incluido el smoke test de producción  
-**Cloudflare Worker Version ID:** `522d1b30-13fd-4bed-aefa-8395986367c4`  
-**Alcance:** GitHub, dominio público, Cloudflare Workers y dos proyectos Supabase. La función de acceso histórico quedó aplicada en PROD/DEV y la interfaz correspondiente quedó publicada mediante PR #84; no se inventaron notas ni se modificó el progreso de alumnos.
+**HEAD comprobado de `master`:** `38533eae71f60e899949f567c30f15c99c3cbe65`  
+**CI:** [41150277769](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41150277769) — success sobre el HEAD actual  
+**Despliegue Cloudflare:** [41150633694](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41150633694) — success sobre el mismo SHA  
+**Worker principal:** `7b625566-1987-4f2c-9875-c369ed584e13`  
+**Runner Python aislado:** `8cb973f4-fde5-4cce-ab25-7dba6a09ad25`  
+**Estado:** publicación técnica verificada. El propietario confirma la aceptación manual de Auth/correo, runner Python en Chrome/Firefox/teléfonos físicos y revisión de las 33 unidades. El proyecto todavía no debe declararse listo para apertura general: quedan controles de gobierno, prueba de aislamiento/persistencia entre dos estudiantes, Preview/migraciones y revisión legal.
 
 ## Dictamen
 
-**Publicado y comprobado técnicamente; todavía no aprobado como lanzamiento educativo completo.**
+**Publicado, con CI y despliegue satisfactorios. Aceptación manual del propietario registrada; lanzamiento educativo general condicionado a los controles restantes.**
 
-El release `0460458` pasó CI completo y despliegue Cloudflare. El smoke test confirmó portada, `/muestra`, `/login`, sitemap, marcador Turnstile, conexión del dominio al Worker y redirección `www` al dominio canónico. PR #84 está publicado; las pruebas reales del recorrido autenticado, correo, Turnstile interactivo y hardware móvil siguen pendientes.
+El smoke test de producción verificó portada, `/muestra`, `/login`, sitemap, asociación de los hostnames personalizados y redirección `www` → dominio raíz HTTP 308. El flujo manual de Auth/correo, las pruebas Python/Turtle en Chrome/Firefox y teléfonos físicos, y la revisión humana de las 33 unidades quedan registrados como confirmados por el propietario; no como una certificación externa independiente.
 
 ## Sitio y capacidades publicadas
 
@@ -21,7 +22,7 @@ El release `0460458` pasó CI completo y despliegue Cloudflare. El smoke test co
 - El panel administrativo ofrece gestión de invitaciones; administración de usuarios y auditoría no están disponibles en esta versión.
 - PR #54 protege los despliegues frente a workflows obsoletos verificando el SHA antes y después de compilar. El despliegue del 30-10-2026 omitió ejecuciones obsoletas y publicó finalmente el HEAD actual.
 - PR #82 ejecuta las soluciones de referencia de todas las actividades de código con 62 casos en procesos Python aislados; el examen conceptual final se excluye porque no requiere código adicional.
-- PR #81 recupera el foco al activar el cierre del selector móvil. La suite Playwright comprueba el diálogo a 320, 360 y 390 px, su encaje en pantalla, el scroll interno y el foco de teclado. Aún falta validar en un teléfono físico.
+- PR #81 recupera el foco al activar el cierre del selector móvil. La suite Playwright comprueba el diálogo a 320, 360 y 390 px, su encaje en pantalla, el scroll interno y el foco de teclado. El propietario confirma pruebas físicas del runner Python; la aceptación visual integral de paleta, editor Monaco, teclado virtual y progreso autenticado sigue separada en issue #18.
 - El smoke test externo leyó `/`, `/muestra`, `/login`, `/sitemap.xml` y `www`. El workflow también comprobó el marcador Turnstile y el redirect HTTP 308.
 
 ## Curso y correcciones recientes
@@ -30,7 +31,7 @@ El release `0460458` pasó CI completo y despliegue Cloudflare. El smoke test co
 - Evaluación M1: `b1-l4`, seis preguntas. Hello World M2: `b2-l9` (sección 2.1). Proyecto obligatorio: `b4-l10`, seis pruebas automáticas y evaluación conceptual. Examen final: `b4-l11`, doce preguntas y umbral 75%.
 - Mejoras publicadas: variables/conversiones `b2-l4`; operadores y desplazamientos `b3-l2`; Bubble Sort `b3-l7`; matrices y bucles anidados `b3-l9`; listas `b3-l6` con saltos de línea reales; excepciones `b4-l7` con `KeyError`, `ValueError`, `else` y `finally`; y explicación introductoria `b1-l1`–`b1-l3`.
 - Las fechas opcionales de invitación se interpretan según el reloj local del administrador, se convierten a un instante UTC en el navegador y se validan en el servidor; la tabla las muestra en hora local. La corrección no alteró el esquema.
-- Pendiente: revisión integral de las 33 unidades, ejemplos/salidas/casos límite y verificación autenticada de todas las pantallas educativas.
+- El propietario confirma la revisión humana de las 33 unidades obligatorias: progresión, claridad, repeticiones, nivel, ejercicios y retroalimentación (30-10-2026). La suite automatizada ejecuta 36 actividades de código contra 62 casos. Sigue pendiente la validación de evaluaciones/progreso entre dos cuentas de estudiantes y un administrador.
 
 ## Supabase — solo lectura
 
@@ -52,26 +53,25 @@ El historial remoto registra 24 migraciones en producción y 10 en DEV. La migra
 
 Producción y DEV usan PostgreSQL 17.11.0.003 y `pgcrypto` 1.3. El Advisor de seguridad de producción reporta Leaked Password Protection desactivado. La organización está en plan Free y la documentación oficial de Supabase indica que la función requiere Pro o superior; no está disponible para activar en el plan actual. Mantener los requisitos básicos de contraseña y reevaluar si se decide actualizar. Dos índices de invitaciones muestran uso no observado (INFO); no cambiarlos sin medir.
 
-## Bloqueos antes del lanzamiento educativo
+## Controles pendientes antes del lanzamiento educativo
 
 ### P0 — Gobierno y exposición del material evaluativo
 
 - El repositorio es público y el historial de `src/lib/course.ts` contiene respuestas, explicaciones y soluciones; `server-only` evita el bundle cliente, pero no impide leer el código desde GitHub.
-- Issue [#21](https://github.com/Reymonth777x/python-desde-cero/issues/21): decidir entre privatizar el repositorio o mantener una copia pública saneada. No cambiar visibilidad ni reescribir historial sin aprobación del propietario.
-- Issue [#23](https://github.com/Reymonth777x/python-desde-cero/issues/23): `master` continúa sin branch protection (`protected: false`). La integración de GitHub devuelve 403 para administrar esa configuración; el propietario debe activar PR obligatorio, una aprobación, conversaciones resueltas y checks requeridos.
+- Issue [#21](https://github.com/Reymonth777x/python-desde-cero/issues/21): preparar la privacidad del código evaluativo. Mantener la visibilidad sin cambios hasta comprobar que los tres socios tienen acceso individual; no arriesgar que pierdan el repositorio al privatizarlo.
+- Issue [#23](https://github.com/Reymonth777x/python-desde-cero/issues/23): `master` continúa sin branch protection (`protected: false`). La conexión GitHub disponible es de solo lectura para administración de reglas; la protección debe activarse con una sesión propietaria con permisos de Settings.
 
-### P1 — Auth, Turnstile y correo
+### P1 — Aislamiento de progreso y controles Auth
 
-- `/login` incluye el widget Turnstile en HTML; eso no demuestra que el desafío interactivo se complete ni que Supabase Auth valide el token/Secret key.
-- Probar con buzón controlado registro, confirmación, login, logout y recuperación/cambio de contraseña en el dominio final.
-- Probar con dos cuentas de estudiante aislamiento de datos, guardado/restauración de progreso, notas y prerrequisitos del calificador.
-- Leaked Password Protection no se puede habilitar en el plan Free; requiere Pro o superior. No considerarla una acción inmediata sin decisión de actualización.
-- Los logs de producción registraron dos respuestas `over_email_send_rate_limit` (429). La configuración del proveedor SMTP no pudo verificarse por herramientas de solo lectura. Confirmar el proveedor en Auth → SMTP; si se usa el SMTP integrado por defecto, configurar SMTP propio y después verificar SPF, DKIM, DMARC, plantillas y URLs de redirección.
+- El propietario confirma que registro, confirmación, login, logout, recuperación y cambio de contraseña funcionan. También confirma la prueba manual del runner y el desafío de acceso.
+- El conector de solo lectura no puede inspeccionar la Secret key, el estado exacto del CAPTCHA de Auth ni el host/login SMTP guardado. No rotar ni modificar secretos basándose en una inferencia.
+- Probar con dos estudiantes DEV y un administrador el aislamiento entre cuentas, una evaluación reprobada/aprobada, la persistencia de la mejor nota y la recuperación del progreso tras cerrar sesión. Issue #20 permanece abierto.
+- Leaked Password Protection aparece desactivado en el Advisor; el plan Free no permite activarlo. Requiere Pro o superior y una decisión de presupuesto.
 
-### P1 — Dispositivo y laboratorio
+### P1 — Aceptación móvil visual
 
-- Playwright cubre Chromium y emulación móvil; la paleta tiene pruebas de viewport. Falta una pasada en teléfono físico: tema, Monaco, teclado táctil, scroll, salida y navegación.
-- Probar Pyodide/Worker, Turtle, `input()`, programas largos, errores y timeout/reinicio en Chrome y Firefox.
+- El propietario confirma pruebas del runner Python, Turtle, límites y errores en Chrome, Firefox y teléfonos físicos.
+- La aceptación visual integral de la paleta de temas, Monaco, teclado virtual, scroll y pantallas de progreso autenticadas sigue abierta en issue #18. La automatización móvil no sustituye la inspección visual de cada pantalla en hardware.
 
 ### P1 — Migraciones y recuperación
 
