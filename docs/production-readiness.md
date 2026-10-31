@@ -1,4 +1,18 @@
-# Preparación para producción — corte del 30 de octubre de 2026
+# Preparación para producción — archivo histórico con actualización 31-10-2026
+
+> **Aviso de vigencia:** el cuerpo original de este documento conserva el corte del 30-10-2026. No utilizar sus SHA, recuentos de migración, estado de Preview ni inventario de funcionalidades como estado actual. La reconciliación de PROD, la publicación de Orilla y el estado actual de QA se resumen en `README.md`, `docs/team/ESTADO.md` y `docs/team/MIGRACIONES.md`.
+
+## Actualización vigente — 31-10-2026
+
+- `master` actual tras integrar PR #106 y #108: `e13bf1146c7956851149457c07c15199252b747c`. El CI de ese SHA debe revisarse en [GitHub Actions](https://github.com/Reymonth777x/python-desde-cero/actions); la publicación de runtime verificada previamente corresponde al commit `ed4ccf8b5a242b7c52b7c63f70380e4efe08f339`.
+- Orilla está publicada en `/orilla`, requiere sesión y ofrece 12 tramos, río abierto y dos retos. La capa de base de datos pasó pruebas SQL reversibles en DEV, pero no se ha completado la aceptación de una partida real desde navegador autenticado ni la vista de progreso en Academia.
+- PROD mantiene 29 migraciones activas que coinciden con los 29 archivos canónicos; DEV conserva 11 migraciones de su bootstrap/wrappers propios. No ejecutar `db push`, `migration repair` ni reset automáticamente.
+- Preview `main`: estado actual `FUNCTIONS_DEPLOYED`, proyecto derivado `ACTIVE_HEALTHY`, `with_data=false`; falta comprobar su ledger y el resultado exacto del paso `migrate`.
+- PR #108 está integrado: suite pgTAP actualizada a 69 aserciones, generador destructivo obsoleto eliminado y documentación corregida. La suite sigue pendiente de ejecución real con `npx supabase test db` en Supabase local limpio.
+- El repositorio sigue público y `master` sin protección. No cambiar visibilidad ni reglas sin la decisión/configuración del propietario.
+- La privacidad/terminología legal y la aceptación Auth/browser de DEV siguen abiertas. Ver issues #17, #18, #20, #21, #23 y #98.
+
+---
 
 **HEAD comprobado de `master`:** `38533eae71f60e899949f567c30f15c99c3cbe65`  
 **CI:** [41150277769](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41150277769) — success sobre el HEAD actual  

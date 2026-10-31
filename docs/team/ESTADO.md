@@ -1,6 +1,20 @@
-# Estado operativo — 30 de octubre de 2026
+# Estado operativo — actualización 31 de octubre de 2026
 
-> Este documento describe el estado comprobado de `master`, producción y Supabase al 30-10-2026. Las pruebas manuales se identifican como confirmación del propietario; no se presentan como telemetría independiente.
+> **Resumen vigente:** esta sección superior recoge la última verificación operativa. Los apartados históricos que siguen conservan el corte del 30-10-2026 y no deben usarse como estado actual sin contrastarlos con `README.md` y `docs/team/MIGRACIONES.md`. Las pruebas manuales se identifican como confirmación del propietario; no se presentan como telemetría independiente.
+
+## Estado vigente — 31-10-2026
+
+- **Master:** `e13bf1146c7956851149457c07c15199252b747c`; PR #106 y PR #108 ya están fusionados. El CI de master del commit e13 está en ejecución; revisar [Actions](https://github.com/Reymonth777x/python-desde-cero/actions) antes de dar por completada esta revisión. El despliegue de runtime verificado sigue siendo el del commit `ed4ccf8b5a242b7c52b7c63f70380e4efe08f339`; los cambios de #108 son pruebas/documentación y eliminación de un generador obsoleto.
+- **Orilla:** publicada en `/orilla` y `/orilla/[chapterId]`, con 12 tramos, río abierto y dos retos. Las rutas protegen visitantes y el runner aislado está desplegado. PROD conserva solo un borrador `c01` (`attempts = 0`, `passed = false`, `stars = 0`); DEV quedó con cero filas tras las pruebas reversibles. Aún no se certificó una partida completa desde navegador autenticado ni su reflejo en Academia.
+- **Pruebas de base de datos ejecutadas en DEV:** una transacción reversible verificó quiz fallido sin progreso, quiz aprobado con 100 puntos, aislamiento entre dos estudiantes y ausencia de escrituras directas; otra verificó RPC/RLS y el bloqueo de `c02` en Orilla. Ambas terminaron con `ROLLBACK` y consultas posteriores confirmaron cero filas de prueba.
+- **Pruebas locales de permisos:** PR #108 integró una suite pgTAP de 69 aserciones para el esquema actual y retiró `scripts/gen-quiz-keys.ts`, que generaba un `TRUNCATE ... CASCADE` sobre `private.quiz_keys`, tabla histórica que no existe en PROD/DEV. Vitest/CI pasó; `npx supabase test db` todavía no se ha ejecutado contra una instancia local limpia.
+- **Migraciones:** PROD tiene 29/29 versiones reconciliadas con `supabase/migrations/`; DEV conserva 11 versiones propias y sus wrappers. No copiar el historial PROD a DEV ni ejecutar `db push` a ciegas. La Preview `main` mejoró de `MIGRATIONS_FAILED` a `FUNCTIONS_DEPLOYED` y `ACTIVE_HEALTHY`, pero su ledger y el paso `migrate` todavía requieren confirmación.
+- **Auth/correo:** existen eventos reales de login, registro y recuperación en los logs agregados; también errores de CAPTCHA, límites, credenciales y confirmación. Los conteos no representan personas únicas y no demuestran una caída general. La aceptación de navegador con cuentas desechables de DEV sigue pendiente.
+- **Gobierno:** el repositorio sigue público y `master` sin branch protection; no se cambiaron visibilidad ni reglas. La decisión sobre exposición del material de evaluación sigue en issue #21; la protección de rama en #23.
+- **Dependencias:** el PR #107 propone una mitigación parcial para `minimatch`; en su rama el audit conserva cinco alertas moderadas por la copia 3.1.5 compartida por plugins ESLint heredados. No está fusionado ni debe describirse como audit limpio.
+- **Privacidad/legal:** sigue pendiente revisión profesional de privacidad, términos, cookies y retención para Costa Rica antes de abrir el registro a público externo (issue #98).
+
+## Corte histórico — 30-10-2026
 
 ## Repositorio y publicación
 
@@ -19,7 +33,7 @@
 - La portada dirige a `/muestra`, una lección real que permite modificar y ejecutar Python sin registrarse. El serializador público excluye preguntas, claves, soluciones, pruebas ocultas y progreso.
 - `/academia` y `/practica` requieren sesión. `/estudiante` solo redirige a `/academia`.
 - El modelo de autorización actual tiene dos perfiles: estudiante y administrador (`profiles.is_admin`). No existe un rol ni un panel docente; `/docente` fue retirado.
-- No hay juegos publicados en el producto activo.
+- En el corte histórico 30-10-2026 no había juegos publicados. Desde el 31-10-2026 Orilla está integrada como área de práctica didáctica autenticada; consultar el resumen vigente superior y `docs/orilla.md`.
 
 ## Estado académico del curso PE1
 

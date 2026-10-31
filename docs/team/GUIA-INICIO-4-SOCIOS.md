@@ -91,4 +91,4 @@ Después, revisen el resultado del CI de GitHub. Las pruebas de integración con
 3. Se rotan los roles de curso, laboratorio y datos; se asigna un revisor que no sea el autor.
 4. Se actualizan `docs/team/ESTADO.md`, `docs/team/DECISIONES.md` y `docs/team/MIGRACIONES.md` con hechos confirmados.
 
-**Regla de equipo:** la IA puede proponer cambios, explicar errores y preparar pruebas, pero un socio debe entender la modificación, revisar el diff y responsabilizarse de su aceptación. No se fusiona código solo porque lo haya producido una IA.
+**Regla de equipo:** cada cambio requiere una persona responsable que entienda la modificación, revise el diff, compruebe las pruebas y se responsabilice de su aceptación. No se fusiona código sin revisión técnica y criterio de aceptación.
