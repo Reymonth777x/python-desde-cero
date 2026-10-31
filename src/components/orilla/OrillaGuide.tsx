@@ -124,9 +124,9 @@ export default function OrillaGuide({ chapterId, ayuda, verbos, builtins, onUseE
           <div className="mt-2 space-y-2 text-sm leading-6 text-[var(--theme-ink)]">
             <p><strong>Primero, completa la misión.</strong> Cuando el resultado diga «Tramo superado», se guarda tu avance y se abre el siguiente tramo.</p>
             <p><strong>1 estrella:</strong> cumples los objetivos en todos los mapas de prueba.</p>
-            <p><strong>2 estrellas:</strong> además, lo haces dentro de los pasos recomendados.</p>
-            <p><strong>3 estrellas:</strong> también demuestras el concepto de Python que practica el tramo.</p>
-            <p className="text-[var(--theme-muted)]">Las estrellas son un reto extra; no necesitas tres para avanzar.</p>
+            <p><strong>2 estrellas:</strong> cuando el tramo tiene ese objetivo, también completas la misión dentro de los pasos recomendados.</p>
+            <p><strong>3 estrellas:</strong> en los niveles que lo piden, demuestras el concepto de Python que estás practicando. Algunos tramos tienen reglas de puntuación propias.</p>
+            <p className="text-[var(--theme-muted)]">Las estrellas adicionales son un reto opcional; con superar la misión puedes seguir río abajo.</p>
           </div>
         </details>
         <details className="rounded-xl border border-[var(--theme-border)] p-3">
