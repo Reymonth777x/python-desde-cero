@@ -24,6 +24,27 @@ test('diagnóstico rápido: el runner Python inicia y ejecuta código', async ({
       requestEvent.method() + ' ' + requestEvent.url() + ' :: ' + (requestEvent.failure()?.errorText ?? 'unknown'),
     );
   });
+  await page.addInitScript(() => {
+    const target = window as Window & {
+      __runnerSmokeMessages?: Array<{
+        origin: string;
+        sourceIsParent: boolean;
+        type: string | null;
+        ports: number;
+      }>;
+    };
+    target.__runnerSmokeMessages = [];
+    window.addEventListener('message', (event) => {
+      const item = {
+        origin: event.origin,
+        sourceIsParent: event.source === window.parent,
+        type: typeof event.data?.type === 'string' ? event.data.type : null,
+        ports: event.ports?.length ?? 0,
+      };
+      target.__runnerSmokeMessages?.push(item);
+    });
+  });
+
   page.on('response', (response) => {
     if (response.url().startsWith('http://127.0.0.1:8788/')) {
       const headers = response.headers();
@@ -71,7 +92,21 @@ test('diagnóstico rápido: el runner Python inicia y ejecuta código', async ({
       }
     }));
 
-    const frames = page.frames().map((frame) => frame.url());
+    const frames = await Promise.all(page.frames().map(async (frame) => {
+      const url = frame.url();
+      const messages = await frame.evaluate(() => {
+        const target = window as Window & {
+          __runnerSmokeMessages?: Array<{
+            origin: string;
+            sourceIsParent: boolean;
+            type: string | null;
+            ports: number;
+          }>;
+        };
+        return target.__runnerSmokeMessages ?? [];
+      }).catch((frameError) => ({ error: frameError instanceof Error ? frameError.message : String(frameError) }));
+      return { url, messages };
+    }));
     const iframe = example.locator('iframe[title="Entorno de ejecución Python aislado"]');
     const iframeSrc = await iframe.getAttribute('src').catch(() => null);
     const output = await example.locator('pre').innerText().catch(() => '(sin salida)');
