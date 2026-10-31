@@ -91,7 +91,7 @@ export default function LessonStudy({
         setSavedScore(Math.max(savedScore, serverResult.score));
         setFeedback(lesson.finalProject ? 'Pruebas locales superadas, revisión conceptual aprobada y progreso guardado.' : lesson.finalAssessment ? 'Examen final aprobado y progreso guardado en tu cuenta.' : 'Evaluación aprobada y progreso guardado en tu cuenta.');
       } else {
-        setFeedback('Aún no alcanzas el puntaje necesario. Revisa la retroalimentación y vuelve a intentarlo.');
+        setFeedback('Aún no alcanzas el puntaje necesario. Repasa los conceptos de la lección y vuelve a intentarlo.');
       }
     } catch {
       setFeedback('No se pudo guardar el progreso por un error de conexión. Inténtalo de nuevo.');
