@@ -96,6 +96,7 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
   const completado = useRef<IDisposable | null>(null);
   const monacoRef = useRef<Monaco | null>(null);
   const editorSectionRef = useRef<HTMLElement | null>(null);
+  const edicionManualRef = useRef(false);
 
   useEffect(() => () => {
     if (temporizador.current !== null) window.clearTimeout(temporizador.current);
@@ -204,9 +205,16 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
     }
     if (borrador === null) return;
 
-    setCode(borrador);
-    setAviso('Recuperé un borrador de este navegador que todavía no estaba guardado.');
-    temporizador.current = window.setTimeout(() => { void persistir(borrador as string); }, 250);
+    const codigoRecuperado = borrador;
+    const recuperacion = window.setTimeout(() => {
+      // Si la persona empezó a escribir antes del siguiente turno, su edición gana.
+      if (edicionManualRef.current) return;
+      setCode(codigoRecuperado);
+      setAviso('Recuperé un borrador de este navegador que todavía no estaba guardado.');
+      temporizador.current = window.setTimeout(() => { void persistir(codigoRecuperado); }, 250);
+    }, 0);
+
+    return () => window.clearTimeout(recuperacion);
   }, [claveLocal, guardado.updatedAt, inicial, persistir]);
 
   const alCambiar = (valor: string | undefined) => {
