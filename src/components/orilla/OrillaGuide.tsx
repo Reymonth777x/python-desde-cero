@@ -30,7 +30,7 @@ export default function OrillaGuide({ chapterId, ayuda, verbos, builtins, onUseE
       <div className="space-y-1">
         <p className="text-[0.68rem] font-bold tracking-[0.14em] text-[var(--theme-accent)]">GUÍA PARA PRINCIPIANTES</p>
         <h2 id="orilla-guia-titulo" className="font-serif text-xl text-[var(--theme-ink)] sm:text-2xl">Primero: ¿cómo se juega?</h2>
-        <p className="text-sm leading-6 text-[var(--theme-muted)]">Orilla se juega escribiendo Python. No arrastras a Nilo ni pulsas casillas del mapa: escribes órdenes y el juego las ejecuta.</p>
+        <p className="text-sm leading-6 text-[var(--theme-muted)]">Escribes Python real; el motor lo ejecuta en un entorno aislado y muestra cómo responde el río. No arrastras a Nilo ni pulsas casillas del mapa: lo controlas con instrucciones.</p>
       </div>
 
       <ol className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
