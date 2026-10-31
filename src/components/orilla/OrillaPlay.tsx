@@ -162,7 +162,11 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
     monacoRef.current = monaco;
     aplicarTemaEditor(monaco);
     completado.current?.dispose();
-    const nombres = [...payload.abiertos.verbos, ...payload.abiertos.builtins];
+    const metodos = [
+      ...(payload.abiertos.constructos.includes('lista') ? ['append', 'insert', 'pop', 'index', 'count'] : []),
+      ...(payload.abiertos.constructos.includes('dict') ? ['get', 'keys', 'values', 'items'] : []),
+    ];
+    const nombres = [...payload.abiertos.verbos, ...payload.abiertos.builtins, ...metodos];
     completado.current = monaco.languages.registerCompletionItemProvider('python', {
       provideCompletionItems: (modelo: editor.ITextModel, posicion: { lineNumber: number; column: number }) => {
         const palabra = modelo.getWordUntilPosition(posicion);
