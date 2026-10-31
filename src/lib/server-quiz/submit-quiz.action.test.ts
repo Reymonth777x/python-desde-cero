@@ -74,6 +74,29 @@ describe('submitQuiz', () => {
     });
   });
 
+  it('no devuelve explicaciones hasta aprobar la evaluación', async () => {
+    mockClient({
+      rpcResult: {
+        score: 50,
+        passed: false,
+        correct: 1,
+        total: 2,
+      },
+    });
+
+    const result = await submitQuiz(null, formData());
+
+    expect(result).toMatchObject({
+      score: 50,
+      passed: false,
+      correct: 1,
+      total: 2,
+      completed: false,
+      explanations: [],
+    });
+    expect(getExplanations).not.toHaveBeenCalled();
+  });
+
   it('rechaza el envío si falta la identidad esperada de la lección', async () => {
     const { rpc } = mockClient({ userId: 'student-1' });
     const data = new FormData();
