@@ -15,6 +15,7 @@ export function recuperarBorradorOrilla(
       typeof valor.code !== 'string' ||
       typeof valor.at !== 'number' ||
       !Number.isFinite(valor.at) ||
+      !Number.isFinite(guardadoEn) ||
       valor.at <= guardadoEn ||
       valor.code === codigoInicial
     ) {
