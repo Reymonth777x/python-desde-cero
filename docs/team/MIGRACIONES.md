@@ -306,3 +306,14 @@ Esta verificación acredita la lógica RPC/ACL/RLS en la base de datos DEV, no e
 ### Herramienta obsoleta retirada
 
 Se eliminó `scripts/gen-quiz-keys.ts`: no era un script npm activo y generaba `TRUNCATE TABLE private.quiz_keys RESTART IDENTITY CASCADE`, además de INSERTs hacia una tabla que no existe en PROD ni DEV. No se sustituye por un generador SQL manual. El catálogo vigente se versiona mediante migraciones revisadas de `private.quiz_answer_key`; no se debe regenerar ni truncar la clave desde `src/lib/course.ts`.
+
+
+## Comprobación posterior de Supabase Preview — 30-10-2026 (hora local Costa Rica)
+
+La lectura más reciente de `list_branches` del proyecto PROD muestra la Preview `main` con:
+
+- `status = FUNCTIONS_DEPLOYED` (antes `MIGRATIONS_FAILED`).
+- `preview_project_status = ACTIVE_HEALTHY`.
+- `with_data = false`; sigue siendo una rama derivada sin datos de producción.
+
+Esto indica un avance respecto al fallo observado antes de fusionar la reconciliación #106, pero la interfaz de solo lectura disponible en esta revisión no expone el ledger de migraciones del proyecto derivado ni el log detallado del paso `migrate`. No cerrar el incidente como reconciliado hasta confirmar en el workflow de Supabase que `migrate` terminó con éxito y comparar las versiones del Preview con el baseline de PROD. No resetear, rebasar ni eliminar la rama como solución rápida.
