@@ -45,6 +45,8 @@ export default function OrillaGuide({ chapterId, ayuda, verbos, builtins, onUseE
         ))}
       </ol>
 
+      <p className="rounded-xl bg-[var(--theme-bg-secondary)] px-3 py-2 text-sm leading-6 text-[var(--theme-ink)]"><strong>Un detalle importante:</strong> las líneas que empiezan con <code>#</code> son comentarios: sirven como pistas y Python no las ejecuta. Las órdenes se escriben sin <code>#</code> y llevan paréntesis, por ejemplo <code>avanzar()</code>.</p>
+
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(260px,.9fr)]">
         <div className="space-y-3 rounded-xl border border-[var(--theme-border)] p-3 sm:p-4">
           <div>
