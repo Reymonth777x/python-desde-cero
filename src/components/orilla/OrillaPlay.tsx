@@ -66,7 +66,7 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
   const leccionHref = hrefLeccion(tramo.lessonId);
 
   const { resolvedTheme } = useTheme();
-  const { estado: estadoWorker, ejecutar, reiniciar } = useOrillaWorker();
+  const { estado: estadoWorker, ejecutar, reiniciar, sandboxFrameRef, handleSandboxFrameLoad, handleSandboxFrameError } = useOrillaWorker();
 
   const [code, setCode] = useState(inicial);
   const [persistido, setPersistido] = useState(inicial);
@@ -182,22 +182,6 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
     instancia.focus();
   };
 
-        if (
-          typeof borrador.code === 'string' &&
-          typeof borrador.at === 'number' &&
-          borrador.at > guardadoEn &&
-          borrador.code !== inicial
-        ) {
-          setCode(borrador.code);
-          setAviso('Recuperé un borrador de este navegador que todavía no estaba guardado.');
-        }
-      }
-    } catch {
-      /* sin almacenamiento local: se sigue con lo guardado */
-    }
-    instancia.focus();
-  };
-
   const persistir = useCallback(
     async (texto: string) => {
       setGuardadoEstado('guardando');
@@ -267,6 +251,18 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6">
+      <iframe
+        ref={sandboxFrameRef}
+        onLoad={handleSandboxFrameLoad}
+        onError={handleSandboxFrameError}
+        title="Entorno aislado de Orilla"
+        aria-hidden="true"
+        tabIndex={-1}
+        sandbox="allow-scripts allow-same-origin"
+        referrerPolicy="no-referrer"
+        loading="eager"
+        className="pointer-events-none absolute -left-[10000px] top-0 h-px w-px overflow-hidden border-0 opacity-0"
+      />
       <header className="space-y-2">
         <p className="text-[0.68rem] font-bold tracking-[0.14em] text-[var(--theme-accent)]">{tramo.orden > 0 ? `ORILLA · TRAMO ${tramo.orden} DE 12` : 'ORILLA · MÁS ALLÁ DE LA CUENCA'}</p>
         <h1 className="font-serif text-3xl text-[var(--theme-ink)]">{tramo.nombre}</h1>
