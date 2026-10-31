@@ -20,14 +20,14 @@ describe('Supabase permission test artifacts', () => {
   });
 
   it('contains no unfinished fragments or psql-only fixture commands', () => {
-    expect(permissionsSql).not.toMatch(/Parte\\s+\\d+\\s+escrita/i);
-    expect(permissionsSql).not.toMatch(/^\\\\(?:set|gset|connect|include)\\b/m);
+    expect(permissionsSql).not.toMatch(/Parte\s+\d+\s+escrita/i);
+    expect(permissionsSql).not.toMatch(/^\\(?:set|gset|connect|include)\b/m);
     expect(permissionsSql).toContain('SELECT * FROM finish();');
     expect(permissionsSql.trimEnd().endsWith('ROLLBACK;')).toBe(true);
   });
 
   it('keeps the pgTAP plan in sync with the assertion count', () => {
-    const assertions = permissionsSql.match(/^\\s*SELECT\\s+(?:ok|is|throws_ok|lives_ok)\\(/gim) ?? [];
+    const assertions = permissionsSql.match(/^\s*SELECT\s+(?:ok|is|throws_ok|lives_ok)\(/gim) ?? [];
     expect(assertions).toHaveLength(69);
     expect(permissionsSql).toContain('SELECT plan(69);');
   });
