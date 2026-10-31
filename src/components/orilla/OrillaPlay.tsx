@@ -17,6 +17,7 @@ import {
 } from '@/lib/orilla/replay';
 import type { EventoOrilla, PayloadTramo, ResultadoOrilla } from '@/lib/orilla/types';
 import { useOrillaWorker } from '@/lib/orilla/use-orilla-worker';
+import { reproducirSonidoOrilla } from '@/lib/orilla/audio';
 import RiverView from './RiverView';
 
 if (typeof window !== 'undefined' && !window.MonacoEnvironment) {
@@ -86,6 +87,7 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
   const [guardadoEstado, setGuardadoEstado] = useState<'' | 'guardando' | 'guardado' | 'error'>('');
   const [aviso, setAviso] = useState<string | null>(null);
   const [notas, setNotas] = useState<string[]>(payload.notas ?? []);
+  const [sonidoActivo, setSonidoActivo] = useState(false);
 
   const temporizador = useRef<number | null>(null);
   const completado = useRef<IDisposable | null>(null);
@@ -213,11 +215,13 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
 
   const alEjecutar = async () => {
     if (ejecutando) return;
-    setEjecutando(true); setReproduciendo(false); setGate(null); setErrorMotor(null); setResultado(null); setConfirmaNotas(false);
+    setEjecutando(true);
+    if (sonidoActivo) reproducirSonidoOrilla('motor'); setReproduciendo(false); setGate(null); setErrorMotor(null); setResultado(null); setConfirmaNotas(false);
     try {
       const res = await ejecutar(code, { ...payload, notas });
       if (!res.gate.ok) { setGate({ mensaje: res.gate.mensaje, linea: res.gate.linea, leccion: res.gate.leccion }); return; }
       setResultado(res);
+      if (sonidoActivo) reproducirSonidoOrilla(res.passed ? 'victoria' : 'error');
       const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       mostrarVariante(res.show ?? 0, res, velocidad === 'instante' || reducido);
       if (esAbierta) setNotas(res.notas ?? []);
@@ -225,7 +229,10 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
       const r = await guardarOrilla({ chapterId: tramo.id, code, passed: res.passed, stars: res.stars, steps: res.passed ? (res.steps ?? null) : null, notas: esAbierta ? (res.notas ?? []) : null, esIntento: true });
       if (r.ok) { setGuardadoEstado('guardado'); setPersistido(code); setMejor({ stars: r.stars, pasos: r.bestSteps, superado: r.passed }); }
       else setGuardadoEstado('error');
-    } catch (error) { setErrorMotor(error instanceof Error ? error.message : 'No se pudo ejecutar el programa.'); }
+    } catch (error) {
+      if (sonidoActivo) reproducirSonidoOrilla('error');
+      setErrorMotor(error instanceof Error ? error.message : 'No se pudo ejecutar el programa.');
+    }
     finally { setEjecutando(false); }
   };
 
@@ -250,7 +257,7 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
     : par !== undefined ? `La segunda estrella pide ${par} pasos o menos en cada tramo del río.` : null;
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6">
+    <div className="mx-auto w-full max-w-[1440px] space-y-5 px-3 py-4 sm:px-6 sm:py-6">
       <iframe
         ref={sandboxFrameRef}
         onLoad={handleSandboxFrameLoad}
@@ -263,7 +270,7 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
         loading="eager"
         className="pointer-events-none absolute -left-[10000px] top-0 h-px w-px overflow-hidden border-0 opacity-0"
       />
-      <header className="space-y-2">
+      <header className="space-y-2 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] px-4 py-4 shadow-sm sm:px-5">
         <p className="text-[0.68rem] font-bold tracking-[0.14em] text-[var(--theme-accent)]">{tramo.orden > 0 ? `ORILLA · TRAMO ${tramo.orden} DE 12` : 'ORILLA · MÁS ALLÁ DE LA CUENCA'}</p>
         <h1 className="font-serif text-3xl text-[var(--theme-ink)]">{tramo.nombre}</h1>
         <p className="text-[var(--theme-muted)]">{tramo.concepto}</p>
@@ -275,14 +282,14 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
         </div>
         <ul className="list-disc space-y-1 pl-5 text-sm leading-6 text-[var(--theme-ink)]">{ui.ayuda.map((linea) => <li key={linea}>{linea}</li>)}</ul>
       </header>
-      <div className="grid gap-6 lg:grid-cols-2">
-        <section aria-labelledby="orilla-editor" className="space-y-3">
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.18fr)_minmax(360px,0.82fr)]">
+        <section aria-labelledby="orilla-editor" className="order-2 min-w-0 space-y-3 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] p-3 shadow-sm sm:p-4 lg:order-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 id="orilla-editor" className="font-serif text-xl text-[var(--theme-ink)]">Tu programa</h2>
             <span role="status" className="text-xs text-[var(--theme-muted)]">{guardadoEstado === 'guardando' && 'Guardando…'}{guardadoEstado === 'guardado' && 'Guardado en tu cuenta'}{guardadoEstado === 'error' && 'No se pudo guardar. Tu borrador sigue en este navegador.'}</span>
           </div>
           {aviso && <p role="status" className="border-l-2 border-[var(--theme-accent)] bg-[var(--theme-bg-secondary)] p-3 text-sm text-[var(--theme-ink)]">{aviso}</p>}
-          <div className="h-[min(52svh,440px)] min-h-[280px] w-full overflow-hidden border border-[var(--theme-border)] bg-[var(--theme-code-bg)]">
+          <div className="h-[min(62svh,560px)] min-h-[340px] w-full overflow-hidden rounded-xl border border-[var(--theme-border)] bg-[var(--theme-code-bg)] shadow-inner">
             <Editor height="100%" defaultLanguage="python" theme="python-desde-cero" value={code} onChange={alCambiar} onMount={alMontar} options={{ minimap: { enabled: false }, fontSize: 16, lineHeight: 24, automaticLayout: true, tabSize: 4, scrollBeyondLastLine: false, wordWrap: 'on' }} />
           </div>
           <div className="grid gap-2 sm:flex sm:flex-wrap">
@@ -293,15 +300,24 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
           </div>
           <details className="border border-[var(--theme-border)] bg-[var(--theme-surface)] p-3"><summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold text-[var(--theme-accent)]">Lo que Nilo entiende en este tramo</summary><dl className="mt-2 space-y-1 text-sm">{[...payload.abiertos.verbos, ...payload.abiertos.builtins].map((nombre) => <div key={nombre} className="flex flex-wrap gap-x-2"><dt className="font-mono font-bold text-[var(--theme-ink)]">{nombre}</dt><dd className="text-[var(--theme-muted)]">{DOC_VERBOS[nombre]}</dd></div>)}</dl></details>
         </section>
-        <section aria-labelledby="orilla-rio" className="space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-2"><h2 id="orilla-rio" className="font-serif text-xl text-[var(--theme-ink)]">El río</h2>{payload.variantes.length > 1 && <span className="text-sm text-[var(--theme-muted)]">Tramo {varIdx + 1} de {payload.variantes.length}</span>}</div>
-          <div tabIndex={0} role="group" aria-label="Vista del río. Las flechas cambian la velocidad de la reproducción." onKeyDown={(e) => alTeclearRio(e.key)} className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"><RiverView estado={estadoMostrado} ocultarMapa={ocultar} descripcion={descripcion} /></div>
-          <p role="status" aria-live="polite" className="text-sm text-[var(--theme-muted)]">{descripcion}</p>
+        <section aria-labelledby="orilla-rio" className="order-1 min-w-0 space-y-3 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] p-3 shadow-sm sm:p-4 lg:order-1">
+          <div className="space-y-2"><div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+              <span className="text-[0.65rem] font-bold tracking-[0.15em] text-[var(--theme-accent)]">TRAMO {tramo.orden || '∞'}</span>
+              {!esAbierta && <span aria-label={`Mejor resultado: ${mejor.stars} de 3 estrellas`} className="tracking-[0.12em] text-amber-500">{estrellasTexto(mejor.stars)}</span>}
+            </div>
+            <button type="button" onClick={() => setSonidoActivo((actual) => !actual)} aria-pressed={sonidoActivo}
+              className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[var(--theme-border)] px-3 text-xs font-semibold text-[var(--theme-ink)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">
+              <span aria-hidden="true">{sonidoActivo ? '♫' : '♪'}</span>{sonidoActivo ? 'Sonido activado' : 'Activar sonido'}
+            </button>
+          </div><div className="flex flex-wrap items-center justify-between gap-2"><h2 id="orilla-rio" className="font-serif text-xl text-[var(--theme-ink)]">Nilo / {tramo.id.toUpperCase()} · {tramo.nombre}</h2>{payload.variantes.length > 1 && <span className="text-sm text-[var(--theme-muted)]">Variación {varIdx + 1} de {payload.variantes.length}</span>}</div></div>
+          <div tabIndex={0} role="group" aria-label="Vista del río. Las flechas cambian la velocidad de la reproducción." onKeyDown={(e) => alTeclearRio(e.key)} className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"><RiverView estado={estadoMostrado} ocultarMapa={ocultar} descripcion={descripcion} variante={variante} animando={reproduciendo} /></div>
+          <p role="status" aria-live="polite" className="sr-only">{descripcion}</p>
           <div className="flex flex-wrap items-center gap-3"><label className="flex items-center gap-2 text-sm font-semibold text-[var(--theme-ink)]">Velocidad<select value={velocidad} onChange={(e) => setVelocidad(e.target.value as Velocidad)} className="min-h-11 border border-[var(--theme-border)] bg-[var(--theme-surface)] px-2 text-sm text-[var(--theme-ink)]">{VELOCIDADES.map((v) => <option key={v} value={v}>{ETIQUETA_VELOCIDAD[v]}</option>)}</select></label>
             {payload.ocultarMapa && !mapaVisible && <button type="button" disabled={fallos < FALLOS_PARA_MAPA} onClick={() => setMapaVisible(true)} className="min-h-11 border border-[var(--theme-border-dark)] px-3 text-sm font-semibold text-[var(--theme-ink)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50">{fallos >= FALLOS_PARA_MAPA ? 'Mostrar mapa' : `Mostrar mapa (tras ${FALLOS_PARA_MAPA} intentos fallidos: ${Math.min(fallos, FALLOS_PARA_MAPA)})`}</button>}
           </div>
           {resultado?.gate.ok && resultado.variants.length > 1 && <div className="flex flex-wrap gap-2" role="group" aria-label="Ver cada tramo del río">{resultado.variants.map((v, i) => <button key={v.indice} type="button" aria-pressed={i === varIdx} onClick={() => mostrarVariante(i, resultado, true)} className="min-h-11 border border-[var(--theme-border-dark)] px-3 text-sm font-semibold text-[var(--theme-ink)] hover:bg-[var(--theme-bg-secondary)] aria-pressed:bg-[var(--theme-accent)] aria-pressed:text-[var(--theme-ink-inverse)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">Tramo {i + 1}{v.passed ? ' ✓' : ' ✗'}</button>)}</div>}
-          <div className="border border-[var(--theme-border)] bg-[var(--theme-surface)] p-3"><h3 className="text-sm font-semibold text-[var(--theme-ink)]">Bitácora</h3><ol className="mt-1 min-h-8 space-y-0.5 font-mono text-sm text-[var(--theme-ink)]">{estadoMostrado.bitacora.length === 0 ? <li className="text-[var(--theme-muted)]">Todavía no hay líneas.</li> : estadoMostrado.bitacora.map((linea, i) => <li key={`${i}-${linea}`}>{linea}</li>)}</ol></div>
+          <div className="overflow-hidden rounded-xl border border-[#244a60] bg-[#071b2a] p-3 shadow-inner"><div className="mb-2 flex items-center justify-between"><h3 className="text-xs font-bold tracking-[0.16em] text-[#7ec9b7]">CONSOLA · BITÁCORA</h3><span className="text-[0.65rem] text-[#77a9b7]">SALIDA DE NILO</span></div><ol className="min-h-9 space-y-1 font-mono text-sm text-[#b6f0df]">{estadoMostrado.bitacora.length === 0 ? <li className="text-[#6f9aa8]">Esperando tu programa…</li> : estadoMostrado.bitacora.map((linea, i) => <li key={`${i}-${linea}`}><span className="mr-2 text-[#5f9ba8]">›</span>{linea}</li>)}</ol></div>
           {esAbierta && <div className="space-y-2 border border-[var(--theme-border)] bg-[var(--theme-surface)] p-3"><h3 className="text-sm font-semibold text-[var(--theme-ink)]">Bitácora de la cuenca</h3><ol className="font-mono text-sm text-[var(--theme-ink)]">{notas.length === 0 ? <li className="text-[var(--theme-muted)]">Sin notas guardadas.</li> : notas.map((n, i) => <li key={`${i}-${n}`}>{n}</li>)}</ol><button type="button" onClick={alVaciarNotas} className="min-h-11 border border-[var(--theme-border-dark)] px-3 text-sm font-semibold text-[var(--theme-ink)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">{confirmaNotas ? 'Confirmar: borrar las notas' : 'Vaciar notas'}</button></div>}
         </section>
       </div>
