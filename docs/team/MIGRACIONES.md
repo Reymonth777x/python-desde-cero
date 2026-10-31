@@ -263,3 +263,17 @@ Consulta de solo lectura de `public.orilla_runs`:
 - DEV no contiene filas de Orilla.
 - El código guarda borradores con `p_es_intento = false`; el contador `attempts` solo aumenta cuando se registra una ejecución. No interpretar la fila de PROD como una partida.
 - Aceptación pendiente: con una cuenta desechable de DEV, abrir `/orilla`, ejecutar la solución de `c01`, verificar que la ejecución queda aprobada y que la campaña/Academia reflejan el progreso. No utilizar cuentas ni datos de estudiantes de producción.
+
+
+### Prueba reversible de guardado y aislamiento de Orilla en DEV — 31-10-2026
+
+Se ejecutó una prueba SQL de integración usando dos perfiles de estudiante existentes en el proyecto DEV, dentro de una sola transacción que terminó en `ROLLBACK`:
+
+- La RPC `record_orilla_run` guardó un intento temporal de `c01` y devolvió `attempts = 1`, `passed = false`, `stars = 0`.
+- El primer estudiante pudo leer su propia fila.
+- El segundo estudiante no pudo ver la fila ajena.
+- Intentar registrar `c02` sin haber superado `c01` fue rechazado con el error de tramo bloqueado.
+- `authenticated` no tiene privilegios directos INSERT/UPDATE/DELETE sobre `public.orilla_runs`.
+- Después del `ROLLBACK`, una consulta independiente verificó que DEV seguía con cero filas en `orilla_runs`.
+
+La prueba acredita el comportamiento de RPC, RLS, prerrequisitos y permisos a nivel de base de datos. **No acredita todavía la experiencia visual real con Monaco/Pyodide desde un navegador autenticado**, ni la actualización visual del mapa y del panel de Academia. Esa aceptación sigue pendiente con un estudiante desechable de DEV.
