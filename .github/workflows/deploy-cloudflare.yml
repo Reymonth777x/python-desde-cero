@@ -359,6 +359,10 @@ jobs:
             echo "::error::El dominio todavía está sirviendo la portada anterior."
             exit 1
           fi
+          if ! grep -Fq '>05</span>' /tmp/python-desde-cero-home.html || ! grep -Fq '>OPCIONAL</span>' /tmp/python-desde-cero-home.html; then
+            echo "::error::La portada publicada no contiene el distintivo exacto 05 / OPCIONAL de la extensión práctica."
+            exit 1
+          fi
 
           # Verify the production login route actually rendered the configured
           # Turnstile widget; checking only the homepage would miss a broken
