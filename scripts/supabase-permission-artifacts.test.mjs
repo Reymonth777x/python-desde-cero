@@ -28,8 +28,8 @@ describe('Supabase permission test artifacts', () => {
 
   it('keeps the pgTAP plan in sync with the assertion count', () => {
     const assertions = permissionsSql.match(/^\s*SELECT\s+(?:ok|is|throws_ok|lives_ok)\(/gim) ?? [];
-    expect(assertions).toHaveLength(69);
-    expect(permissionsSql).toContain('SELECT plan(69);');
+    expect(assertions).toHaveLength(70);
+    expect(permissionsSql).toContain('SELECT plan(70);');
   });
 
   it('does not ship the old generator that emitted a cascading TRUNCATE', () => {

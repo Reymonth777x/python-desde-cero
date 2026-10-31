@@ -8,7 +8,7 @@
 -- It must never be executed against a hosted DEV or PROD database.
 
 BEGIN;
-SELECT plan(69);
+SELECT plan(70);
 
 -- ---------------------------------------------------------------------------
 -- Current schema, RLS, and table-level ACLs (run as the test database owner).
@@ -38,7 +38,7 @@ SELECT ok(NOT has_table_privilege('authenticated', 'public.profiles', 'UPDATE'),
 SELECT ok(has_table_privilege('authenticated', 'public.invitations', 'SELECT'), 'authenticated has invitation SELECT privilege, subject to admin RLS');
 SELECT ok(has_table_privilege('authenticated', 'public.invitations', 'INSERT'), 'authenticated has invitation INSERT privilege, subject to admin RLS');
 SELECT ok(NOT has_table_privilege('authenticated', 'public.invitations', 'UPDATE'), 'authenticated cannot update invitations directly');
-SELECT ok(NOT has_table_privilege('authenticated', 'public.invitations', 'DELETE'), 'authenticated cannot delete invitations directly');
+SELECT ok(has_table_privilege('authenticated', 'public.invitations', 'DELETE'), 'authenticated has DELETE privilege, with access restricted by admin RLS');
 
 SELECT ok(has_table_privilege('authenticated', 'public.progress', 'SELECT'), 'authenticated can read progress subject to owner RLS');
 SELECT ok(NOT has_table_privilege('authenticated', 'public.progress', 'INSERT'), 'authenticated cannot insert progress directly');
@@ -236,6 +236,7 @@ SELECT throws_ok(
   $sql$INSERT INTO public.progress (user_id, module_id, lesson_id, is_completed, best_score)
        VALUES ('00000000-0000-0000-0000-00000000000a', 'module-1', 'b1-l2', TRUE, 100)$sql$,
   '42501',
+  NULL,
   'student A cannot insert progress directly'
 );
 SELECT throws_ok(
@@ -243,11 +244,13 @@ SELECT throws_ok(
        WHERE user_id = '00000000-0000-0000-0000-00000000000a'
          AND module_id = 'module-1' AND lesson_id = 'b1-l1'$sql$,
   '42501',
+  NULL,
   'student A cannot update progress directly'
 );
 SELECT throws_ok(
   $sql$SELECT * FROM private.quiz_answer_key LIMIT 1$sql$,
   '42501',
+  NULL,
   'student A cannot read private answer keys'
 );
 SELECT is(
@@ -260,21 +263,35 @@ SELECT is(
   0,
   'student A cannot read administrator invitations'
 );
+DELETE FROM public.invitations
+WHERE code = 'PGTAP-ADMIN-SEED';
 SELECT throws_ok(
   $sql$INSERT INTO public.invitations (code, expires_at, created_by)
        VALUES ('PGTAP-STUDENT-FORBIDDEN', now() + interval '1 day',
                '00000000-0000-0000-0000-00000000000a')$sql$,
   '42501',
+  NULL,
   'student A cannot create administrator invitations'
 );
 SELECT throws_ok(
   $sql$UPDATE public.profiles SET is_admin = TRUE
        WHERE id = '00000000-0000-0000-0000-00000000000a'$sql$,
   '42501',
+  NULL,
   'student A cannot grant themselves administrator privileges'
 );
 
 RESET ROLE;
+
+SELECT is(
+  (
+    SELECT count(*)::integer
+    FROM public.invitations
+    WHERE code = 'PGTAP-ADMIN-SEED'
+  ),
+  1,
+  'student A cannot delete administrator invitations because RLS filters the row'
+);
 
 -- ---------------------------------------------------------------------------
 -- Student B: cannot read A's progress, cannot skip prerequisites, cannot write
@@ -302,12 +319,14 @@ SELECT is(
 SELECT throws_ok(
   $sql$SELECT public.submit_quiz_v2('module-2', 'b2-l1', ARRAY[0])$sql$,
   'P0001',
+  NULL,
   'student B cannot submit a module 2 quiz before completing its prerequisite'
 );
 SELECT throws_ok(
   $sql$INSERT INTO private.quiz_attempts (user_id, module_id, lesson_id, score, passed)
        VALUES ('00000000-0000-0000-0000-00000000000b', 'module-1', 'b1-l1', 100, TRUE)$sql$,
   '42501',
+  NULL,
   'student B cannot insert private quiz attempts directly'
 );
 SELECT ok(
@@ -322,6 +341,7 @@ SELECT ok(
 SELECT throws_ok(
   $sql$SELECT public.record_orilla_run('c02', 'print("locked")', FALSE, 0, NULL, NULL, TRUE)$sql$,
   '42501',
+  NULL,
   'student B cannot unlock c02 without passing c01'
 );
 SELECT is(
