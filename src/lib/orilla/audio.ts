@@ -68,10 +68,10 @@ export async function activarAmbienteOrilla(): Promise<boolean> {
     filtroBajo.frequency.value = 1050;
     filtroBajo.Q.value = 0.45;
     volumen.gain.setValueAtTime(0.0001, audio.currentTime);
-    volumen.gain.linearRampToValueAtTime(0.12, audio.currentTime + 1.2);
+    volumen.gain.linearRampToValueAtTime(0.045, audio.currentTime + 1.2);
     oleaje.type = 'sine';
     oleaje.frequency.value = 0.09;
-    modulacion.gain.value = 0.035;
+    modulacion.gain.value = 0.012;
 
     fuente.connect(filtroAlto);
     filtroAlto.connect(filtroBajo);
