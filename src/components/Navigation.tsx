@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: '/', label: 'Inicio' },
   { href: '/academia', label: 'Academia' },
   { href: '/practica', label: 'Laboratorio' },
+  { href: '/orilla', label: 'Orilla' },
   { href: '/login', label: 'Acceso' },
 ];
 

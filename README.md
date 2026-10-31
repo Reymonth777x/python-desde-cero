@@ -16,11 +16,12 @@ The platform is organized into modules and lessons, each with learning objective
 
 - Structured course path — Modules and lessons covering Python fundamentals, with objectives, explanations, code examples, exercises, and quiz assessments
 - In-browser Python editor — Monaco Editor with Pyodide in a dedicated Web Worker inside a sandboxed iframe hosted on a separate Cloudflare `workers.dev` origin
+- Orilla practice — a Python river challenge with 12 guided stages, an open river, two advanced challenges, and per-user saved runs
 - Student authentication — Registration, email confirmation, login, logout, and password reset via Supabase Auth
 - Progress tracking — Lesson completion and quiz scores stored per user, with module gating based on assessment results
 - Admin invitation management — Admin-only page for generating one-time invitation codes for student registration
 - Public registration — Users can register without an invitation code; providing a valid, unused, unexpired invitation code is optional
-- Protected routes — Middleware-based route protection for `/practica` and `/academia` paths
+- Protected routes — Middleware-based route protection for `/practica`, `/academia`, and `/orilla` paths
 - Responsive design — Tailwind CSS layout that adapts to desktop, tablet, and mobile screens
 - PWA manifest — Web app manifest for installable progressive web app behavior
 
@@ -125,6 +126,10 @@ Quiz grading is handled in `src/lib/course-grading.ts` with a 75% passing thresh
 ## Python Execution
 
 Student code runs in Pyodide inside a dedicated Web Worker created by the runner iframe on the separate origin `https://python-desdecero-runner.pythondesdecero.workers.dev`. The academy embeds that origin in a sandboxed iframe and transfers a private `MessagePort` only after the iframe validates the parent window and exact allowed origin. Python output and Turtle commands return through that port; the app bounds code/input/output sizes and stops executions that exceed the time limit. The runner's response CSP only permits the academy's production hostnames and explicit localhost development origins as parents. See [the runner implementation](runner/runner-frame.js) and [its protocol](src/lib/use-python-worker.ts).
+
+## Orilla
+
+Orilla is an authenticated practice area at `/orilla`. It uses the same isolated Pyodide Worker and private `MessagePort` as the laboratory, with a separate Python engine at `public/orilla-engine.py`. The campaign has twelve stages linked to course concepts; attempts and personal progress are saved in `orilla_runs`. The Orilla check runs locally with `npm run test:orilla`. Its stars are practice feedback, not official assessment grades.
 
 ## Security Notes
 

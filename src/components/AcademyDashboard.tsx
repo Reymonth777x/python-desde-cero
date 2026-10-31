@@ -17,6 +17,7 @@ type Props = {
   progressRows: ProgressRow[];
   progressUnavailable: boolean;
   isAdmin: boolean;
+  orillaHechos?: number;
 };
 
 /** Returns true if the previous assessment is complete or the student has historical progress in this module. */
@@ -48,6 +49,7 @@ export default function AcademyDashboard({
   progressRows,
   progressUnavailable,
   isAdmin,
+  orillaHechos = 0,
 }: Props) {
   const completed = (moduleId: string, lessonId: string) =>
     progressRows.some(
@@ -327,6 +329,20 @@ export default function AcademyDashboard({
           <Link href="/practica" className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">
             Abrir el laboratorio
           </Link>
+        </aside>
+
+        <aside className="mt-6 border border-[var(--theme-border)] bg-[var(--theme-surface)] p-5 sm:p-6">
+          <p className="text-xs font-bold tracking-[0.14em] text-[var(--theme-accent)]">PRÁCTICA INTERACTIVA</p>
+          <h2 className="mt-2 font-serif text-2xl">Orilla: conduce a Nilo por el río</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--theme-muted)]">
+            Escribe Python para guiar una lancha, cruza canales, limpia ramas y resuelve retos usando los conceptos de cada lección.
+          </p>
+          <div className="mt-4 flex flex-wrap items-center gap-4">
+            <span className="text-sm text-[var(--theme-muted)]">{orillaHechos} de 12 tramos de la campaña superados</span>
+            <Link href="/orilla" className="inline-flex min-h-11 items-center gap-2 bg-[var(--theme-accent)] px-4 py-2 text-sm font-semibold text-[var(--theme-ink-inverse)] hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">
+              Entrar a Orilla <ArrowRight aria-hidden="true" size={16} />
+            </Link>
+          </div>
         </aside>
       </div>
     </main>
