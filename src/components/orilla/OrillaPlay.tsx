@@ -19,7 +19,7 @@ import type { ChapterId, EventoOrilla, PayloadTramo, ResultadoOrilla } from '@/l
 import OrillaGuide from './OrillaGuide';
 import { useOrillaWorker } from '@/lib/orilla/use-orilla-worker';
 import { activarAmbienteOrilla, desactivarAmbienteOrilla, reproducirSonidoOrilla } from '@/lib/orilla/audio';
-import { recuperarBorradorOrilla } from '@/lib/orilla/draft';
+import { recuperarBorradorOrilla, timestampGuardadoOrilla } from '@/lib/orilla/draft';
 import RiverView from './RiverView';
 import OrillaCodeEditor from './OrillaCodeEditor';
 
@@ -197,8 +197,8 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
   useEffect(() => {
     let borrador: string | null = null;
     try {
-      const guardadoEnCrudo = guardado.updatedAt ? Date.parse(guardado.updatedAt) : 0;
-      const guardadoEn = Number.isFinite(guardadoEnCrudo) ? guardadoEnCrudo : 0;
+      const guardadoEn = timestampGuardadoOrilla(guardado.updatedAt);
+      if (guardadoEn === null) return;
       borrador = recuperarBorradorOrilla(window.localStorage.getItem(claveLocal), guardadoEn, inicial);
     } catch {
       // El almacenamiento local puede estar deshabilitado; se conserva el estado de la cuenta.
@@ -218,6 +218,8 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
   }, [claveLocal, guardado.updatedAt, inicial, persistir]);
 
   const alCambiar = (valor: string | undefined) => {
+    // Cualquier edición del textarea, Monaco o ejemplo elegido gana frente a la recuperación diferida.
+    edicionManualRef.current = true;
     const nuevo = valor ?? '';
     setCode(nuevo);
     setConfirmaAndamiaje(false);

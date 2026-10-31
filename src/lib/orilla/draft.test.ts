@@ -1,5 +1,21 @@
 import { describe, expect, it } from 'vitest';
-import { recuperarBorradorOrilla } from './draft';
+import { recuperarBorradorOrilla, timestampGuardadoOrilla } from './draft';
+
+describe('timestampGuardadoOrilla', () => {
+  it('usa cero solo cuando no existe un guardado remoto', () => {
+    expect(timestampGuardadoOrilla(null)).toBe(0);
+  });
+
+  it('convierte una fecha remota válida a milisegundos', () => {
+    const fecha = '2026-10-31T06:00:00.000Z';
+    expect(timestampGuardadoOrilla(fecha)).toBe(Date.parse(fecha));
+  });
+
+  it('rechaza fechas presentes pero inválidas, sin degradarlas a cero', () => {
+    expect(timestampGuardadoOrilla('fecha-no-válida')).toBeNull();
+    expect(timestampGuardadoOrilla('')).toBeNull();
+  });
+});
 
 describe('recuperarBorradorOrilla', () => {
   it('recupera un borrador móvil más reciente que el guardado remoto', () => {
