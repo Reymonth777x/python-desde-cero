@@ -41,8 +41,8 @@ export default async function PracticaPage() {
       </header>
 
       <div className="mx-auto max-w-5xl px-5 py-10 sm:py-14">
-        <p className="text-xs font-bold tracking-[0.17em] text-[var(--theme-accent)]">
-          PYTHON DESDE CERO / LABORATORIO
+        <p className="text-sm font-semibold text-[var(--theme-accent)]">
+          Tu espacio para practicar
         </p>
         <h1 className="mt-4 font-serif text-4xl sm:text-5xl">
           Laboratorio de Python
