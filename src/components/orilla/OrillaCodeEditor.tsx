@@ -62,9 +62,10 @@ export default function OrillaCodeEditor({ value, onChange, verbos, builtins, co
     const fin = campo?.selectionEnd ?? inicio;
     const antes = value.slice(0, inicio);
     const despues = value.slice(fin);
-    const salto = antes.length > 0 && !antes.endsWith('\n') ? '\n' : '';
-    const codigoNuevo = antes + salto + fragmento + despues;
-    const posicionNueva = inicio + salto.length + posicionCursor;
+    const saltoInicial = antes.length > 0 && !antes.endsWith('\n') ? '\n' : '';
+    const saltoFinal = despues.length > 0 && !despues.startsWith('\n') ? '\n' : '';
+    const codigoNuevo = antes + saltoInicial + fragmento + saltoFinal + despues;
+    const posicionNueva = inicio + saltoInicial.length + posicionCursor;
     onChange(codigoNuevo);
     window.requestAnimationFrame(() => {
       const actual = textarea.current;
