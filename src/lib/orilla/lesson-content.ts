@@ -86,7 +86,7 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   c10: {
     historia: "Cuatro calas quedaron bloqueadas por ramas. El equipo quiere que Nilo aprenda una rutina que pueda reutilizar en cada cala.",
     explicacion: "Una función se crea con def. Dentro colocas instrucciones relacionadas y luego llamas la función por su nombre. Definirla no la ejecuta: también tienes que llamarla.",
-    ejemplo: "def limpiar_si_hay_rama():\n    if hay_rama():\n        limpiar()\n\n# Llama la función cuando Nilo esté junto a una rama",
+    ejemplo: "def quitar_rama():\n    if hay_rama():\n        limpiar()\n\nquitar_rama()",
     pregunta: "¿Qué diferencia hay entre definir una función y llamarla?",
     respuesta: "Definirla guarda las instrucciones. Llamarla hace que Python las ejecute.",
     reto: "Ponle a tu función un nombre que describa exactamente la tarea que realiza."
@@ -102,7 +102,7 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   c12: {
     historia: "La cuenca necesita una restauración completa. Hay que limpiar, observar, medir, sembrar y entregar un informe. Esta vez el río combina todo lo que aprendiste.",
     explicacion: "Los programas reales combinan conceptos. Puedes usar variables para recordar datos, if para decidir, bucles para repetir y funciones para organizar tareas. Divide la misión en partes pequeñas y comprueba cada una.",
-    ejemplo: "if hay_rama():\n    limpiar()\n\npez = recoger()\n# Continúa con las demás tareas",
+    ejemplo: "def limpiar_si_hay_rama():\n    if hay_rama():\n        limpiar()\n\n# Llama la función cuando Nilo esté junto a una rama",
     pregunta: "¿Por qué conviene dividir una misión grande en tareas pequeñas?",
     respuesta: "Porque puedes probar cada parte, encontrar errores con más facilidad y reutilizar instrucciones.",
     reto: "Antes de programar, escribe en palabras el orden de las cinco tareas que resolverás."
