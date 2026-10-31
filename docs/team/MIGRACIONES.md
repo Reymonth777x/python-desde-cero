@@ -253,3 +253,13 @@ DEV se creó con un snapshot de desarrollo `20261030061534_dev_environment_boots
 ### Distinción importante sobre Supabase Preview
 
 La reparación anterior corrige el historial del proyecto de producción principal. No equivale a reparar la rama Preview `main` que reporta `MIGRATIONS_FAILED`. Esa rama es un proyecto derivado separado, marcado `with_data=false` y `ACTIVE_HEALTHY`; su estado debe comprobarse después de que Supabase evalúe esta rama Git. No resetearla ni eliminarla por anticipado.
+
+
+### Aceptación funcional de Orilla — lectura real de filas (31-10-2026)
+
+Consulta de solo lectura de `public.orilla_runs`:
+
+- PROD contiene exactamente una fila: `chapter_id = c01`, `passed = false`, `stars = 0`, `best_steps = NULL`, `attempts = 0`. Es un borrador guardado; no acredita que el estudiante ejecutara el programa ni que superara el objetivo.
+- DEV no contiene filas de Orilla.
+- El código guarda borradores con `p_es_intento = false`; el contador `attempts` solo aumenta cuando se registra una ejecución. No interpretar la fila de PROD como una partida.
+- Aceptación pendiente: con una cuenta desechable de DEV, abrir `/orilla`, ejecutar la solución de `c01`, verificar que la ejecución queda aprobada y que la campaña/Academia reflejan el progreso. No utilizar cuentas ni datos de estudiantes de producción.
