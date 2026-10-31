@@ -216,7 +216,12 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
   const alEjecutar = async () => {
     if (ejecutando) return;
     setEjecutando(true);
-    if (sonidoActivo) reproducirSonidoOrilla('motor'); setReproduciendo(false); setGate(null); setErrorMotor(null); setResultado(null); setConfirmaNotas(false);
+    if (sonidoActivo) reproducirSonidoOrilla('motor');
+    setReproduciendo(false);
+    setGate(null);
+    setErrorMotor(null);
+    setResultado(null);
+    setConfirmaNotas(false);
     try {
       const res = await ejecutar(code, { ...payload, notas });
       if (!res.gate.ok) { setGate({ mensaje: res.gate.mensaje, linea: res.gate.linea, leccion: res.gate.leccion }); return; }
