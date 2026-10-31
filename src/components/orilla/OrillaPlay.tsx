@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import Editor, { type Monaco } from '@monaco-editor/react';
+import type { Monaco } from '@monaco-editor/react';
 import type { editor, IDisposable } from 'monaco-editor';
 import { useTheme } from '@/app/theme-provider';
 import { guardarOrilla, vaciarNotasOrilla } from '@/app/orilla/actions';
@@ -20,6 +20,7 @@ import OrillaGuide from './OrillaGuide';
 import { useOrillaWorker } from '@/lib/orilla/use-orilla-worker';
 import { reproducirSonidoOrilla } from '@/lib/orilla/audio';
 import RiverView from './RiverView';
+import OrillaCodeEditor from './OrillaCodeEditor';
 
 if (typeof window !== 'undefined' && !window.MonacoEnvironment) {
   window.MonacoEnvironment = { baseUrl: '/monaco/vs/' };
@@ -295,9 +296,14 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
             <span role="status" className="text-xs text-[var(--theme-muted)]">{guardadoEstado === 'guardando' && 'Guardando…'}{guardadoEstado === 'guardado' && 'Guardado en tu cuenta'}{guardadoEstado === 'error' && 'No se pudo guardar. Tu borrador sigue en este navegador.'}</span>
           </div>
           {aviso && <p role="status" className="border-l-2 border-[var(--theme-accent)] bg-[var(--theme-bg-secondary)] p-3 text-sm text-[var(--theme-ink)]">{aviso}</p>}
-          <div className="h-[min(62svh,560px)] min-h-[340px] w-full overflow-hidden rounded-xl border border-[var(--theme-border)] bg-[var(--theme-code-bg)] shadow-inner">
-            <Editor height="100%" defaultLanguage="python" theme="python-desde-cero" value={code} onChange={alCambiar} onMount={alMontar} options={{ minimap: { enabled: false }, fontSize: 16, lineHeight: 24, automaticLayout: true, tabSize: 4, scrollBeyondLastLine: false, wordWrap: 'on' }} />
-          </div>
+          <OrillaCodeEditor
+            value={code}
+            onChange={alCambiar}
+            verbos={payload.abiertos.verbos}
+            builtins={payload.abiertos.builtins}
+            constructos={payload.abiertos.constructos}
+            onMount={alMontar}
+          />
           <div className="grid gap-2 sm:flex sm:flex-wrap">
             <button type="button" onClick={alEjecutar} disabled={ejecutando} data-testid="orilla-ejecutar" className="flex min-h-12 w-full items-center justify-center bg-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">{ejecutando ? estadoWorker === 'cargando' ? 'Preparando Python…' : 'Ejecutando…' : 'Ejecutar'}</button>
             <button type="button" onClick={alReiniciarRio} className="flex min-h-12 w-full items-center justify-center border border-[var(--theme-border-dark)] px-5 py-3 text-base font-semibold text-[var(--theme-ink)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] sm:w-auto">Reiniciar el río</button>
