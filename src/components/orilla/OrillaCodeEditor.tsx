@@ -136,12 +136,13 @@ export default function OrillaCodeEditor({ value, onChange, verbos, builtins, co
               value={value}
               onChange={(evento) => onChange(evento.target.value)}
               onKeyDown={manejarTeclas}
+              wrap="off"
               spellCheck={false}
               autoCapitalize="off"
               autoCorrect="off"
               autoComplete="off"
               rows={Math.max(8, Math.min(16, lineas + 2))}
-              className="min-h-[260px] w-full resize-y bg-[#071b2a] px-3 py-3 font-mono text-base leading-7 text-[#e3f6ef] caret-[#f4d27c] outline-none placeholder:text-[#7899a6] focus:ring-2 focus:ring-inset focus:ring-[#6bc9b2]"
+              className="min-h-[260px] w-full resize-y overflow-x-auto whitespace-pre bg-[#071b2a] px-3 py-3 font-mono text-base leading-7 text-[#e3f6ef] caret-[#f4d27c] outline-none placeholder:text-[#7899a6] focus:ring-2 focus:ring-inset focus:ring-[#6bc9b2]"
               placeholder="# Escribe aquí las instrucciones de Nilo"
             />
           </div>
