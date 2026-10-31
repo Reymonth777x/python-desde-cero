@@ -63,20 +63,20 @@ export default function OrillaGuide({ chapterId, ayuda, verbos, builtins, onUseE
           </ol>
         </section>
 
-        <section className="space-y-3 rounded-2xl border border-[#b9d9ce] bg-[#eef7f1] p-3 text-[#173c35] dark:border-[#315b50] dark:bg-[#112f2d] dark:text-[#e3f3eb] sm:p-4">
+        <section className="space-y-3 rounded-2xl border border-[var(--theme-border)] bg-gradient-to-br from-[var(--theme-accent-light)] to-[var(--theme-surface)] p-3 text-[var(--theme-ink)] sm:p-4">
           <div className="flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#d4eadc] text-lg dark:bg-[#21483f]" aria-hidden="true">💡</span>
-            <div><p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-[#286c57] dark:text-[#9bd8bd]">Aprende en este nivel</p><h3 className="font-serif text-lg font-semibold">Una idea de Python</h3></div>
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--theme-surface)] text-lg" aria-hidden="true">💡</span>
+            <div><p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-[var(--theme-accent)]">Aprende en este nivel</p><h3 className="font-serif text-lg font-semibold">Una idea de Python</h3></div>
           </div>
           <p className="text-sm leading-6">{leccion.explicacion}</p>
-          <div className="overflow-hidden rounded-xl border border-[#234c4d]/30 bg-[#071b2a]">
+          <div className="overflow-hidden rounded-xl border border-white/20 bg-[#071b2a]">
             <div className="flex items-center justify-between border-b border-white/10 px-3 py-2"><span className="text-[0.63rem] font-bold tracking-[0.15em] text-[#84cbb8]">EJEMPLO PEQUEÑO</span><span className="text-[0.62rem] text-[#83a9b2]">PYTHON</span></div>
             <pre className="overflow-x-auto p-3 font-mono text-[0.78rem] leading-6 text-[#d8f7e9]"><code>{leccion.ejemplo}</code></pre>
           </div>
           <details className="rounded-xl border border-[#b6d1c4] bg-white/60 p-3 dark:border-[#315b50] dark:bg-black/10">
             <summary className="min-h-10 cursor-pointer py-2 text-sm font-semibold">🧠 Comprueba lo que aprendiste</summary>
             <p className="mt-2 text-sm font-semibold">{leccion.pregunta}</p>
-            <details className="mt-2 rounded-lg bg-[#dcece2] p-2 dark:bg-[#173d35]">
+            <details className="mt-2 rounded-lg bg-[var(--theme-surface)] p-2">
               <summary className="min-h-9 cursor-pointer py-2 text-xs font-bold">Mostrar explicación</summary>
               <p className="pb-1 text-sm leading-5">{leccion.respuesta}</p>
             </details>
