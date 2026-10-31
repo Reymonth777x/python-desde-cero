@@ -277,3 +277,32 @@ Se ejecutó una prueba SQL de integración usando dos perfiles de estudiante exi
 - Después del `ROLLBACK`, una consulta independiente verificó que DEV seguía con cero filas en `orilla_runs`.
 
 La prueba acredita el comportamiento de RPC, RLS, prerrequisitos y permisos a nivel de base de datos. **No acredita todavía la experiencia visual real con Monaco/Pyodide desde un navegador autenticado**, ni la actualización visual del mapa y del panel de Academia. Esa aceptación sigue pendiente con un estudiante desechable de DEV.
+
+
+## Pruebas de permisos y evaluación actuales — 31-10-2026
+
+La suite `supabase/tests/permissions.sql` fue reemplazada para coincidir con el esquema canónico vigente:
+
+- Usa `public.progress`, `public.invitations`, `public.orilla_runs`, `private.quiz_answer_key` y `private.quiz_attempts`.
+- Comprueba ACL, RLS, los wrappers públicos `SECURITY INVOKER`, las funciones privadas autoritativas `SECURITY DEFINER), el bloqueo del RPC heredado, aislamiento entre dos estudiantes y permisos del administrador.
+- Comprueba quiz incorrecto sin progreso, quiz aprobado con score persistido, prerrequisitos de módulo y el guardado/avance de Orilla.
+- Crea tres usuarios Auth ficticios en el test local, dentro de una transacción que termina en `ROLLBACK`; no requiere cuentas remotas ni modifica datos persistentes.
+- El plan pgTAP contiene **69 aserciones**. Se añadió una regresión Vitest para impedir que vuelvan a aparecer placeholders, referencias a tablas antiguas o comandos psql incompletos.
+
+La ejecución real de pgTAP (`npx supabase test db`) todavía no se ha realizado contra una instancia local limpia; la prueba está escrita, pero no debe marcarse como ejecutada hasta disponer de Docker/Supabase CLI local y observar el resultado.
+
+### Integración reversible ejecutada en DEV — quiz/progreso — 31-10-2026
+
+Dentro de una transacción con `ROLLBACK` en el proyecto DEV:
+
+- El quiz incorrecto `module-1/b1-l1` devolvió `passed = false` y no creó progreso.
+- Las respuestas correctas devolvieron `passed = true`, score 100 y fila de progreso completada.
+- La segunda cuenta no pudo leer la fila de progreso de la primera por RLS.
+- El rol `authenticated` no tiene INSERT/UPDATE en `public.progress`, INSERT en `private.quiz_attempts`, ni SELECT en `private.quiz_answer_key`.
+- Consulta independiente posterior al `ROLLBACK`: cero filas en `progress`, `private.quiz_attempts` y `orilla_runs`.
+
+Esta verificación acredita la lógica RPC/ACL/RLS en la base de datos DEV, no el flujo UI/browser de Auth, recarga o nueva sesión.
+
+### Herramienta obsoleta retirada
+
+Se eliminó `scripts/gen-quiz-keys.ts`: no era un script npm activo y generaba `TRUNCATE TABLE private.quiz_keys RESTART IDENTITY CASCADE`, además de INSERTs hacia una tabla que no existe en PROD ni DEV. No se sustituye por un generador SQL manual. El catálogo vigente se versiona mediante migraciones revisadas de `private.quiz_answer_key`; no se debe regenerar ni truncar la clave desde `src/lib/course.ts`.
