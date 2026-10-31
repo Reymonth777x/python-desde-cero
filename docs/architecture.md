@@ -15,6 +15,7 @@
 - `/login/forgot-password` y `/login/reset-password`: solicitud y cambio de contraseña.
 - `/academia` y `/academia/[moduleId]/[lessonId]`: recorrido educativo autenticado.
 - `/practica`: editor, ejecución y progreso.
+- `/orilla` y `/orilla/[chapterId]`: práctica gamificada de Python, con campaña de 12 tramos y retos extra; requiere sesión.
 - `/admin/invitaciones`: gestión administrativa protegida en página y Server Action.
 - `/auth/callback`: intercambio de códigos de Auth y redirección fija a práctica o restablecimiento.
 
@@ -25,6 +26,10 @@
 - Middleware refresca/verifica claims para restringir aprendizaje. Las páginas y acciones administrativas vuelven a comprobar identidad y `profiles.is_admin`.
 - RLS debe ser la protección final de filas. Las migraciones locales son la única evidencia disponible; el ACL y RLS remotos no se han consultado.
 - Python se ejecuta en un Worker del navegador, con límites de duración y salida en el código existente. El Worker reduce el bloqueo de interfaz, pero no es aislamiento de seguridad absoluto.
+
+## Orilla
+
+Orilla comparte el Worker Pyodide del laboratorio mediante el `MessagePort` transferido y añade el motor didáctico `public/orilla-engine.py`. Su motor limita el subconjunto de Python permitido por AST, evalúa mapas y objetivos y devuelve eventos para reproducir el recorrido. La interfaz guarda código y resultados de práctica en `public.orilla_runs` por RPC autenticada; las estrellas son feedback de práctica, no notas oficiales de las evaluaciones del curso.
 
 ## Datos
 

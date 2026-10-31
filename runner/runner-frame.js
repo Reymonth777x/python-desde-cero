@@ -9,6 +9,7 @@
   const MAX_INPUT_LINES = 20;
   const MAX_INPUT_LINE_LENGTH = 1000;
   const MAX_WORKER_SOURCE_LENGTH = 1000000;
+  const MAX_ORILLA_CODE_LENGTH = 20000;
 
   let parentPort = null;
   let worker = null;
@@ -20,6 +21,7 @@
   let workerStartPromise = null;
   let restartAfterStart = false;
   let queuedExecutions = [];
+  let queuedOrillaExecutions = [];
 
   function sendToParent(message) {
     if (!parentPort) return;
@@ -30,6 +32,7 @@
     workerGeneration += 1;
     workerReady = false;
     queuedExecutions = [];
+    queuedOrillaExecutions = [];
 
     if (workerPort) {
       workerPort.onmessage = null;
@@ -73,6 +76,30 @@
     }
   }
 
+  function dispatchQueuedOrillaExecutions() {
+    if (!workerReady || !workerPort) return;
+    const queue = queuedOrillaExecutions;
+    queuedOrillaExecutions = [];
+    for (const message of queue) {
+      workerPort.postMessage({
+        type: "orilla:run",
+        id: message.id,
+        code: message.code,
+        tramo: message.tramo
+      });
+    }
+  }
+
+  function validOrillaExecution(message) {
+    return message &&
+      Number.isSafeInteger(message.id) &&
+      typeof message.code === "string" &&
+      message.code.length <= MAX_ORILLA_CODE_LENGTH &&
+      message.tramo &&
+      typeof message.tramo === "object" &&
+      !Array.isArray(message.tramo);
+  }
+
   function handleWorkerMessage(event) {
     const message = event.data;
     if (!message || typeof message !== "object") return;
@@ -81,6 +108,7 @@
       workerReady = true;
       sendToParent({ status: "ready" });
       dispatchQueuedExecutions();
+      dispatchQueuedOrillaExecutions();
       return;
     }
 
@@ -88,6 +116,17 @@
       const error = typeof message.error === "string" ? message.error.slice(0, 2000) : "No se pudo iniciar Python.";
       sendToParent({ status: "init-error", error });
       stopWorker();
+      return;
+    }
+
+    if (message.type === "orilla:result" || message.type === "orilla:error") {
+      if (!Number.isSafeInteger(message.id)) return;
+      sendToParent({
+        type: message.type,
+        id: message.id,
+        result: message.type === "orilla:result" ? message.result : undefined,
+        error: typeof message.error === "string" ? message.error.slice(0, 2000) : undefined
+      });
       return;
     }
 
@@ -227,6 +266,36 @@
         });
       } else {
         queuedExecutions = [message];
+      }
+      return;
+    }
+
+    if (message.type === "orilla:run") {
+      if (!validOrillaExecution(message)) {
+        sendToParent({
+          type: "orilla:error",
+          id: Number.isSafeInteger(message.id) ? message.id : undefined,
+          error: "La solicitud de Orilla no es válida."
+        });
+        return;
+      }
+
+      if (!worker) startWorker();
+      if (workerReady && workerPort) {
+        workerPort.postMessage({
+          type: "orilla:run",
+          id: message.id,
+          code: message.code,
+          tramo: message.tramo
+        });
+      } else if (queuedOrillaExecutions.length < 4) {
+        queuedOrillaExecutions.push(message);
+      } else {
+        sendToParent({
+          type: "orilla:error",
+          id: message.id,
+          error: "Hay demasiados programas de Orilla en espera."
+        });
       }
       return;
     }

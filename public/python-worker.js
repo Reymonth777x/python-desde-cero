@@ -16,12 +16,14 @@
     const MAX_INPUT_LINES = 20;
     const MAX_INPUT_LINE_LENGTH = 1000;
     const MAX_TURTLE_COMMANDS = 5000;
+    const ORILLA_MAX_CODE_LENGTH = 20000;
 
     let responsePort = null;
     const pendingMessages = [];
     const MAX_PENDING_MESSAGES = 8;
     let runtimeStatus = "loading";
     let initializationError = "";
+    let orillaEnginePromise = null;
 
     const pyodideReadyPromise = loadPyodide({
         indexURL: PYODIDE_BASE_URL,
@@ -193,6 +195,65 @@
         }
     }
 
+
+    async function loadOrillaEngine(pyodide) {
+        if (!orillaEnginePromise) {
+            orillaEnginePromise = (async () => {
+                const response = await fetch("/orilla-engine.py", { credentials: "omit", cache: "no-cache" });
+                if (!response.ok) {
+                    throw new Error("No se pudo cargar el motor de Orilla: " + response.status);
+                }
+                const source = await response.text();
+                if (source.length < 1000 || source.length > 100000) {
+                    throw new Error("El motor de Orilla no tiene un tamaño válido.");
+                }
+                pyodide.FS.writeFile("/home/pyodide/orilla_engine.py", source);
+                return pyodide.pyimport("orilla_engine");
+            })().catch((error) => {
+                orillaEnginePromise = null;
+                throw error;
+            });
+        }
+        return orillaEnginePromise;
+    }
+
+    async function handleOrillaExecution(data) {
+        const id = data?.id;
+        if (!Number.isSafeInteger(id)) {
+            send({ type: "orilla:error", id, error: "El identificador de Orilla no es válido." });
+            return;
+        }
+        if (runtimeStatus === "init-error") {
+            send({ type: "orilla:error", id, error: initializationError });
+            return;
+        }
+        if (runtimeStatus !== "ready") {
+            send({ type: "orilla:error", id, error: "Python todavía se está preparando." });
+            return;
+        }
+        if (typeof data.code !== "string" || data.code.length > ORILLA_MAX_CODE_LENGTH) {
+            send({ type: "orilla:error", id, error: "El programa de Orilla supera el límite permitido." });
+            return;
+        }
+        if (!data.tramo || typeof data.tramo !== "object" || Array.isArray(data.tramo)) {
+            send({ type: "orilla:error", id, error: "Los datos del tramo no son válidos." });
+            return;
+        }
+
+        try {
+            const pyodide = await pyodideReadyPromise;
+            const motor = await loadOrillaEngine(pyodide);
+            const resultado = motor.run_json(data.code, JSON.stringify(data.tramo));
+            send({ type: "orilla:result", id, result: JSON.parse(resultado) });
+        } catch (error) {
+            send({
+                type: "orilla:error",
+                id,
+                error: error?.message || "El motor de Orilla no pudo ejecutar el programa.",
+            });
+        }
+    }
+
     self.onmessage = (event) => {
         const message = event.data ?? {};
 
@@ -203,6 +264,8 @@
                 const request = portEvent.data ?? {};
                 if (request.type === "execute") {
                     void handleExecution(request);
+                } else if (request.type === "orilla:run") {
+                    void handleOrillaExecution(request);
                 } else if (request.type === "stop") {
                     // Termination is performed by the owning frame; this
                     // message exists only to make the protocol explicit.

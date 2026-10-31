@@ -1,0 +1,7 @@
+avanzar()
+avanzar()
+avanzar()
+avanzar()
+avanzar()
+profundidad = columna()
+decir(profundidad)

@@ -2,7 +2,7 @@ import { resolvePythonRunnerOrigin } from '@/lib/python-runner-protocol';
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const LEARNING_PREFIXES = ['/practica', '/academia'];
+const LEARNING_PREFIXES = ['/practica', '/academia', '/orilla'];
 
 function matchesPrefix(pathname: string, prefix: string) {
   return pathname === prefix || pathname.startsWith(`${prefix}/`);

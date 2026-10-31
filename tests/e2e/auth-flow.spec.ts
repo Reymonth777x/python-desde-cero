@@ -41,6 +41,13 @@ test.describe('Autenticacion y flujo de usuario', () => {
     await expect(page).toHaveURL(/.*\/login/);
   });
 
+  test('Orilla protege el mapa y los tramos para visitantes', async ({ page }) => {
+    for (const path of ['/orilla', '/orilla/c01']) {
+      await page.goto(path);
+      await expect(page).toHaveURL(/login/);
+    }
+  });
+
   test('Login conserva el correo, limpia la contraseña y reintenta Turnstile si no carga', async ({ page }) => {
     let widgetRequests = 0;
     await page.route('https://challenges.cloudflare.com/turnstile/**', async (route) => {

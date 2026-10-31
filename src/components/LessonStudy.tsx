@@ -10,6 +10,7 @@ import { submitQuiz, type SubmitQuizResult } from '@/lib/server-quiz/submit-quiz
 import PythonEditor from '@/components/PythonEditor';
 import type { ExerciseTestResult } from '@/lib/exercise-output';
 import { acquireSubmissionLock, releaseSubmissionLock } from '@/lib/submission-lock';
+import { tramoDeLeccion } from '@/lib/orilla/catalog';
 
 type Props = {
   lesson: ClientSafeLesson;
@@ -45,6 +46,7 @@ export default function LessonStudy({
   const [savedScore, setSavedScore] = useState(initialScore);
   const [projectTestsPassed, setProjectTestsPassed] = useState(false);
 
+  const orillaTramo = tramoDeLeccion(lesson.id);
   const answersJson = JSON.stringify(
     lesson.questions.map((_q, index) => answers[index] ?? -1)
   );
@@ -126,6 +128,7 @@ export default function LessonStudy({
           <p className="text-xs font-bold tracking-[0.15em] text-[var(--theme-accent)]">MÓDULO {moduleNumber} · {lesson.section}</p>
           <h1 className="mt-3 max-w-3xl font-serif text-3xl leading-tight sm:text-4xl">{lesson.title}</h1>
           <p className="mt-3 text-sm text-[var(--theme-muted)]">{moduleTitle}</p>
+          {orillaTramo && <Link href={`/orilla/${orillaTramo}`} className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-[var(--theme-accent)] underline underline-offset-4">Practicar este concepto en Orilla <ArrowRight aria-hidden="true" className="ml-2" size={16} /></Link>}
         </div>
 
         {progressUnavailable && (

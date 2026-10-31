@@ -1,0 +1,5 @@
+avanzar()
+avanzar()
+avanzar()
+texto = mirar()
+decir(texto)
