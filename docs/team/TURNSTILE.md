@@ -1,6 +1,6 @@
 # Turnstile y autenticación — producción
 
-## Estado comprobado y aceptación manual — 31 de octubre de 2026
+## Estado comprobado y aceptación manual — 30 de octubre de 2026
 
 - La variable pública `NEXT_PUBLIC_TURNSTILE_SITE_KEY` está disponible en GitHub Actions y el workflow la inyecta durante el build de Vinext.
 - La publicación actual comprobada de `master` es el SHA `38533eae71f60e899949f567c30f15c99c3cbe65`. CI [41150277769](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41150277769) y despliegue Cloudflare [41150633694](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41150633694) terminaron correctamente sobre el mismo SHA. El Worker principal tiene versión `7b625566-1987-4f2c-9875-c369ed584e13`.
