@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import Editor, { type Monaco } from '@monaco-editor/react';
 import type { editor } from 'monaco-editor';
 import { DOC_VERBOS, VERBOS_SIN_ARGUMENTOS } from '@/lib/orilla/ayuda-verbos';
@@ -79,7 +79,7 @@ export default function OrillaCodeEditor({ value, onChange, verbos, builtins, co
     if (bloque) insertar(bloque.codigo, bloque.cursor);
   };
 
-  const manejarTeclas = (evento: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const manejarTeclas = (evento: ReactKeyboardEvent<HTMLTextAreaElement>) => {
     if (evento.key !== 'Tab' && evento.key !== 'Enter') return;
     evento.preventDefault();
     const campo = evento.currentTarget;
