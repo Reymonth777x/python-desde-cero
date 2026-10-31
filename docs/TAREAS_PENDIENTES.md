@@ -1,30 +1,43 @@
 # Tareas pendientes de configuración, calidad y operación
 
-Actualización: 31 de octubre de 2026. Este resumen superior es el estado operativo vigente. Las listas de las secciones históricas que siguen conservan el corte del 30-10-2026; sus casillas no deben interpretarse como pendientes actuales sin contrastar con los issues enlazados.
+Actualización: 31 de octubre de 2026. Este resumen superior es el estado operativo vigente. Las listas históricas que siguen conservan sus cortes anteriores y no deben interpretarse como pendientes actuales sin contrastarlas con los issues enlazados.
 
 ## Estado vigente — 31-10-2026
 
-### Completado
-- [x] Orilla integrada y publicada: `/orilla`, 12 tramos, río abierto y dos retos. Las rutas requieren sesión y el runner de Python aislado está publicado.
-- [x] Corregido el bloqueo del runner: allowlist de orígenes apex/`www` y smoke test real de ejecución en CI.
+### Completado y publicado
+
+- [x] Orilla integrada en producción: `/orilla`, 12 tramos guiados, río abierto y dos retos. Las rutas requieren sesión y el runner Python de origen aislado está publicado.
+- [x] Corregido el bloqueo del runner: allowlist de orígenes apex/`www`, política de producción y smoke test real de ejecución.
 - [x] Reconciliado el historial PROD: 29 versiones remotas coinciden con 29 archivos activos canónicos en `supabase/migrations/`. La reparación de 001/002/003/005 en PROD fue solo de metadatos; no reejecutó SQL.
-- [x] Corregidos los datos y guía de migraciones: DEV conserva su bootstrap y wrappers propios (11 versiones). No copiarle el historial de PROD ni ejecutar `db push` a ciegas.
-- [x] Pruebas SQL reversibles en DEV: quiz fallido no crea progreso, quiz aprobado guarda 100 puntos, el segundo estudiante no puede leer progreso del primero; RPC/RLS de Orilla y bloqueo de `c02` comprobados. Todas las transacciones terminaron en `ROLLBACK` y las consultas posteriores confirmaron cero filas de prueba.
-- [x] PR #108 fusionado: suite pgTAP reescrita para esquema actual (69 aserciones), generador obsoleto que emitía `TRUNCATE ... CASCADE` retirado y documentos históricos corregidos. CI de PR pasó 172 pruebas E2E y builds.
-- [x] Portada, login, `www` y rutas protegidas de Orilla revalidadas después de la publicación anterior. Turnstile aparece en el HTML del login.
+- [x] DEV conserva su bootstrap y wrappers propios (11 versiones). No copiar el historial PROD ni ejecutar `db push` a ciegas.
+- [x] Pruebas SQL reversibles en DEV: quiz fallido no crea progreso, quiz aprobado guarda 100 puntos, un segundo estudiante no puede leer el progreso del primero; RPC/RLS de Orilla y bloqueo de `c02` comprobados. Las transacciones terminaron en `ROLLBACK` y las consultas posteriores confirmaron cero filas de prueba.
+- [x] PR #108 integró la suite pgTAP de 69 aserciones para el esquema actual y retiró el generador obsoleto que emitía `TRUNCATE ... CASCADE`.
+- [x] PR #118 añadió pruebas Playwright de controles del laboratorio en 320, 360 y 390 px; PR #119 humanizó el encabezado de `/practica`.
+- [x] PR #120 conectó `OrillaPlay` al helper probado de recuperación de borradores.
+- [x] PR #121/#124 corrigieron la tarjeta de la extensión opcional y reforzaron E2E + smoke de producción para exigir los nodos exactos `05` y `OPCIONAL`.
+- [x] PR #122 añadió regresiones de login exitoso, redirección interna y registro con callback de confirmación mediante Supabase simulado.
+- [x] PR #125 mejoró la guía, los ejemplos y la edición móvil de Orilla. PR #126 corrigió la recuperación: fecha remota presente pero inválida bloquea la recuperación y una edición manual prevalece frente al timeout.
+- [x] CI #793 [run](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41177442432) y deploy #140 [run](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41177624316) completaron en `success` sobre el mismo SHA `a4d7f6a225813ab2bbb27948f6d2fed9bcae17e4`. CI incluye unit tests, verificación de ejercicios, Pyodide/Orilla, TypeScript, ESLint, build, Playwright E2E, Vinext, pgTAP en Supabase efímero y PowerShell. El deploy verificó el dominio personalizado y la versión servida.
+- [x] La portada pública se inspeccionó tras deploy #139 y #140: módulos `01`–`05`, extensión con etiqueta `OPCIONAL`; `/muestra` y `/login` responden y `/practica`/`/orilla` exigen sesión para visitantes.
+- [x] Supabase Preview `main` está `FUNCTIONS_DEPLOYED` y `ACTIVE_HEALTHY`; el workflow registrado en issue #3 informó `All migrations are up to date`. No se hizo reset ni borrado.
+- [x] PR #107 de mitigación de dependencias quedó fusionado. La auditoría de dependencias de CI sigue siendo informativa y requiere revisar su salida antes de afirmar que no quedan avisos.
 
 ### Pendiente real
-- [ ] **Orilla en navegador:** usar una cuenta desechable DEV, iniciar sesión, abrir `c01`, ejecutar el código, superar el objetivo, recargar y comprobar que el mapa y Academia reflejan el avance. PROD solo tiene un borrador `c01` con cero intentos; no utilizar alumnos de PROD. Seguimiento: issue [#20](https://github.com/Reymonth777x/python-desde-cero/issues/20).
-- [ ] **Auth y evaluaciones en navegador DEV:** confirmar registro, correo, CAPTCHA, login, logout, recuperación, quiz aprobado/reprobado y persistencia al reingresar. Los logs de PROD muestran uso real y errores de CAPTCHA/límites, pero no sustituyen una aceptación controlada de DEV. Issues [#17](https://github.com/Reymonth777x/python-desde-cero/issues/17) y [#20](https://github.com/Reymonth777x/python-desde-cero/issues/20).
-- [ ] **pgTAP real:** ejecutar `npx supabase test db` contra una instancia Supabase local limpia. La suite nueva está escrita y tiene guardas Vitest, pero no se ha ejecutado con Docker/Supabase CLI local. No ejecutarla contra DEV ni PROD.
-- [x] **Supabase Preview:** `main` está `FUNCTIONS_DEPLOYED` y `ACTIVE_HEALTHY`; el workflow `09bb28322abe438299e8e8eaa313f821` (2026-10-31 02:50:48 UTC) registra `All migrations are up to date`. No se hizo reset ni borrado. Issue [#3](https://github.com/Reymonth777x/python-desde-cero/issues/3) listo para cerrar.
-- [ ] **Móvil/rediseño:** completar inventario y revisión visual de portada, lección, paleta, Monaco, teclado virtual y progreso en teléfonos físicos. Las pruebas a 320/360/390 px no sustituyen aceptación física. Issue [#18](https://github.com/Reymonth777x/python-desde-cero/issues/18).
-- [ ] **Gobierno de GitHub:** `master` sigue sin protección. Activar PR obligatorio, aprobación, conversaciones resueltas y checks `test-and-build`/`powershell-launcher`. Issue [#23](https://github.com/Reymonth777x/python-desde-cero/issues/23).
-- [ ] **Decisión de visibilidad:** el repositorio sigue público y las respuestas de evaluación permanecen en el historial. No cambiar visibilidad ni reescribir commits sin decisión explícita. Issue [#21](https://github.com/Reymonth777x/python-desde-cero/issues/21).
-- [ ] **Dependencias:** PR #107 propone una mitigación parcial de `minimatch`; su rama conserva cinco avisos moderados en una copia heredada de ESLint. No considerar el audit limpio ni forzar un salto mayor incompatible.
-- [ ] **Privacidad y términos:** revisión profesional de privacidad, términos, cookies, retención y derechos para Costa Rica antes de abrir registro externo. Issue [#98](https://github.com/Reymonth777x/python-desde-cero/issues/98).
 
-La referencia de publicación, commits y Workers está en `README.md`; el estado exacto de migraciones está en `docs/team/MIGRACIONES.md`. Las secciones siguientes son el checklist conservado del 30-10-2026 y sirven como historial, no como fuente de estado actual.
+- [ ] **Orilla en navegador DEV:** usar una cuenta desechable, iniciar sesión, abrir `c01`, ejecutar el código, superar el objetivo, recargar y comprobar que el mapa y Academia reflejan el avance. PROD solo tiene el borrador anterior `c01` con cero intentos; no usar cuentas de alumnos de PROD. Seguimiento: issue [#20](https://github.com/Reymonth777x/python-desde-cero/issues/20).
+- [ ] **Auth y evaluaciones en navegador DEV:** confirmar registro, correo real, Turnstile, login, logout, recuperación, quiz aprobado/reprobado y persistencia al reingresar. Las pruebas de Server Actions con mocks no sustituyen esta aceptación. Issues [#17](https://github.com/Reymonth777x/python-desde-cero/issues/17) y [#20](https://github.com/Reymonth777x/python-desde-cero/issues/20).
+- [ ] **Móvil físico/rediseño:** revisar selector de temas, Monaco/textarea, teclado virtual, desplazamiento, foco y progreso autenticado en teléfonos físicos. Las pruebas a 320/360/390 px no sustituyen la aceptación física. Issue [#18](https://github.com/Reymonth777x/python-desde-cero/issues/18).
+- [ ] **Gobierno de GitHub:** `master` sigue sin protección. Activar PR obligatorio, una aprobación, conversaciones resueltas, checks `test-and-build` y `powershell-launcher`, no permitir force-push/eliminación ni bypass. Issue [#23](https://github.com/Reymonth777x/python-desde-cero/issues/23). La integración disponible permitió inspeccionar, pero no modificar, esta configuración.
+- [ ] **Decisión de visibilidad:** el repositorio sigue público y las respuestas históricas de evaluación permanecen en Git. No cambiar la visibilidad ni reescribir el historial sin decisión explícita. Issue [#21](https://github.com/Reymonth777x/python-desde-cero/issues/21).
+- [ ] **Dependencias:** revisar los avisos actuales que reporte `npm audit`/la auditoría informativa de CI tras el merge #107. No declarar el audit limpio solo porque la suite general haya pasado.
+- [ ] **Privacidad y términos:** revisión profesional de privacidad, términos, cookies, retención, derechos de titulares y tratamiento de menores para Costa Rica antes de abrir el registro externo. Issue [#98](https://github.com/Reymonth777x/python-desde-cero/issues/98).
+
+### Notas de validación
+
+- pgTAP ya se ejecuta en CI sobre una instancia Supabase local efímera y limpia; los jobs #791/#793 completaron en verde. Esto no aplica migraciones ni escribe datos en DEV o PROD.
+- El runtime protege las respuestas del curso mediante serializadores server-only, pero el código/historial Git del repositorio público sigue conteniendo material de evaluación histórico. La decisión de visibilidad y el plan de material histórico siguen siendo del propietario.
+- PR #123 se cerró como reemplazado por #125; no se fusionó ni se eliminó su rama.
+- La referencia operativa exacta está en `README.md` y el estado de migraciones en `docs/team/MIGRACIONES.md`. Las secciones siguientes conservan el checklist histórico del 30-10-2026 y no deben reabrirse automáticamente.
 
 ---
 
