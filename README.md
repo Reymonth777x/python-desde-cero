@@ -176,9 +176,9 @@ No se incluyen credenciales SMTP, tokens ni claves API en este repositorio. La p
 
 ## Latest verified release
 
-- GitHub `master`: `a4d7f6a225813ab2bbb27948f6d2fed9bcae17e4` (October 31, 2026).
-- CI: [run 41177442432](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41177442432) — success on that exact SHA. All three jobs passed: `test-and-build`, `powershell-launcher` and `supabase-pgtap`.
-- Cloudflare deployment: [run 41177624316](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41177624316) — success on the same SHA. The workflow published the isolated Python runner, compiled and deployed the Worker, verified that the custom domain remained connected, and checked the served version.
+- GitHub `master` HEAD: `13ce9e2ce7915e5dcd3c1df330ef7029c19755a6` (October 31, 2026; documentation-only merge #127 after the runtime release).
+- Last functional runtime commit: `a4d7f6a225813ab2bbb27948f6d2fed9bcae17e4`. CI [run 41177442432](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41177442432) and Cloudflare deploy [run 41177624316](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41177624316) passed on that exact SHA.
+- The current `master` HEAD also passed CI [run 41178125638](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41178125638) and Cloudflare deployment [run 41178300094](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41178300094), both on `13ce9e2`. PR #127 changed documentation only; the application runtime is unchanged from `a4d7f6a`. The workflow re-published the isolated Python runner, compiled and deployed the Worker, verified the custom domain and checked the served version.
 - Production smoke verification confirmed the homepage, `/muestra`, `/login`, the exact optional-module label (`05` and `OPCIONAL`), and that unauthenticated requests to `/practica` and `/orilla` require login. The deployment workflow also verifies the runner origin and its production-only policy.
 - PRs #118, #119, #120, #121, #122, #124, #125 and #126 delivered the mobile lab checks and wording, Orilla draft wiring/mobile guide improvements, Auth success-path tests, optional-module label regression test, and safe Orilla draft recovery. PR #123 was closed as superseded by #125; it was not merged.
 - PROD has 29/29 active migration versions reconciled; DEV retains its separate 11-version bootstrap and wrappers. Preview `main` was confirmed healthy with all migrations up to date. No schema or migration changes were made in the Orilla draft guard fixes.
