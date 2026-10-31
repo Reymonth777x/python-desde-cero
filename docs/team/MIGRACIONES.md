@@ -238,3 +238,18 @@ DEV se creó con un snapshot de desarrollo `20261030061534_dev_environment_boots
 - No ejecutar `db push`, `db reset`, `merge_branch` ni borrar la rama Preview como atajo.
 - La reparación de historial debe ser metadata-only, version por version, con comparación previa de objetos y permisos. No marcar como applied una migración cuyo efecto no esté presente.
 - Después de la reparación, comprobar `list_migrations` en ambos entornos y confirmar que PROD y DEV no tienen versiones remotas ausentes en la carpeta correspondiente. Si el preview sigue fallando, leer el error nuevo antes de tocar esa rama.
+
+
+### Cierre de reconciliación del proyecto de producción — 31-10-2026
+
+- La carpeta activa `supabase/migrations/` de esta rama contiene 29 archivos y el historial de PROD contiene exactamente las mismas 29 versiones: cero archivos locales ausentes del historial y cero versiones remotas sin archivo local.
+- Se recuperaron las sentencias SQL originales de 011–015 desde `schema_migrations.statements[1]` de producción; los archivos nuevos conservan las sentencias originales sin reconstrucción.
+- Las cuatro migraciones 024–027 se renombraron a sus timestamps reales de PROD. Se comparó el contenido de cada archivo con la sentencia registrada y los cuatro dieron igualdad exacta.
+- Los SQL locales alternativos de 011–013 y las cuatro migraciones de funcionalidades que no tienen tablas/columnas/consumidores en el producto actual se preservaron en `supabase/archive/migrations/`; no forman parte del orden de ejecución.
+- En PROD se completó una reparación solo de historial para `20261026083700`, `20261026083705`, `20261026083715` y `20261026083730`. Antes de insertarlas se verificó que las tablas base y el trigger de Auth existían, que `handle_new_user()` ya ejecutaba el registro con invitación opcional y que el vencimiento de invitaciones estaba normalizado. Las cuatro filas fueron insertadas en `supabase_migrations.schema_migrations` con las sentencias de su archivo local y `ON CONFLICT DO NOTHING`. No se ejecutaron esas sentencias SQL ni se alteró esquema, datos, usuarios, invitaciones, progreso, permisos o triggers.
+- No se modificó el historial remoto de DEV. DEV sigue utilizando un bootstrap de entorno propio y tres wrappers/ajustes de privilegios locales a ese proyecto. No se deben insertar en DEV versiones comunes por mera semejanza de nombre: antes se requiere una matriz de efectos por timestamp y comprobar sus RPC/ACL para conservar el wrapper v2 de DEV.
+- Esta reconciliación se preparó en la rama `fix/reconcile-supabase-migration-history-20261031`. La rama aún requiere CI y revisión de Supabase Preview antes de integrarse en `master`.
+
+### Distinción importante sobre Supabase Preview
+
+La reparación anterior corrige el historial del proyecto de producción principal. No equivale a reparar la rama Preview `main` que reporta `MIGRATIONS_FAILED`. Esa rama es un proyecto derivado separado, marcado `with_data=false` y `ACTIVE_HEALTHY`; su estado debe comprobarse después de que Supabase evalúe esta rama Git. No resetearla ni eliminarla por anticipado.
