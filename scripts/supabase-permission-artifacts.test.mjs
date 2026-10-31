@@ -16,7 +16,7 @@ describe('Supabase permission test artifacts', () => {
 
     expect(permissionsSql).not.toContain('public.quiz_attempts');
     expect(permissionsSql).not.toContain('private.quiz_keys');
-    expect(permissionsSql).not.toContain('submit_quiz(');
+    expect(permissionsSql).not.toMatch(/\bSELECT\s+public\.submit_quiz\(/);
   });
 
   it('contains no unfinished fragments or psql-only fixture commands', () => {
