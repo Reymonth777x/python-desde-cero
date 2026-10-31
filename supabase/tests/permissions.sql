@@ -387,7 +387,11 @@ SELECT lives_ok(
   'administrator can create an invitation'
 );
 SELECT is(
-  (SELECT count(*)::integer FROM public.invitations),
+  (
+    SELECT count(*)::integer
+    FROM public.invitations
+    WHERE code IN ('PGTAP-ADMIN-SEED', 'PGTAP-ADMIN-CREATED')
+  ),
   2,
   'administrator can see both test invitations'
 );
