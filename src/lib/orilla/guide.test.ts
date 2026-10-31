@@ -28,7 +28,7 @@ describe('guía inicial de Orilla', () => {
   });
 
   it('el primer tramo ofrece un ejemplo que lleva hasta la boya', () => {
-    expect(GUIA_ORILLA.c01.ejemplo).toBe('avanzar()\\navanzar()\\navanzar()');
+    expect(GUIA_ORILLA.c01.ejemplo).toBe('avanzar()\navanzar()\navanzar()');
   });
 
   it('la leyenda no repite símbolos y explica los elementos del río', () => {
