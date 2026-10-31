@@ -317,3 +317,15 @@ La lectura más reciente de `list_branches` del proyecto PROD muestra la Preview
 - `with_data = false`; sigue siendo una rama derivada sin datos de producción.
 
 Esto indica un avance respecto al fallo observado antes de fusionar la reconciliación #106, pero la interfaz de solo lectura disponible en esta revisión no expone el ledger de migraciones del proyecto derivado ni el log detallado del paso `migrate`. No cerrar el incidente como reconciliado hasta confirmar en el workflow de Supabase que `migrate` terminó con éxito y comparar las versiones del Preview con el baseline de PROD. No resetear, rebasar ni eliminar la rama como solución rápida.
+
+
+## Cierre de la verificación de Supabase Preview — 31-10-2026 02:50:48 UTC
+
+La rama Preview `main` del proyecto de producción `nuqydanbbgqcofcftshk` se verificó después de fusionar la reconciliación #106:
+
+- `list_branches` devuelve `status = FUNCTIONS_DEPLOYED`, `preview_project_status = ACTIVE_HEALTHY` y `with_data = false`.
+- Los logs del workflow de Preview registran que clonó `git_ref = master`, comprobó el servicio, conectó a la base derivada y escribió explícitamente **`All migrations are up to date.`**.
+- El mismo run registra que no hubo funciones que desplegar; no informa errores de migración ni exige ejecución de DDL adicional.
+- ID del workflow de Preview: `09bb28322abe438299e8e8eaa313f821`; rama derivada: `82612040-2379-41e3-8f76-100fadca6a2c`.
+
+La reconciliación del historial PROD y el workflow posterior de Preview están completados. El incidente de Preview puede cerrarse. No se ejecutó reset, rebase ni eliminación; tampoco se alteró el proyecto principal PROD/DEV durante esta verificación.
