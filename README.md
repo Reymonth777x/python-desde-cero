@@ -166,7 +166,7 @@ No se incluyen credenciales SMTP, tokens ni claves API en este repositorio. La p
 - The two-student/admin acceptance of persisted quiz results and progress isolation remains open in issue #20. Supabase's leaked-password protection warning is also open; the current Free plan does not provide that feature.
 ## Latest verified release
 
-- GitHub `master`: `38533eae71f60e899949f567c30f15c99c3cbe65` (October 31, 2026). This is the current documentation/readiness update; the last application runtime change remains `d072f962d96a9e3deb1d5d2a7a4a8a83ebec4e21`.
+- GitHub `master`: `38533eae71f60e899949f567c30f15c99c3cbe65` (October 30, 2026). This is the current documentation/readiness update; the last application runtime change remains `d072f962d96a9e3deb1d5d2a7a4a8a83ebec4e21`.
 - CI: [run 41150277769](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41150277769) — passed on the exact `master` SHA, including 24 Vitest files, 168 Playwright tests, 62 cases across 36 Python activities, TypeScript, ESLint, Next/Vinext builds and npm audit.
 - Cloudflare deployment: [run 41150633694](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41150633694) — passed on the same SHA. Main Worker version `7b625566-1987-4f2c-9875-c369ed584e13`; isolated Python runner version `8cb973f4-fde5-4cce-ab25-7dba6a09ad25`.
 - Production smoke test verified the home page, `/muestra`, `/login`, sitemap, both custom hostnames, and `www` → apex redirect (HTTP 308). The public production domain is responding.
@@ -193,6 +193,6 @@ Each partner must keep their own `.env.local` and use the DEV Supabase project. 
 
 ## License
 
-No license has been applied yet. As of October 31, 2026, this GitHub repository is **public**; issue #21 tracks the owner's decision about keeping it public or moving internal development to a private repository. Public visibility allows anyone to inspect the source and its Git history, including historical course assessment material. The app's `server-only` boundaries protect runtime bundles, not the public Git repository. Do not port or reuse course content without confirming licensing terms.
+No license has been applied yet. As of October 30, 2026, this GitHub repository is **public**; issue #21 tracks the owner's decision about keeping it public or moving internal development to a private repository. Public visibility allows anyone to inspect the source and its Git history, including historical course assessment material. The app's `server-only` boundaries protect runtime bundles, not the public Git repository. Do not port or reuse course content without confirming licensing terms.
 
 This project is independent educational material. Confirm licensing before reusing external or course-provider materials.
