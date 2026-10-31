@@ -24,6 +24,7 @@ const requiredFiles = [
   join(pyodideSource, "pyodide.asm.wasm"),
   join(root, "public", "python-worker.js"),
   join(root, "public", "turtle_compat.py"),
+  join(root, "public", "orilla-engine.py"),
   join(root, "runner", "index.html"),
   join(root, "runner", "runner-frame.js"),
   join(root, "runner", "_headers"),
@@ -40,6 +41,7 @@ mkdirSync(destination, { recursive: true });
 cpSync(pyodideSource, join(destination, "pyodide", "0.29.5", "full"), { recursive: true });
 copyFileSync(join(root, "public", "python-worker.js"), join(destination, "python-worker.js"));
 copyFileSync(join(root, "public", "turtle_compat.py"), join(destination, "turtle_compat.py"));
+copyFileSync(join(root, "public", "orilla-engine.py"), join(destination, "orilla-engine.py"));
 copyFileSync(join(root, "runner", "index.html"), join(destination, "index.html"));
 
 const runnerFrameTemplate = readFileSync(join(root, "runner", "runner-frame.js"), "utf8");
