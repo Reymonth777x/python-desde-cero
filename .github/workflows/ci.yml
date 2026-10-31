@@ -30,6 +30,28 @@ jobs:
           }
           Write-Host "PowerShell launcher syntax OK"
 
+  supabase-pgtap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.121.0
+
+      - name: Start ephemeral local Supabase database
+        run: supabase db start
+
+      - name: Run pgTAP permissions and acceptance tests
+        run: supabase test db
+
+      - name: Stop local Supabase services
+        if: always()
+        run: supabase stop || true
+
   test-and-build:
     runs-on: ubuntu-latest
     env:
