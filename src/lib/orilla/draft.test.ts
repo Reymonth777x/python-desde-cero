@@ -28,11 +28,16 @@ describe('recuperarBorradorOrilla', () => {
     )).toBe('');
   });
 
-  it('ignora JSON corrupto y fechas no válidas sin romper la partida', () => {
+  it('ignora JSON corrupto y fechas locales o remotas no válidas sin romper la partida', () => {
     expect(recuperarBorradorOrilla('{no es json', 0, '')).toBeNull();
     expect(recuperarBorradorOrilla(
       JSON.stringify({ code: 'avanzar()', at: Number.NaN }),
       0,
+      '',
+    )).toBeNull();
+    expect(recuperarBorradorOrilla(
+      JSON.stringify({ code: 'avanzar()', at: 2000 }),
+      Number.NaN,
       '',
     )).toBeNull();
   });
