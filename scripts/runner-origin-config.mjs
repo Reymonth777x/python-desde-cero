@@ -38,6 +38,10 @@ export function resolveRunnerParentOrigins({
   const seen = new Set();
 
   for (const candidate of candidates) {
+    if (candidate.includes("*")) {
+      throw new Error("No se permiten comodines en los orígenes padre: " + candidate);
+    }
+
     let url;
     try {
       url = new URL(candidate);
