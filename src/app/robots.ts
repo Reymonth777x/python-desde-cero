@@ -1,6 +1,14 @@
 import type { MetadataRoute } from "next";
+import { isProductionSite, resolveSiteUrl } from "@/lib/site-url";
 
 export default function robots(): MetadataRoute.Robots {
+  const siteUrl = resolveSiteUrl();
+  if (!isProductionSite(siteUrl)) {
+    return {
+      rules: [{ userAgent: "*", disallow: ["/"] }],
+    };
+  }
+
   return {
     rules: [
       {
@@ -9,6 +17,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/academia", "/estudiante", "/practica", "/admin", "/api", "/auth", "/python-runner"],
       },
     ],
-    sitemap: "https://python-desdecero.com/sitemap.xml",
+    sitemap: new URL("/sitemap.xml", siteUrl).toString(),
   };
 }
