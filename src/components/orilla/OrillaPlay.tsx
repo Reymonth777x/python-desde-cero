@@ -8,6 +8,7 @@ import { useTheme } from '@/app/theme-provider';
 import { guardarOrilla, vaciarNotasOrilla } from '@/app/orilla/actions';
 import { DOC_VERBOS, VERBOS_SIN_ARGUMENTOS } from '@/lib/orilla/ayuda-verbos';
 import { hrefLeccion } from '@/lib/orilla/enlaces';
+import { recuperarBorradorOrilla } from '@/lib/orilla/draft';
 import {
   aplicarEvento,
   describirRio,
@@ -175,13 +176,11 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
     });
     try {
       const crudo = window.localStorage.getItem(claveLocal);
-      if (crudo) {
-        const borrador = JSON.parse(crudo) as { code?: unknown; at?: unknown };
-        const guardadoEn = guardado.updatedAt ? Date.parse(guardado.updatedAt) : 0;
-        if (typeof borrador.code === 'string' && typeof borrador.at === 'number' && borrador.at > guardadoEn && borrador.code !== inicial) {
-          setCode(borrador.code);
-          setAviso('Recuperé un borrador de este navegador que todavía no estaba guardado.');
-        }
+      const guardadoEn = guardado.updatedAt ? Date.parse(guardado.updatedAt) : 0;
+      const recuperado = recuperarBorradorOrilla(crudo, guardadoEn, inicial);
+      if (recuperado !== null) {
+        setCode(recuperado);
+        setAviso('Recuperé un borrador de este navegador que todavía no estaba guardado.');
       }
     } catch { /* sin almacenamiento local: se sigue con lo guardado */ }
     instancia.focus();
