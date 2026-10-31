@@ -4,11 +4,12 @@
 
 Los archivos que describen cambios de base de datos se guardan en `supabase/migrations/`. Las migraciones históricas deben conservarse; no se borran porque parezcan duplicadas sin verificar el historial remoto.
 
-## Estado remoto comprobado (corte 30-10-2026)
+## Estado remoto comprobado (corte 31-10-2026)
 
-- Producción registra **24 migraciones** y DEV **10**. `supabase/migrations/` contiene 30 archivos; el timestamp de la migración 028 se alineó con producción (`20261030183117`).
-- Las dos últimas funciones aplicadas son `revoke_legacy_quiz_rpc_execution` (producción `20261030174256`, DEV `20261030174245`) y `grandfather_existing_module_progress` (producción `20261030183117`, DEV `20261030183123`). Son dos migraciones diferentes; la retirada del RPC heredado no es la migración 028.
-- Supabase Preview sigue fallando porque hay versiones históricas remotas sin archivo local equivalente y archivos locales con timestamps diferentes. No ejecutar `db push`, `migration repair` ni reset para intentar arreglarlo automáticamente.
+- Producción registra **25 migraciones** y DEV **11**. Ambos historiales incluyen la migración Orilla 029; las versiones remotas son `20261031012927` en producción y `20261031012712` en DEV.
+- Los proyectos principales `nuqydanbbgqcofcftshk` (producción) y `fcwbkkivelsipqqrbpya` (DEV) están `ACTIVE_HEALTHY`; ambos ejecutan PostgreSQL `17.11.0.003`.
+- Las dos migraciones de funciones anteriores a Orilla siguen siendo distintas: `revoke_legacy_quiz_rpc_execution` (producción `20261030174256`, DEV `20261030174245`) y `grandfather_existing_module_progress` (producción `20261030183117`, DEV `20261030183123`). La migración 029 de Orilla se registró después y no las sustituye.
+- Supabase Preview continúa con `status = MIGRATIONS_FAILED` (rama `main`), aunque su proyecto Preview informa `ACTIVE_HEALTHY`. Las versiones históricas remotas no coinciden completamente con los archivos locales y los timestamps no están alineados. No ejecutar `db push`, `migration repair`, `reset` ni `rebase` para intentar arreglarlo automáticamente.
 
 El historial de Supabase para el proyecto `nuqydanbbgqcofcftshk` incluye, entre otras, las entradas timestamp:
 - `20261026221230` — `011_secure_quiz_submission`
@@ -89,7 +90,7 @@ Los nombres de las migraciones coinciden, pero Supabase identifica las migracion
 
 ## Diferencias detectadas entre el repositorio y Supabase remoto
 
-Comparación de versiones realizada el 30-10-2026 entre los 30 archivos locales de supabase/migrations/ en master y los historiales de producción (24) y DEV (10).
+Comparación de versiones actualizada el 31-10-2026 sobre la carpeta canónica `supabase/migrations/` en `master` (`990a345cc5bfd2b6a2860e6c90c7d08bfd0dc9b2`) y los historiales remotos de producción (25) y DEV (11). Los timestamps históricos que difieren se detallan en las secciones siguientes; no asumir equivalencia solo por el nombre ordinal.
 
 ### Versiones locales que no aparecen en el historial remoto
 
@@ -189,3 +190,14 @@ La excepción de progreso histórico también se aplica en la interfaz: el PR #8
 - Auditoría de solo lectura en ambos entornos: `public.orilla_runs` existe con RLS activo; `authenticated` tiene lectura propia por política; `anon` no puede leer y ninguno de esos roles puede escribir directamente. Las RPC públicas son `SECURITY INVOKER`, las funciones autoritativas están en `private` con `SECURITY DEFINER` y `search_path` vacío; solo `authenticated` puede ejecutarlas. El trigger `orilla_runs_guard` está habilitado.
 - No se hicieron cambios SQL en DEV ni producción durante esta revisión. La migración ya estaba aplicada en ambos entornos; solo se alineó el timestamp canónico del archivo con producción.
 - Se mantiene la restricción general de este documento: no ejecutar `db push`, `migration repair` ni `db reset` mientras persista la divergencia histórica de otras migraciones. No repetir la migración 029 en ningún entorno.
+
+## Aceptación real de Orilla — corte 31-10-2026
+
+Consulta de solo lectura sobre `public.orilla_runs`:
+
+- Producción contiene una fila para `c01`, con `passed = false`, `stars = 0`, `best_steps = NULL` y `attempts = 0`. El dato demuestra que se guardó un borrador del primer tramo, pero **no demuestra una ejecución del motor ni un tramo superado**.
+- DEV contiene cero filas en `public.orilla_runs`; tampoco presenta todavía intentos de quiz ni progreso de curso en las cuentas desechables consultadas.
+- El código de la interfaz guarda borradores con `p_es_intento = false` y solo incrementa `attempts` cuando el usuario ejecuta el programa. Por eso no debe interpretarse una fila con cero intentos como prueba de una partida.
+- Para cerrar la aceptación hay que ejecutar `c01` con una cuenta desechable de DEV, comprobar que el registro cambia a un intento, superar el objetivo y confirmar que el tramo se refleja en el mapa de Orilla y en Academia. No usar cuentas ni datos de producción para esa prueba.
+
+Esta verificación no modifica filas, permisos ni esquema. No aplicar otra vez la migración 029.
