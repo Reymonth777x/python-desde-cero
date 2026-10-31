@@ -5,7 +5,7 @@ export function resolveSiteUrl(configuredUrl = process.env.NEXT_PUBLIC_SITE_URL)
     ? configuredUrl.trim()
     : PRODUCTION_SITE_ORIGIN;
 
-  let url;
+  let url: URL;
   try {
     url = new URL(candidate);
   } catch {
@@ -25,6 +25,6 @@ export function resolveSiteUrl(configuredUrl = process.env.NEXT_PUBLIC_SITE_URL)
   return new URL(url.origin);
 }
 
-export function isProductionSite(siteUrl) {
+export function isProductionSite(siteUrl: URL) {
   return siteUrl instanceof URL && siteUrl.origin === PRODUCTION_SITE_ORIGIN;
 }
