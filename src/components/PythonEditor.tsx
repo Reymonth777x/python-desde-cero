@@ -230,7 +230,7 @@ export default function PythonEditor({
         className="pointer-events-none absolute -left-[10000px] top-0 h-px w-px overflow-hidden border-0 opacity-0"
       />
       <section aria-labelledby="python-lab-guide" className="border-l-2 border-[var(--theme-border-dark)] bg-[var(--theme-bg-secondary)] p-4 sm:p-5">
-        <p className="text-[0.68rem] font-bold tracking-[0.14em] text-[var(--theme-accent)]">LABORATORIO · EN TRES PASOS</p>
+        <p className="text-[0.68rem] font-bold tracking-[0.14em] text-[var(--theme-accent)]">Cómo usar este laboratorio</p>
         <h2 id="python-lab-guide" className="mt-1 font-serif text-xl text-[var(--theme-ink)]">Prueba tu código</h2>
         <ol className="mt-3 grid gap-2 text-sm leading-5 sm:grid-cols-3">
           <li className="flex items-start gap-2">
@@ -247,7 +247,7 @@ export default function PythonEditor({
           </li>
         </ol>
         <details className="mt-3 border-t border-[var(--theme-border)] pt-3">
-          <summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold text-[var(--theme-accent)]">Ver indicaciones de esta actividad</summary>
+          <summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold text-[var(--theme-accent)]">Instrucciones de esta actividad</summary>
           <p className="pb-2 text-sm leading-6 text-[var(--theme-muted)]">{instructions}</p>
         </details>
       </section>
@@ -297,10 +297,11 @@ export default function PythonEditor({
         </div>
 
         <div className="space-y-2 md:hidden">
-          <p className="text-xs font-semibold text-[var(--theme-muted)]">Atajos para escribir en la pantalla táctil</p>
+          <p className="text-xs font-semibold text-[var(--theme-muted)]">Teclas útiles en el móvil</p>
           <div aria-label="Teclas de Python para pantalla táctil" className="grid grid-cols-4 gap-2">
             {[
               { label: '()', accessible: 'Insertar paréntesis', text: '()', cursor: 1 },
+              { label: '[]', accessible: 'Insertar corchetes', text: '[]', cursor: 1 },
               { label: '""', accessible: 'Insertar comillas', text: '""', cursor: 1 },
               { label: ':', accessible: 'Insertar dos puntos', text: ':' },
               { label: '=', accessible: 'Insertar signo igual', text: '=' },
@@ -313,7 +314,7 @@ export default function PythonEditor({
                 type="button"
                 aria-label={key.accessible}
                 onClick={() => insertOnMobile(key.text, key.cursor)}
-                className="flex min-h-11 min-w-0 items-center justify-center border border-[var(--theme-border)] bg-[var(--theme-surface)] px-1 font-mono text-sm text-[var(--theme-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"
+                className="flex min-h-12 min-w-0 items-center justify-center border border-[var(--theme-border)] bg-[var(--theme-surface)] px-2 font-mono text-base text-[var(--theme-ink)] transition-colors active:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"
               >
                 {key.label}
               </button>
@@ -353,6 +354,18 @@ export default function PythonEditor({
                   : tests?.length
                     ? 'Comprobar ejercicio'
                     : 'Ejecutar código'}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setCode(defaultCode);
+              setInput('');
+              invalidateTests();
+            }}
+            className="flex min-h-12 w-full items-center justify-center border border-[var(--theme-border)] px-5 py-3 text-sm font-semibold text-[var(--theme-muted)] transition-colors hover:bg-[var(--theme-bg-secondary)] hover:text-[var(--theme-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] sm:w-auto"
+          >
+            Restaurar ejemplo
           </button>
 
           {isRunning && (
