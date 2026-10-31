@@ -229,8 +229,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          grep -Fq '"https://python-desdecero.com"' runner-public/runner-frame.js
-          grep -Fq '"https://www.python-desdecero.com"' runner-public/runner-frame.js
+          grep -Fq 'const ALLOWED_PARENT_ORIGINS = new Set(["https://python-desdecero.com","https://www.python-desdecero.com"]);' runner-public/runner-frame.js
           grep -Fq 'frame-ancestors https://python-desdecero.com https://www.python-desdecero.com' runner-public/_headers
           if grep -Eiq 'localhost|127\.0\.0\.1' runner-public/runner-frame.js runner-public/_headers; then
             echo "::error::La política de producción incluye loopback; se cancela el deploy."
@@ -258,8 +257,7 @@ jobs:
           curl --fail --silent --show-error --location --retry 5 --retry-delay 2 --retry-all-errors \
             "$runner_origin/runner-frame.js" -o /tmp/python-runner-frame.js
           grep -Fq "ALLOWED_PARENT_ORIGINS" /tmp/python-runner-frame.js
-          grep -Fq '"https://python-desdecero.com"' /tmp/python-runner-frame.js
-          grep -Fq '"https://www.python-desdecero.com"' /tmp/python-runner-frame.js
+          grep -Fq 'const ALLOWED_PARENT_ORIGINS = new Set(["https://python-desdecero.com","https://www.python-desdecero.com"]);' /tmp/python-runner-frame.js
           if grep -Eiq 'localhost|127\.0\.0\.1' /tmp/python-runner-frame.js /tmp/python-runner-response-headers; then
             echo "::error::La allowlist del runner publicado contiene un origen local no permitido."
             exit 1
