@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+
 import {
   createRunnerOriginConfig,
   DEFAULT_LOCAL_PARENT_ORIGINS,
@@ -68,6 +70,24 @@ describe("política de orígenes del runner", () => {
       environment: "production",
       configuredOrigins: ",",
     })).toThrow(/vacía o no es válida/);
+  });
+
+  it("genera un Set plano de orígenes, no un array anidado", () => {
+    const origins = resolveRunnerParentOrigins({
+      environment: "production",
+      configuredOrigins: "https://python-desdecero.com,https://www.python-desdecero.com",
+    });
+    const originConfig = createRunnerOriginConfig(origins);
+    const template = readFileSync(new URL("../runner/runner-frame.js", import.meta.url), "utf8");
+    const generated = replacePlaceholderExactlyOnce(
+      template,
+      "__PYTHON_RUNNER_ALLOWED_PARENT_ORIGINS_JSON__",
+      originConfig.javascript,
+    );
+    const statement = generated.match(/const ALLOWED_PARENT_ORIGINS = new Set\((\[[^\n]+\])\);/);
+
+    expect(statement?.[1]).toBe(originConfig.javascript);
+    expect(JSON.parse(statement?.[1] ?? "[]")).toEqual(origins);
   });
 
   it("solo reemplaza placeholders presentes una vez", () => {
