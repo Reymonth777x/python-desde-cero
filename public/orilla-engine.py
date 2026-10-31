@@ -44,7 +44,8 @@ SIEMPRE_CERRADO = {
     'Await': 'await', 'Yield': 'yield', 'YieldFrom': 'yield', 'Global': 'global',
     'Nonlocal': 'nonlocal', 'With': 'with', 'Match': 'match', 'Lambda': 'lambda',
     'Delete': 'del', 'Assert': 'assert', 'Raise': 'raise', 'NamedExpr': ':=',
-    'Starred': '*', ''ListComp': 'comprensiones', 'SetComp': 'comprensiones',
+    'Starred': '*',
+    'ListComp': 'comprensiones', 'SetComp': 'comprensiones',
     'DictComp': 'comprensiones', 'GeneratorExp': 'comprensiones', 'Set': 'conjuntos',
     'TryStar': 'try', 'BitAnd': 'bit a bit', 'BitOr': 'bit a bit',
     'BitXor': 'bit a bit', 'LShift': 'bit a bit', 'RShift': 'bit a bit',
@@ -126,7 +127,8 @@ def _cierre_llamada(cap, nombre, linea, abiertos):
         tramo = cap['tramos'][builtins[nombre]]
         return _hallazgo(
             linea,
-            f"`{nombre}` todavía no se abre. Aparece en {tramo['nombre']}, con la f"lección de {tramo['tema']}.", tramo['leccion'])
+            f"`{nombre}` todavía no se abre. Aparece en {tramo['nombre']}, con la "
+            f"lección de {tramo['tema']}.", tramo['leccion'])
     if nombre == 'print':
         extra = ' Para mostrar algo usa `decir(...)`.' if 'decir' in abiertos['verbos'] else ''
         return _hallazgo(linea, '`print` no se usa en Orilla.' + extra)
