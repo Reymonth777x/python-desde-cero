@@ -263,18 +263,8 @@ SELECT is(
   0,
   'student A cannot read administrator invitations'
 );
-SELECT is(
-  (
-    WITH deleted AS (
-      DELETE FROM public.invitations
-      WHERE code = 'PGTAP-ADMIN-SEED'
-      RETURNING code
-    )
-    SELECT count(*)::integer FROM deleted
-  ),
-  0,
-  'student A cannot delete administrator invitations because RLS filters the row'
-);
+DELETE FROM public.invitations
+WHERE code = 'PGTAP-ADMIN-SEED';
 SELECT throws_ok(
   $sql$INSERT INTO public.invitations (code, expires_at, created_by)
        VALUES ('PGTAP-STUDENT-FORBIDDEN', now() + interval '1 day',
@@ -292,6 +282,16 @@ SELECT throws_ok(
 );
 
 RESET ROLE;
+
+SELECT is(
+  (
+    SELECT count(*)::integer
+    FROM public.invitations
+    WHERE code = 'PGTAP-ADMIN-SEED'
+  ),
+  1,
+  'student A cannot delete administrator invitations because RLS filters the row'
+);
 
 -- ---------------------------------------------------------------------------
 -- Student B: cannot read A's progress, cannot skip prerequisites, cannot write
