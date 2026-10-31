@@ -48,7 +48,7 @@ export const GUIA_ORILLA: Record<ChapterId, GuiaTramo> = {
   c04: {
     mision: 'Llega a la boya y escribe 4 en la bitácora: es el número de remos que hacen falta para el trayecto.',
     pasos: [
-      { titulo: 'Calcula el trayecto', detalle: 'Usa la posición de Nilo para saber cuántas columnas recorre desde el muelle.' },
+      { titulo: 'Calcula el trayecto', detalle: 'Llega a la boya y consulta columna(): en este mapa devuelve 8 porque las columnas empiezan a contarse desde 0.' },
       { titulo: 'Cuenta grupos de dos', detalle: 'Se necesita un remo por cada dos columnas. La división entera // cuenta grupos completos y descarta la parte decimal.' },
       { titulo: 'Anota el resultado', detalle: 'Cuando tengas el cálculo, muéstralo con decir(). El valor esperado en este tramo es 4.' },
     ],
