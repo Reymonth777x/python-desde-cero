@@ -23,6 +23,7 @@ const PASOS_BASE = [
 export default function OrillaGuide({ chapterId, ayuda, verbos, builtins, onUseExample }: Props) {
   const guia = GUIA_ORILLA[chapterId];
   const leccion = MICROLECCIONES_ORILLA[chapterId];
+  const ejemploVisible = guia.ejemplo ?? leccion.ejemplo;
   const nombres = [...new Set(guia.comandos)].filter((nombre) => verbos.includes(nombre) || builtins.includes(nombre));
   const resumen = nombres.map((nombre) => ({ nombre, descripcion: DOC_VERBOS[nombre] })).filter((item) => item.descripcion);
 
@@ -71,7 +72,15 @@ export default function OrillaGuide({ chapterId, ayuda, verbos, builtins, onUseE
           <p className="text-sm leading-6">{leccion.explicacion}</p>
           <div className="overflow-hidden rounded-xl border border-white/20 bg-[#071b2a]">
             <div className="flex items-center justify-between border-b border-white/10 px-3 py-2"><span className="text-[0.63rem] font-bold tracking-[0.15em] text-[#84cbb8]">EJEMPLO PEQUEÑO</span><span className="text-[0.62rem] text-[#83a9b2]">PYTHON</span></div>
-            <pre className="overflow-x-auto p-3 font-mono text-[0.78rem] leading-6 text-[#d8f7e9]"><code>{leccion.ejemplo}</code></pre>
+            <pre className="overflow-x-auto p-3 font-mono text-[0.78rem] leading-6 text-[#d8f7e9]"><code>{ejemploVisible}</code></pre>
+          {onUseExample && (
+            <div className="space-y-2">
+              <button type="button" onClick={() => onUseExample(ejemploVisible)} className="min-h-11 w-full rounded-xl bg-[var(--theme-accent)] px-3 py-2 text-sm font-semibold text-[var(--theme-ink-inverse)] hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">
+                Probar este ejemplo en el editor
+              </button>
+              <p className="text-xs leading-5 text-[var(--theme-muted)]">Al usarlo, reemplazarás tu código actual. En varios niveles es un punto de partida: todavía tendrás que completarlo para resolver toda la misión.</p>
+            </div>
+          )}
           </div>
           <details className="rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] p-3">
             <summary className="min-h-10 cursor-pointer py-2 text-sm font-semibold">🧠 Comprueba lo que aprendiste</summary>
@@ -95,17 +104,6 @@ export default function OrillaGuide({ chapterId, ayuda, verbos, builtins, onUseE
           <p className="mt-1 text-xs opacity-75">Es opcional: sirve para practicar un poco más, sin bloquear tu avance.</p>
         </div>
       </div>
-
-      {guia.ejemplo && onUseExample && (
-        <div className="space-y-2 rounded-2xl border border-[var(--theme-accent)]/40 bg-[var(--theme-bg-secondary)] p-3 sm:p-4">
-          <p className="text-sm font-semibold text-[var(--theme-ink)]">🚣 Ejemplo para tu primer viaje</p>
-          <pre className="overflow-x-auto rounded-xl bg-[#071b2a] p-3 font-mono text-sm leading-6 text-[#b6f0df]">{guia.ejemplo}</pre>
-          <button type="button" onClick={() => onUseExample(guia.ejemplo!)} className="min-h-11 w-full rounded-xl bg-[var(--theme-accent)] px-3 py-2 text-sm font-semibold text-[var(--theme-ink-inverse)] hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">
-            Usar este ejemplo en el editor
-          </button>
-          <p className="text-xs leading-5 text-[var(--theme-muted)]">Al pulsar, reemplazarás el contenido actual del editor por este ejemplo. Puedes editarlo después.</p>
-        </div>
-      )}
 
       <div className="grid gap-2 sm:grid-cols-2">
         <details className="rounded-xl border border-[var(--theme-border)] p-3">
