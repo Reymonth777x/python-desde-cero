@@ -151,33 +151,39 @@ No se incluyen credenciales SMTP, tokens ni claves API en este repositorio. La p
 
 ### Implemented
 
-- Course modules 1–5 with lessons, examples, exercises, and quizzes
-- Authentication (register, login, logout, password reset) via Supabase Auth
-- Protected routes and middleware-based session verification
-- In-browser Python editor with a cross-origin isolated Pyodide runner
-- Student progress tracking and quiz score persistence
-- Admin invitation management page
-- PWA manifest
-- Security headers (CSP, X-Frame-Options, etc.)
-- Automated quality suite: `master` CI [41160065524](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41160065524) passed on October 31, 2026, including 172 Playwright E2E tests, 147 Orilla checks, Python course exercise verification, TypeScript, ESLint, Next production build, Vinext/Cloudflare build, and the isolated runner smoke test.
+- Course modules 1–5 with lessons, examples, exercises, and quizzes; module 5 is clearly identified as an optional extension.
+- Authentication (registration, login, logout, password reset) via Supabase Auth, with protected student and administrator routes.
+- In-browser Python editor with a cross-origin isolated Pyodide runner.
+- Orilla authenticated practice area with 12 guided stages, an open river, two challenges, and saved personal runs.
+- Student progress tracking and quiz score persistence, protected by Supabase RLS and server-side grading.
+- Admin invitation management page and PWA manifest.
+- Security headers (CSP, X-Frame-Options, etc.).
+- Responsive viewport coverage for the lab controls and a production smoke test that checks the optional module's exact `05` / `OPCIONAL` label.
+- Orilla draft recovery now rejects an invalid remote timestamp and does not overwrite an edit made before the delayed recovery callback.
+- CI includes Vitest, course exercise verification, Orilla/Pyodide checks, TypeScript, ESLint, production builds, Playwright E2E, Vinext/Cloudflare build, pgTAP against an ephemeral local Supabase stack, and PowerShell launcher validation.
 
 ### Known Limitations
 
-- The owner confirmed successful manual registration, email confirmation, login, logout, password recovery and password change on October 30, 2026. The connected read-only inspection cannot reveal the SMTP host/login saved in Supabase Auth or individual Brevo message receipts, so this is recorded as owner-confirmed functional acceptance rather than an independently inspected SMTP configuration.
+- The owner previously confirmed working Auth flows (registration, email confirmation, login, logout and recovery). The current project still needs a separately evidenced browser acceptance in the DEV Supabase project using disposable accounts, including its redirect URLs, real confirmation email and Turnstile challenge. Mocked Server Action tests do not prove email delivery or DEV provider configuration; see [issue #17](https://github.com/Reymonth777x/python-desde-cero/issues/17).
 - PROD and DEV RLS/table grants have been inspected. Direct student INSERT/UPDATE/DELETE on `public.progress` and direct insertion into the private quiz-attempt table are not granted; quiz submission and prerequisite checks run through the private authoritative function. See [docs/team/MIGRACIONES.md](docs/team/MIGRACIONES.md).
-- Production's active migration folder and remote ledger now match 29/29 versions. DEV intentionally retains its own bootstrap and wrappers and still needs a separate reconciliation before any remote migration push. Preview `main` now reports `FUNCTIONS_DEPLOYED` and its derived project is `ACTIVE_HEALTHY`; its latest Supabase workflow log explicitly says `All migrations are up to date` (2026-10-31 02:50:48 UTC). Do not reset or delete it as a shortcut.
-- Manual owner acceptance covers the Python runner, Turtle, error/limit cases, Chrome, Firefox and physical phones. Visual acceptance of the complete authenticated mobile interface (theme picker, editor, virtual keyboard and progress screens) remains tracked in issue #18.
-- `master` branch protection is not enabled yet, and the public repository exposes historical course assessment material in Git history; see [issues #23](https://github.com/Reymonth777x/python-desde-cero/issues/23) and [#21](https://github.com/Reymonth777x/python-desde-cero/issues/21).
-- A reversible DEV SQL integration test verified that a failed quiz does not complete a lesson, a correct quiz persists a score of 100, a second student cannot read the first student's progress, and direct table writes remain blocked. The local pgTAP permissions suite has been refreshed to 69 assertions for the current schema, but `supabase test db` has not yet been run against a clean local Supabase stack. Browser-level Auth, quiz UI, reload/new-session persistence and administrator acceptance remain open in [issue #20](https://github.com/Reymonth777x/python-desde-cero/issues/20). Supabase's leaked-password protection warning is also open; the current Free plan does not provide that feature.
-- Orilla's production table currently has only one `c01` row with `attempts = 0`, `passed = false`, `stars = 0`, and `best_steps = NULL`. This is a saved draft, not a confirmed game execution or pass. DEV has no Orilla rows yet. Complete the first authenticated run with a disposable DEV student account and confirm the result appears on the map and in Academia; never use a production student's account for acceptance.
+- Production's active migration folder and remote ledger match 29/29 versions. DEV intentionally retains its own 11-version bootstrap and environment-specific wrappers; do not copy PROD's history or run `db push` blindly. Supabase Preview `main` reported `FUNCTIONS_DEPLOYED` and `ACTIVE_HEALTHY`; its workflow recorded `All migrations are up to date` on October 31, 2026. Do not reset or delete it as a shortcut.
+- pgTAP is now executed by CI against a clean, ephemeral local Supabase stack. It is not run against DEV or PROD. This does not replace the remaining browser acceptance of Auth, quizzes, progress, Orilla and administrator flows in [issue #20](https://github.com/Reymonth777x/python-desde-cero/issues/20).
+- The CI suite checks responsive viewports at 320, 360 and 390 px. Physical-device acceptance of the complete authenticated mobile interface (theme picker, Monaco/textarea, virtual keyboard, scrolling, focus and progress screens) remains open in [issue #18](https://github.com/Reymonth777x/python-desde-cero/issues/18).
+- Orilla's production table currently has only the earlier `c01` draft with `attempts = 0`, `passed = false`, `stars = 0` and `best_steps = NULL`; DEV had no Orilla rows after the reversible tests. This is not a confirmed game completion. Test the first full run using a disposable DEV student account and verify the map and Academia; never use a production student's account for acceptance.
+- `master` branch protection is not enabled yet. The repository remains public and its Git history includes historical course assessment material. Do not change visibility or rewrite history without the owner's decision; see [issues #23](https://github.com/Reymonth777x/python-desde-cero/issues/23) and [#21](https://github.com/Reymonth777x/python-desde-cero/issues/21).
+- PR #107's dependency mitigation has been merged, but it is not a clean audit: its last recorded `npm audit` still reported **5 moderate vulnerabilities** and one remaining `minimatch@3.1.5` copy shared by `eslint-plugin-import`, `eslint-plugin-jsx-a11y` and `eslint-plugin-react` through `eslint-config-next` (these consumers request `^3.1.2`). The CI audit is informational/non-blocking. Do not force `minimatch@11` outside those declared ranges; a follow-up should update or replace the plugin chain and rerun full CI.
+- A professional review of privacy, terms, cookies, retention, data-subject rights and any policy for minors in Costa Rica is still required before opening registration to external students; see [issue #98](https://github.com/Reymonth777x/python-desde-cero/issues/98).
+
 ## Latest verified release
 
-- GitHub `master`: `ed4ccf8b5a242b7c52b7c63f70380e4efe08f339` (October 31, 2026), including Orilla, the corrected runner allowlist and the reconciled 29-version PROD migration folder.
-- CI: [run 41160065524](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41160065524) — passed on that exact SHA, including 172 Playwright E2E tests, 147 Orilla checks, course exercise verification, TypeScript, ESLint, Next/Vinext builds and the Python-runner smoke test.
-- Cloudflare deployment: [run 41160415988](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41160415988) — passed on the same SHA. Site Worker version `6de2ce10-292e-4990-a533-6500a33798e4`; isolated Python runner version `77947204-8fb1-4809-8045-c447a92f4c08`.
-- Production smoke test verified the homepage, `/muestra`, `/login` with the Turnstile widget in HTML, sitemap, both custom hostnames, `www` → apex redirect (HTTP 308), Orilla route protection, and the production runner's exact apex/`www` parent-origin allowlist.
-- PROD has 29/29 active migration versions reconciled; DEV retains its separate 11-version bootstrap and wrappers. Supabase Preview `main` currently reports `FUNCTIONS_DEPLOYED` with `preview_project_status = ACTIVE_HEALTHY` (previously `MIGRATIONS_FAILED`); the derived branch migration ledger/final workflow status still needs direct confirmation, and it has not been reset or deleted.
-- Orilla's first authenticated browser run and progress reflection in Academia still need acceptance testing with a disposable DEV student account. The saved PROD `c01` row is a draft (`attempts = 0`, `passed = false`), not a completed game.
+- GitHub `master`: `a4d7f6a225813ab2bbb27948f6d2fed9bcae17e4` (October 31, 2026).
+- CI: [run 41177442432](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41177442432) — success on that exact SHA. All three jobs passed: `test-and-build`, `powershell-launcher` and `supabase-pgtap`.
+- Cloudflare deployment: [run 41177624316](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41177624316) — success on the same SHA. The workflow published the isolated Python runner, compiled and deployed the Worker, verified that the custom domain remained connected, and checked the served version.
+- Production smoke verification confirmed the homepage, `/muestra`, `/login`, the exact optional-module label (`05` and `OPCIONAL`), and that unauthenticated requests to `/practica` and `/orilla` require login. The deployment workflow also verifies the runner origin and its production-only policy.
+- PRs #118, #119, #120, #121, #122, #124, #125 and #126 delivered the mobile lab checks and wording, Orilla draft wiring/mobile guide improvements, Auth success-path tests, optional-module label regression test, and safe Orilla draft recovery. PR #123 was closed as superseded by #125; it was not merged.
+- PROD has 29/29 active migration versions reconciled; DEV retains its separate 11-version bootstrap and wrappers. Preview `main` was confirmed healthy with all migrations up to date. No schema or migration changes were made in the Orilla draft guard fixes.
+- The remaining acceptance items are browser-level DEV Auth and Orilla flows, physical mobile review, branch protection, owner decision on repository visibility/history, dependency-advisory review, and professional privacy/legal review.
+
 ## Release and sync instructions for the team
 
 From an existing checkout with no uncommitted changes:
