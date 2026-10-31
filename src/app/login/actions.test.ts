@@ -1,12 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/lib/supabase/server', () => ({ createClient: vi.fn() }));
+vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
 vi.mock('next/navigation', () => ({
   redirect: (path: string): never => {
     throw new Error(`NEXT_REDIRECT:${path}`);
   },
 }));
 
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { login, requestPasswordReset, signup } from './actions';
 
@@ -94,6 +96,75 @@ describe('acciones de autenticación con Turnstile', () => {
   });
 
 
+
+  it('inicia sesión y redirige al destino interno solicitado', async () => {
+    const signIn = vi.fn().mockResolvedValue({
+      data: { user: { id: 'student-1' }, session: { access_token: 'test-session' } },
+      error: null,
+    });
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { signInWithPassword: signIn },
+    } as unknown as Awaited<ReturnType<typeof createClient>>);
+
+    await expect(login({}, form({
+      email: 'student@example.test',
+      password: 'test-password',
+      captchaToken: 'valid-test-token',
+      next: '/practica',
+    }))).rejects.toThrow('NEXT_REDIRECT:/practica');
+
+    expect(signIn).toHaveBeenCalledWith({
+      email: 'student@example.test',
+      password: 'test-password',
+      options: { captchaToken: 'valid-test-token' },
+    });
+    expect(revalidatePath).toHaveBeenCalledWith('/', 'layout');
+  });
+
+  it('no permite que un login exitoso redirija fuera del sitio', async () => {
+    const signIn = vi.fn().mockResolvedValue({
+      data: { user: { id: 'student-1' }, session: { access_token: 'test-session' } },
+      error: null,
+    });
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { signInWithPassword: signIn },
+    } as unknown as Awaited<ReturnType<typeof createClient>>);
+
+    await expect(login({}, form({
+      email: 'student@example.test',
+      password: 'test-password',
+      captchaToken: 'valid-test-token',
+      next: 'https://example.invalid',
+    }))).rejects.toThrow('NEXT_REDIRECT:/academia');
+  });
+
+  it('registra una cuenta y usa el callback local configurado cuando requiere confirmación', async () => {
+    const signUp = vi.fn().mockResolvedValue({
+      data: { user: { id: 'student-2' }, session: null },
+      error: null,
+    });
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { signUp },
+    } as unknown as Awaited<ReturnType<typeof createClient>>);
+
+    await expect(signup(form({
+      full_name: 'Estudiante de prueba',
+      email: 'signup@example.test',
+      password: 'test-password',
+      captchaToken: 'valid-test-token',
+      next: '/practica',
+    }))).rejects.toThrow('NEXT_REDIRECT:/login?message=check-email');
+
+    expect(signUp).toHaveBeenCalledWith({
+      email: 'signup@example.test',
+      password: 'test-password',
+      options: {
+        data: { full_name: 'Estudiante de prueba' },
+        emailRedirectTo: 'http://localhost:3000/auth/callback',
+        captchaToken: 'valid-test-token',
+      },
+    });
+  });
 
   it('muestra un error de CAPTCHA antes que el mensaje de invitación al registrar', async () => {
     const signUp = mockAuth('signUp');
