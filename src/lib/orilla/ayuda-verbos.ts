@@ -29,6 +29,8 @@ export const DOC_VERBOS: Record<string, string> = {
   range: 'Genera los números de un recorrido.',
   len: 'Cuenta los elementos de una lista o de un texto.',
   list: 'Crea una lista.',
+  append: 'Añade un valor al final de una lista.',
+  get: 'Busca una clave de un diccionario y devuelve su valor.',
   min: 'Devuelve el menor de varios valores.',
   max: 'Devuelve el mayor de varios valores.',
   sum: 'Suma los números de una lista.',
