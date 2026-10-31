@@ -1,6 +1,34 @@
 # Tareas pendientes de configuración, calidad y operación
 
-Actualizado el 30 de octubre de 2026 tras comprobar `master`, CI, despliegue y los dos proyectos Supabase. Los elementos completados se separan de las verificaciones que aún requieren una sesión real, hardware o intervención de plataforma.
+Actualización: 31 de octubre de 2026. Este resumen superior es el estado operativo vigente. Las listas de las secciones históricas que siguen conservan el corte del 30-10-2026; sus casillas no deben interpretarse como pendientes actuales sin contrastar con los issues enlazados.
+
+## Estado vigente — 31-10-2026
+
+### Completado
+- [x] Orilla integrada y publicada: `/orilla`, 12 tramos, río abierto y dos retos. Las rutas requieren sesión y el runner de Python aislado está publicado.
+- [x] Corregido el bloqueo del runner: allowlist de orígenes apex/`www` y smoke test real de ejecución en CI.
+- [x] Reconciliado el historial PROD: 29 versiones remotas coinciden con 29 archivos activos canónicos en `supabase/migrations/`. La reparación de 001/002/003/005 en PROD fue solo de metadatos; no reejecutó SQL.
+- [x] Corregidos los datos y guía de migraciones: DEV conserva su bootstrap y wrappers propios (11 versiones). No copiarle el historial de PROD ni ejecutar `db push` a ciegas.
+- [x] Pruebas SQL reversibles en DEV: quiz fallido no crea progreso, quiz aprobado guarda 100 puntos, el segundo estudiante no puede leer progreso del primero; RPC/RLS de Orilla y bloqueo de `c02` comprobados. Todas las transacciones terminaron en `ROLLBACK` y las consultas posteriores confirmaron cero filas de prueba.
+- [x] PR #108 fusionado: suite pgTAP reescrita para esquema actual (69 aserciones), generador obsoleto que emitía `TRUNCATE ... CASCADE` retirado y documentos históricos corregidos. CI de PR pasó 172 pruebas E2E y builds.
+- [x] Portada, login, `www` y rutas protegidas de Orilla revalidadas después de la publicación anterior. Turnstile aparece en el HTML del login.
+
+### Pendiente real
+- [ ] **Orilla en navegador:** usar una cuenta desechable DEV, iniciar sesión, abrir `c01`, ejecutar el código, superar el objetivo, recargar y comprobar que el mapa y Academia reflejan el avance. PROD solo tiene un borrador `c01` con cero intentos; no utilizar alumnos de PROD. Seguimiento: issue [#20](https://github.com/Reymonth777x/python-desde-cero/issues/20).
+- [ ] **Auth y evaluaciones en navegador DEV:** confirmar registro, correo, CAPTCHA, login, logout, recuperación, quiz aprobado/reprobado y persistencia al reingresar. Los logs de PROD muestran uso real y errores de CAPTCHA/límites, pero no sustituyen una aceptación controlada de DEV. Issues [#17](https://github.com/Reymonth777x/python-desde-cero/issues/17) y [#20](https://github.com/Reymonth777x/python-desde-cero/issues/20).
+- [ ] **pgTAP real:** ejecutar `npx supabase test db` contra una instancia Supabase local limpia. La suite nueva está escrita y tiene guardas Vitest, pero no se ha ejecutado con Docker/Supabase CLI local. No ejecutarla contra DEV ni PROD.
+- [ ] **Supabase Preview:** `main` cambió de `MIGRATIONS_FAILED` a `FUNCTIONS_DEPLOYED` y el proyecto derivado está `ACTIVE_HEALTHY`; falta confirmar el ledger del Preview y el resultado detallado del paso `migrate`. No resetear ni borrar la rama. Issue [#3](https://github.com/Reymonth777x/python-desde-cero/issues/3).
+- [ ] **Móvil/rediseño:** completar inventario y revisión visual de portada, lección, paleta, Monaco, teclado virtual y progreso en teléfonos físicos. Las pruebas a 320/360/390 px no sustituyen aceptación física. Issue [#18](https://github.com/Reymonth777x/python-desde-cero/issues/18).
+- [ ] **Gobierno de GitHub:** `master` sigue sin protección. Activar PR obligatorio, aprobación, conversaciones resueltas y checks `test-and-build`/`powershell-launcher`. Issue [#23](https://github.com/Reymonth777x/python-desde-cero/issues/23).
+- [ ] **Decisión de visibilidad:** el repositorio sigue público y las respuestas de evaluación permanecen en el historial. No cambiar visibilidad ni reescribir commits sin decisión explícita. Issue [#21](https://github.com/Reymonth777x/python-desde-cero/issues/21).
+- [ ] **Dependencias:** PR #107 propone una mitigación parcial de `minimatch`; su rama conserva cinco avisos moderados en una copia heredada de ESLint. No considerar el audit limpio ni forzar un salto mayor incompatible.
+- [ ] **Privacidad y términos:** revisión profesional de privacidad, términos, cookies, retención y derechos para Costa Rica antes de abrir registro externo. Issue [#98](https://github.com/Reymonth777x/python-desde-cero/issues/98).
+
+La referencia de publicación, commits y Workers está en `README.md`; el estado exacto de migraciones está en `docs/team/MIGRACIONES.md`. Las secciones siguientes son el checklist conservado del 30-10-2026 y sirven como historial, no como fuente de estado actual.
+
+---
+
+## Checklist histórico — corte 30-10-2026
 
 ## 1. Completado y verificado en código/producción
 
