@@ -69,8 +69,8 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   },
   c08: {
     historia: "Un carrizal joven necesita nueve juncos nuevos. Plantar uno por uno sería lento; Nilo puede repetir una tarea organizada por filas.",
-    explicacion: "for recorre una secuencia. range(3) produce tres vueltas: 0, 1 y 2. En cada vuelta puedes ejecutar varias instrucciones, siempre con la misma indentación dentro del bloque.",
-    ejemplo: "for vuelta in range(3):\n    sembrar()\n    avanzar()",
+    explicacion: "for recorre una secuencia. range(3) produce tres vueltas: 0, 1 y 2. Dentro de cada vuelta puedes comprobar una condición, hacer una tarea y avanzar. En el carrizal repetirás este patrón para cubrir las filas.",
+    ejemplo: "if frente_libre():\n    avanzar()\n\nfor vuelta in range(3):\n    if agua_baja():\n        sembrar()\n    if frente_libre():\n        avanzar()",
     pregunta: "¿Cuántas vueltas realiza for vuelta in range(3)?",
     respuesta: "Tres vueltas. Los valores generados son 0, 1 y 2.",
     reto: "¿Qué cambiarías para que el bucle tenga cinco vueltas?"
@@ -126,7 +126,7 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   abierta: {
     historia: "Llegaste al río abierto: ya no hay una ruta marcada ni una sola manera correcta de explorar. El ecosistema necesita que tomes decisiones y dejes registro de tu trabajo.",
     explicacion: "Un proyecto abierto combina instrucciones conocidas para resolver objetivos simultáneos. Puedes diseñar tu ruta, probar una estrategia, leer las notas guardadas y mejorar tu solución.",
-    ejemplo: "anotar(\"Exploración lista\")\nmis_notas = leer_notas()\ndecir(mis_notas)",
+    ejemplo: "anotar(\"trabajo listo: cuenca cuidada\")\nmis_notas = leer_notas()\nif len(mis_notas) > 0:\n    decir(mis_notas[0])",
     pregunta: "¿Tiene que existir una sola solución para esta misión?",
     respuesta: "No. Puedes llegar al objetivo con distintas rutas y estrategias mientras cumplas todos los encargos.",
     reto: "Crea una estrategia propia y explica en una nota por qué elegiste ese recorrido."
