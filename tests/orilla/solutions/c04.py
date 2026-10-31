@@ -1,6 +1,9 @@
-# Calcula los remos con división entera.
-columnas = 8
-remos = columnas // 2
-for _ in range(7):
-    avanzar()
+avanzar()
+avanzar()
+avanzar()
+avanzar()
+avanzar()
+avanzar()
+avanzar()
+remos = columna() // 2
 decir(remos)
