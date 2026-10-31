@@ -119,7 +119,7 @@ export async function submitQuiz(
     passed: rpcPassed,
     correct: Number(rpcResult.correct ?? 0),
     total: Number(rpcResult.total ?? total),
-    explanations: getExplanations(moduleId, lessonId),
+    explanations: rpcPassed ? getExplanations(moduleId, lessonId) : [],
     completed: rpcPassed,
   };
 }
