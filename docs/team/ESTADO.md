@@ -1,11 +1,11 @@
-# Estado operativo — 31 de octubre de 2026
+# Estado operativo — 30 de octubre de 2026
 
-> Este documento describe el estado comprobado de `master`, producción y Supabase al 31-10-2026. Las pruebas manuales se identifican como confirmación del propietario; no se presentan como telemetría independiente.
+> Este documento describe el estado comprobado de `master`, producción y Supabase al 30-10-2026. Las pruebas manuales se identifican como confirmación del propietario; no se presentan como telemetría independiente.
 
 ## Repositorio y publicación
 
 - Repositorio: `Reymonth777x/python-desde-cero`; rama de producción: `master`.
-- Última publicación comprobada: HEAD de `master` `38533eae71f60e899949f567c30f15c99c3cbe65` (31-10-2026). La CI [41150277769](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41150277769) y el despliegue Cloudflare [41150633694](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41150633694) terminaron en `success` sobre el mismo SHA. El último cambio de runtime funcional sigue siendo `d072f962d96a9e3deb1d5d2a7a4a8a83ebec4e21`; los commits posteriores actualizan workflows/documentación.
+- Última publicación comprobada: HEAD de `master` `38533eae71f60e899949f567c30f15c99c3cbe65` (30-10-2026). La CI [41150277769](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41150277769) y el despliegue Cloudflare [41150633694](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41150633694) terminaron en `success` sobre el mismo SHA. El último cambio de runtime funcional sigue siendo `d072f962d96a9e3deb1d5d2a7a4a8a83ebec4e21`; los commits posteriores actualizan workflows/documentación.
 - Cloudflare Worker principal Version ID actual: `7b625566-1987-4f2c-9875-c369ed584e13`.
 - PR #91 integró el ejecutor Python de origen separado. Su Worker actual es `https://python-desdecero-runner.pythondesdecero.workers.dev`, versión `8cb973f4-fde5-4cce-ab25-7dba6a09ad25`.
 - La release actual se validó con 24 archivos Vitest, 168 pruebas Playwright, TypeScript, ESLint, build Next, build Vinext y `npm audit` (0 vulnerabilidades).
