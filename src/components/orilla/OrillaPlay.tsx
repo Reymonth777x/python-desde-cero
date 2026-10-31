@@ -15,7 +15,8 @@ import {
   estadoInicial,
   type EstadoRio,
 } from '@/lib/orilla/replay';
-import type { EventoOrilla, PayloadTramo, ResultadoOrilla } from '@/lib/orilla/types';
+import type { ChapterId, EventoOrilla, PayloadTramo, ResultadoOrilla } from '@/lib/orilla/types';
+import OrillaGuide from './OrillaGuide';
 import { useOrillaWorker } from '@/lib/orilla/use-orilla-worker';
 import { reproducirSonidoOrilla } from '@/lib/orilla/audio';
 import RiverView from './RiverView';
@@ -45,7 +46,7 @@ type Guardado = {
 };
 
 export type OrillaPlayProps = {
-  tramo: { id: string; orden: number; nombre: string; concepto: string; lessonId: string };
+  tramo: { id: ChapterId; orden: number; nombre: string; concepto: string; lessonId: string };
   ui: { ayuda: string[]; andamiaje: string; consecuencia: string };
   payload: PayloadTramo;
   guardado: Guardado;
@@ -285,8 +286,8 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
           {!esAbierta && <span aria-label={`Mejor resultado: ${mejor.stars} de 3 estrellas`}>{estrellasTexto(mejor.stars)}</span>}
           {mejor.pasos !== null && <span>Mejor marca: {mejor.pasos} pasos</span>}
         </div>
-        <ul className="list-disc space-y-1 pl-5 text-sm leading-6 text-[var(--theme-ink)]">{ui.ayuda.map((linea) => <li key={linea}>{linea}</li>)}</ul>
       </header>
+      <OrillaGuide chapterId={tramo.id} ayuda={ui.ayuda} verbos={payload.abiertos.verbos} builtins={payload.abiertos.builtins} onUseExample={alCambiar} />
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.18fr)_minmax(360px,0.82fr)]">
         <section aria-labelledby="orilla-editor" className="order-2 min-w-0 space-y-3 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] p-3 shadow-sm sm:p-4 lg:order-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -303,7 +304,7 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
             <button type="button" onClick={alVolverAlAndamiaje} className="flex min-h-12 w-full items-center justify-center border border-[var(--theme-border-dark)] px-5 py-3 text-base font-semibold text-[var(--theme-ink)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] sm:w-auto">{confirmaAndamiaje ? 'Confirmar: se pierde tu código' : 'Volver al andamiaje'}</button>
             {estadoWorker === 'error' && <button type="button" onClick={reiniciar} className="flex min-h-12 w-full items-center justify-center border border-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-accent)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] sm:w-auto">Reintentar carga de Python</button>}
           </div>
-          <details className="border border-[var(--theme-border)] bg-[var(--theme-surface)] p-3"><summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold text-[var(--theme-accent)]">Lo que Nilo entiende en este tramo</summary><dl className="mt-2 space-y-1 text-sm">{[...payload.abiertos.verbos, ...payload.abiertos.builtins].map((nombre) => <div key={nombre} className="flex flex-wrap gap-x-2"><dt className="font-mono font-bold text-[var(--theme-ink)]">{nombre}</dt><dd className="text-[var(--theme-muted)]">{DOC_VERBOS[nombre]}</dd></div>)}</dl></details>
+          <details className="border border-[var(--theme-border)] bg-[var(--theme-surface)] p-3"><summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold text-[var(--theme-accent)]">Lista completa de comandos disponibles</summary><dl className="mt-2 space-y-1 text-sm">{[...payload.abiertos.verbos, ...payload.abiertos.builtins].map((nombre) => <div key={nombre} className="flex flex-wrap gap-x-2"><dt className="font-mono font-bold text-[var(--theme-ink)]">{nombre}</dt><dd className="text-[var(--theme-muted)]">{DOC_VERBOS[nombre]}</dd></div>)}</dl></details>
         </section>
         <section aria-labelledby="orilla-rio" className="order-1 min-w-0 space-y-3 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] p-3 shadow-sm sm:p-4 lg:order-1">
           <div className="space-y-2"><div className="flex flex-wrap items-center justify-between gap-3">
