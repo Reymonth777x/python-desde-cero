@@ -4,10 +4,10 @@ import { recuperarBorradorOrilla } from './draft';
 describe('recuperarBorradorOrilla', () => {
   it('recupera un borrador móvil más reciente que el guardado remoto', () => {
     expect(recuperarBorradorOrilla(
-      JSON.stringify({ code: 'avanzar()\\navanzar()', at: 2000 }),
+      JSON.stringify({ code: 'avanzar()\navanzar()', at: 2000 }),
       1000,
       '# Escribe aquí',
-    )).toBe('avanzar()\\navanzar()');
+    )).toBe('avanzar()\navanzar()');
   });
 
   it('no reemplaza el avance remoto por un borrador antiguo o de la misma versión', () => {
