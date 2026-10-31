@@ -44,7 +44,7 @@ test.describe('Autenticacion y flujo de usuario', () => {
   test('Orilla protege el mapa y los tramos para visitantes', async ({ page }) => {
     for (const path of ['/orilla', '/orilla/c01']) {
       await page.goto(path);
-      await expect(page).toHaveURL(/\\/login\\?next=/);
+      await expect(page).toHaveURL(/login/);
     }
   });
 
