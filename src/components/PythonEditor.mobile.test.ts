@@ -5,7 +5,7 @@ const source = readFileSync(new URL('./PythonEditor.tsx', import.meta.url), 'utf
 
 describe('Flujo móvil del laboratorio', () => {
   it('presenta guía, editor, acción y resultado en una sola secuencia', () => {
-    expect(source).toContain('LABORATORIO · EN TRES PASOS');
+    expect(source).toContain('Cómo usar este laboratorio');
     expect(source).toContain('data-testid="python-editor-frame"');
     expect(source).toContain('data-testid="python-run"');
     expect(source).toContain('data-testid="python-output"');
@@ -17,10 +17,14 @@ describe('Flujo móvil del laboratorio', () => {
   });
 
   it('mantiene ayudas táctiles y el campo de entrada de input()', () => {
-    expect(source).toContain('Atajos para escribir en la pantalla táctil');
+    expect(source).toContain('Teclas útiles en el móvil');
     expect(source).toContain('grid grid-cols-4 gap-2');
+    expect(source).toContain('min-h-12 min-w-0');
+    expect(source).toContain("accessible: 'Insertar corchetes'");
+    expect(source).toContain("text: '[]'");
     expect(source).toContain('Datos que pide tu programa con input()');
     expect(source).toContain('Comprobar ejercicio');
+    expect(source).toContain('Restaurar ejemplo');
   });
 
   it('no duplica el botón de ejecución y lleva al estudiante al resultado', () => {
