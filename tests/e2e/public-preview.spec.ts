@@ -1,5 +1,17 @@
 import { expect, test } from '@playwright/test';
 
+test('La extensión opcional se distingue del recorrido obligatorio en la portada', async ({ page }) => {
+  await page.goto('/');
+
+  const extension = page.locator('article').filter({
+    has: page.getByRole('heading', { name: 'Archivos y persistencia (extensión práctica)' }),
+  });
+  await expect(extension).toBeVisible();
+  await expect(extension.getByText('05', { exact: true })).toBeVisible();
+  await expect(extension.getByText('OPCIONAL', { exact: true })).toBeVisible();
+  await expect(extension.getByText('EXTENSIÓN OPCIONAL', { exact: true })).toHaveCount(0);
+});
+
 test('El visitante puede abrir y ejecutar la muestra real antes del registro', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('link', { name: /Probar la primera lección/ }).click();
