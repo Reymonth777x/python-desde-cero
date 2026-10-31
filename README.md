@@ -135,7 +135,7 @@ Orilla is an authenticated practice area at `/orilla`. It uses the same isolated
 
 - **Never commit `.env.local` or any file containing secret values.** These are excluded by `.gitignore`.
 - Supabase RLS policies are the final layer of data protection; migration files in `supabase/migrations/` define the schema and policies but must be reviewed and applied deliberately.
-- Migration files are stored in `supabase/migrations/` with timestamp prefixes. The remote PROD and DEV migration histories were inspected on October 30, 2026; the repository contains documented timestamp/name drift and the Supabase Preview branch has failed migrations. Read [docs/team/MIGRACIONES.md](docs/team/MIGRACIONES.md). Do not run `db push`, `migration repair`, or `db reset` against a remote project until that reconciliation has an explicit plan.
+- Migration files are stored in `supabase/migrations/` with timestamp prefixes. The remote PROD and DEV migration histories were rechecked on October 31, 2026: production has 25 recorded migrations and DEV has 11, including Orilla migration 029. Historical timestamp/name drift remains documented, and the Supabase Preview branch still reports failed migrations. Read [docs/team/MIGRACIONES.md](docs/team/MIGRACIONES.md). Do not run `db push`, `migration repair`, or `db reset` against a remote project until that reconciliation has an explicit plan.
 
 ## Correo de autenticación
 
@@ -159,23 +159,24 @@ No se incluyen credenciales SMTP, tokens ni claves API en este repositorio. La p
 - Admin invitation management page
 - PWA manifest
 - Security headers (CSP, X-Frame-Options, etc.)
-- Automated quality suite: 24 Vitest test files, 168 Playwright E2E tests, TypeScript, ESLint, Next production build, Vinext/Cloudflare build, and course exercise verification (latest verified CI)
+- Automated quality suite: 172 Playwright E2E tests, 147 Orilla checks, TypeScript, ESLint, Next production build, Vinext/Cloudflare build, runner smoke test, and course exercise verification (latest verified CI)
 
 ### Known Limitations
 
 - The owner confirmed successful manual registration, email confirmation, login, logout, password recovery and password change on October 30, 2026. The connected read-only inspection cannot reveal the SMTP host/login saved in Supabase Auth or individual Brevo message receipts, so this is recorded as owner-confirmed functional acceptance rather than an independently inspected SMTP configuration.
 - PROD and DEV RLS/table grants have been inspected. Direct student INSERT/UPDATE/DELETE on `public.progress` and direct insertion into the private quiz-attempt table are not granted; quiz submission and prerequisite checks run through the private authoritative function. See [docs/team/MIGRACIONES.md](docs/team/MIGRACIONES.md).
-- Supabase migration history still differs from local filenames/timestamps, and the Production Preview branch reports migration failure. Do not apply migrations automatically.
+- Supabase migration history still differs from local filenames/timestamps. Production records 25 migrations and DEV records 11; the Production Preview branch `main` reports `MIGRATIONS_FAILED` while the parent project and DEV project are healthy. Do not run `db push`, `migration repair`, `reset` or `rebase` as an automatic fix. See issue #3.
+- Production currently has one `orilla_runs` row for `c01`, with `attempts = 0`, `passed = false`, and zero stars. This confirms a saved draft, not a successful execution. DEV currently has no Orilla runs. The first authenticated execution and progress reflection in Academia still need acceptance testing with a disposable DEV student account; never use production student accounts for this test.
 - Manual owner acceptance covers the Python runner, Turtle, error/limit cases, Chrome, Firefox and physical phones. Visual acceptance of the complete authenticated mobile interface (theme picker, editor, virtual keyboard and progress screens) remains tracked in issue #18.
 - `master` branch protection is not enabled yet, and the public repository exposes historical course assessment material in Git history; see [issues #23](https://github.com/Reymonth777x/python-desde-cero/issues/23) and [#21](https://github.com/Reymonth777x/python-desde-cero/issues/21).
 - The two-student/admin acceptance of persisted quiz results and progress isolation remains open in issue #20. Supabase's leaked-password protection warning is also open; the current Free plan does not provide that feature.
 ## Latest verified release
 
-- GitHub `master`: `38533eae71f60e899949f567c30f15c99c3cbe65` (October 30, 2026). This is the current documentation/readiness update; the last application runtime change remains `d072f962d96a9e3deb1d5d2a7a4a8a83ebec4e21`.
-- CI: [run 41150277769](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41150277769) — passed on the exact `master` SHA, including 24 Vitest files, 168 Playwright tests, 62 cases across 36 Python activities, TypeScript, ESLint, Next/Vinext builds and npm audit.
-- Cloudflare deployment: [run 41150633694](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41150633694) — passed on the same SHA. Main Worker version `7b625566-1987-4f2c-9875-c369ed584e13`; isolated Python runner version `8cb973f4-fde5-4cce-ab25-7dba6a09ad25`.
-- Production smoke test verified the home page, `/muestra`, `/login`, sitemap, both custom hostnames, and `www` → apex redirect (HTTP 308). The public production domain is responding.
-- Owner-confirmed manual acceptance: Auth/email flows, Python/Turtle runtime across Chrome/Firefox and physical phones, and human review of all 33 mandatory units.
+- GitHub `master`: `990a345cc5bfd2b6a2860e6c90c7d08bfd0dc9b2` (October 31, 2026), including Orilla and the corrected isolated runner origin allowlist.
+- CI: [run 41157114524](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41157114524) — passed on this exact SHA. It reports 172 Playwright E2E tests passed, 147 Orilla checks, the real runner smoke test, TypeScript, ESLint, Next/Vinext builds, and course exercise verification.
+- Cloudflare deployment: [run 41157468052](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41157468052) — passed on the same SHA. Site Worker version `e66ab3b5-38f3-4078-8dfc-62e4ebedfb2b`; isolated Python runner version `041d189f-1070-455a-b440-546f7110f7c2`.
+- Production smoke test rechecked the home page and `/login`; `/orilla` and `/orilla/c01` are published and redirect unauthenticated visitors to login (not 404). The runner script serves the exact production apex and `www` origins in its parent allowlist.
+- Owner-confirmed manual acceptance remains on record for Auth/email flows and general Python/Turtle execution. The remaining Orilla acceptance is an authenticated first-tramo run and confirmation that progress is reflected in Academia.
 ## Release and sync instructions for the team
 
 From an existing checkout with no uncommitted changes:
@@ -198,6 +199,6 @@ Each partner must keep their own `.env.local` and use the DEV Supabase project. 
 
 ## License
 
-No license has been applied yet. As of October 30, 2026, this GitHub repository is **public**; issue #21 tracks the owner's decision about keeping it public or moving internal development to a private repository. Public visibility allows anyone to inspect the source and its Git history, including historical course assessment material. The app's `server-only` boundaries protect runtime bundles, not the public Git repository. Do not port or reuse course content without confirming licensing terms.
+No license has been applied yet. As of October 31, 2026, this GitHub repository is **public**; issue #21 tracks the owner's decision about keeping it public or moving internal development to a private repository. Public visibility allows anyone to inspect the source and its Git history, including historical course assessment material. The app's `server-only` boundaries protect runtime bundles, not the public Git repository. Do not port or reuse course content without confirming licensing terms.
 
 This project is independent educational material. Confirm licensing before reusing external or course-provider materials.
