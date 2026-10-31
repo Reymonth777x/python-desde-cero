@@ -1,14 +1,7 @@
 (() => {
   "use strict";
 
-  const ALLOWED_PARENT_ORIGINS = new Set([
-    "https://python-desdecero.com",
-    "https://www.python-desdecero.com",
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:3001"
-  ]);
+  const ALLOWED_PARENT_ORIGINS = new Set(__PYTHON_RUNNER_ALLOWED_PARENT_ORIGINS_JSON__);
   const MAX_CODE_LENGTH = 50000;
   const MAX_OUTPUT_LENGTH = 20000;
   const OUTPUT_TRUNCATION_NOTICE = "\n[Salida limitada para proteger el navegador.]";
