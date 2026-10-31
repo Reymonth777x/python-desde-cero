@@ -7,7 +7,7 @@ import {
 
 describe("origen público de la aplicación", () => {
   it("usa el dominio canonical como fallback", () => {
-    expect(resolveSiteUrl(undefined).origin).toBe(PRODUCTION_SITE_ORIGIN);
+    expect(resolveSiteUrl("").origin).toBe(PRODUCTION_SITE_ORIGIN);
   });
 
   it("acepta el origen configurado de una aplicación de auditoría", () => {
