@@ -230,7 +230,7 @@ export default function PythonEditor({
         className="pointer-events-none absolute -left-[10000px] top-0 h-px w-px overflow-hidden border-0 opacity-0"
       />
       <section aria-labelledby="python-lab-guide" className="border-l-2 border-[var(--theme-border-dark)] bg-[var(--theme-bg-secondary)] p-4 sm:p-5">
-        <p className="text-[0.68rem] font-bold tracking-[0.14em] text-[var(--theme-accent)]">Cómo usar este laboratorio</p>
+        <p className="text-sm font-semibold text-[var(--theme-accent)]">Cómo usar este laboratorio</p>
         <h2 id="python-lab-guide" className="mt-1 font-serif text-xl text-[var(--theme-ink)]">Prueba tu código</h2>
         <ol className="mt-3 grid gap-2 text-sm leading-5 sm:grid-cols-3">
           <li className="flex items-start gap-2">
