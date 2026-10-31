@@ -5,12 +5,13 @@ export function resolveSiteUrl(configuredUrl = process.env.NEXT_PUBLIC_SITE_URL)
     ? configuredUrl.trim()
     : PRODUCTION_SITE_ORIGIN;
 
-  let url: URL;
-  try {
-    url = new URL(candidate);
-  } catch {
-    throw new Error("NEXT_PUBLIC_SITE_URL debe ser una URL absoluta válida.");
-  }
+  const url = (() => {
+    try {
+      return new URL(candidate);
+    } catch {
+      throw new Error("NEXT_PUBLIC_SITE_URL debe ser una URL absoluta válida.");
+    }
+  })();
 
   if (
     url.username ||
