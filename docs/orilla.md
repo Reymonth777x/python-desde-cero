@@ -24,7 +24,7 @@ El resultado de Orilla es una práctica gamificada y el motor corre en el navega
 | Protocolo con Pyodide | `src/lib/orilla/use-orilla-worker.ts` y `public/python-worker.js` |
 | Mapa, editor y reproducción | `src/components/orilla/` |
 | Lectura y escritura por cuenta | `src/app/orilla/` y RPC de Supabase |
-| Migración | `supabase/migrations/20261031005000_029_orilla_runs.sql` |
+| Migración | `supabase/migrations/20261031012927_029_orilla_runs.sql` |
 
 ## Desbloqueo y guardado
 
