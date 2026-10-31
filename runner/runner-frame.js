@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const ALLOWED_PARENT_ORIGINS = new Set(__PYTHON_RUNNER_ALLOWED_PARENT_ORIGINS_JSON__);
+  const ALLOWED_PARENT_ORIGINS = new Set(["__PYTHON_RUNNER_ALLOWED_PARENT_ORIGINS_PLACEHOLDER__"]);
   const MAX_CODE_LENGTH = 50000;
   const MAX_OUTPUT_LENGTH = 20000;
   const OUTPUT_TRUNCATION_NOTICE = "\n[Salida limitada para proteger el navegador.]";
