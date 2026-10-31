@@ -49,15 +49,15 @@ describe('quiz answer-key drift detection', () => {
     const previousKeys = [...keysFromBalanceMigration(sql), ...keysFromPracticeMigration(additionalSql)]
       .filter((key) => !key.startsWith("'module-1', 'b1-l4',") && !key.startsWith("'module-5', 'b5-l4',"));
     const finalAssessmentSql = readFileSync(
-      new URL('../../supabase/migrations/20261030064000_024_add_required_pe1_assessments_and_project.sql', import.meta.url),
+      new URL('../../supabase/migrations/20261030081610_add_required_pe1_assessments_and_project.sql', import.meta.url),
       'utf8',
     );
     const helloWorldSql = readFileSync(
-      new URL('../../supabase/migrations/20261030072000_025_add_module_2_hello_world_quiz.sql', import.meta.url),
+      new URL('../../supabase/migrations/20261030081612_add_module_2_hello_world_quiz.sql', import.meta.url),
       'utf8',
     );
     const rpcSecuritySql = readFileSync(
-      new URL('../../supabase/migrations/20261030074000_026_harden_quiz_rpc_invoker.sql', import.meta.url),
+      new URL('../../supabase/migrations/20261030073610_harden_quiz_rpc_invoker.sql', import.meta.url),
       'utf8',
     );
     const actual = [

@@ -189,3 +189,91 @@ La excepción de progreso histórico también se aplica en la interfaz: el PR #8
 - Auditoría de solo lectura en ambos entornos: `public.orilla_runs` existe con RLS activo; `authenticated` tiene lectura propia por política; `anon` no puede leer y ninguno de esos roles puede escribir directamente. Las RPC públicas son `SECURITY INVOKER`, las funciones autoritativas están en `private` con `SECURITY DEFINER` y `search_path` vacío; solo `authenticated` puede ejecutarlas. El trigger `orilla_runs_guard` está habilitado.
 - No se hicieron cambios SQL en DEV ni producción durante esta revisión. La migración ya estaba aplicada en ambos entornos; solo se alineó el timestamp canónico del archivo con producción.
 - Se mantiene la restricción general de este documento: no ejecutar `db push`, `migration repair` ni `db reset` mientras persista la divergencia histórica de otras migraciones. No repetir la migración 029 en ningún entorno.
+
+
+---
+
+## Reconciliación de historial — 31-10-2026
+
+Esta sección es la referencia vigente y sustituye los conteos/versiones de los apartados históricos anteriores.
+
+### Hechos verificados en PROD y DEV
+
+- PROD registra 25 migraciones; DEV registra 11. Ambos esquemas tienen `profiles`, `invitations`, `progress`, el calificador privado de quizzes y `orilla_runs`.
+- PROD y DEV **no** tienen `public.quiz_attempts` ni `private.quiz_keys`; su modelo activo usa `private.quiz_attempts` y `private.quiz_answer_key`.
+- PROD y DEV tampoco tienen `exercise_submissions`, `achievements`, `user_achievements`, `user_streaks`, `audit_log` ni `project_submissions`; el código actual no consulta esas tablas.
+- Las preferencias `theme`, `avatar`, `sound_enabled` y `reduce_motion` tampoco existen como columnas de `profiles`; el selector de tema actual no debe depender de esas columnas.
+- El trigger `on_auth_user_created` existe y está habilitado en ambos proyectos. La definición actual de `public.handle_new_user()` es el flujo de invitación opcional de la migración 005.
+- `invitations.expires_at` es `NOT NULL`, tiene default de siete días y no hay filas con vencimiento nulo.
+- La rama Supabase Preview `main` del proyecto de producción tiene `MIGRATIONS_FAILED`, pero el proyecto de preview continúa `ACTIVE_HEALTHY` y está marcado `with_data=false`. No resetearla sin una razón y comprobación posterior.
+
+### Cambios de repositorio preparados en esta rama
+
+1. Restaurar las cinco migraciones históricas 011–015 con el SQL exacto recuperado de `supabase_migrations.schema_migrations` de PROD:
+   - `20261026221230_011_secure_quiz_submission.sql`
+   - `20261026221332_012_deny_direct_quiz_table_access.sql`
+   - `20261026222246_013_randomize_quiz_option_order.sql`
+   - `20261026230434_014_require_invitation_expiry.sql`
+   - `20261026230815_015_private_quiz_rpc_wrapper.sql`
+
+   Las sentencias guardadas en el historial remoto se conservaron literalmente; no se regeneraron a partir de nombres ni se reescribió su lógica.
+
+2. Alinear los archivos 024–027 a las versiones de PROD, sin cambiar su SQL. Se comparó cada archivo con `statements[1]` del historial remoto y los cuatro contenidos dieron coincidencia exacta:
+   - 024 → `20261030081610`
+   - 025 → `20261030081612`
+   - 026 → `20261030073610`
+   - 027 → `20261030084308`
+
+3. Archivar fuera de `supabase/migrations/` las tres variantes de quizzes que no representan el esquema desplegado y las cuatro migraciones de características sin consumidor actual. Se preservan sus contenidos en `supabase/archive/migrations/`; no se aplican automáticamente.
+
+4. Mantener las migraciones base 001–003 y la función de registro opcional 005 dentro de la carpeta activa. Los objetos base y el trigger ya existen en PROD y DEV, y el cuerpo actual de `handle_new_user()` coincide con el comportamiento de 005. Antes de publicar la rama se requiere reconciliar **solo el historial** de esas versiones (marcarlas como ya aplicadas), sin volver a ejecutar sus SQL.
+
+### Diferencia específica de DEV
+
+DEV se creó con un snapshot de desarrollo `20261030061534_dev_environment_bootstrap_20261030` y tres migraciones auxiliares para wrappers/privilegios. No se deben copiar esas sentencias a la secuencia común de producción: el bootstrap es específico de DEV y las auxiliares preservan un wrapper de compatibilidad que PROD retiró. La reconciliación de DEV requiere conservar su comportamiento, y alinear solo los timestamps compartidos 024–029 cuando sus sentencias/efectos sean equivalentes. La migración `revoke_legacy_quiz_rpc_execution` de DEV incluye comentarios adicionales y protege su wrapper v2; no se sustituye sin volver a comparar el ACL resultante.
+
+### Límites operativos
+
+- La restauración y renombrado de archivos no ejecutan SQL ni cambian datos.
+- No ejecutar `db push`, `db reset`, `merge_branch` ni borrar la rama Preview como atajo.
+- La reparación de historial debe ser metadata-only, version por version, con comparación previa de objetos y permisos. No marcar como applied una migración cuyo efecto no esté presente.
+- Después de la reparación, comprobar `list_migrations` en ambos entornos y confirmar que PROD y DEV no tienen versiones remotas ausentes en la carpeta correspondiente. Si el preview sigue fallando, leer el error nuevo antes de tocar esa rama.
+
+
+### Cierre de reconciliación del proyecto de producción — 31-10-2026
+
+- La carpeta activa `supabase/migrations/` de esta rama contiene 29 archivos y el historial de PROD contiene exactamente las mismas 29 versiones: cero archivos locales ausentes del historial y cero versiones remotas sin archivo local.
+- Se recuperaron las sentencias SQL originales de 011–015 desde `schema_migrations.statements[1]` de producción; los archivos nuevos conservan las sentencias originales sin reconstrucción.
+- Las cuatro migraciones 024–027 se renombraron a sus timestamps reales de PROD. Se comparó el contenido de cada archivo con la sentencia registrada y los cuatro dieron igualdad exacta.
+- Los SQL locales alternativos de 011–013 y las cuatro migraciones de funcionalidades que no tienen tablas/columnas/consumidores en el producto actual se preservaron en `supabase/archive/migrations/`; no forman parte del orden de ejecución.
+- En PROD se completó una reparación solo de historial para `20261026083700`, `20261026083705`, `20261026083715` y `20261026083730`. Antes de insertarlas se verificó que las tablas base y el trigger de Auth existían, que `handle_new_user()` ya ejecutaba el registro con invitación opcional y que el vencimiento de invitaciones estaba normalizado. Las cuatro filas fueron insertadas en `supabase_migrations.schema_migrations` con las sentencias de su archivo local y `ON CONFLICT DO NOTHING`. No se ejecutaron esas sentencias SQL ni se alteró esquema, datos, usuarios, invitaciones, progreso, permisos o triggers.
+- No se modificó el historial remoto de DEV. DEV sigue utilizando un bootstrap de entorno propio y tres wrappers/ajustes de privilegios locales a ese proyecto. No se deben insertar en DEV versiones comunes por mera semejanza de nombre: antes se requiere una matriz de efectos por timestamp y comprobar sus RPC/ACL para conservar el wrapper v2 de DEV.
+- Esta reconciliación se preparó en la rama `fix/reconcile-supabase-migration-history-20261031`. La rama aún requiere CI y revisión de Supabase Preview antes de integrarse en `master`.
+
+### Distinción importante sobre Supabase Preview
+
+La reparación anterior corrige el historial del proyecto de producción principal. No equivale a reparar la rama Preview `main` que reporta `MIGRATIONS_FAILED`. Esa rama es un proyecto derivado separado, marcado `with_data=false` y `ACTIVE_HEALTHY`; su estado debe comprobarse después de que Supabase evalúe esta rama Git. No resetearla ni eliminarla por anticipado.
+
+
+### Aceptación funcional de Orilla — lectura real de filas (31-10-2026)
+
+Consulta de solo lectura de `public.orilla_runs`:
+
+- PROD contiene exactamente una fila: `chapter_id = c01`, `passed = false`, `stars = 0`, `best_steps = NULL`, `attempts = 0`. Es un borrador guardado; no acredita que el estudiante ejecutara el programa ni que superara el objetivo.
+- DEV no contiene filas de Orilla.
+- El código guarda borradores con `p_es_intento = false`; el contador `attempts` solo aumenta cuando se registra una ejecución. No interpretar la fila de PROD como una partida.
+- Aceptación pendiente: con una cuenta desechable de DEV, abrir `/orilla`, ejecutar la solución de `c01`, verificar que la ejecución queda aprobada y que la campaña/Academia reflejan el progreso. No utilizar cuentas ni datos de estudiantes de producción.
+
+
+### Prueba reversible de guardado y aislamiento de Orilla en DEV — 31-10-2026
+
+Se ejecutó una prueba SQL de integración usando dos perfiles de estudiante existentes en el proyecto DEV, dentro de una sola transacción que terminó en `ROLLBACK`:
+
+- La RPC `record_orilla_run` guardó un intento temporal de `c01` y devolvió `attempts = 1`, `passed = false`, `stars = 0`.
+- El primer estudiante pudo leer su propia fila.
+- El segundo estudiante no pudo ver la fila ajena.
+- Intentar registrar `c02` sin haber superado `c01` fue rechazado con el error de tramo bloqueado.
+- `authenticated` no tiene privilegios directos INSERT/UPDATE/DELETE sobre `public.orilla_runs`.
+- Después del `ROLLBACK`, una consulta independiente verificó que DEV seguía con cero filas en `orilla_runs`.
+
+La prueba acredita el comportamiento de RPC, RLS, prerrequisitos y permisos a nivel de base de datos. **No acredita todavía la experiencia visual real con Monaco/Pyodide desde un navegador autenticado**, ni la actualización visual del mapa y del panel de Academia. Esa aceptación sigue pendiente con un estudiante desechable de DEV.
