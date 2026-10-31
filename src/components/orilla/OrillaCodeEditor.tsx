@@ -62,6 +62,14 @@ export default function OrillaCodeEditor({ value, onChange, verbos, builtins, co
     [constructos],
   );
 
+  const metodos = useMemo(
+    () => Object.values(METODOS).filter((metodo) =>
+      (metodo.nombre === 'append' && constructos.includes('lista')) ||
+      (metodo.nombre === 'get' && constructos.includes('dict')),
+    ),
+    [constructos],
+  );
+
   const insertar = (fragmento: string, posicionCursor: number) => {
     const campo = textarea.current;
     const inicio = campo?.selectionStart ?? value.length;
