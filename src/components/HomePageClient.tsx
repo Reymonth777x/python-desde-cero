@@ -284,9 +284,9 @@ export default function HomePageClient({ accountLinks, progressSummary }: HomePa
                 className="group flex min-h-[220px] flex-col border-b border-[var(--theme-border)] p-5 last:border-b-0 sm:odd:border-r sm:even:border-r-0 xl:border-b-0 xl:border-r xl:last:border-r-0"
               >
                 <div className="flex items-center justify-between gap-3">
-                  <span className="font-mono text-xs text-[var(--theme-accent)]">{courseModule.optional ? 'EX' : `0${index + 1}`}</span>
+                  <span className="font-mono text-xs text-[var(--theme-accent)]">`0${index + 1}`</span>
                   {courseModule.optional && (
-                    <span className="border border-[var(--theme-accent)]/40 px-2 py-1 text-[9px] font-bold tracking-[0.14em] text-[var(--theme-accent)]">EXTENSIÓN OPCIONAL</span>
+                    <span className="border border-[var(--theme-accent)]/40 px-2 py-1 text-[9px] font-bold tracking-[0.14em] text-[var(--theme-accent)]">OPCIONAL</span>
                   )}
                   <span className="h-2 w-2 rounded-full border border-[var(--theme-border-dark)] transition-colors group-hover:bg-[var(--theme-accent)]" />
                 </div>
