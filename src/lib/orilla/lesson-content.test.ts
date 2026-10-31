@@ -23,6 +23,12 @@ describe('microlecciones narrativas de Orilla', () => {
     expect(MICROLECCIONES_ORILLA.c08.ejemplo).toContain('for');
     expect(MICROLECCIONES_ORILLA.c10.ejemplo).toContain('def');
     expect(MICROLECCIONES_ORILLA.c11.ejemplo).toContain('registrar');
+    expect(MICROLECCIONES_ORILLA.c11.ejemplo).toContain('except OrillaError');
+    expect(MICROLECCIONES_ORILLA.c08.ejemplo).toContain('if agua_baja():');
+    expect(MICROLECCIONES_ORILLA.c09.ejemplo).toContain('while frente_libre():');
+    expect(MICROLECCIONES_ORILLA.c12.ejemplo).toContain('def limpiar_si_hay_rama');
+    expect(MICROLECCIONES_ORILLA.abierta.ejemplo).toContain('decir(mis_notas[0])');
+    expect(MICROLECCIONES_ORILLA.abierta.ejemplo).not.toContain('decir(mis_notas)');
     expect(MICROLECCIONES_ORILLA['reto-luces'].explicacion).toContain('bucles');
     expect(MICROLECCIONES_ORILLA['reto-luces'].ejemplo).toContain('for vuelta');
     expect(MICROLECCIONES_ORILLA['reto-luces'].ejemplo).not.toContain('.sort(');

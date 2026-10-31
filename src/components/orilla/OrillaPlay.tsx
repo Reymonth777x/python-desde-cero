@@ -8,7 +8,6 @@ import { useTheme } from '@/app/theme-provider';
 import { guardarOrilla, vaciarNotasOrilla } from '@/app/orilla/actions';
 import { DOC_VERBOS, VERBOS_SIN_ARGUMENTOS } from '@/lib/orilla/ayuda-verbos';
 import { hrefLeccion } from '@/lib/orilla/enlaces';
-import { recuperarBorradorOrilla } from '@/lib/orilla/draft';
 import {
   aplicarEvento,
   describirRio,
@@ -20,6 +19,7 @@ import type { ChapterId, EventoOrilla, PayloadTramo, ResultadoOrilla } from '@/l
 import OrillaGuide from './OrillaGuide';
 import { useOrillaWorker } from '@/lib/orilla/use-orilla-worker';
 import { activarAmbienteOrilla, desactivarAmbienteOrilla, reproducirSonidoOrilla } from '@/lib/orilla/audio';
+import { recuperarBorradorOrilla } from '@/lib/orilla/draft';
 import RiverView from './RiverView';
 import OrillaCodeEditor from './OrillaCodeEditor';
 
@@ -95,6 +95,8 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
   const temporizador = useRef<number | null>(null);
   const completado = useRef<IDisposable | null>(null);
   const monacoRef = useRef<Monaco | null>(null);
+  const editorSectionRef = useRef<HTMLElement | null>(null);
+  const edicionManualRef = useRef(false);
 
   useEffect(() => () => {
     if (temporizador.current !== null) window.clearTimeout(temporizador.current);
@@ -161,7 +163,11 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
     monacoRef.current = monaco;
     aplicarTemaEditor(monaco);
     completado.current?.dispose();
-    const nombres = [...payload.abiertos.verbos, ...payload.abiertos.builtins];
+    const metodos = [
+      ...(payload.abiertos.constructos.includes('lista') ? ['append', 'insert', 'pop', 'index', 'count'] : []),
+      ...(payload.abiertos.constructos.includes('dict') ? ['get', 'keys', 'values', 'items'] : []),
+    ];
+    const nombres = [...payload.abiertos.verbos, ...payload.abiertos.builtins, ...metodos];
     completado.current = monaco.languages.registerCompletionItemProvider('python', {
       provideCompletionItems: (modelo: editor.ITextModel, posicion: { lineNumber: number; column: number }) => {
         const palabra = modelo.getWordUntilPosition(posicion);
@@ -174,15 +180,6 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
         })) };
       },
     });
-    try {
-      const crudo = window.localStorage.getItem(claveLocal);
-      const guardadoEn = guardado.updatedAt ? Date.parse(guardado.updatedAt) : 0;
-      const recuperado = recuperarBorradorOrilla(crudo, guardadoEn, inicial);
-      if (recuperado !== null) {
-        setCode(recuperado);
-        setAviso('Recuperé un borrador de este navegador que todavía no estaba guardado.');
-      }
-    } catch { /* sin almacenamiento local: se sigue con lo guardado */ }
     instancia.focus();
   };
 
@@ -196,6 +193,30 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
     [tramo.id],
   );
 
+  // Se ejecuta tanto con el textarea móvil como con Monaco de escritorio.
+  useEffect(() => {
+    let borrador: string | null = null;
+    try {
+      const guardadoEnCrudo = guardado.updatedAt ? Date.parse(guardado.updatedAt) : 0;
+      const guardadoEn = Number.isFinite(guardadoEnCrudo) ? guardadoEnCrudo : 0;
+      borrador = recuperarBorradorOrilla(window.localStorage.getItem(claveLocal), guardadoEn, inicial);
+    } catch {
+      // El almacenamiento local puede estar deshabilitado; se conserva el estado de la cuenta.
+    }
+    if (borrador === null) return;
+
+    const codigoRecuperado = borrador;
+    const recuperacion = window.setTimeout(() => {
+      // Si la persona empezó a escribir antes del siguiente turno, su edición gana.
+      if (edicionManualRef.current) return;
+      setCode(codigoRecuperado);
+      setAviso('Recuperé un borrador de este navegador que todavía no estaba guardado.');
+      temporizador.current = window.setTimeout(() => { void persistir(codigoRecuperado); }, 250);
+    }, 0);
+
+    return () => window.clearTimeout(recuperacion);
+  }, [claveLocal, guardado.updatedAt, inicial, persistir]);
+
   const alCambiar = (valor: string | undefined) => {
     const nuevo = valor ?? '';
     setCode(nuevo);
@@ -203,6 +224,14 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
     try { window.localStorage.setItem(claveLocal, JSON.stringify({ code: nuevo, at: Date.now() })); } catch { /* ignorado */ }
     if (temporizador.current !== null) window.clearTimeout(temporizador.current);
     temporizador.current = window.setTimeout(() => { void persistir(nuevo); }, 800);
+  };
+
+  const alUsarEjemplo = (nuevo: string) => {
+    alCambiar(nuevo);
+    window.requestAnimationFrame(() => {
+      const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      editorSectionRef.current?.scrollIntoView({ behavior: reducido ? 'auto' : 'smooth', block: 'center' });
+    });
   };
 
   const mostrarVariante = (indice: number, res: ResultadoOrilla, instante: boolean) => {
@@ -299,9 +328,9 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
           {mejor.pasos !== null && <span>Mejor marca: {mejor.pasos} pasos</span>}
         </div>
       </header>
-      <OrillaGuide chapterId={tramo.id} ayuda={ui.ayuda} verbos={payload.abiertos.verbos} builtins={payload.abiertos.builtins} onUseExample={alCambiar} />
+      <OrillaGuide chapterId={tramo.id} ayuda={ui.ayuda} verbos={payload.abiertos.verbos} builtins={payload.abiertos.builtins} onUseExample={alUsarEjemplo} />
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.18fr)_minmax(360px,0.82fr)]">
-        <section aria-labelledby="orilla-editor" className="order-2 min-w-0 space-y-3 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] p-3 shadow-sm sm:p-4 lg:order-2">
+        <section ref={editorSectionRef} aria-labelledby="orilla-editor" className="order-1 min-w-0 space-y-3 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] p-3 shadow-sm sm:p-4 lg:order-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 id="orilla-editor" className="font-serif text-xl text-[var(--theme-ink)]">Tu programa</h2>
             <span role="status" className="text-xs text-[var(--theme-muted)]">{guardadoEstado === 'guardando' && 'Guardando…'}{guardadoEstado === 'guardado' && 'Guardado en tu cuenta'}{guardadoEstado === 'error' && 'No se pudo guardar. Tu borrador sigue en este navegador.'}</span>
@@ -323,7 +352,7 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
           </div>
           <details className="border border-[var(--theme-border)] bg-[var(--theme-surface)] p-3"><summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold text-[var(--theme-accent)]">Lista completa de comandos disponibles</summary><dl className="mt-2 space-y-1 text-sm">{[...payload.abiertos.verbos, ...payload.abiertos.builtins].map((nombre) => <div key={nombre} className="flex flex-wrap gap-x-2"><dt className="font-mono font-bold text-[var(--theme-ink)]">{nombre}</dt><dd className="text-[var(--theme-muted)]">{DOC_VERBOS[nombre]}</dd></div>)}</dl></details>
         </section>
-        <section aria-labelledby="orilla-rio" className="order-1 min-w-0 space-y-3 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] p-3 shadow-sm sm:p-4 lg:order-1">
+        <section aria-labelledby="orilla-rio" className="order-2 min-w-0 space-y-3 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] p-3 shadow-sm sm:p-4 lg:order-1">
           <div className="space-y-2"><div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
               <span className="text-[0.65rem] font-bold tracking-[0.15em] text-[var(--theme-accent)]">TRAMO {tramo.orden || '∞'}</span>

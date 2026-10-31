@@ -15,14 +15,14 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
     historia: "Amanece en el río. Nilo espera en el muelle y una boya roja marca el primer destino. Tu trabajo es darle instrucciones claras, una por una.",
     explicacion: "Python lee el programa de arriba hacia abajo. Cada línea es una instrucción. Una llamada como avanzar() ejecuta una acción; los paréntesis indican que estás llamando a una función.",
     ejemplo: "avanzar()\navanzar()",
-    pregunta: "¿Qué sucede si escribes avanzar() cuatro veces?",
-    respuesta: "Nilo intenta avanzar cuatro casillas. El orden y la cantidad de instrucciones importan.",
+    pregunta: "¿Qué sucede si escribes avanzar() cuatro veces cuando la boya está a tres casillas?",
+    respuesta: "Nilo llega a la boya después de tres movimientos. En el cuarto intenta entrar en la orilla y el motor muestra un error: avanzar() no puede atravesar una pared.",
     reto: "¿Puedes predecir dónde terminará Nilo antes de pulsar Ejecutar?"
   },
   c02: {
     historia: "La boya tiene un letrero medio cubierto por la bruma. Nilo debe acercarse, leerlo y dejar constancia de lo que encontró.",
     explicacion: "Una función puede devolver un dato. mirar() observa sin mover la lancha. Puedes guardar lo que devuelve en una variable y reutilizarlo después. decir() escribe el resultado en la bitácora.",
-    ejemplo: "objeto = mirar()\ndecir(objeto)",
+    ejemplo: "avanzar()\navanzar()\navanzar()\nobjeto = mirar()\ndecir(objeto)",
     pregunta: "¿mirar() mueve a Nilo?",
     respuesta: "No. Solo devuelve información sobre la casilla que tiene delante.",
     reto: "Prueba a guardar lo que devuelve mirar() en una variable con un nombre que tenga sentido."
@@ -30,7 +30,7 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   c03: {
     historia: "Una sonda científica cayó al canal. El equipo necesita saber la posición exacta de Nilo para localizarla en el mapa.",
     explicacion: "Una variable es una etiqueta para guardar un valor. Por ejemplo, columna_actual = columna() guarda el número de columna. Python empieza a contar desde cero: la primera columna es 0.",
-    ejemplo: "columna_actual = columna()\ndecir(columna_actual)",
+    ejemplo: "avanzar()\navanzar()\navanzar()\navanzar()\navanzar()\ncolumna_actual = columna()\ndecir(columna_actual)",
     pregunta: "Si Nilo está en la primera columna, ¿qué número devuelve columna()?",
     respuesta: "Devuelve 0, porque las posiciones empiezan a contarse desde cero.",
     reto: "Guarda también la fila en otra variable y compara ambos datos."
@@ -38,7 +38,7 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   c04: {
     historia: "El puente de madera necesita remos. La encargada no quiere una aproximación: necesita calcular cuántos hacen falta para completar el trayecto.",
     explicacion: "Python puede hacer operaciones. El operador // divide y devuelve solo los grupos completos: 9 // 2 da 4. No es lo mismo que /, que devuelve un resultado decimal.",
-    ejemplo: "remos = columna() // 2\ndecir(remos)",
+    ejemplo: "avanzar()\navanzar()\navanzar()\navanzar()\navanzar()\navanzar()\navanzar()\nremos = columna() // 2\ndecir(remos)",
     pregunta: "¿Cuánto vale 9 // 2?",
     respuesta: "4. La división entera descarta la parte decimal.",
     reto: "Cambia los números de una operación de prueba y predice el resultado antes de ejecutarla."
@@ -69,8 +69,8 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   },
   c08: {
     historia: "Un carrizal joven necesita nueve juncos nuevos. Plantar uno por uno sería lento; Nilo puede repetir una tarea organizada por filas.",
-    explicacion: "for recorre una secuencia. range(3) produce tres vueltas: 0, 1 y 2. En cada vuelta puedes ejecutar varias instrucciones, siempre con la misma indentación dentro del bloque.",
-    ejemplo: "for vuelta in range(3):\n    sembrar()\n    avanzar()",
+    explicacion: "for recorre una secuencia. range(3) produce tres vueltas: 0, 1 y 2. Dentro de cada vuelta puedes comprobar una condición, hacer una tarea y avanzar. En el carrizal repetirás este patrón para cubrir las filas.",
+    ejemplo: "for vuelta in range(3):\n    if frente_libre():\n        avanzar()\n    if agua_baja():\n        sembrar()",
     pregunta: "¿Cuántas vueltas realiza for vuelta in range(3)?",
     respuesta: "Tres vueltas. Los valores generados son 0, 1 y 2.",
     reto: "¿Qué cambiarías para que el bucle tenga cinco vueltas?"
@@ -78,7 +78,7 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   c09: {
     historia: "Un cardumen se refugió entre las piedras. Las tallas cambian según la corriente, así que necesitas recoger los datos reales, guardarlos y ordenarlos.",
     explicacion: "Una lista almacena varios valores en un solo lugar. append() añade un elemento al final. Después puedes recorrer la lista, comparar elementos y ordenarlos sin escribir una variable distinta para cada pez.",
-    ejemplo: "tallas = []\ntallas.append(recoger())",
+    ejemplo: "tallas = []\nwhile frente_libre():\n    avanzar()\n    if aqui() == \"pez\":\n        tallas.append(recoger())",
     pregunta: "¿Qué hace tallas.append(7)?",
     respuesta: "Añade el valor 7 al final de la lista tallas.",
     reto: "Imagina una lista de tres números. ¿Cómo comprobarías cuál es el menor?"
@@ -94,7 +94,7 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   c11: {
     historia: "Dos muestras esperan ser estudiadas. El cuaderno científico exige fichas ordenadas y el terreno seco puede provocar un error si intentas medirlo.",
     explicacion: "Un diccionario guarda datos en pares clave: valor. Una clave permite recuperar un dato por su nombre. try/except permite manejar un error previsto y continuar el programa sin que se detenga por completo.",
-    ejemplo: "muestra = medir()\nficha = {\"especie\": muestra[\"especie\"], \"talla\": muestra[\"talla\"], \"columna\": columna()}\nregistrar(ficha)",
+    ejemplo: "while mirar() != \"muestra\":\n    avanzar()\navanzar()\ntry:\n    muestra = medir()\n    ficha = {\"especie\": muestra[\"especie\"], \"talla\": muestra[\"talla\"], \"columna\": columna()}\n    registrar(ficha)\nexcept OrillaError:\n    decir(\"Esta casilla no tiene una muestra que se pueda medir\")",
     pregunta: "En muestra[\"talla\"], ¿qué representa \"talla\"?",
     respuesta: "Es la clave del diccionario que identifica el valor de la talla.",
     reto: "¿Qué harías para que un error esperado no interrumpa todo el recorrido?"
@@ -102,7 +102,7 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   c12: {
     historia: "La cuenca necesita una restauración completa. Hay que limpiar, observar, medir, sembrar y entregar un informe. Esta vez el río combina todo lo que aprendiste.",
     explicacion: "Los programas reales combinan conceptos. Puedes usar variables para recordar datos, if para decidir, bucles para repetir y funciones para organizar tareas. Divide la misión en partes pequeñas y comprueba cada una.",
-    ejemplo: "if hay_rama():\n    limpiar()\n\npez = recoger()\n# Continúa con las demás tareas",
+    ejemplo: "def limpiar_si_hay_rama():\n    if hay_rama():\n        limpiar()\n\n# Llama la función cuando Nilo esté junto a una rama",
     pregunta: "¿Por qué conviene dividir una misión grande en tareas pequeñas?",
     respuesta: "Porque puedes probar cada parte, encontrar errores con más facilidad y reutilizar instrucciones.",
     reto: "Antes de programar, escribe en palabras el orden de las cinco tareas que resolverás."
@@ -118,7 +118,7 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   'reto-luces': {
     historia: "Al caer la tarde, cinco luces se encienden a lo largo del remanso. Debes recoger todos sus brillos, incluso cuando dos tengan el mismo valor.",
     explicacion: "En Python normal existen métodos para ordenar listas, pero este reto está diseñado para que aprendas a construir el ordenamiento con bucles. Compara dos valores vecinos: si están en el orden contrario, intercámbialos. Repite el recorrido hasta que el mayor quede primero. No elimines repetidos: dos datos iguales siguen siendo dos observaciones.",
-    ejemplo: "brillos = [2, 5, 4, 4, 1]\nfor vuelta in range(len(brillos)):\n    for indice in range(len(brillos) - 1 - vuelta):\n        if brillos[indice] < brillos[indice + 1]:\n            temporal = brillos[indice]\n            brillos[indice] = brillos[indice + 1]\n            brillos[indice + 1] = temporal\ndecir(brillos)",
+    ejemplo: "def ordenar_mayor_a_menor(brillos):\n    for vuelta in range(len(brillos)):\n        for indice in range(len(brillos) - 1 - vuelta):\n            if brillos[indice] < brillos[indice + 1]:\n                temporal = brillos[indice]\n                brillos[indice] = brillos[indice + 1]\n                brillos[indice + 1] = temporal\n    return brillos\n\n# Usa la función con los brillos que recogiste",
     pregunta: "¿Cuántos valores hay en [2, 5, 4, 4, 1]?",
     respuesta: "Cinco. Los dos valores 4 cuentan por separado.",
     reto: "Prueba a ordenar una lista que tenga números repetidos y observa que ninguno desaparece."
@@ -126,7 +126,7 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   abierta: {
     historia: "Llegaste al río abierto: ya no hay una ruta marcada ni una sola manera correcta de explorar. El ecosistema necesita que tomes decisiones y dejes registro de tu trabajo.",
     explicacion: "Un proyecto abierto combina instrucciones conocidas para resolver objetivos simultáneos. Puedes diseñar tu ruta, probar una estrategia, leer las notas guardadas y mejorar tu solución.",
-    ejemplo: "anotar(\"Exploración lista\")\nmis_notas = leer_notas()\ndecir(mis_notas)",
+    ejemplo: "anotar(\"trabajo listo: cuenca cuidada\")\nmis_notas = leer_notas()\nif len(mis_notas) > 0:\n    decir(mis_notas[0])",
     pregunta: "¿Tiene que existir una sola solución para esta misión?",
     respuesta: "No. Puedes llegar al objetivo con distintas rutas y estrategias mientras cumplas todos los encargos.",
     reto: "Crea una estrategia propia y explica en una nota por qué elegiste ese recorrido."

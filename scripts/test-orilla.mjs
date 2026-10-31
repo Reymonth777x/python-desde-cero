@@ -8,6 +8,7 @@ import { loadPyodide } from 'pyodide';
 import { TODOS_LOS_TRAMOS } from '../src/lib/orilla/catalog.ts';
 import { construirPayload } from '../src/lib/orilla/chapters/index.ts';
 import { MICROLECCIONES_ORILLA } from '../src/lib/orilla/lesson-content.ts';
+import { GUIA_ORILLA } from '../src/lib/orilla/guide.ts';
 
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const leer = (...partes) => readFileSync(path.join(raiz, ...partes), 'utf8');
@@ -31,8 +32,22 @@ const comprobar = (nombre, condicion, detalle = '') => {
 
 for (const id of TODOS_LOS_TRAMOS) {
   const leccion = MICROLECCIONES_ORILLA[id];
-  const ejemplo = ejecutar(id, leccion.ejemplo);
-  comprobar(`${id}: el ejemplo educativo pasa la compuerta Python`, ejemplo.gate.ok, JSON.stringify(ejemplo.gate));
+  const comprobarEjemplo = (nombre, codigo) => {
+    const ejemplo = ejecutar(id, codigo);
+    comprobar(`${id}: ${nombre} pasa la compuerta Python`, ejemplo.gate.ok, JSON.stringify(ejemplo.gate));
+    if (ejemplo.gate.ok) {
+      for (const variante of ejemplo.variants) {
+        comprobar(
+          `${id}: ${nombre} se ejecuta sin error en la variante ${variante.indice + 1}`,
+          !variante.error,
+          JSON.stringify(variante.error),
+        );
+      }
+    }
+  };
+  comprobarEjemplo('la microlección', leccion.ejemplo);
+  const ejemploDeGuia = GUIA_ORILLA[id].ejemplo;
+  if (ejemploDeGuia) comprobarEjemplo('el ejemplo de misión', ejemploDeGuia);
 
   const r = ejecutar(id, leer('tests', 'orilla', 'solutions', `${id}.py`));
   comprobar(`${id}: la solución pasa la compuerta`, r.gate.ok, JSON.stringify(r.gate));

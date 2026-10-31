@@ -21,6 +21,12 @@ type Props = {
 };
 
 type Plantilla = { nombre: string; codigo: string; cursor: number };
+type PlantillaMetodo = Plantilla & { descripcion: string };
+
+const METODOS: Record<string, PlantillaMetodo> = {
+  append: { nombre: 'append', codigo: 'tallas.append(valor)', cursor: 'tallas.append('.length, descripcion: 'Añade un valor al final de la lista.' },
+  get: { nombre: 'get', codigo: 'ficha.get("clave")', cursor: 'ficha.get("'.length, descripcion: 'Busca una clave del diccionario y devuelve su valor.' },
+};
 
 const BLOQUES: Record<string, Plantilla> = {
   if: { nombre: 'if', codigo: 'if condicion:\n    ', cursor: 3 },
@@ -53,6 +59,14 @@ export default function OrillaCodeEditor({ value, onChange, verbos, builtins, co
   );
   const estructuras = useMemo(
     () => constructos.filter((nombre) => BLOQUES[nombre]),
+    [constructos],
+  );
+
+  const metodos = useMemo(
+    () => Object.values(METODOS).filter((metodo) =>
+      (metodo.nombre === 'append' && constructos.includes('lista')) ||
+      (metodo.nombre === 'get' && constructos.includes('dict')),
+    ),
     [constructos],
   );
 
@@ -133,6 +147,7 @@ export default function OrillaCodeEditor({ value, onChange, verbos, builtins, co
             <textarea
               ref={textarea}
               aria-label="Escribe tu programa Python para controlar a Nilo"
+              aria-describedby="orilla-editor-ayuda"
               data-testid="orilla-codigo-mobile"
               value={value}
               onChange={(evento) => onChange(evento.target.value)}
@@ -143,7 +158,7 @@ export default function OrillaCodeEditor({ value, onChange, verbos, builtins, co
               autoCorrect="off"
               autoComplete="off"
               rows={Math.max(8, Math.min(16, lineas + 2))}
-              className="min-h-[260px] w-full resize-y overflow-x-auto whitespace-pre bg-[#071b2a] px-3 py-3 font-mono text-base leading-7 text-[#e3f6ef] caret-[#f4d27c] outline-none placeholder:text-[#7899a6] focus:ring-2 focus:ring-inset focus:ring-[#6bc9b2]"
+              className="min-h-[260px] w-full resize-none overflow-x-auto whitespace-pre bg-[#071b2a] px-3 py-3 font-mono text-base leading-7 text-[#e3f6ef] caret-[#f4d27c] outline-none placeholder:text-[#7899a6] focus:ring-2 focus:ring-inset focus:ring-[#6bc9b2]"
               placeholder="# Escribe aquí las instrucciones de Nilo"
             />
           </div>
@@ -171,6 +186,20 @@ export default function OrillaCodeEditor({ value, onChange, verbos, builtins, co
               </button>
             ))}
           </div>
+          {metodos.length > 0 && (
+            <div className="border-t border-[var(--theme-border)] pt-2">
+              <p className="mb-2 text-xs font-semibold text-[var(--theme-muted)]">Métodos de tus datos</p>
+              <div className="flex flex-wrap gap-2">
+                {metodos.map((metodo) => (
+                  <button key={metodo.nombre} type="button" title={metodo.descripcion} onClick={() => insertar(metodo.codigo, metodo.cursor)}
+                    className="min-h-10 rounded-xl border border-[var(--theme-accent)]/50 px-3 font-mono text-xs font-semibold text-[var(--theme-accent)] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">
+                    {metodo.nombre === 'append' ? 'tallas.append(valor)' : 'ficha.get("clave")'}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-2 text-xs leading-5 text-[var(--theme-muted)]">Son ejemplos de escritura: cambia tallas, ficha, valor o clave por los nombres de tu programa.</p>
+            </div>
+          )}
           {estructuras.length > 0 && (
             <div className="border-t border-[var(--theme-border)] pt-2">
               <p className="mb-2 text-xs font-semibold text-[var(--theme-muted)]">Bloques de Python</p>
@@ -184,7 +213,7 @@ export default function OrillaCodeEditor({ value, onChange, verbos, builtins, co
               </div>
             </div>
           )}
-          <p className="text-xs leading-5 text-[var(--theme-muted)]">También puedes escribir normalmente. La tecla Tab añade cuatro espacios y Enter conserva la sangría de Python.</p>
+          <p id="orilla-editor-ayuda" className="text-xs leading-5 text-[var(--theme-muted)]">También puedes escribir normalmente. La tecla Tab añade cuatro espacios y Enter conserva la sangría de Python.</p>
         </div>
       </div>
     );
