@@ -133,6 +133,7 @@ export default function OrillaCodeEditor({ value, onChange, verbos, builtins, co
             <textarea
               ref={textarea}
               aria-label="Escribe tu programa Python para controlar a Nilo"
+              aria-describedby="orilla-editor-ayuda"
               data-testid="orilla-codigo-mobile"
               value={value}
               onChange={(evento) => onChange(evento.target.value)}
@@ -184,7 +185,7 @@ export default function OrillaCodeEditor({ value, onChange, verbos, builtins, co
               </div>
             </div>
           )}
-          <p className="text-xs leading-5 text-[var(--theme-muted)]">También puedes escribir normalmente. La tecla Tab añade cuatro espacios y Enter conserva la sangría de Python.</p>
+          <p id="orilla-editor-ayuda" className="text-xs leading-5 text-[var(--theme-muted)]">También puedes escribir normalmente. La tecla Tab añade cuatro espacios y Enter conserva la sangría de Python.</p>
         </div>
       </div>
     );
