@@ -1,3 +1,14 @@
+/**
+ * Devuelve la fecha del último guardado remoto.
+ * Solo la ausencia explícita de updatedAt permite usar cero como línea base.
+ * Una fecha presente pero inválida no permite comparar ni recuperar borradores.
+ */
+export function timestampGuardadoOrilla(updatedAt: string | null): number | null {
+  if (updatedAt === null) return 0;
+  const timestamp = Date.parse(updatedAt);
+  return Number.isFinite(timestamp) ? timestamp : null;
+}
+
 /** Recupera un borrador local solo si es más reciente que el último guardado en la cuenta. */
 export function recuperarBorradorOrilla(
   contenido: string | null,
