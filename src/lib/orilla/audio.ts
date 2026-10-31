@@ -1,6 +1,7 @@
 export type SonidoOrilla = 'motor' | 'victoria' | 'error';
 
 let contexto: AudioContext | null = null;
+let ambiente: { fuente: AudioBufferSourceNode; filtroBajo: BiquadFilterNode; filtroAlto: BiquadFilterNode; volumen: GainNode; oleaje: OscillatorNode; modulacion: GainNode } | null = null;
 
 function obtenerContexto(): AudioContext | null {
   if (typeof window === 'undefined' || typeof window.AudioContext === 'undefined') return null;
@@ -31,7 +32,85 @@ function tono(
   oscilador.stop(inicio + duracion + 0.015);
 }
 
-/** Efectos cortos sintetizados con Web Audio; no descargan archivos ni dependen de autoplay. */
+/**
+ * Ambiente suave de agua en movimiento, generado localmente con Web Audio.
+ * Solo empieza tras una acción explícita del jugador; no descarga ni reproduce audio externo.
+ */
+export async function activarAmbienteOrilla(): Promise<boolean> {
+  const audio = obtenerContexto();
+  if (!audio) return false;
+  try {
+    await audio.resume();
+    if (ambiente) return true;
+
+    const longitud = Math.max(1, Math.floor(audio.sampleRate * 4));
+    const buffer = audio.createBuffer(1, longitud, audio.sampleRate);
+    const datos = buffer.getChannelData(0);
+    let marron = 0;
+    for (let i = 0; i < longitud; i += 1) {
+      const blanco = Math.random() * 2 - 1;
+      marron = (marron + 0.035 * blanco) / 1.035;
+      datos[i] = marron * 5.5;
+    }
+
+    const fuente = audio.createBufferSource();
+    const filtroAlto = audio.createBiquadFilter();
+    const filtroBajo = audio.createBiquadFilter();
+    const volumen = audio.createGain();
+    const oleaje = audio.createOscillator();
+    const modulacion = audio.createGain();
+
+    fuente.buffer = buffer;
+    fuente.loop = true;
+    filtroAlto.type = 'highpass';
+    filtroAlto.frequency.value = 150;
+    filtroBajo.type = 'lowpass';
+    filtroBajo.frequency.value = 1050;
+    filtroBajo.Q.value = 0.45;
+    volumen.gain.setValueAtTime(0.0001, audio.currentTime);
+    volumen.gain.linearRampToValueAtTime(0.045, audio.currentTime + 1.2);
+    oleaje.type = 'sine';
+    oleaje.frequency.value = 0.09;
+    modulacion.gain.value = 0.012;
+
+    fuente.connect(filtroAlto);
+    filtroAlto.connect(filtroBajo);
+    filtroBajo.connect(volumen);
+    volumen.connect(audio.destination);
+    oleaje.connect(modulacion);
+    modulacion.connect(volumen.gain);
+
+    fuente.start();
+    oleaje.start();
+    ambiente = { fuente, filtroBajo, filtroAlto, volumen, oleaje, modulacion };
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Detiene el río con una transición corta para evitar un corte brusco. */
+export function desactivarAmbienteOrilla(): void {
+  const actual = ambiente;
+  const audio = contexto;
+  if (!actual || !audio) return;
+  ambiente = null;
+  const ahora = audio.currentTime;
+  actual.volumen.gain.cancelScheduledValues(ahora);
+  actual.volumen.gain.setTargetAtTime(0.0001, ahora, 0.12);
+  window.setTimeout(() => {
+    try { actual.fuente.stop(); } catch { /* ya detenido */ }
+    try { actual.oleaje.stop(); } catch { /* ya detenido */ }
+    actual.fuente.disconnect();
+    actual.filtroAlto.disconnect();
+    actual.filtroBajo.disconnect();
+    actual.volumen.disconnect();
+    actual.oleaje.disconnect();
+    actual.modulacion.disconnect();
+  }, 500);
+}
+
+/** Efectos cortos sintetizados con Web Audio; respetan el control de sonido del jugador. */
 export function reproducirSonidoOrilla(sonido: SonidoOrilla): void {
   const audio = obtenerContexto();
   if (!audio) return;

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import Editor, { type Monaco } from '@monaco-editor/react';
+import type { Monaco } from '@monaco-editor/react';
 import type { editor, IDisposable } from 'monaco-editor';
 import { useTheme } from '@/app/theme-provider';
 import { guardarOrilla, vaciarNotasOrilla } from '@/app/orilla/actions';
@@ -18,8 +18,9 @@ import {
 import type { ChapterId, EventoOrilla, PayloadTramo, ResultadoOrilla } from '@/lib/orilla/types';
 import OrillaGuide from './OrillaGuide';
 import { useOrillaWorker } from '@/lib/orilla/use-orilla-worker';
-import { reproducirSonidoOrilla } from '@/lib/orilla/audio';
+import { activarAmbienteOrilla, desactivarAmbienteOrilla, reproducirSonidoOrilla } from '@/lib/orilla/audio';
 import RiverView from './RiverView';
+import OrillaCodeEditor from './OrillaCodeEditor';
 
 if (typeof window !== 'undefined' && !window.MonacoEnvironment) {
   window.MonacoEnvironment = { baseUrl: '/monaco/vs/' };
@@ -98,6 +99,7 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
     if (temporizador.current !== null) window.clearTimeout(temporizador.current);
     completado.current?.dispose();
     completado.current = null;
+    desactivarAmbienteOrilla();
   }, []);
 
   const ocultar = Boolean(payload.ocultarMapa) && !mapaVisible;
@@ -257,6 +259,17 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
     if (tecla === 'ArrowRight' || tecla === 'ArrowUp') setVelocidad(VELOCIDADES[Math.min(i + 1, 3)]);
     if (tecla === 'ArrowLeft' || tecla === 'ArrowDown') setVelocidad(VELOCIDADES[Math.max(i - 1, 0)]);
   };
+
+  const alternarSonido = async () => {
+    if (sonidoActivo) {
+      desactivarAmbienteOrilla();
+      setSonidoActivo(false);
+      return;
+    }
+    const activado = await activarAmbienteOrilla();
+    if (activado) setSonidoActivo(true);
+    else setAviso('Este navegador no pudo iniciar el sonido. Puedes seguir jugando sin audio.');
+  };
   const par = payload.pasosPar;
   const pistaEstrellas = mejor.stars >= 3 || esAbierta ? null : mejor.stars === 2
     ? `La tercera estrella pide usar bien el concepto del tramo: ${tramo.concepto.toLowerCase()}.`
@@ -295,9 +308,14 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
             <span role="status" className="text-xs text-[var(--theme-muted)]">{guardadoEstado === 'guardando' && 'Guardando…'}{guardadoEstado === 'guardado' && 'Guardado en tu cuenta'}{guardadoEstado === 'error' && 'No se pudo guardar. Tu borrador sigue en este navegador.'}</span>
           </div>
           {aviso && <p role="status" className="border-l-2 border-[var(--theme-accent)] bg-[var(--theme-bg-secondary)] p-3 text-sm text-[var(--theme-ink)]">{aviso}</p>}
-          <div className="h-[min(62svh,560px)] min-h-[340px] w-full overflow-hidden rounded-xl border border-[var(--theme-border)] bg-[var(--theme-code-bg)] shadow-inner">
-            <Editor height="100%" defaultLanguage="python" theme="python-desde-cero" value={code} onChange={alCambiar} onMount={alMontar} options={{ minimap: { enabled: false }, fontSize: 16, lineHeight: 24, automaticLayout: true, tabSize: 4, scrollBeyondLastLine: false, wordWrap: 'on' }} />
-          </div>
+          <OrillaCodeEditor
+            value={code}
+            onChange={alCambiar}
+            verbos={payload.abiertos.verbos}
+            builtins={payload.abiertos.builtins}
+            constructos={payload.abiertos.constructos}
+            onMount={alMontar}
+          />
           <div className="grid gap-2 sm:flex sm:flex-wrap">
             <button type="button" onClick={alEjecutar} disabled={ejecutando} data-testid="orilla-ejecutar" className="flex min-h-12 w-full items-center justify-center bg-[var(--theme-accent)] px-5 py-3 text-base font-semibold text-[var(--theme-ink-inverse)] transition-colors hover:bg-[var(--theme-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">{ejecutando ? estadoWorker === 'cargando' ? 'Preparando Python…' : 'Ejecutando…' : 'Ejecutar'}</button>
             <button type="button" onClick={alReiniciarRio} className="flex min-h-12 w-full items-center justify-center border border-[var(--theme-border-dark)] px-5 py-3 text-base font-semibold text-[var(--theme-ink)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)] sm:w-auto">Reiniciar el río</button>
@@ -312,9 +330,9 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
               <span className="text-[0.65rem] font-bold tracking-[0.15em] text-[var(--theme-accent)]">TRAMO {tramo.orden || '∞'}</span>
               {!esAbierta && <span aria-label={`Mejor resultado: ${mejor.stars} de 3 estrellas`} className="tracking-[0.12em] text-amber-500">{estrellasTexto(mejor.stars)}</span>}
             </div>
-            <button type="button" onClick={() => setSonidoActivo((actual) => !actual)} aria-pressed={sonidoActivo}
+            <button type="button" onClick={() => { void alternarSonido(); }} aria-pressed={sonidoActivo}
               className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[var(--theme-border)] px-3 text-xs font-semibold text-[var(--theme-ink)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">
-              <span aria-hidden="true">{sonidoActivo ? '♫' : '♪'}</span>{sonidoActivo ? 'Sonido activado' : 'Activar sonido'}
+              <span aria-hidden="true">{sonidoActivo ? '♫' : '♪'}</span>{sonidoActivo ? 'Ambiente activado' : 'Sonido del río'}
             </button>
           </div><div className="flex flex-wrap items-center justify-between gap-2"><h2 id="orilla-rio" className="font-serif text-xl text-[var(--theme-ink)]">Nilo / {tramo.id.toUpperCase()} · {tramo.nombre}</h2>{payload.variantes.length > 1 && <span className="text-sm text-[var(--theme-muted)]">Variación {varIdx + 1} de {payload.variantes.length}</span>}</div></div>
           <div tabIndex={0} role="group" aria-label="Vista del río. Las flechas cambian la velocidad de la reproducción." onKeyDown={(e) => alTeclearRio(e.key)} className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"><RiverView estado={estadoMostrado} ocultarMapa={ocultar} descripcion={descripcion} variante={variante} animando={reproduciendo} /></div>
