@@ -45,7 +45,7 @@ copyFileSync(join(root, "runner", "index.html"), join(destination, "index.html")
 const runnerFrameTemplate = readFileSync(join(root, "runner", "runner-frame.js"), "utf8");
 const runnerFrame = replacePlaceholderExactlyOnce(
   runnerFrameTemplate,
-  "__PYTHON_RUNNER_ALLOWED_PARENT_ORIGINS_JSON__",
+  '"__PYTHON_RUNNER_ALLOWED_PARENT_ORIGINS_PLACEHOLDER__"',
   originConfig.javascript,
 );
 writeFileSync(join(destination, "runner-frame.js"), runnerFrame, "utf8");
