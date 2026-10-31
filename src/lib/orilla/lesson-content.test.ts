@@ -23,5 +23,8 @@ describe('microlecciones narrativas de Orilla', () => {
     expect(MICROLECCIONES_ORILLA.c08.ejemplo).toContain('for');
     expect(MICROLECCIONES_ORILLA.c10.ejemplo).toContain('def');
     expect(MICROLECCIONES_ORILLA.c11.ejemplo).toContain('registrar');
+    expect(MICROLECCIONES_ORILLA['reto-luces'].explicacion).toContain('bucles');
+    expect(MICROLECCIONES_ORILLA['reto-luces'].ejemplo).toContain('for vuelta');
+    expect(MICROLECCIONES_ORILLA['reto-luces'].ejemplo).not.toContain('.sort(');
   });
 });

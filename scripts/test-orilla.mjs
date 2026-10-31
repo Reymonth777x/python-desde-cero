@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { loadPyodide } from 'pyodide';
 import { TODOS_LOS_TRAMOS } from '../src/lib/orilla/catalog.ts';
 import { construirPayload } from '../src/lib/orilla/chapters/index.ts';
+import { MICROLECCIONES_ORILLA } from '../src/lib/orilla/lesson-content.ts';
 
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const leer = (...partes) => readFileSync(path.join(raiz, ...partes), 'utf8');
@@ -29,6 +30,10 @@ const comprobar = (nombre, condicion, detalle = '') => {
 };
 
 for (const id of TODOS_LOS_TRAMOS) {
+  const leccion = MICROLECCIONES_ORILLA[id];
+  const ejemplo = ejecutar(id, leccion.ejemplo);
+  comprobar(`${id}: el ejemplo educativo pasa la compuerta Python`, ejemplo.gate.ok, JSON.stringify(ejemplo.gate));
+
   const r = ejecutar(id, leer('tests', 'orilla', 'solutions', `${id}.py`));
   comprobar(`${id}: la solución pasa la compuerta`, r.gate.ok, JSON.stringify(r.gate));
   if (!r.gate.ok) continue;

@@ -117,8 +117,8 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   },
   'reto-luces': {
     historia: "Al caer la tarde, cinco luces se encienden a lo largo del remanso. Debes recoger todos sus brillos, incluso cuando dos tengan el mismo valor.",
-    explicacion: "Puedes guardar datos en una lista y ordenar la lista con sort(). reverse=True cambia el orden para mostrar primero los valores mayores. No elimines repetidos: dos datos iguales siguen siendo dos observaciones.",
-    ejemplo: "brillos = [2, 5, 4, 4, 1]\nbrillos.sort(reverse=True)\ndecir(brillos)",
+    explicacion: "En Python normal existen métodos para ordenar listas, pero este reto está diseñado para que aprendas a construir el ordenamiento con bucles. Compara dos valores vecinos: si están en el orden contrario, intercámbialos. Repite el recorrido hasta que el mayor quede primero. No elimines repetidos: dos datos iguales siguen siendo dos observaciones.",
+    ejemplo: "brillos = [2, 5, 4, 4, 1]\nfor vuelta in range(len(brillos)):\n    for indice in range(len(brillos) - 1 - vuelta):\n        if brillos[indice] < brillos[indice + 1]:\n            temporal = brillos[indice]\n            brillos[indice] = brillos[indice + 1]\n            brillos[indice + 1] = temporal\ndecir(brillos)",
     pregunta: "¿Cuántos valores hay en [2, 5, 4, 4, 1]?",
     respuesta: "Cinco. Los dos valores 4 cuentan por separado.",
     reto: "Prueba a ordenar una lista que tenga números repetidos y observa que ninguno desaparece."
