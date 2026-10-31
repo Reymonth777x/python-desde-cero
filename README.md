@@ -158,19 +158,19 @@ No se incluyen credenciales SMTP, tokens ni claves API en este repositorio. La p
 
 ### Known Limitations
 
-- Brevo reports the domain as authenticated and branded. Its dashboard showed four transactional emails in the last seven days, 100% delivered and 0% hard bounce/blocked; that aggregate does not identify which messages came from Supabase Auth. The saved SMTP host/login and complete registration/reset flows still require a controlled end-to-end check.
-- PROD and DEV RLS/table grants have been inspected. Direct student INSERT/UPDATE/DELETE on `public.progress` is revoked; quiz submission and prerequisite checks run through the private authoritative function. See [docs/team/MIGRACIONES.md](docs/team/MIGRACIONES.md).
+- The owner confirmed successful manual registration, email confirmation, login, logout, password recovery and password change on October 30, 2026. The connected read-only inspection cannot reveal the SMTP host/login saved in Supabase Auth or individual Brevo message receipts, so this is recorded as owner-confirmed functional acceptance rather than an independently inspected SMTP configuration.
+- PROD and DEV RLS/table grants have been inspected. Direct student INSERT/UPDATE/DELETE on `public.progress` and direct insertion into the private quiz-attempt table are not granted; quiz submission and prerequisite checks run through the private authoritative function. See [docs/team/MIGRACIONES.md](docs/team/MIGRACIONES.md).
 - Supabase migration history still differs from local filenames/timestamps, and the Production Preview branch reports migration failure. Do not apply migrations automatically.
-- Real-device mobile and physical accessibility testing has not been completed.
+- Manual owner acceptance covers the Python runner, Turtle, error/limit cases, Chrome, Firefox and physical phones. Visual acceptance of the complete authenticated mobile interface (theme picker, editor, virtual keyboard and progress screens) remains tracked in issue #18.
 - `master` branch protection is not enabled yet, and the public repository exposes historical course assessment material in Git history; see [issues #23](https://github.com/Reymonth777x/python-desde-cero/issues/23) and [#21](https://github.com/Reymonth777x/python-desde-cero/issues/21).
-
+- The two-student/admin acceptance of persisted quiz results and progress isolation remains open in issue #20. Supabase's leaked-password protection warning is also open; the current Free plan does not provide that feature.
 ## Latest verified release
 
-- GitHub `master`: `f95231db81c6222263a698523f205e8fa7e3d23d` (October 30, 2026). This release refreshes CI tooling and operational documentation; the last application runtime changes are in `d072f962d96a9e3deb1d5d2a7a4a8a83ebec4e21`.
-- CI: [run 41140127258](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41140127258) — passed, including 24 Vitest files, 168 Playwright tests, Next/Vinext builds and `npm audit` (0 vulnerabilities).
-- Cloudflare deployment: [run 41140504102](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41140504102) — passed. Main Worker version `f67a7cca-49b3-4f11-ab4c-586ec970286e`; isolated Python runner version `e2235f5c-dfe5-4dd1-a529-e34aa607db70`.
-- Production smoke test verified `/`, `/muestra`, `/login` with the Turnstile widget, `sitemap.xml`, the custom domain association, and `www` → apex redirect (HTTP 308).
-
+- GitHub `master`: `38533eae71f60e899949f567c30f15c99c3cbe65` (October 31, 2026). This is the current documentation/readiness update; the last application runtime change remains `d072f962d96a9e3deb1d5d2a7a4a8a83ebec4e21`.
+- CI: [run 41150277769](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41150277769) — passed on the exact `master` SHA, including 24 Vitest files, 168 Playwright tests, 62 cases across 36 Python activities, TypeScript, ESLint, Next/Vinext builds and npm audit.
+- Cloudflare deployment: [run 41150633694](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41150633694) — passed on the same SHA. Main Worker version `7b625566-1987-4f2c-9875-c369ed584e13`; isolated Python runner version `8cb973f4-fde5-4cce-ab25-7dba6a09ad25`.
+- Production smoke test verified the home page, `/muestra`, `/login`, sitemap, both custom hostnames, and `www` → apex redirect (HTTP 308). The public production domain is responding.
+- Owner-confirmed manual acceptance: Auth/email flows, Python/Turtle runtime across Chrome/Firefox and physical phones, and human review of all 33 mandatory units.
 ## Release and sync instructions for the team
 
 From an existing checkout with no uncommitted changes:
@@ -193,6 +193,6 @@ Each partner must keep their own `.env.local` and use the DEV Supabase project. 
 
 ## License
 
-No license has been applied yet. As of October 30, 2026, this GitHub repository is **public**; issue #21 tracks the owner's decision about keeping it public or moving internal development to a private repository. Public visibility allows anyone to inspect the source and its Git history, including historical course assessment material. The app's `server-only` boundaries protect runtime bundles, not the public Git repository. Do not port or reuse course content without confirming licensing terms.
+No license has been applied yet. As of October 31, 2026, this GitHub repository is **public**; issue #21 tracks the owner's decision about keeping it public or moving internal development to a private repository. Public visibility allows anyone to inspect the source and its Git history, including historical course assessment material. The app's `server-only` boundaries protect runtime bundles, not the public Git repository. Do not port or reuse course content without confirming licensing terms.
 
 This project is independent educational material. Confirm licensing before reusing external or course-provider materials.
