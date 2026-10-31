@@ -70,7 +70,7 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   c08: {
     historia: "Un carrizal joven necesita nueve juncos nuevos. Plantar uno por uno sería lento; Nilo puede repetir una tarea organizada por filas.",
     explicacion: "for recorre una secuencia. range(3) produce tres vueltas: 0, 1 y 2. Dentro de cada vuelta puedes comprobar una condición, hacer una tarea y avanzar. En el carrizal repetirás este patrón para cubrir las filas.",
-    ejemplo: "if frente_libre():\n    avanzar()\n\nfor vuelta in range(3):\n    if agua_baja():\n        sembrar()\n    if frente_libre():\n        avanzar()",
+    ejemplo: "for vuelta in range(3):\n    if frente_libre():\n        avanzar()\n    if agua_baja():\n        sembrar()",
     pregunta: "¿Cuántas vueltas realiza for vuelta in range(3)?",
     respuesta: "Tres vueltas. Los valores generados son 0, 1 y 2.",
     reto: "¿Qué cambiarías para que el bucle tenga cinco vueltas?"
@@ -94,7 +94,7 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   c11: {
     historia: "Dos muestras esperan ser estudiadas. El cuaderno científico exige fichas ordenadas y el terreno seco puede provocar un error si intentas medirlo.",
     explicacion: "Un diccionario guarda datos en pares clave: valor. Una clave permite recuperar un dato por su nombre. try/except permite manejar un error previsto y continuar el programa sin que se detenga por completo.",
-    ejemplo: "try:\n    muestra = medir()\n    ficha = {\"especie\": muestra[\"especie\"], \"talla\": muestra[\"talla\"], \"columna\": columna()}\n    registrar(ficha)\nexcept OrillaError:\n    decir(\"Aquí no hay muestra; continúa con la siguiente casilla\")",
+    ejemplo: "while mirar() != \"muestra\":\n    avanzar()\navanzar()\ntry:\n    muestra = medir()\n    ficha = {\"especie\": muestra[\"especie\"], \"talla\": muestra[\"talla\"], \"columna\": columna()}\n    registrar(ficha)\nexcept OrillaError:\n    decir(\"Esta casilla no tiene una muestra que se pueda medir\")",
     pregunta: "En muestra[\"talla\"], ¿qué representa \"talla\"?",
     respuesta: "Es la clave del diccionario que identifica el valor de la talla.",
     reto: "¿Qué harías para que un error esperado no interrumpa todo el recorrido?"
