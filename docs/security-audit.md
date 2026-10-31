@@ -1,4 +1,18 @@
-# Auditoría de seguridad y preparación para producción
+# Auditoría de seguridad y preparación para producción — corte histórico 25-10-2026
+
+> **Documento histórico; no representa el estado actual.** Esta revisión se realizó el 25-10-2026 sin acceso a Supabase remoto. Sus hallazgos, rutas SQL, recuentos de vulnerabilidades y conclusiones deben leerse como fotografía del código de aquella fecha. La aplicación, el esquema remoto y la publicación cambiaron después. La referencia operativa vigente es `docs/team/ESTADO.md`, `docs/team/MIGRACIONES.md` y `README.md`.
+
+## Correcciones de vigencia — 31-10-2026
+
+- El flujo de recuperación de contraseña sí está implementado actualmente en `src/app/login/forgot-password/page.tsx`, `src/app/login/reset-password/page.tsx` y las acciones Auth. Por ello, el hallazgo histórico SEC-05 (“recuperación no implementada”) está **superado en código**. La entrega de correo y los recorridos Auth con cuentas desechables de DEV deben seguirse comprobando de forma separada.
+- La calificación actual usa `private.quiz_answer_key`, `private.quiz_attempts`, `public.submit_quiz_v2` y `private.submit_quiz_authoritative_v2`. La ruta heredada `submit_quiz` fue retirada/restringida. Las afirmaciones históricas sobre `public.quiz_attempts`, `record_quiz_attempt` o `private.quiz_keys` no describen el esquema conectado.
+- El registro PROD/DEV se verificó posteriormente: PROD mantiene 29 versiones de migración y DEV 11; PROD tiene 29/29 archivos canónicos reconciliados. Orilla 029 está aplicada en ambos proyectos y su RLS/RPC fue auditado.
+- Orilla se integró y publicó después de esta auditoría. La capa SQL de Orilla y su aislamiento por usuario se verificaron con transacciones reversibles en DEV; la aceptación del recorrido real de navegador autenticado aún está pendiente.
+- El CI actual incluye Vitest, ejercicios Python, 147 comprobaciones Orilla, TypeScript, ESLint, build Next/Vinext, runner smoke y Playwright E2E. La suite pgTAP de 69 aserciones se actualizó, pero no se ha ejecutado contra una instancia local limpia.
+- El audit de dependencias tuvo cambios posteriores. PR #107 propone mitigación parcial, con cinco avisos moderados residuales en su rama; no asumir que la auditoría histórica de este documento representa el conteo actual ni que la mitigación está integrada.
+- El repositorio continúa público y `master` no tiene protección de rama. La decisión de visibilidad, la protección de rama y la revisión legal de privacidad siguen abiertas; ver issues #21, #23 y #98.
+
+Las secciones siguientes se conservan para trazabilidad histórica. No ejecutar las migraciones archivadas ni aplicar las recomendaciones antiguas sin contrastarlas con el esquema y los historiales vigentes.
 
 - **Fecha:** 25 de octubre de 2026
 - **Repositorio auditado:** `C:\Users\USUARIO\python-desdecero`
