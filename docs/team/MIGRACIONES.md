@@ -180,3 +180,12 @@ No volver a conceder `EXECUTE` a la ruta heredada. La aplicación usa `submit_qu
 - Verificación de solo lectura en producción y DEV: los indicadores `existing_module_progress`, `existing_project_progress` y `existing_exam_progress` están presentes en la definición remota del calificador.
 
 La excepción de progreso histórico también se aplica en la interfaz: el PR #84 se fusionó en `04604585d899173439f73c8a9d1975451e771200`. Su CI de PR [41107541504](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41107541504) y CI de master [41108215559](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41108215559) pasaron; Cloudflare publicó ese mismo SHA en [41108747917](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41108747917), con smoke tests de producción satisfactorios.
+
+## 029 — Orilla (verificación remota 31-10-2026)
+
+- Archivo canónico del repositorio: `supabase/migrations/20261031012927_029_orilla_runs.sql`.
+- Producción registra `20261031012927`, nombre `orilla_runs`. El SQL guardado en el historial remoto coincide exactamente con el archivo canónico (7.843 caracteres).
+- DEV registra la misma migración como `20261031012712`, nombre `orilla_runs`. Su SQL es equivalente al archivo canónico tras normalizar comentarios y formato. No hay que volver a ejecutar la migración.
+- Auditoría de solo lectura en ambos entornos: `public.orilla_runs` existe con RLS activo; `authenticated` tiene lectura propia por política; `anon` no puede leer y ninguno de esos roles puede escribir directamente. Las RPC públicas son `SECURITY INVOKER`, las funciones autoritativas están en `private` con `SECURITY DEFINER` y `search_path` vacío; solo `authenticated` puede ejecutarlas. El trigger `orilla_runs_guard` está habilitado.
+- No se hicieron cambios SQL en DEV ni producción durante esta revisión. La migración ya estaba aplicada en ambos entornos; solo se alineó el timestamp canónico del archivo con producción.
+- Se mantiene la restricción general de este documento: no ejecutar `db push`, `migration repair` ni `db reset` mientras persista la divergencia histórica de otras migraciones. No repetir la migración 029 en ningún entorno.
