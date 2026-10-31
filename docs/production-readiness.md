@@ -1,4 +1,4 @@
-# Preparación para producción — corte del 31 de octubre de 2026
+# Preparación para producción — corte del 30 de octubre de 2026
 
 **HEAD comprobado de `master`:** `38533eae71f60e899949f567c30f15c99c3cbe65`  
 **CI:** [41150277769](https://github.com/Reymonth777x/python-desde-cero/actions/runs/41150277769) — success sobre el HEAD actual  
@@ -63,7 +63,7 @@ Producción y DEV usan PostgreSQL 17.11.0.003 y `pgcrypto` 1.3. El Advisor de se
 
 ### P1 — Aislamiento de progreso y controles Auth
 
-- El propietario confirma que registro, confirmación, login, logout, recuperación y cambio de contraseña funcionan. También confirma la prueba manual del runner y el desafío de acceso.
+- El propietario confirma que registro, confirmación, login, logout, recuperación y cambio de contraseña funcionan. También confirma la prueba manual del runner y el acceso a la academia.
 - El conector de solo lectura no puede inspeccionar la Secret key, el estado exacto del CAPTCHA de Auth ni el host/login SMTP guardado. No rotar ni modificar secretos basándose en una inferencia.
 - Probar con dos estudiantes DEV y un administrador el aislamiento entre cuentas, una evaluación reprobada/aprobada, la persistencia de la mejor nota y la recuperación del progreso tras cerrar sesión. Issue #20 permanece abierto.
 - Leaked Password Protection aparece desactivado en el Advisor; el plan Free no permite activarlo. Requiere Pro o superior y una decisión de presupuesto.
