@@ -15,14 +15,14 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
     historia: "Amanece en el río. Nilo espera en el muelle y una boya roja marca el primer destino. Tu trabajo es darle instrucciones claras, una por una.",
     explicacion: "Python lee el programa de arriba hacia abajo. Cada línea es una instrucción. Una llamada como avanzar() ejecuta una acción; los paréntesis indican que estás llamando a una función.",
     ejemplo: "avanzar()\navanzar()",
-    pregunta: "¿Qué sucede si escribes avanzar() cuatro veces?",
-    respuesta: "Nilo intenta avanzar cuatro casillas. El orden y la cantidad de instrucciones importan.",
+    pregunta: "¿Qué sucede si escribes avanzar() cuatro veces cuando la boya está a tres casillas?",
+    respuesta: "Nilo llega a la boya después de tres movimientos. En el cuarto intenta entrar en la orilla y el motor muestra un error: avanzar() no puede atravesar una pared.",
     reto: "¿Puedes predecir dónde terminará Nilo antes de pulsar Ejecutar?"
   },
   c02: {
     historia: "La boya tiene un letrero medio cubierto por la bruma. Nilo debe acercarse, leerlo y dejar constancia de lo que encontró.",
     explicacion: "Una función puede devolver un dato. mirar() observa sin mover la lancha. Puedes guardar lo que devuelve en una variable y reutilizarlo después. decir() escribe el resultado en la bitácora.",
-    ejemplo: "objeto = mirar()\ndecir(objeto)",
+    ejemplo: "avanzar()\navanzar()\navanzar()\nobjeto = mirar()\ndecir(objeto)",
     pregunta: "¿mirar() mueve a Nilo?",
     respuesta: "No. Solo devuelve información sobre la casilla que tiene delante.",
     reto: "Prueba a guardar lo que devuelve mirar() en una variable con un nombre que tenga sentido."
@@ -30,7 +30,7 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   c03: {
     historia: "Una sonda científica cayó al canal. El equipo necesita saber la posición exacta de Nilo para localizarla en el mapa.",
     explicacion: "Una variable es una etiqueta para guardar un valor. Por ejemplo, columna_actual = columna() guarda el número de columna. Python empieza a contar desde cero: la primera columna es 0.",
-    ejemplo: "columna_actual = columna()\ndecir(columna_actual)",
+    ejemplo: "avanzar()\navanzar()\navanzar()\navanzar()\navanzar()\ncolumna_actual = columna()\ndecir(columna_actual)",
     pregunta: "Si Nilo está en la primera columna, ¿qué número devuelve columna()?",
     respuesta: "Devuelve 0, porque las posiciones empiezan a contarse desde cero.",
     reto: "Guarda también la fila en otra variable y compara ambos datos."
@@ -38,7 +38,7 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   c04: {
     historia: "El puente de madera necesita remos. La encargada no quiere una aproximación: necesita calcular cuántos hacen falta para completar el trayecto.",
     explicacion: "Python puede hacer operaciones. El operador // divide y devuelve solo los grupos completos: 9 // 2 da 4. No es lo mismo que /, que devuelve un resultado decimal.",
-    ejemplo: "remos = columna() // 2\ndecir(remos)",
+    ejemplo: "avanzar()\navanzar()\navanzar()\navanzar()\navanzar()\navanzar()\navanzar()\nremos = columna() // 2\ndecir(remos)",
     pregunta: "¿Cuánto vale 9 // 2?",
     respuesta: "4. La división entera descarta la parte decimal.",
     reto: "Cambia los números de una operación de prueba y predice el resultado antes de ejecutarla."
@@ -78,7 +78,7 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   c09: {
     historia: "Un cardumen se refugió entre las piedras. Las tallas cambian según la corriente, así que necesitas recoger los datos reales, guardarlos y ordenarlos.",
     explicacion: "Una lista almacena varios valores en un solo lugar. append() añade un elemento al final. Después puedes recorrer la lista, comparar elementos y ordenarlos sin escribir una variable distinta para cada pez.",
-    ejemplo: "tallas = []\nif aqui() == \"pez\":\n    tallas.append(recoger())",
+    ejemplo: "tallas = []\nwhile frente_libre():\n    avanzar()\n    if aqui() == \"pez\":\n        tallas.append(recoger())",
     pregunta: "¿Qué hace tallas.append(7)?",
     respuesta: "Añade el valor 7 al final de la lista tallas.",
     reto: "Imagina una lista de tres números. ¿Cómo comprobarías cuál es el menor?"
