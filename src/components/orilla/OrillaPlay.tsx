@@ -157,14 +157,14 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
     completado.current?.dispose();
     const nombres = [...payload.abiertos.verbos, ...payload.abiertos.builtins];
     completado.current = monaco.languages.registerCompletionItemProvider('python', {
-      provideCompletionItems: (modelo, posicion) => {
+      provideCompletionItems: (modelo: editor.ITextModel, posicion: { lineNumber: number; column: number }) => {
         const palabra = modelo.getWordUntilPosition(posicion);
         const rango = { startLineNumber: posicion.lineNumber, endLineNumber: posicion.lineNumber, startColumn: palabra.startColumn, endColumn: palabra.endColumn };
         return { suggestions: nombres.map((nombre) => ({
           label: nombre, kind: monaco.languages.CompletionItemKind.Function,
           insertText: VERBOS_SIN_ARGUMENTOS.has(nombre) ? `${nombre}()` : `${nombre}($0)`,
           insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          documentation: DOC_VERBOS[nombre], range,
+          documentation: DOC_VERBOS[nombre], range: rango,
         })) };
       },
     });
