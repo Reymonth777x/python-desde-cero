@@ -226,7 +226,7 @@ export default function HomePageClient({ accountLinks, progressSummary }: HomePa
               FORMACIÓN PRÁCTICA EN PYTHON
             </p>
             <h1 className="mt-7 max-w-2xl text-[clamp(3.1rem,6.2vw,5.5rem)] font-semibold leading-[0.98] tracking-[-0.065em]">
-              Aprende a programar.
+              Aprende a programar.{" "}
               <span className="mt-2 block font-normal text-[var(--theme-accent)]">Entiende lo que haces.</span>
             </h1>
             <p className="mt-7 max-w-xl text-base leading-8 text-[var(--theme-muted)] sm:text-lg">

@@ -4,6 +4,7 @@ import "./globals.css";
 import "./themes.css";
 import { ThemeProvider } from "./theme-provider";
 import { headers } from "next/headers";
+import { isProductionSite, resolveSiteUrl } from "@/lib/site-url";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -16,8 +17,15 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
+const siteUrl = resolveSiteUrl();
+const isCanonicalProductionSite = isProductionSite(siteUrl);
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://python-desdecero.com"),
+  metadataBase: siteUrl,
+  robots: {
+    index: isCanonicalProductionSite,
+    follow: isCanonicalProductionSite,
+  },
   title: {
     template: "%s | Python desde cero",
     default: "Python desde cero",

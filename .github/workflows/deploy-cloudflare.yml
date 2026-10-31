@@ -220,7 +220,22 @@ jobs:
           echo "Cuenta accesible; credenciales no mostradas."
 
       - name: Preparar assets del ejecutor Python aislado
+        env:
+          PYTHON_RUNNER_ENV: production
+          PYTHON_RUNNER_ALLOWED_PARENT_ORIGINS: https://python-desdecero.com,https://www.python-desdecero.com
         run: npm run prepare:python-runner
+
+      - name: Verificar que la política generada sea exclusiva de producción
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq '"https://python-desdecero.com"' runner-public/runner-frame.js
+          grep -Fq '"https://www.python-desdecero.com"' runner-public/runner-frame.js
+          grep -Fq 'frame-ancestors https://python-desdecero.com https://www.python-desdecero.com' runner-public/_headers
+          if grep -Eiq 'localhost|127\.0\.0\.1' runner-public/runner-frame.js runner-public/_headers; then
+            echo "::error::La política de producción incluye loopback; se cancela el deploy."
+            exit 1
+          fi
 
       - name: Publicar el origen aislado para Python
         id: isolated-runner
@@ -236,12 +251,20 @@ jobs:
           fi
 
           curl --fail --silent --show-error --location --retry 5 --retry-delay 2 --retry-all-errors \
+            --dump-header /tmp/python-runner-response-headers \
             "$runner_origin/" -o /tmp/python-runner-index.html
           grep -Fq "runner-frame.js" /tmp/python-runner-index.html
 
           curl --fail --silent --show-error --location --retry 5 --retry-delay 2 --retry-all-errors \
             "$runner_origin/runner-frame.js" -o /tmp/python-runner-frame.js
           grep -Fq "ALLOWED_PARENT_ORIGINS" /tmp/python-runner-frame.js
+          grep -Fq '"https://python-desdecero.com"' /tmp/python-runner-frame.js
+          grep -Fq '"https://www.python-desdecero.com"' /tmp/python-runner-frame.js
+          if grep -Eiq 'localhost|127\.0\.0\.1' /tmp/python-runner-frame.js /tmp/python-runner-response-headers; then
+            echo "::error::La allowlist del runner publicado contiene un origen local no permitido."
+            exit 1
+          fi
+          grep -Fqi 'frame-ancestors https://python-desdecero.com https://www.python-desdecero.com' /tmp/python-runner-response-headers
 
           curl --fail --silent --show-error --dump-header /tmp/python-runner-worker-headers \
             --output /dev/null "$runner_origin/python-worker.js"
