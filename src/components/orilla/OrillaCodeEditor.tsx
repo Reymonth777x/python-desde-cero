@@ -1,7 +1,13 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
-import Editor, { type Monaco } from '@monaco-editor/react';
+import dynamic from 'next/dynamic';
+import type { Monaco } from '@monaco-editor/react';
+
+const Editor = dynamic(() => import('@monaco-editor/react'), {
+  ssr: false,
+  loading: () => <div className="flex h-[340px] items-center justify-center text-sm text-[var(--theme-muted)]">Preparando el editor Python…</div>,
+});
 import type { editor } from 'monaco-editor';
 import { DOC_VERBOS, VERBOS_SIN_ARGUMENTOS } from '@/lib/orilla/ayuda-verbos';
 
@@ -25,7 +31,7 @@ const BLOQUES: Record<string, Plantilla> = {
 };
 
 function usePantallaPequena() {
-  const [pequena, setPequena] = useState(false);
+  const [pequena, setPequena] = useState<boolean | null>(null);
   useEffect(() => {
     const media = window.matchMedia('(max-width: 767px), (pointer: coarse) and (max-width: 900px)');
     const actualizar = () => setPequena(media.matches);
@@ -101,6 +107,10 @@ export default function OrillaCodeEditor({ value, onChange, verbos, builtins, co
     });
   };
 
+  if (movil === null) {
+    return <div className="flex min-h-[260px] items-center justify-center rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] text-sm text-[var(--theme-muted)]" aria-busy="true">Preparando tu espacio de código…</div>;
+  }
+
   if (movil) {
     const visibles = mostrarTodas ? comandos : comandos.slice(0, 6);
     return (
@@ -117,7 +127,7 @@ export default function OrillaCodeEditor({ value, onChange, verbos, builtins, co
           </div>
           <div className="flex items-stretch">
             <div aria-hidden="true" className="min-w-9 select-none border-r border-white/10 bg-[#0b2535] px-2 pt-4 text-right font-mono text-xs leading-7 text-[#6b96a5]">
-              {Array.from({ length: Math.max(lineas, 8) }, (_, i) => <div key={i}>{i + 1}</div>)}
+              {Array.from({ length: Math.max(8, Math.min(16, lineas + 2)) }, (_, i) => <div key={i}>{i + 1}</div>)}
             </div>
             <textarea
               ref={textarea}
