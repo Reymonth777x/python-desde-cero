@@ -18,7 +18,7 @@ import {
 import type { ChapterId, EventoOrilla, PayloadTramo, ResultadoOrilla } from '@/lib/orilla/types';
 import OrillaGuide from './OrillaGuide';
 import { useOrillaWorker } from '@/lib/orilla/use-orilla-worker';
-import { reproducirSonidoOrilla } from '@/lib/orilla/audio';
+import { activarAmbienteOrilla, desactivarAmbienteOrilla, reproducirSonidoOrilla } from '@/lib/orilla/audio';
 import RiverView from './RiverView';
 import OrillaCodeEditor from './OrillaCodeEditor';
 
@@ -99,6 +99,7 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
     if (temporizador.current !== null) window.clearTimeout(temporizador.current);
     completado.current?.dispose();
     completado.current = null;
+    desactivarAmbienteOrilla();
   }, []);
 
   const ocultar = Boolean(payload.ocultarMapa) && !mapaVisible;
@@ -258,6 +259,17 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
     if (tecla === 'ArrowRight' || tecla === 'ArrowUp') setVelocidad(VELOCIDADES[Math.min(i + 1, 3)]);
     if (tecla === 'ArrowLeft' || tecla === 'ArrowDown') setVelocidad(VELOCIDADES[Math.max(i - 1, 0)]);
   };
+
+  const alternarSonido = async () => {
+    if (sonidoActivo) {
+      desactivarAmbienteOrilla();
+      setSonidoActivo(false);
+      return;
+    }
+    const activado = await activarAmbienteOrilla();
+    if (activado) setSonidoActivo(true);
+    else setAviso('Este navegador no pudo iniciar el sonido. Puedes seguir jugando sin audio.');
+  };
   const par = payload.pasosPar;
   const pistaEstrellas = mejor.stars >= 3 || esAbierta ? null : mejor.stars === 2
     ? `La tercera estrella pide usar bien el concepto del tramo: ${tramo.concepto.toLowerCase()}.`
@@ -318,9 +330,9 @@ export default function OrillaPlay({ tramo, ui, payload, guardado, siguienteHref
               <span className="text-[0.65rem] font-bold tracking-[0.15em] text-[var(--theme-accent)]">TRAMO {tramo.orden || '∞'}</span>
               {!esAbierta && <span aria-label={`Mejor resultado: ${mejor.stars} de 3 estrellas`} className="tracking-[0.12em] text-amber-500">{estrellasTexto(mejor.stars)}</span>}
             </div>
-            <button type="button" onClick={() => setSonidoActivo((actual) => !actual)} aria-pressed={sonidoActivo}
+            <button type="button" onClick={() => { void alternarSonido(); }} aria-pressed={sonidoActivo}
               className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[var(--theme-border)] px-3 text-xs font-semibold text-[var(--theme-ink)] hover:bg-[var(--theme-bg-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]">
-              <span aria-hidden="true">{sonidoActivo ? '♫' : '♪'}</span>{sonidoActivo ? 'Sonido activado' : 'Activar sonido'}
+              <span aria-hidden="true">{sonidoActivo ? '♫' : '♪'}</span>{sonidoActivo ? 'Ambiente activado' : 'Sonido del río'}
             </button>
           </div><div className="flex flex-wrap items-center justify-between gap-2"><h2 id="orilla-rio" className="font-serif text-xl text-[var(--theme-ink)]">Nilo / {tramo.id.toUpperCase()} · {tramo.nombre}</h2>{payload.variantes.length > 1 && <span className="text-sm text-[var(--theme-muted)]">Variación {varIdx + 1} de {payload.variantes.length}</span>}</div></div>
           <div tabIndex={0} role="group" aria-label="Vista del río. Las flechas cambian la velocidad de la reproducción." onKeyDown={(e) => alTeclearRio(e.key)} className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-focus-ring)]"><RiverView estado={estadoMostrado} ocultarMapa={ocultar} descripcion={descripcion} variante={variante} animando={reproduciendo} /></div>
