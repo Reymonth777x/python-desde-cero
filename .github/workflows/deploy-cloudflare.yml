@@ -5,8 +5,6 @@ on:
     workflows: ["CI"]
     types: [completed]
     branches: [master]
-  workflow_dispatch:
-
 permissions:
   contents: read
 
@@ -129,6 +127,8 @@ jobs:
   deploy:
     needs: check-credentials
     if: needs.check-credentials.outputs.configured == 'true'
+    environment:
+      name: production
     runs-on: ubuntu-latest
     steps:
       - name: Checkout del código
