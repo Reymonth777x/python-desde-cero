@@ -47,9 +47,12 @@ copyFileSync(join(root, "runner", "index.html"), join(destination, "index.html")
 const runnerFrameTemplate = readFileSync(join(root, "runner", "runner-frame.js"), "utf8");
 const runnerFrame = replacePlaceholderExactlyOnce(
   runnerFrameTemplate,
-  '"__PYTHON_RUNNER_ALLOWED_PARENT_ORIGINS_PLACEHOLDER__"',
+  "__PYTHON_RUNNER_ALLOWED_PARENT_ORIGINS_JSON__",
   originConfig.javascript,
 );
+if (!runnerFrame.includes("const ALLOWED_PARENT_ORIGINS = new Set(" + originConfig.javascript + ");")) {
+  throw new Error("La lista de orígenes generada para runner-frame.js no es un array plano.");
+}
 writeFileSync(join(destination, "runner-frame.js"), runnerFrame, "utf8");
 
 const headersTemplate = readFileSync(join(root, "runner", "_headers"), "utf8");
