@@ -78,7 +78,7 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   c09: {
     historia: "Un cardumen se refugió entre las piedras. Las tallas cambian según la corriente, así que necesitas recoger los datos reales, guardarlos y ordenarlos.",
     explicacion: "Una lista almacena varios valores en un solo lugar. append() añade un elemento al final. Después puedes recorrer la lista, comparar elementos y ordenarlos sin escribir una variable distinta para cada pez.",
-    ejemplo: "tallas = []\ntallas.append(recoger())",
+    ejemplo: "tallas = []\nif aqui() == \"pez\":\n    tallas.append(recoger())",
     pregunta: "¿Qué hace tallas.append(7)?",
     respuesta: "Añade el valor 7 al final de la lista tallas.",
     reto: "Imagina una lista de tres números. ¿Cómo comprobarías cuál es el menor?"
@@ -86,7 +86,7 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   c10: {
     historia: "Cuatro calas quedaron bloqueadas por ramas. El equipo quiere que Nilo aprenda una rutina que pueda reutilizar en cada cala.",
     explicacion: "Una función se crea con def. Dentro colocas instrucciones relacionadas y luego llamas la función por su nombre. Definirla no la ejecuta: también tienes que llamarla.",
-    ejemplo: "def quitar_rama():\n    if hay_rama():\n        limpiar()\n\nquitar_rama()",
+    ejemplo: "def limpiar_si_hay_rama():\n    if hay_rama():\n        limpiar()\n\n# Llama la función cuando Nilo esté junto a una rama",
     pregunta: "¿Qué diferencia hay entre definir una función y llamarla?",
     respuesta: "Definirla guarda las instrucciones. Llamarla hace que Python las ejecute.",
     reto: "Ponle a tu función un nombre que describa exactamente la tarea que realiza."
@@ -94,7 +94,7 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   c11: {
     historia: "Dos muestras esperan ser estudiadas. El cuaderno científico exige fichas ordenadas y el terreno seco puede provocar un error si intentas medirlo.",
     explicacion: "Un diccionario guarda datos en pares clave: valor. Una clave permite recuperar un dato por su nombre. try/except permite manejar un error previsto y continuar el programa sin que se detenga por completo.",
-    ejemplo: "muestra = medir()\nficha = {\"especie\": muestra[\"especie\"], \"talla\": muestra[\"talla\"], \"columna\": columna()}\nregistrar(ficha)",
+    ejemplo: "try:\n    muestra = medir()\n    ficha = {\"especie\": muestra[\"especie\"], \"talla\": muestra[\"talla\"], \"columna\": columna()}\n    registrar(ficha)\nexcept OrillaError:\n    decir(\"Aquí no hay muestra; continúa con la siguiente casilla\")",
     pregunta: "En muestra[\"talla\"], ¿qué representa \"talla\"?",
     respuesta: "Es la clave del diccionario que identifica el valor de la talla.",
     reto: "¿Qué harías para que un error esperado no interrumpa todo el recorrido?"
@@ -118,7 +118,7 @@ export const MICROLECCIONES_ORILLA: Record<ChapterId, MicroleccionOrilla> = {
   'reto-luces': {
     historia: "Al caer la tarde, cinco luces se encienden a lo largo del remanso. Debes recoger todos sus brillos, incluso cuando dos tengan el mismo valor.",
     explicacion: "En Python normal existen métodos para ordenar listas, pero este reto está diseñado para que aprendas a construir el ordenamiento con bucles. Compara dos valores vecinos: si están en el orden contrario, intercámbialos. Repite el recorrido hasta que el mayor quede primero. No elimines repetidos: dos datos iguales siguen siendo dos observaciones.",
-    ejemplo: "brillos = [2, 5, 4, 4, 1]\nfor vuelta in range(len(brillos)):\n    for indice in range(len(brillos) - 1 - vuelta):\n        if brillos[indice] < brillos[indice + 1]:\n            temporal = brillos[indice]\n            brillos[indice] = brillos[indice + 1]\n            brillos[indice + 1] = temporal\ndecir(brillos)",
+    ejemplo: "def ordenar_mayor_a_menor(brillos):\n    for vuelta in range(len(brillos)):\n        for indice in range(len(brillos) - 1 - vuelta):\n            if brillos[indice] < brillos[indice + 1]:\n                temporal = brillos[indice]\n                brillos[indice] = brillos[indice + 1]\n                brillos[indice + 1] = temporal\n    return brillos\n\n# Usa la función con los brillos que recogiste",
     pregunta: "¿Cuántos valores hay en [2, 5, 4, 4, 1]?",
     respuesta: "Cinco. Los dos valores 4 cuentan por separado.",
     reto: "Prueba a ordenar una lista que tenga números repetidos y observa que ninguno desaparece."
