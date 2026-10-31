@@ -3,13 +3,13 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import dynamic from 'next/dynamic';
 import type { Monaco } from '@monaco-editor/react';
+import type { editor } from 'monaco-editor';
+import { DOC_VERBOS, VERBOS_SIN_ARGUMENTOS } from '@/lib/orilla/ayuda-verbos';
 
 const Editor = dynamic(() => import('@monaco-editor/react'), {
   ssr: false,
   loading: () => <div className="flex h-[340px] items-center justify-center text-sm text-[var(--theme-muted)]">Preparando el editor Python…</div>,
 });
-import type { editor } from 'monaco-editor';
-import { DOC_VERBOS, VERBOS_SIN_ARGUMENTOS } from '@/lib/orilla/ayuda-verbos';
 
 type Props = {
   value: string;
